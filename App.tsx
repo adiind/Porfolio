@@ -1,6 +1,6 @@
 
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TIMELINE_DATA, CONFIG } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
@@ -12,6 +12,7 @@ import ProfileModal from './components/ProfileModal';
 import ProjectModal from './components/ProjectModal';
 import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
+import { useScrollDetection } from './hooks/useScrollDetection';
 
 const App: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -24,6 +25,10 @@ const App: React.FC = () => {
   const [mode, setMode] = useState<TimelineMode>('intro');
   const [pixelsPerMonth, setPixelsPerMonth] = useState<number>(35); 
   const [scrollCooldown, setScrollCooldown] = useState(false);
+  const [isInitialTransitionComplete, setIsInitialTransitionComplete] = useState(false);
+
+  // Scroll Detection - disable hover during scrolling
+  const isScrolling = useScrollDetection(scrollContainerRef, 200);
 
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
@@ -34,9 +39,21 @@ const App: React.FC = () => {
   const handleZoom = (targetMode: TimelineMode) => {
     if (scrollCooldown) return;
 
-    setScrollCooldown(true);
-    setTimeout(() => setScrollCooldown(false), 800);
+    const wasIntro = mode === 'intro';
+    const isTransitioningToNormal = wasIntro && targetMode === 'normal';
+    
+    // If transitioning from intro to normal, disable hover until transition completes
+    if (isTransitioningToNormal) {
+      setIsInitialTransitionComplete(false);
+    }
+    
+    // If going back to intro, reset the flag
+    if (targetMode === 'intro') {
+      setIsInitialTransitionComplete(false);
+    }
 
+    setScrollCooldown(true);
+    
     setMode(targetMode);
 
     if (targetMode === 'fit') {
@@ -48,6 +65,18 @@ const App: React.FC = () => {
     } else if (targetMode === 'detail') {
       setPixelsPerMonth(60);
     }
+    
+    // Enable hover after transition completes
+    // pageTransition uses spring physics, but we wait for scrollCooldown (800ms) + buffer
+    setTimeout(() => {
+      setScrollCooldown(false);
+      if (isTransitioningToNormal) {
+        // Wait a bit more for the spring animation to fully settle
+        setTimeout(() => {
+          setIsInitialTransitionComplete(true);
+        }, 300);
+      }
+    }, 800);
   };
 
   const handleManualZoom = (direction: 'in' | 'out') => {
@@ -88,9 +117,51 @@ const App: React.FC = () => {
   }, [mode, scrollCooldown, isProfileOpen, activeCaseStudy, activeProject]);
 
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+  // Throttled scroll handler for better performance
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
-  };
+  }, []);
+
+  // Debounced hover handlers to prevent jitter during scroll
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const handleHover = useCallback((id: string | null) => {
+    // Clear existing timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    
+    // Don't allow hover if:
+    // 1. Currently scrolling
+    // 2. Initial transition from intro hasn't completed
+    // 3. In intro mode
+    if (isScrolling || !isInitialTransitionComplete || mode === 'intro') {
+      return;
+    }
+    
+    // Small delay before activating hover to prevent jitter
+    hoverTimeoutRef.current = setTimeout(() => {
+      if (!isScrolling && isInitialTransitionComplete && mode !== 'intro') {
+        setHoveredId(id);
+      }
+    }, 50);
+  }, [isScrolling, isInitialTransitionComplete, mode]);
+
+  const handleLaneHover = useCallback((lane: number | null) => {
+    if (!isScrolling && isInitialTransitionComplete && mode !== 'intro') {
+      setHoveredLane(lane);
+    }
+  }, [isScrolling, isInitialTransitionComplete, mode]);
+
+  // Clear hover when scrolling starts or during initial transition
+  useEffect(() => {
+    if (isScrolling || !isInitialTransitionComplete || mode === 'intro') {
+      setHoveredId(null);
+      setHoveredLane(null);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    }
+  }, [isScrolling, isInitialTransitionComplete, mode]);
 
   const filteredData = useMemo(() => {
     if (filter === 'all') return TIMELINE_DATA;
@@ -115,7 +186,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative">
+    <div className="flex flex-col h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative z-10">
       
       {/* --- CASE STUDY MODAL --- */}
       <AnimatePresence>
@@ -353,13 +424,14 @@ const App: React.FC = () => {
                      key={item.id}
                      item={item}
                      hoveredId={hoveredId}
-                     onHover={setHoveredId}
-                     onLaneHover={setHoveredLane}
+                     onHover={handleHover}
+                     onLaneHover={handleLaneHover}
                      isDimmed={hoveredId !== null && hoveredId !== item.id}
                      pixelsPerMonth={pixelsPerMonth}
                      mode={mode}
                      onOpenCaseStudy={setActiveCaseStudy}
                      onOpenProject={setActiveProject}
+                     isScrolling={isScrolling || !isInitialTransitionComplete || mode === 'intro'}
                    />
                  ))}
                </AnimatePresence>

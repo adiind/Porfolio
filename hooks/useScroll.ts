@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { TimelineMode } from '../types';
 import { smoothScrollTo } from '../utils';
 
@@ -60,4 +60,5 @@ export const useScroll = (
     scrollToPosition,
   };
 };
+
 

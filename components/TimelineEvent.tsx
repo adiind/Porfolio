@@ -15,6 +15,7 @@ interface Props {
   mode: TimelineMode;
   onOpenCaseStudy: (study: CaseStudy) => void;
   onOpenProject?: (project: TimelineItem) => void;
+  isScrolling?: boolean;
 }
 
 const TimelineEvent: React.FC<Props> = ({ 
@@ -26,9 +27,10 @@ const TimelineEvent: React.FC<Props> = ({
   pixelsPerMonth,
   mode,
   onOpenCaseStudy,
-  onOpenProject
+  onOpenProject,
+  isScrolling = false
 }) => {
-  const isHovered = hoveredId === item.id;
+  const isHovered = hoveredId === item.id && !isScrolling;
   const isFit = mode === 'fit' || mode === 'intro';
   const isZoomedOut = pixelsPerMonth < 20;
   const isTinkerVerse = item.id === 'tinkerverse';
@@ -144,15 +146,15 @@ const TimelineEvent: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'flex-start' // Place items at start (left)
           }}
-          onMouseEnter={() => { onHover(item.id); onLaneHover(null); }}
-          onMouseLeave={() => { onHover(null); onLaneHover(null); }}
+          onMouseEnter={() => { if (!isScrolling) { onHover(item.id); onLaneHover(null); } }}
+          onMouseLeave={() => { if (!isScrolling) { onHover(null); onLaneHover(null); } }}
           onClick={() => onOpenProject && onOpenProject(item)}
           className="group cursor-pointer flex-row-reverse" // Flex reverse or manual placement
         >
           {/* Glowing Horizontal Line */}
-          <div className="w-full h-[2px] bg-white shadow-[0_0_15px_rgba(255,255,255,1)] relative transition-all duration-300 group-hover:w-[110%] group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] rounded-full">
+          <div className={`w-full h-[2px] bg-white shadow-[0_0_15px_rgba(255,255,255,1)] relative transition-all duration-300 ${!isScrolling ? 'group-hover:w-[110%] group-hover:shadow-[0_0_25px_rgba(255,255,255,1)]' : ''} rounded-full`}>
              {/* Bigger Eye Icon at the LEFT End */}
-             <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-black border border-white p-1.5 rounded-full group-hover:scale-125 transition-transform shadow-[0_0_25px_white]">
+             <div className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-black border border-white p-1.5 rounded-full ${!isScrolling ? 'group-hover:scale-125' : ''} transition-transform shadow-[0_0_25px_white]`}>
                <Eye size={18} className="text-white" />
              </div>
           </div>
@@ -216,12 +218,16 @@ const TimelineEvent: React.FC<Props> = ({
           height: Math.max(height, 60), 
         }}
         onMouseEnter={() => {
-          onHover(item.id);
-          onLaneHover(null); 
+          if (!isScrolling) {
+            onHover(item.id);
+            onLaneHover(null); 
+          }
         }}
         onMouseLeave={() => {
-          onHover(null);
-          onLaneHover(null);
+          if (!isScrolling) {
+            onHover(null);
+            onLaneHover(null);
+          }
         }}
         className="group flex flex-col items-end"
       >
@@ -230,7 +236,7 @@ const TimelineEvent: React.FC<Props> = ({
           w-full h-full rounded-l-md bg-gradient-to-r ${theme.grad}
           border-y border-l backdrop-blur-md
           flex flex-col items-center justify-center gap-2 p-1 cursor-pointer
-          transition-all duration-300 group-hover:w-[5.5rem] group-hover:brightness-125
+          transition-all duration-300 ${!isScrolling ? 'group-hover:w-[5.5rem] group-hover:brightness-125' : ''}
         `}>
           {theme.icon}
           {!isFit && (
@@ -355,12 +361,16 @@ const TimelineEvent: React.FC<Props> = ({
   return (
     <motion.div
       onMouseEnter={() => {
-        onHover(item.id);
-        onLaneHover(item.lane);
+        if (!isScrolling) {
+          onHover(item.id);
+          onLaneHover(item.lane);
+        }
       }}
       onMouseLeave={() => {
-        onHover(null);
-        onLaneHover(null);
+        if (!isScrolling) {
+          onHover(null);
+          onLaneHover(null);
+        }
       }}
       layout 
       initial={{ opacity: 0, y: 100 }}
@@ -375,9 +385,9 @@ const TimelineEvent: React.FC<Props> = ({
       }}
       transition={{ 
         type: 'spring', 
-        stiffness: 120, 
-        damping: 20,
-        layout: { duration: 0.6 }
+        stiffness: 100, 
+        damping: 25,
+        layout: { duration: 0.4, ease: 'easeOut' }
       }}
       style={{
         position: 'absolute',
