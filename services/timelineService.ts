@@ -59,7 +59,7 @@ export const timelineService = {
   /**
    * Get lane style for positioning
    */
-  getLaneStyle: (lane: 0 | 1 | 2) => { left: string; width: string } => {
+  getLaneStyle: (lane: 0 | 1 | 2): { left: string; width: string } => {
     const laneWidth = '30%';
     switch (lane) {
       case 0: return { left: '0%', width: laneWidth };
@@ -69,4 +69,5 @@ export const timelineService = {
     }
   },
 };
+
 

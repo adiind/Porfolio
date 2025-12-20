@@ -246,3 +246,5 @@ if (process.env.NODE_ENV === 'development') {
 - [ ] Add error boundaries
 - [ ] Clean up effects properly
 
+
+
