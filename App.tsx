@@ -24,60 +24,54 @@ const App: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<TimelineMode>('intro');
   const [pixelsPerMonth, setPixelsPerMonth] = useState<number>(35); 
-  const [scrollCooldown, setScrollCooldown] = useState(false);
-  const [isInitialTransitionComplete, setIsInitialTransitionComplete] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const isAnimatingRef = useRef(false);
 
-  // Scroll Detection - disable hover during scrolling
-  const isScrolling = useScrollDetection(scrollContainerRef, 200);
+  // Scroll Detection - short debounce for responsive hover
+  const isScrolling = useScrollDetection(scrollContainerRef, 50);
 
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
   const [activeProject, setActiveProject] = useState<TimelineItem | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // 1. Handle Zoom Transitions
-  const handleZoom = (targetMode: TimelineMode) => {
-    if (scrollCooldown) return;
+  // 1. Handle Zoom Transitions - simplified
+  const handleZoom = useCallback((targetMode: TimelineMode) => {
+    if (isAnimatingRef.current || mode === targetMode) return;
+    
+    isAnimatingRef.current = true;
+    setIsAnimating(true);
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H1',location:'App.tsx:handleZoom',message:'enter handleZoom',data:{targetMode,mode,scrollTop:scrollContainerRef.current?.scrollTop ?? null,isAnimating},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion agent log
 
-    const wasIntro = mode === 'intro';
-    const isTransitioningToNormal = wasIntro && targetMode === 'normal';
-    
-    // If transitioning from intro to normal, disable hover until transition completes
-    if (isTransitioningToNormal) {
-      setIsInitialTransitionComplete(false);
-    }
-    
-    // If going back to intro, reset the flag
-    if (targetMode === 'intro') {
-      setIsInitialTransitionComplete(false);
+    // Reset scroll when going to intro
+    if (targetMode === 'intro' && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
     }
 
-    setScrollCooldown(true);
-    
     setMode(targetMode);
 
     if (targetMode === 'fit') {
       const totalMonths = getMonthDiff(parseDate(CONFIG.startDate), parseDate(CONFIG.endDate));
       setPixelsPerMonth(Math.max((window.innerHeight - 200) / totalMonths, 2));
-      if (scrollContainerRef.current) smoothScrollTo(scrollContainerRef.current, 0);
+      if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
     } else if (targetMode === 'normal') {
       setPixelsPerMonth(35);
     } else if (targetMode === 'detail') {
       setPixelsPerMonth(60);
     }
     
-    // Enable hover after transition completes
-    // pageTransition uses spring physics, but we wait for scrollCooldown (800ms) + buffer
+    // Re-enable after animation (500ms)
     setTimeout(() => {
-      setScrollCooldown(false);
-      if (isTransitioningToNormal) {
-        // Wait a bit more for the spring animation to fully settle
-        setTimeout(() => {
-          setIsInitialTransitionComplete(true);
-        }, 300);
-      }
-    }, 800);
-  };
+      setIsAnimating(false);
+      isAnimatingRef.current = false;
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H1',location:'App.tsx:handleZoom',message:'exit handleZoom',data:{targetMode,modeAfter:mode,isAnimating:false},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion agent log
+    }, 550);
+  }, [isAnimating, mode]);
 
   const handleManualZoom = (direction: 'in' | 'out') => {
     setMode('normal'); // Switch to normal mode on manual zoom
@@ -88,33 +82,125 @@ const App: React.FC = () => {
     });
   };
 
-  // 2. Scroll Logic
+  // 2. Scroll Logic - scroll down from intro triggers timeline
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
-      if (scrollCooldown || isProfileOpen || activeCaseStudy || activeProject) return; // Disable scroll zoom if modals are open
+      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject) return;
+      if (mode !== 'intro') return;
       if (mode === 'intro' && e.deltaY > 5) {
         handleZoom('normal');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H2',location:'App.tsx:handleGlobalWheel',message:'intro->normal triggered',data:{deltaY:e.deltaY,mode},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion agent log
       }
     };
-    window.addEventListener('wheel', handleGlobalWheel);
+    window.addEventListener('wheel', handleGlobalWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleGlobalWheel);
-  }, [mode, scrollCooldown, isProfileOpen, activeCaseStudy, activeProject]);
+  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, handleZoom]);
 
+  // Scroll-back to intro: Hybrid approach - track scroll direction + position with smart debouncing
+  const scrollBackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollTopRef = useRef<number>(0);
+  const scrollStartTimeRef = useRef<number>(0);
+  const modeRef = useRef<TimelineMode>(mode);
+  
+  // Keep mode ref in sync
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+  
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    const handleContainerWheel = (e: WheelEvent) => {
-      if (scrollCooldown || isProfileOpen || activeCaseStudy || activeProject) return;
-      if (mode === 'normal' && container.scrollTop <= 10 && e.deltaY < -5) {
-        handleZoom('intro');
+    
+    // Initialize lastScrollTop to current position
+    lastScrollTopRef.current = container.scrollTop;
+    
+    const handleScrollBack = () => {
+      const currentScrollTop = container.scrollTop;
+      const wasScrollingUp = currentScrollTop < lastScrollTopRef.current;
+      lastScrollTopRef.current = currentScrollTop;
+      
+      // Reset scroll start time if scrolling down
+      if (!wasScrollingUp) {
+        scrollStartTimeRef.current = 0;
+        if (scrollBackTimeoutRef.current) {
+          clearTimeout(scrollBackTimeoutRef.current);
+          scrollBackTimeoutRef.current = null;
+        }
+        return;
       }
-      if (mode === 'fit' && e.deltaY < -5) {
+      
+      // Only proceed if at/near top and conditions are met
+      if (currentScrollTop >= 1 || isAnimatingRef.current || (modeRef.current !== 'normal' && modeRef.current !== 'fit')) {
+        scrollStartTimeRef.current = 0;
+        if (scrollBackTimeoutRef.current) {
+          clearTimeout(scrollBackTimeoutRef.current);
+          scrollBackTimeoutRef.current = null;
+        }
+        return;
+      }
+      
+      // We're scrolling up and at/near top - track when we FIRST reached top
+      if (scrollStartTimeRef.current === 0) {
+        scrollStartTimeRef.current = Date.now();
+      }
+      
+      // Clear existing timeout
+      if (scrollBackTimeoutRef.current) {
+        clearTimeout(scrollBackTimeoutRef.current);
+      }
+      
+      // Set new timeout - waits for scroll to settle at top
+      scrollBackTimeoutRef.current = setTimeout(() => {
+        // Final check before triggering
+        const finalScrollTop = container.scrollTop;
+        const timeAtTop = Date.now() - scrollStartTimeRef.current;
+        
+        if (finalScrollTop < 1 && !isAnimatingRef.current && (modeRef.current === 'normal' || modeRef.current === 'fit')) {
+          // Require at least 200ms at top to avoid accidental triggers on fast scrolls
+          if (timeAtTop >= 200) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H2',location:'App.tsx:handleScrollBack',message:'scroll->intro triggered',data:{scrollTop:finalScrollTop,mode:modeRef.current,timeAtTop},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion agent log
+            handleZoom('intro');
+          }
+        }
+        
+        // Reset
+        scrollBackTimeoutRef.current = null;
+        scrollStartTimeRef.current = 0;
+      }, 300); // Wait 300ms after last scroll event at top
+    };
+    
+    container.addEventListener('scroll', handleScrollBack, { passive: true });
+    
+    // Also handle gentle wheel scrolls at top for immediate feedback
+    const handleWheelAtTop = (e: WheelEvent) => {
+      if (isAnimatingRef.current || modeRef.current === 'intro') return;
+      if (container.scrollTop > 1) return; // Must be at top
+      if (e.deltaY >= -20) return; // Only gentle scroll up (avoid momentum flings)
+      
+      // For gentle scrolls at top, allow immediate trigger
+      if (!scrollBackTimeoutRef.current && !isAnimatingRef.current) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H2',location:'App.tsx:handleWheelAtTop',message:'gentle wheel->intro triggered',data:{deltaY:e.deltaY,scrollTop:container.scrollTop,mode:modeRef.current},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion agent log
+        e.preventDefault();
         handleZoom('intro');
       }
     };
-    container.addEventListener('wheel', handleContainerWheel);
-    return () => container.removeEventListener('wheel', handleContainerWheel);
-  }, [mode, scrollCooldown, isProfileOpen, activeCaseStudy, activeProject]);
+    
+    container.addEventListener('wheel', handleWheelAtTop, { passive: false });
+    
+    return () => {
+      container.removeEventListener('scroll', handleScrollBack);
+      container.removeEventListener('wheel', handleWheelAtTop);
+      if (scrollBackTimeoutRef.current) {
+        clearTimeout(scrollBackTimeoutRef.current);
+      }
+    };
+  }, [handleZoom]); // Only depend on handleZoom, use ref for mode
 
 
   // Throttled scroll handler for better performance
@@ -122,46 +208,26 @@ const App: React.FC = () => {
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
 
-  // Debounced hover handlers to prevent jitter during scroll
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Simple hover handlers - only block during animation or intro
+  const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
+  
   const handleHover = useCallback((id: string | null) => {
-    // Clear existing timeout
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    
-    // Don't allow hover if:
-    // 1. Currently scrolling
-    // 2. Initial transition from intro hasn't completed
-    // 3. In intro mode
-    if (isScrolling || !isInitialTransitionComplete || mode === 'intro') {
-      return;
-    }
-    
-    // Small delay before activating hover to prevent jitter
-    hoverTimeoutRef.current = setTimeout(() => {
-      if (!isScrolling && isInitialTransitionComplete && mode !== 'intro') {
-        setHoveredId(id);
-      }
-    }, 50);
-  }, [isScrolling, isInitialTransitionComplete, mode]);
+    if (mode === 'intro' || isAnimating) return;
+    setHoveredId(id);
+  }, [mode, isAnimating]);
 
   const handleLaneHover = useCallback((lane: number | null) => {
-    if (!isScrolling && isInitialTransitionComplete && mode !== 'intro') {
-      setHoveredLane(lane);
-    }
-  }, [isScrolling, isInitialTransitionComplete, mode]);
+    if (mode === 'intro' || isAnimating) return;
+    setHoveredLane(lane);
+  }, [mode, isAnimating]);
 
-  // Clear hover when scrolling starts or during initial transition
+  // Clear hover during animation
   useEffect(() => {
-    if (isScrolling || !isInitialTransitionComplete || mode === 'intro') {
+    if (isAnimating || mode === 'intro') {
       setHoveredId(null);
       setHoveredLane(null);
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
     }
-  }, [isScrolling, isInitialTransitionComplete, mode]);
+  }, [isAnimating, mode]);
 
   const filteredData = useMemo(() => {
     if (filter === 'all') return TIMELINE_DATA;
@@ -177,12 +243,11 @@ const App: React.FC = () => {
   const contentHeight = totalMonths * pixelsPerMonth;
   const totalContainerHeight = contentHeight + 400; 
 
-  // Animation Transition Configuration
+  // Animation Transition Configuration - fast tween for smooth GPU-accelerated animation
   const pageTransition = {
-    type: "spring" as const,
-    stiffness: 50,
-    damping: 20,
-    mass: 1
+    type: "tween" as const,
+    duration: 0.5,
+    ease: [0.32, 0.72, 0, 1] // Custom cubic-bezier for smooth feel
   };
 
   return (
@@ -263,14 +328,13 @@ const App: React.FC = () => {
       
       {/* --- HERO SECTION (Parallax Exit) --- */}
       <motion.div
-         className="absolute inset-0 z-40"
+         className="absolute inset-0 z-40 will-change-transform"
          animate={{ 
            opacity: mode === 'intro' ? 1 : 0,
-           y: mode === 'intro' ? 0 : -200, 
-           scale: mode === 'intro' ? 1 : 0.9,
+           y: mode === 'intro' ? 0 : -150, 
+           scale: mode === 'intro' ? 1 : 0.95,
            pointerEvents: mode === 'intro' ? 'auto' : 'none',
-           filter: mode === 'intro' ? 'blur(0px)' : 'blur(12px)',
-           zIndex: mode === 'intro' ? 40 : -1 // Ensure hero is behind when inactive
+           zIndex: mode === 'intro' ? 40 : -1
          }}
          transition={pageTransition}
       >
@@ -296,12 +360,11 @@ const App: React.FC = () => {
 
       {/* --- TIMELINE SECTION (Slide Up Entrance) --- */}
       <motion.div 
-        className="flex-1 relative w-full h-full"
+        className="flex-1 relative w-full h-full will-change-transform"
         animate={{ 
-          opacity: mode === 'intro' ? 0.4 : 1, 
-          y: mode === 'intro' ? '85vh' : 0, 
-          scale: mode === 'intro' ? 0.95 : 1,
-          filter: mode === 'intro' ? 'blur(8px)' : 'blur(0px)'
+          opacity: mode === 'intro' ? 0.3 : 1, 
+          y: mode === 'intro' ? '80vh' : 0, 
+          scale: mode === 'intro' ? 0.98 : 1
         }}
         transition={pageTransition}
       >
@@ -344,7 +407,7 @@ const App: React.FC = () => {
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="h-full overflow-y-auto overflow-x-hidden relative scroll-smooth no-scrollbar"
+          className="h-full overflow-y-auto overflow-x-hidden relative no-scrollbar"
         >
           <div 
             className="relative w-full max-w-6xl mx-auto mt-[160px]"
@@ -385,56 +448,22 @@ const App: React.FC = () => {
                   ))}
                </div>
                
-               {/* Permanent Competition/Project/Vignette Glow (Render behind cards) */}
-               {filteredData.map((item) => {
-                 if (item.type !== 'competition' && item.type !== 'project' && item.type !== 'vignette') return null;
-                 const isHovered = hoveredId === item.id;
-                 // Match exact positioning logic from TimelineEvent
-                 const startDate = parseDate(item.start);
-                 const endDate = parseDate(item.end);
-                 const timelineEnd = parseDate(CONFIG.endDate);
-                 const monthsFromTop = getMonthDiff(endDate, timelineEnd);
-                 const top = monthsFromTop * pixelsPerMonth;
-                 const durationMonths = getMonthDiff(startDate, endDate);
-                 const height = Math.max(durationMonths * pixelsPerMonth, 60);
-
-                 // Determine color
-                 let glowColor = 'from-purple-600/50 via-purple-500/30';
-                 if (item.type === 'project') glowColor = 'from-cyan-600/50 via-teal-500/30';
-                 if (item.type === 'vignette') glowColor = 'from-white/30 via-gray-100/10';
-
-                 return (
-                   <motion.div 
-                     key={`glow-${item.id}`}
-                     animate={{ 
-                       opacity: isHovered ? 0.6 : 0.15, // Always visible (0.15), Stronger on hover (0.6)
-                       scaleX: 1
-                     }}
-                     transition={{ duration: 0.4 }}
-                     style={{ top, height }}
-                     className={`absolute left-0 right-0 bg-gradient-to-r ${glowColor} to-transparent blur-3xl pointer-events-none z-[5] origin-left`}
-                   />
-                 );
-               })}
-
                {/* Timeline Events */}
-               <AnimatePresence>
-                 {filteredData.map((item) => (
-                   <TimelineEvent 
-                     key={item.id}
-                     item={item}
-                     hoveredId={hoveredId}
-                     onHover={handleHover}
-                     onLaneHover={handleLaneHover}
-                     isDimmed={hoveredId !== null && hoveredId !== item.id}
-                     pixelsPerMonth={pixelsPerMonth}
-                     mode={mode}
-                     onOpenCaseStudy={setActiveCaseStudy}
-                     onOpenProject={setActiveProject}
-                     isScrolling={isScrolling || !isInitialTransitionComplete || mode === 'intro'}
-                   />
-                 ))}
-               </AnimatePresence>
+               {filteredData.map((item) => (
+                 <TimelineEvent 
+                   key={item.id}
+                   item={item}
+                   hoveredId={hoveredId}
+                   onHover={handleHover}
+                   onLaneHover={handleLaneHover}
+                   isDimmed={hoveredId !== null && hoveredId !== item.id}
+                   pixelsPerMonth={pixelsPerMonth}
+                   mode={mode}
+                   onOpenCaseStudy={setActiveCaseStudy}
+                   onOpenProject={setActiveProject}
+                   isScrolling={!canHover}
+                 />
+               ))}
             </div>
           </div>
         </div>
