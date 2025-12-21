@@ -146,8 +146,9 @@ const TimelineEvent: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'flex-start' // Place items at start (left)
           }}
-          onMouseEnter={() => { if (!isScrolling) { onHover(item.id); onLaneHover(null); } }}
-          onMouseLeave={() => { if (!isScrolling) { onHover(null); onLaneHover(null); } }}
+          onMouseEnter={() => { onHover(item.id); onLaneHover(null); }}
+          onMouseMove={() => { if (hoveredId !== item.id) { onHover(item.id); onLaneHover(null); } }}
+          onMouseLeave={() => { onHover(null); onLaneHover(null); }}
           onClick={() => onOpenProject && onOpenProject(item)}
           className="group cursor-pointer flex-row-reverse" // Flex reverse or manual placement
         >
@@ -218,16 +219,18 @@ const TimelineEvent: React.FC<Props> = ({
           height: Math.max(height, 60), 
         }}
         onMouseEnter={() => {
-          if (!isScrolling) {
+          onHover(item.id);
+          onLaneHover(null); 
+        }}
+        onMouseMove={() => {
+          if (hoveredId !== item.id) {
             onHover(item.id);
-            onLaneHover(null); 
+            onLaneHover(null);
           }
         }}
         onMouseLeave={() => {
-          if (!isScrolling) {
-            onHover(null);
-            onLaneHover(null);
-          }
+          onHover(null);
+          onLaneHover(null);
         }}
         className="group flex flex-col items-end"
       >
@@ -340,6 +343,12 @@ const TimelineEvent: React.FC<Props> = ({
           onHover(item.id);
           onLaneHover(item.lane);
         }}
+        onMouseMove={() => {
+          if (hoveredId !== item.id) {
+            onHover(item.id);
+            onLaneHover(item.lane);
+          }
+        }}
         onMouseLeave={() => {
           onHover(null);
           onLaneHover(null);
@@ -361,16 +370,19 @@ const TimelineEvent: React.FC<Props> = ({
   return (
     <motion.div
       onMouseEnter={() => {
-        if (!isScrolling) {
+        onHover(item.id);
+        onLaneHover(item.lane);
+      }}
+      onMouseMove={() => {
+        // Also trigger on mouse move - handles case where card scrolls under cursor
+        if (hoveredId !== item.id) {
           onHover(item.id);
           onLaneHover(item.lane);
         }
       }}
       onMouseLeave={() => {
-        if (!isScrolling) {
-          onHover(null);
-          onLaneHover(null);
-        }
+        onHover(null);
+        onLaneHover(null);
       }}
       layout 
       initial={{ opacity: 0, y: 100 }}
@@ -455,6 +467,12 @@ const TimelineEvent: React.FC<Props> = ({
             layout
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ 
+              duration: 0.3, 
+              ease: 'easeOut',
+              opacity: { duration: 0.2 }
+            }}
             className="mt-3 pt-3 border-t border-white/10"
           >
             <p className={`text-xs leading-relaxed mb-3 opacity-90 ${s.text}`}>{item.summary}</p>

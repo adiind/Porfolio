@@ -29,6 +29,12 @@ const App: React.FC = () => {
 
   // Scroll Detection - short debounce for responsive hover
   const isScrolling = useScrollDetection(scrollContainerRef, 50);
+  const isScrollingRef = useRef(isScrolling);
+  
+  // Keep ref in sync
+  useEffect(() => {
+    isScrollingRef.current = isScrolling;
+  }, [isScrolling]);
 
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
@@ -233,9 +239,15 @@ const App: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
   }, []);
 
-  // Clear hover during animation or when scrolling starts
+  // Clear hover during animation, intro, or when scrolling STARTS (not when it stops)
+  const prevIsScrollingRef = useRef(isScrolling);
   useEffect(() => {
-    if (isAnimating || mode === 'intro' || isScrolling) {
+    const wasScrolling = prevIsScrollingRef.current;
+    prevIsScrollingRef.current = isScrolling;
+    
+    // Only clear if scrolling just started (transitioned from false to true)
+    // or if in intro/animation mode
+    if (isAnimating || mode === 'intro' || (isScrolling && !wasScrolling)) {
       setHoveredId(null);
       setHoveredLane(null);
     }
@@ -249,13 +261,16 @@ const App: React.FC = () => {
   // Helper function to detect and hover item under mouse
   const detectAndHoverItemUnderMouse = useCallback(() => {
     if (!mousePositionRef.current || !scrollContainerRef.current) return;
-    if (mode === 'intro' || isAnimatingRef.current) return;
+    if (mode === 'intro' || isAnimatingRef.current || isScrollingRef.current) return;
     
     const container = scrollContainerRef.current;
     const { x, y } = mousePositionRef.current;
     
     // Use requestAnimationFrame to ensure DOM is settled
     requestAnimationFrame(() => {
+      // Double-check scrolling state after frame
+      if (isScrollingRef.current) return;
+      
       // Get element at mouse position
       const elementAtPoint = document.elementFromPoint(x, y);
       if (!elementAtPoint) return;
@@ -280,10 +295,13 @@ const App: React.FC = () => {
   // When scroll stops, check which item is under the mouse and hover it
   useEffect(() => {
     if (!isScrolling && mode !== 'intro' && !isAnimating) {
-      // Small delay to ensure scroll momentum has settled
+      // Delay to ensure scroll momentum has fully settled, DOM is stable, and state updates are complete
       const timer = setTimeout(() => {
-        detectAndHoverItemUnderMouse();
-      }, 16); // One frame delay
+        // Double-check we're still not scrolling and not animating
+        if (!isScrollingRef.current && !isAnimatingRef.current) {
+          detectAndHoverItemUnderMouse();
+        }
+      }, 150); // Wait for scroll to fully settle and React state to stabilize
       return () => clearTimeout(timer);
     }
   }, [isScrolling, mode, isAnimating, detectAndHoverItemUnderMouse]);
