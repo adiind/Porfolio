@@ -208,31 +208,101 @@ const App: React.FC = () => {
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
 
-  // Simple hover handlers - only block during animation or intro
+  // Simple hover handlers - block during animation, intro, or scrolling
   const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
   
   const handleHover = useCallback((id: string | null) => {
-    if (mode === 'intro' || isAnimating) return;
+    if (mode === 'intro' || isAnimating || isScrolling) return;
     setHoveredId(id);
-  }, [mode, isAnimating]);
+  }, [mode, isAnimating, isScrolling]);
 
   const handleLaneHover = useCallback((lane: number | null) => {
-    if (mode === 'intro' || isAnimating) return;
+    if (mode === 'intro' || isAnimating || isScrolling) return;
     setHoveredLane(lane);
-  }, [mode, isAnimating]);
+  }, [mode, isAnimating, isScrolling]);
 
-  // Clear hover during animation
+  // Track mouse position for hover detection after scroll (tracked globally)
+  const mousePositionRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Track mouse position globally so we capture it even when over intro/hero
   useEffect(() => {
-    if (isAnimating || mode === 'intro') {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      mousePositionRef.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
+  }, []);
+
+  // Clear hover during animation or when scrolling starts
+  useEffect(() => {
+    if (isAnimating || mode === 'intro' || isScrolling) {
       setHoveredId(null);
       setHoveredLane(null);
     }
-  }, [isAnimating, mode]);
+  }, [isAnimating, mode, isScrolling]);
 
   const filteredData = useMemo(() => {
     if (filter === 'all') return TIMELINE_DATA;
     return TIMELINE_DATA.filter(item => item.type === filter || (item.type === 'foundational' && filter === 'corporate')); 
   }, [filter]);
+
+  // Helper function to detect and hover item under mouse
+  const detectAndHoverItemUnderMouse = useCallback(() => {
+    if (!mousePositionRef.current || !scrollContainerRef.current) return;
+    if (mode === 'intro' || isAnimatingRef.current) return;
+    
+    const container = scrollContainerRef.current;
+    const { x, y } = mousePositionRef.current;
+    
+    // Use requestAnimationFrame to ensure DOM is settled
+    requestAnimationFrame(() => {
+      // Get element at mouse position
+      const elementAtPoint = document.elementFromPoint(x, y);
+      if (!elementAtPoint) return;
+
+      // Find the timeline item element (closest parent with data-item-id)
+      let current: HTMLElement | null = elementAtPoint as HTMLElement;
+      while (current && current !== container) {
+        const itemId = current.getAttribute('data-item-id');
+        if (itemId) {
+          const item = filteredData.find(i => i.id === itemId);
+          if (item) {
+            handleHover(item.id);
+            handleLaneHover(item.lane);
+            return;
+          }
+        }
+        current = current.parentElement;
+      }
+    });
+  }, [mode, filteredData, handleHover, handleLaneHover]);
+
+  // When scroll stops, check which item is under the mouse and hover it
+  useEffect(() => {
+    if (!isScrolling && mode !== 'intro' && !isAnimating) {
+      // Small delay to ensure scroll momentum has settled
+      const timer = setTimeout(() => {
+        detectAndHoverItemUnderMouse();
+      }, 16); // One frame delay
+      return () => clearTimeout(timer);
+    }
+  }, [isScrolling, mode, isAnimating, detectAndHoverItemUnderMouse]);
+
+  // When animation completes (isAnimating goes from true to false), check for item under mouse
+  const prevIsAnimatingRef = useRef(isAnimating);
+  useEffect(() => {
+    const wasAnimating = prevIsAnimatingRef.current;
+    prevIsAnimatingRef.current = isAnimating;
+    
+    // Animation just completed
+    if (wasAnimating && !isAnimating && mode !== 'intro') {
+      // Give extra time for Framer Motion animations to fully settle
+      const timer = setTimeout(() => {
+        detectAndHoverItemUnderMouse();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating, mode, detectAndHoverItemUnderMouse]);
 
   // Find currently hovered item object for bookmark logic
   const hoveredItem = useMemo(() => {
