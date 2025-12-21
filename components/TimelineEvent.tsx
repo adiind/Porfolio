@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
@@ -30,7 +30,30 @@ const TimelineEvent: React.FC<Props> = ({
   onOpenProject,
   isScrolling = false
 }) => {
-  const isHovered = hoveredId === item.id && !isScrolling;
+  // Once hoveredId is set, show it regardless of isScrolling (isScrolling check only prevents setting hover, not showing it)
+  const isHovered = hoveredId === item.id;
+  
+  // Track if mouse is currently over this card
+  const isMouseOverRef = useRef(false);
+  const prevIsScrollingRef = useRef(isScrolling);
+  
+  // When scrolling stops and mouse is over card, trigger hover
+  useEffect(() => {
+    const wasScrolling = prevIsScrollingRef.current;
+    prevIsScrollingRef.current = isScrolling;
+    
+    // Scrolling just stopped and mouse is over this card
+    if (wasScrolling && !isScrolling && isMouseOverRef.current && hoveredId !== item.id) {
+      onHover(item.id);
+      onLaneHover(item.lane);
+    }
+  }, [isScrolling, hoveredId, item.id, item.lane, onHover, onLaneHover]);
+  
+  // #region agent log
+  React.useEffect(() => {
+    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H1',location:'TimelineEvent.tsx:isHovered',message:'isHovered calculated',data:{itemId:item.id,hoveredId,isScrolling,isHovered,itemTitle:item.title},timestamp:Date.now()})}).catch(()=>{});
+  }, [hoveredId, isScrolling, item.id, isHovered]);
+  // #endregion agent log
   const isFit = mode === 'fit' || mode === 'intro';
   const isZoomedOut = pixelsPerMonth < 20;
   const isTinkerVerse = item.id === 'tinkerverse';
@@ -146,9 +169,24 @@ const TimelineEvent: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'flex-start' // Place items at start (left)
           }}
-          onMouseEnter={() => { onHover(item.id); onLaneHover(null); }}
-          onMouseMove={() => { if (hoveredId !== item.id) { onHover(item.id); onLaneHover(null); } }}
-          onMouseLeave={() => { onHover(null); onLaneHover(null); }}
+          onMouseEnter={() => { 
+            isMouseOverRef.current = true;
+            if (!isScrolling) {
+              onHover(item.id);
+              onLaneHover(null);
+            }
+          }}
+          onMouseMove={() => { 
+            if (!isScrolling && hoveredId !== item.id) {
+              onHover(item.id);
+              onLaneHover(null);
+            }
+          }}
+          onMouseLeave={() => { 
+            isMouseOverRef.current = false;
+            onHover(null);
+            onLaneHover(null);
+          }}
           onClick={() => onOpenProject && onOpenProject(item)}
           className="group cursor-pointer flex-row-reverse" // Flex reverse or manual placement
         >
@@ -219,16 +257,20 @@ const TimelineEvent: React.FC<Props> = ({
           height: Math.max(height, 60), 
         }}
         onMouseEnter={() => {
-          onHover(item.id);
-          onLaneHover(null); 
+          isMouseOverRef.current = true;
+          if (!isScrolling) {
+            onHover(item.id);
+            onLaneHover(null);
+          }
         }}
         onMouseMove={() => {
-          if (hoveredId !== item.id) {
+          if (!isScrolling && hoveredId !== item.id) {
             onHover(item.id);
             onLaneHover(null);
           }
         }}
         onMouseLeave={() => {
+          isMouseOverRef.current = false;
           onHover(null);
           onLaneHover(null);
         }}
@@ -340,16 +382,20 @@ const TimelineEvent: React.FC<Props> = ({
           zIndex: isHovered ? 50 : 10
         }}
         onMouseEnter={() => {
-          onHover(item.id);
-          onLaneHover(item.lane);
+          isMouseOverRef.current = true;
+          if (!isScrolling) {
+            onHover(item.id);
+            onLaneHover(item.lane);
+          }
         }}
         onMouseMove={() => {
-          if (hoveredId !== item.id) {
+          if (!isScrolling && hoveredId !== item.id) {
             onHover(item.id);
             onLaneHover(item.lane);
           }
         }}
         onMouseLeave={() => {
+          isMouseOverRef.current = false;
           onHover(null);
           onLaneHover(null);
         }}
@@ -370,17 +416,21 @@ const TimelineEvent: React.FC<Props> = ({
   return (
     <motion.div
       onMouseEnter={() => {
-        onHover(item.id);
-        onLaneHover(item.lane);
+        isMouseOverRef.current = true;
+        if (!isScrolling) {
+          onHover(item.id);
+          onLaneHover(item.lane);
+        }
       }}
       onMouseMove={() => {
         // Also trigger on mouse move - handles case where card scrolls under cursor
-        if (hoveredId !== item.id) {
+        if (!isScrolling && hoveredId !== item.id) {
           onHover(item.id);
           onLaneHover(item.lane);
         }
       }}
       onMouseLeave={() => {
+        isMouseOverRef.current = false;
         onHover(null);
         onLaneHover(null);
       }}
@@ -388,7 +438,6 @@ const TimelineEvent: React.FC<Props> = ({
       initial={{ opacity: 0, y: 100 }}
       animate={{ 
         top: top,
-        height: isHovered && !isFit ? 'auto' : height,
         opacity: isDimmed ? 0.1 : 1, 
         scale: isDimmed ? 0.98 : isHovered ? 1.05 : 1,
         y: 0,
@@ -404,13 +453,17 @@ const TimelineEvent: React.FC<Props> = ({
       style={{
         position: 'absolute',
         ...laneStyle,
-        minHeight: `${height}px`,
         ...(isHovered && !isFit ? { 
+          height: 'auto',
           width: '450px', 
           maxWidth: '85vw', 
           left: laneStyle.left, 
-          right: 'auto' 
-        } : {}),
+          right: 'auto',
+          minHeight: `${height}px`
+        } : {
+          height: `${height}px`,
+          minHeight: `${height}px`
+        }),
       }}
       className={`
         rounded-lg md:rounded-xl backdrop-blur-md cursor-pointer overflow-hidden group
@@ -420,7 +473,7 @@ const TimelineEvent: React.FC<Props> = ({
       `}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 pointer-events-none" />
-      <div className={`flex flex-col relative z-10 h-full ${isFit ? 'p-2 justify-center' : 'p-3 md:p-4'}`}>
+      <div className={`flex flex-col relative z-10 ${isFit ? 'h-full p-2 justify-center' : 'p-3 md:p-4'}`}>
         <div className="flex justify-between items-start gap-2">
           <motion.div layout className="flex-1 min-w-0 relative">
             {/* Header Row */}
@@ -462,19 +515,20 @@ const TimelineEvent: React.FC<Props> = ({
           </motion.div>
         </div>
         
-        {(isHovered && !isFit) && (
-          <motion.div
-            layout
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ 
-              duration: 0.3, 
-              ease: 'easeOut',
-              opacity: { duration: 0.2 }
-            }}
-            className="mt-3 pt-3 border-t border-white/10"
-          >
+        <AnimatePresence>
+          {(isHovered && !isFit) && (
+            <motion.div
+              layout
+              initial={{ opacity: 0, maxHeight: 0 }}
+              animate={{ opacity: 1, maxHeight: 2000 }}
+              exit={{ opacity: 0, maxHeight: 0 }}
+              transition={{ 
+                maxHeight: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+                opacity: { duration: 0.3 }
+              }}
+              style={{ overflow: 'hidden' }}
+              className="mt-3 pt-3 border-t border-white/10"
+            >
             <p className={`text-xs leading-relaxed mb-3 opacity-90 ${s.text}`}>{item.summary}</p>
             <ul className={`space-y-1.5 text-xs ${s.subtext}`}>
               {item.bullets?.map((bullet, idx) => (
@@ -575,7 +629,8 @@ const TimelineEvent: React.FC<Props> = ({
               </motion.div>
             )}
           </motion.div>
-        )}
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
