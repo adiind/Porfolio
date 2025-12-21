@@ -35,6 +35,13 @@ const App: React.FC = () => {
   useEffect(() => {
     isScrollingRef.current = isScrolling;
   }, [isScrolling]);
+  
+  // Track hoveredId state changes
+  useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H4',location:'App.tsx:hoveredId-state',message:'hoveredId state changed',data:{hoveredId,isScrolling,mode,isAnimating},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion agent log
+  }, [hoveredId, isScrolling, mode, isAnimating]);
 
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
@@ -218,9 +225,20 @@ const App: React.FC = () => {
   const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
   
   const handleHover = useCallback((id: string | null) => {
-    if (mode === 'intro' || isAnimating || isScrolling) return;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H2',location:'App.tsx:handleHover',message:'handleHover called',data:{id,mode,isAnimating,isScrolling,currentHoveredId:hoveredId},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion agent log
+    if (mode === 'intro' || isAnimating || isScrolling) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H2',location:'App.tsx:handleHover',message:'handleHover BLOCKED',data:{blockedBy:mode==='intro'?'intro':isAnimating?'animating':'scrolling'},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion agent log
+      return;
+    }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H2',location:'App.tsx:handleHover',message:'handleHover SETTING hoveredId',data:{id,previousId:hoveredId},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion agent log
     setHoveredId(id);
-  }, [mode, isAnimating, isScrolling]);
+  }, [mode, isAnimating, isScrolling, hoveredId]);
 
   const handleLaneHover = useCallback((lane: number | null) => {
     if (mode === 'intro' || isAnimating || isScrolling) return;
@@ -248,10 +266,13 @@ const App: React.FC = () => {
     // Only clear if scrolling just started (transitioned from false to true)
     // or if in intro/animation mode
     if (isAnimating || mode === 'intro' || (isScrolling && !wasScrolling)) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H3',location:'App.tsx:clearHover',message:'CLEARING hover',data:{isAnimating,mode,isScrolling,wasScrolling,currentHoveredId:hoveredId},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion agent log
       setHoveredId(null);
       setHoveredLane(null);
     }
-  }, [isAnimating, mode, isScrolling]);
+  }, [isAnimating, mode, isScrolling, hoveredId]);
 
   const filteredData = useMemo(() => {
     if (filter === 'all') return TIMELINE_DATA;
@@ -260,20 +281,38 @@ const App: React.FC = () => {
 
   // Helper function to detect and hover item under mouse
   const detectAndHoverItemUnderMouse = useCallback(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H5',location:'App.tsx:detectAndHoverItemUnderMouse',message:'detectAndHoverItemUnderMouse called',data:{hasMousePos:!!mousePositionRef.current,hasContainer:!!scrollContainerRef.current,mode,isAnimating:isAnimatingRef.current,isScrolling:isScrollingRef.current},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion agent log
     if (!mousePositionRef.current || !scrollContainerRef.current) return;
-    if (mode === 'intro' || isAnimatingRef.current || isScrollingRef.current) return;
+    if (mode === 'intro' || isAnimatingRef.current || isScrollingRef.current) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H5',location:'App.tsx:detectAndHoverItemUnderMouse',message:'detect blocked early',data:{blockedBy:mode==='intro'?'intro':isAnimatingRef.current?'animating':'scrolling'},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion agent log
+      return;
+    }
     
     const container = scrollContainerRef.current;
     const { x, y } = mousePositionRef.current;
     
-    // Use requestAnimationFrame to ensure DOM is settled
+      // Use requestAnimationFrame to ensure DOM is settled
     requestAnimationFrame(() => {
       // Double-check scrolling state after frame
-      if (isScrollingRef.current) return;
+      if (isScrollingRef.current) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H5',location:'App.tsx:detectAndHoverItemUnderMouse',message:'detect blocked by scrolling after RAF',data:{isScrolling:isScrollingRef.current},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion agent log
+        return;
+      }
       
       // Get element at mouse position
       const elementAtPoint = document.elementFromPoint(x, y);
-      if (!elementAtPoint) return;
+      if (!elementAtPoint) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H5',location:'App.tsx:detectAndHoverItemUnderMouse',message:'no element at point',data:{x,y},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion agent log
+        return;
+      }
 
       // Find the timeline item element (closest parent with data-item-id)
       let current: HTMLElement | null = elementAtPoint as HTMLElement;
@@ -282,6 +321,9 @@ const App: React.FC = () => {
         if (itemId) {
           const item = filteredData.find(i => i.id === itemId);
           if (item) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'run1',hypothesisId:'H5',location:'App.tsx:detectAndHoverItemUnderMouse',message:'found item, calling handleHover',data:{itemId:item.id,itemTitle:item.title},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion agent log
             handleHover(item.id);
             handleLaneHover(item.lane);
             return;
