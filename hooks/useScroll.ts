@@ -11,9 +11,27 @@ export const useScroll = (
 ) => {
   const [scrollTop, setScrollTop] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const isScrollingRef = useRef(false); // Ref for sync access
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
+
+    // Set scrolling state
+    setIsScrolling(true);
+    isScrollingRef.current = true; // Sync update
+
+    // Clear existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    // Set timeout to reset scrolling state
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+      isScrollingRef.current = false; // Sync update
+    }, 150);
   }, []);
 
   const scrollToPosition = useCallback((top: number) => {
@@ -38,7 +56,7 @@ export const useScroll = (
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    
+
     const handleContainerWheel = (e: WheelEvent) => {
       if (scrollCooldown || isModalOpen) return;
       if (mode === 'normal' && container.scrollTop <= 10 && e.deltaY < -5) {
@@ -48,7 +66,7 @@ export const useScroll = (
         onZoomToIntro();
       }
     };
-    
+
     container.addEventListener('wheel', handleContainerWheel);
     return () => container.removeEventListener('wheel', handleContainerWheel);
   }, [mode, scrollCooldown, isModalOpen, onZoomToIntro]);
@@ -58,6 +76,8 @@ export const useScroll = (
     scrollContainerRef,
     handleScroll,
     scrollToPosition,
+    isScrolling,
+    isScrollingRef // Export the Ref
   };
 };
 

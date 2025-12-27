@@ -49,6 +49,8 @@ const App: React.FC = () => {
     scrollContainerRef,
     handleScroll,
     scrollToPosition,
+    isScrolling,
+    isScrollingRef,
   } = useScroll(
     mode,
     scrollCooldown,
@@ -96,7 +98,7 @@ const App: React.FC = () => {
         let glowColor = 'from-purple-600/50 via-purple-500/30';
         if (item.type === 'project') glowColor = 'from-cyan-600/50 via-teal-500/30';
         if (item.type === 'vignette') glowColor = 'from-white/30 via-gray-100/10';
-        
+
         return {
           ...item,
           position,
@@ -211,11 +213,10 @@ const App: React.FC = () => {
                       width: '30%',
                       left: lane === 0 ? '0%' : lane === 1 ? '35%' : '70%',
                       background: hoveredLane === lane
-                        ? `linear-gradient(to bottom, ${
-                            lane === 0 ? 'rgba(244,63,94,0.05)' :
-                            lane === 1 ? 'rgba(99,102,241,0.05)' :
+                        ? `linear-gradient(to bottom, ${lane === 0 ? 'rgba(244,63,94,0.05)' :
+                          lane === 1 ? 'rgba(99,102,241,0.05)' :
                             'rgba(245,158,11,0.05)'
-                          }, transparent)`
+                        }, transparent)`
                         : 'transparent'
                     }}
                   />
@@ -250,6 +251,8 @@ const App: React.FC = () => {
                     mode={mode}
                     onOpenCaseStudy={openCaseStudy}
                     onOpenProject={openProject}
+                    isScrolling={isScrolling}
+                    isScrollingRef={isScrollingRef}
                   />
                 ))}
               </AnimatePresence>
