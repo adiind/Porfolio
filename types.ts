@@ -29,11 +29,24 @@ export interface Publication {
   link?: string;
 }
 
+export interface FeatureCard {
+  title: string;
+  subtitle: string;
+  summary: string; // Short summary for closed state
+  expandedSummary: string; // Longer summary for open state
+  pills: {
+    label: string;
+    description: string;
+  }[];
+  details: string[]; // Bullet points for open state
+}
+
 export interface TimelineItem {
   id: string;
   lane: 0 | 1 | 2;
   title: string;
   company: string;
+  companyUrl?: string; // Optional URL for company/competition
   type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project' | 'vignette';
   subtype?: 'role' | 'post';
   start: string; // YYYY-MM-DD
@@ -43,14 +56,15 @@ export interface TimelineItem {
   caseStudy?: CaseStudy; // New Field for Case Studies
   award?: Award; // New Field for Awards
   publication?: Publication; // New Field for Publications
+  featureCards?: FeatureCard[]; // New Field for Special Feature Cards (e.g. Snapdeal Ads)
   videoUrl?: string; // New Field for Video Embeds
   imageUrl?: string; // New Field for Project Images
-  
+
   // New Fields for Redesign
   logoUrl?: string;
   skills?: string[];
   themeColor?: 'red' | 'orange' | 'blue' | 'green';
-  
+
   // Detailed Project View
   extendedDescription?: string;
   projectLinks?: { label: string; url: string }[];
@@ -73,8 +87,8 @@ export interface SocialPost {
 }
 
 export interface TimelineConfig {
-  startDate: string; 
-  endDate: string;   
+  startDate: string;
+  endDate: string;
 }
 
 export type TimelineMode = 'intro' | 'fit' | 'normal' | 'detail';
