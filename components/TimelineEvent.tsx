@@ -609,6 +609,29 @@ const TimelineEvent: React.FC<Props> = ({
                 />
               ))}
 
+              {/* DIFFERENTIATOR CALLOUT */}
+              {item.differentiator && (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mt-4 rounded-xl p-4 bg-gradient-to-r from-indigo-950/50 to-purple-950/50 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)]"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0 border border-indigo-500/30">
+                      <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-[9px] uppercase tracking-widest font-bold text-indigo-400/80 mb-1">Differentiator</div>
+                      <p className="text-xs text-gray-300 leading-relaxed">{item.differentiator}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
               {/* PUBLICATION MODULE (Blue Theme) */}
               {item.publication && (
                 <motion.div layout className="mt-4 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-lg p-3 text-blue-900 shadow-lg relative overflow-hidden border border-blue-200">
