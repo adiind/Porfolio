@@ -177,10 +177,73 @@ Since then, I have been thinking about how tools can help people express themsel
     subtype: 'role',
     start: "2023-02-01",
     end: "2024-09-30",
-    summary: "Supply Chain Algorithms & Network Design.",
-    bullets: ["Scaled Wondermart from city to country operations.", "Built real-time pipelines for 1000+ stakeholders."],
+    summary: "Supply Chain, Marketplace, Product Analytics, Platform Building.",
+    bullets: [
+      "Worked full-time across Udaan's supply-chain vertical, supporting marketplace and inventory models at national scale.",
+      "Owned reporting systems, procurement and availability analytics, and operational decision-intelligence used by product managers, central ops, warehousing, catalogue, pricing and CX teams.",
+      "Built supply-chain systems first for single-city pilots, then scaled operations pan-India across FMCG, pharma and food.",
+      "Designed real-time reporting dashboards that enabled teams to act immediately instead of waiting for analyst decks.",
+      "Founding analyst for Percept Insights, a Mixpanel-alternative analytics platform used internally and by external partner teams.",
+      "Only analyst and acting PM for Wondermart (mobile-first B2C commerce), running weekly product reviews with developers and prioritizing features using funnel and retention data."
+    ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Udaanlogo.png",
     themeColor: 'orange',
+    skills: ["Supply Chain", "Marketplace", "Product Analytics", "Platform Building"],
+    differentiator: "Experience across both marketplace operations and temporary warehouse-ownership pilots, giving rare visibility into how shifting supply risk changes economics, metrics and workflow design.",
+    featureCards: [
+      {
+        title: "Nation Wide Availability and JIT Vendor Performance",
+        subtitle: "Analytics Owner",
+        summary: "Built real-time analytics controlling SKU availability and vendor reliability, enabling automated procurement instead of manual daily calls.",
+        expandedSummary: "Centralized SKU availability, catalogue health, pricing correctness and vendor performance into one live system. Diagnosed SKU unavailability by tracing operational blockers such as MOQ rules and catalogue issues and exposed how these were creating preventable lost orders. Partnered with procurement and ops to tune reorder logic at SKU, vendor and city level.",
+        pills: [
+          { label: "SKU", description: "Stock Keeping Unit, a single product variant managed and reordered independently." },
+          { label: "Availability", description: "Whether the item is actually purchasable right now." },
+          { label: "MOQ", description: "Minimum Order Quantity, vendor minimum order rule that blocks ordering and creates artificial stockouts." },
+          { label: "JIT Supply", description: "Just In Time, inventory is ordered only when demand occurs, reducing cost but increasing risk." },
+          { label: "Warehousing", description: "Holding inventory in advance of demand in order to reduce delivery time and protect against supply uncertainty." }
+        ],
+        details: [
+          "Automated procurement actions that previously required manual reconciliation",
+          "Defined supply-chain decision metrics adopted by operations leadership"
+        ],
+        skills: ["SQL", "Real-time Dashboarding", "Metric Definition", "Workflow Automation"]
+      },
+      {
+        title: "Wondermart (Mobile-First B2C Commerce)",
+        subtitle: "Sole Analyst & Acting PM",
+        summary: "Mapped funnel friction and repeat-purchase drivers and ran weekly reviews with the development team and leadership.",
+        expandedSummary: "Supported Wondermart by owning all analytics for feature decisions and acting as the product manager driving weekly reviews with the development team. Analytics shaped checkout UX, repeat-order incentives, homepage listing logic, special-deal placement and SKU visibility rules, as well as SKU selection strategy based on demand and retention patterns.",
+        pills: [
+          { label: "Customer Segmentation", description: "Grouping users by behavior to tailor product decisions." },
+          { label: "Retention", description: "How many users return and continue buying after first experience." },
+          { label: "Mixpanel-Style Analytics", description: "Event-level product usage signals rather than surface-level pageviews." },
+          { label: "Repeat-Purchase", description: "Recurring orders indicating product-market fit for essentials." }
+        ],
+        details: [
+          "Led weekly roadmap prioritization with dev team",
+          "Drove UX fixes based on funnel-stage loss"
+        ],
+        skills: ["Funnel Analytics", "PM Decision-Making", "Quantified UX Prioritization"]
+      },
+      {
+        title: "Percept Insights (Analytics Platform)",
+        subtitle: "Founding Analyst",
+        summary: "Defined the dashboards and onboarding that enabled teams and partners to make decisions without analyst dependency.",
+        expandedSummary: "Set reusable dashboard patterns and training playbooks for an analytics platform similar in spirit to Mixpanel. Acted as the primary product tester and informed product requirements based on real usage gaps. Decided feature priority and sequence by evaluating which capabilities would unblock teams fastest. Shifted decision-making from BI reliance to direct product and ops ownership.",
+        pills: [
+          { label: "Self-Serve Dashboards", description: "Teams can answer questions without requesting analysts." },
+          { label: "Analytics Training", description: "Structured onboarding to teach PMs, ops, CX to use data independently." },
+          { label: "Team Enablement", description: "Data access made part of standard workflow." },
+          { label: "Product-Led Decisions", description: "Decisions made where product is built, not in BI." }
+        ],
+        details: [
+          "Created dashboard patterns reused across product teams",
+          "Trained non-technical users to self-serve data"
+        ],
+        skills: ["Platform Thinking", "Internal Enablement", "Analytics Training"]
+      }
+    ],
     caseStudy: {
       title: "Unified Procurement Reporting",
       summary: "A system built to bring clarity, speed, and trust to India-wide procurement reporting.",
@@ -191,7 +254,7 @@ Since then, I have been thinking about how tools can help people express themsel
           type: 'cover',
           title: 'Unified Procurement Reporting',
           content: {
-            subtitle: 'Dashboard System for Udaan’s B2B Supply Chain',
+            subtitle: "Dashboard System for Udaan's B2B Supply Chain",
             description: 'A system built to bring clarity, speed, and trust to India-wide procurement reporting after a complete supply-chain restructuring.',
             role: 'Adi Agarwal - Product Analyst'
           }
@@ -247,7 +310,7 @@ Since then, I have been thinking about how tools can help people express themsel
           content: {
             kpis: [
               { name: 'Availability %', def: '#In-Stock / #Total Products', purpose: 'Shows supply-chain health' },
-              { name: 'GMV Impact %', def: 'Availability × weighted average of last month’s GMV', purpose: 'Shows business consequence' }
+              { name: 'GMV Impact %', def: "Availability × weighted average of last month's GMV", purpose: 'Shows business consequence' }
             ],
             highlights: [
               'National overview + Hero SKUs highlighted',
@@ -264,7 +327,7 @@ Since then, I have been thinking about how tools can help people express themsel
             points: [
               'This project started as a data cleanup task but evolved into a study of how design translates trust in data.',
               'Dashboard Changed Decision-Making altogether, leadership reviews began directly in dashboards.',
-              'By merging engineering precision with human-centered visual language, Udaan’s procurement dashboard became a living, shared system.',
+              "By merging engineering precision with human-centered visual language, Udaan's procurement dashboard became a living, shared system.",
               'Not just improving viewing performance, but aligning every team on what performance means.'
             ]
           }

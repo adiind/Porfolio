@@ -39,6 +39,7 @@ export interface FeatureCard {
     description: string;
   }[];
   details: string[]; // Bullet points for open state
+  skills?: string[]; // Skills for this specific project
 }
 
 export interface TimelineItem {
@@ -74,6 +75,9 @@ export interface TimelineItem {
   caption?: string;
   likes?: number;
   comments?: number;
+
+  // Differentiator callout for company cards
+  differentiator?: string;
 }
 
 export interface SocialPost {
