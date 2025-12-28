@@ -39,7 +39,7 @@ export interface FeatureCard {
     description: string;
   }[];
   details: string[]; // Bullet points for open state
-  skills?: string[]; // Skills for this specific project
+  skills?: { label: string; description: string }[]; // Skills with descriptions for this project
 }
 
 export interface TimelineItem {
@@ -63,7 +63,7 @@ export interface TimelineItem {
 
   // New Fields for Redesign
   logoUrl?: string;
-  skills?: string[];
+  skills?: { label: string; description: string }[]; // Skills/toolkit with descriptions
   themeColor?: 'red' | 'orange' | 'blue' | 'green';
 
   // Detailed Project View

@@ -12,6 +12,7 @@ interface Props {
 
 const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
     const [hoveredPill, setHoveredPill] = useState<string | null>(null);
+    const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
     const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
 
     return (
@@ -70,12 +71,37 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                                 {data.summary}
                             </p>
 
-                            {/* Simple Pills */}
+                            {/* Interactive Pills (also in collapsed state) */}
                             <div className="flex flex-wrap items-center gap-2">
                                 {data.pills.map((pill, i) => (
-                                    <span key={i} className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] uppercase tracking-wide font-medium text-gray-300">
-                                        {pill.label}
-                                    </span>
+                                    <div
+                                        key={i}
+                                        className="relative"
+                                        onMouseEnter={(e) => {
+                                            e.stopPropagation();
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setTooltipPos({
+                                                top: rect.top + window.scrollY,
+                                                left: rect.left + rect.width / 2 + window.scrollX
+                                            });
+                                            setHoveredPill(pill.label);
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.stopPropagation();
+                                            setHoveredPill(null);
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <span className={`
+                                            cursor-help px-3 py-1 rounded-full border text-[10px] uppercase tracking-wide font-medium transition-all duration-300
+                                            ${hoveredPill === pill.label
+                                                ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.2)]'
+                                                : 'border-white/10 bg-white/5 text-gray-300 hover:border-yellow-500/30 hover:text-yellow-200'
+                                            }
+                                        `}>
+                                            {pill.label}
+                                        </span>
+                                    </div>
                                 ))}
                                 <span className="ml-auto flex items-center gap-1 text-[10px] text-yellow-500 uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0 duration-300">
                                     Deep Dive <ArrowRight size={12} />
@@ -143,7 +169,7 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                                 </div>
                             </div>
 
-                            {/* Skills Section - Visually Distinct */}
+                            {/* Skills Section - Visually Distinct with Hover Effects */}
                             {data.skills && data.skills.length > 0 && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
@@ -159,15 +185,37 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {data.skills.map((skill, i) => (
-                                            <motion.span
+                                            <motion.div
                                                 key={i}
                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ delay: 0.35 + i * 0.05 }}
-                                                className="px-3 py-1 rounded-md text-[10px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
+                                                onMouseEnter={(e) => {
+                                                    e.stopPropagation();
+                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                    setTooltipPos({
+                                                        top: rect.top + window.scrollY,
+                                                        left: rect.left + rect.width / 2 + window.scrollX
+                                                    });
+                                                    setHoveredSkill(skill.label);
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.stopPropagation();
+                                                    setHoveredSkill(null);
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                whileHover={{
+                                                    scale: 1.05,
+                                                    boxShadow: '0 0 15px rgba(16,185,129,0.4)',
+                                                    backgroundColor: 'rgba(16,185,129,0.2)'
+                                                }}
+                                                className={`px-3 py-1 rounded-md text-[10px] font-medium border shadow-[0_0_8px_rgba(16,185,129,0.1)] cursor-help transition-colors duration-200 ${hoveredSkill === skill.label
+                                                    ? 'bg-emerald-500/20 text-emerald-100 border-emerald-400/50'
+                                                    : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:text-emerald-100 hover:border-emerald-400/40'
+                                                    }`}
                                             >
-                                                {skill}
-                                            </motion.span>
+                                                {skill.label}
+                                            </motion.div>
                                         ))}
                                     </div>
                                 </motion.div>
@@ -176,10 +224,18 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Global Portal for Tooltip */}
+                {/* Global Portal for Pill Tooltip */}
                 {hoveredPill && (
                     <Portal
                         pill={data.pills.find((p) => p.label === hoveredPill)!}
+                        position={tooltipPos}
+                    />
+                )}
+
+                {/* Global Portal for Skill Tooltip */}
+                {hoveredSkill && data.skills && (
+                    <SkillPortal
+                        skill={data.skills.find((s) => s.label === hoveredSkill)!}
                         position={tooltipPos}
                     />
                 )}
@@ -213,6 +269,36 @@ const Portal: React.FC<{ pill: { label: string; description: string }; position:
             </div>
             {/* Arrow */}
             <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0a0a0a] border-r border-b border-yellow-500/40 rotate-45" />
+        </motion.div>,
+        document.body
+    );
+};
+
+const SkillPortal: React.FC<{ skill: { label: string; description: string }; position: { top: number; left: number } }> = ({ skill, position }) => {
+    return ReactDOM.createPortal(
+        <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            style={{
+                position: 'absolute',
+                top: position.top - 15,
+                left: position.left,
+                zIndex: 99999,
+                transform: 'translate(-50%, -100%)'
+            }}
+            className="w-56 p-4 rounded-xl bg-[#0a0a0a] border border-emerald-500/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden pointer-events-none"
+        >
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 to-emerald-300" />
+            <div className="text-[9px] uppercase text-emerald-400 font-bold mb-1.5 tracking-wider flex items-center gap-2">
+                {skill.label}
+            </div>
+            <div className="text-xs text-gray-200 leading-snug font-medium">
+                {skill.description}
+            </div>
+            {/* Arrow */}
+            <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0a0a0a] border-r border-b border-emerald-500/40 rotate-45" />
         </motion.div>,
         document.body
     );
