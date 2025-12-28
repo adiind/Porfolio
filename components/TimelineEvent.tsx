@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
@@ -45,6 +46,10 @@ const TimelineEvent: React.FC<Props> = ({
 
   // Manage which feature card is expanded (by index)
   const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null);
+
+  // State for toolkit skill tooltips
+  const [hoveredToolkitSkill, setHoveredToolkitSkill] = useState<string | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
 
   // When scrolling stops and mouse is over card, trigger hover
   useEffect(() => {
@@ -562,20 +567,74 @@ const TimelineEvent: React.FC<Props> = ({
                 ))}
               </ul>
 
-              {/* SKILLS PILLS (Footer) */}
+              {/* SKILLS PILLS (Footer) with Hover Effects & Tooltips */}
               {item.skills && (
                 <motion.div layout className="mt-4 pt-3 border-t border-white/10">
                   <div className="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-2">Toolkit</div>
                   <div className="flex flex-wrap gap-2">
                     {item.skills.map((skill, idx) => (
-                      <span
+                      <motion.div
                         key={idx}
-                        className={`text-[9px] uppercase tracking-wide border px-2 py-1 rounded-full bg-white/5 whitespace-nowrap ${item.lane === 0 ? 'border-rose-500/30 text-rose-100' : 'border-white/20 text-white/80'}`}
+                        onMouseEnter={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltipPos({
+                            top: rect.top + window.scrollY,
+                            left: rect.left + rect.width / 2 + window.scrollX
+                          });
+                          setHoveredToolkitSkill(skill.label);
+                        }}
+                        onMouseLeave={() => setHoveredToolkitSkill(null)}
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: item.lane === 0
+                            ? '0 0 12px rgba(244,63,94,0.4)'
+                            : '0 0 12px rgba(255,255,255,0.2)'
+                        }}
+                        className={`text-[9px] uppercase tracking-wide border px-2 py-1 rounded-full bg-white/5 whitespace-nowrap cursor-help transition-all duration-200 ${hoveredToolkitSkill === skill.label
+                            ? (item.lane === 0
+                              ? 'border-rose-400/60 text-rose-50 bg-rose-500/15'
+                              : 'border-white/50 text-white bg-white/15')
+                            : (item.lane === 0
+                              ? 'border-rose-500/30 text-rose-100 hover:border-rose-400/50 hover:text-rose-50 hover:bg-rose-500/10'
+                              : 'border-white/20 text-white/80 hover:border-white/40 hover:text-white hover:bg-white/10')
+                          }`}
                       >
-                        {skill}
-                      </span>
+                        {skill.label}
+                      </motion.div>
                     ))}
                   </div>
+
+                  {/* Toolkit Skill Tooltip Portal */}
+                  {hoveredToolkitSkill && ReactDOM.createPortal(
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        position: 'absolute',
+                        top: tooltipPos.top - 15,
+                        left: tooltipPos.left,
+                        zIndex: 99999,
+                        transform: 'translate(-50%, -100%)'
+                      }}
+                      className={`w-56 p-4 rounded-xl bg-[#0a0a0a] shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden pointer-events-none ${item.lane === 0 ? 'border border-rose-500/40' : 'border border-white/30'
+                        }`}
+                    >
+                      <div className={`absolute top-0 left-0 w-full h-1 ${item.lane === 0 ? 'bg-gradient-to-r from-rose-600 to-rose-300' : 'bg-gradient-to-r from-gray-500 to-gray-300'
+                        }`} />
+                      <div className={`text-[9px] uppercase font-bold mb-1.5 tracking-wider ${item.lane === 0 ? 'text-rose-400' : 'text-gray-400'
+                        }`}>
+                        {hoveredToolkitSkill}
+                      </div>
+                      <div className="text-xs text-gray-200 leading-snug font-medium">
+                        {item.skills?.find(s => s.label === hoveredToolkitSkill)?.description}
+                      </div>
+                      <div className={`absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0a0a0a] rotate-45 ${item.lane === 0 ? 'border-r border-b border-rose-500/40' : 'border-r border-b border-white/30'
+                        }`} />
+                    </motion.div>,
+                    document.body
+                  )}
                 </motion.div>
               )}
 
@@ -599,6 +658,53 @@ const TimelineEvent: React.FC<Props> = ({
                 </motion.div>
               )}
 
+              {/* DIFFERENTIATOR CALLOUT - Enhanced & Above Projects */}
+              {item.differentiator && (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="mt-4 relative rounded-xl overflow-hidden"
+                >
+                  {/* Animated gradient border */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600 opacity-30 blur-sm" />
+                  <div className="absolute inset-[1px] rounded-xl bg-[#0a0a0a]" />
+
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute inset-0 opacity-20">
+                      <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]"
+                        style={{ animation: 'shimmer 3s infinite linear' }} />
+                    </div>
+                  </div>
+
+                  <div className="relative p-4">
+                    <div className="flex items-start gap-4">
+                      {/* Icon with glow */}
+                      <div className="relative flex-shrink-0">
+                        <div className="absolute inset-0 bg-violet-500/30 rounded-xl blur-md" />
+                        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center border border-violet-500/40">
+                          <svg className="w-5 h-5 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-[9px] uppercase tracking-widest font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                            What Sets Me Apart
+                          </span>
+                          <div className="flex-1 h-px bg-gradient-to-r from-violet-500/30 to-transparent" />
+                        </div>
+                        <p className="text-sm text-gray-200 leading-relaxed font-medium">{item.differentiator}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
               {/* FEATURE CARDS (Snapdeal Ads etc.) */}
               {item.featureCards && item.featureCards.map((card, idx) => (
                 <SnapdealAdsCard
@@ -608,29 +714,6 @@ const TimelineEvent: React.FC<Props> = ({
                   onToggle={() => setExpandedCardIndex(expandedCardIndex === idx ? null : idx)}
                 />
               ))}
-
-              {/* DIFFERENTIATOR CALLOUT */}
-              {item.differentiator && (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mt-4 rounded-xl p-4 bg-gradient-to-r from-indigo-950/50 to-purple-950/50 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0 border border-indigo-500/30">
-                      <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-[9px] uppercase tracking-widest font-bold text-indigo-400/80 mb-1">Differentiator</div>
-                      <p className="text-xs text-gray-300 leading-relaxed">{item.differentiator}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
 
               {/* PUBLICATION MODULE (Blue Theme) */}
               {item.publication && (

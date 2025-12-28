@@ -28,7 +28,14 @@ export const TIMELINE_DATA: TimelineItem[] = [
     summary: "Specializing in Human-Centered Design. Bridging the gap between engineering feasibility and user desirability.",
     bullets: ["Thesis: AI-Human collaboration in creative workflows."],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Northwestern_Wildcats_logo.svg/1200px-Northwestern_Wildcats_logo.svg.png",
-    skills: ["Rapid Prototyping", "Service Design", "Interaction Design", "Physical Computing", "Ethnographic Research", "Figma"]
+    skills: [
+      { label: "Rapid Prototyping", description: "Quickly building functional models to test and iterate on ideas." },
+      { label: "Service Design", description: "Designing end-to-end experiences across touchpoints and stakeholders." },
+      { label: "Interaction Design", description: "Crafting intuitive interfaces and user flows for digital products." },
+      { label: "Physical Computing", description: "Blending hardware and software to create interactive physical objects." },
+      { label: "Ethnographic Research", description: "Understanding user behavior through immersive observation and interviews." },
+      { label: "Figma", description: "Industry-standard tool for UI/UX design and collaborative prototyping." }
+    ]
   },
   {
     id: "zomato",
@@ -39,10 +46,92 @@ export const TIMELINE_DATA: TimelineItem[] = [
     subtype: 'role',
     start: "2024-10-01",
     end: "2025-07-31",
-    summary: "Optimizing Search & Discovery for millions of users.",
-    bullets: ["Leveraged 1B+ social graph contacts to build recommendation engine.", "Reduced food waste by 50% via Hyperpure supply prediction models.", "Led cross-functional team of 6 engineers."],
+    summary: "Homepage & Search.",
+    bullets: [
+      "Senior Product Analyst on Zomato's Homepage & Search team, the highest-leverage surface through which ~80% of all orders were placed.",
+      "Worked directly with product, engineering and design teams on UI layout, listing size, module ordering, ranking logic and surface interactions.",
+      "Analytics covered ~10 million daily active users, using clickstream data to understand how users scrolled, clicked, searched, abandoned, or converted.",
+      "Evaluated ML-based ranking output and helped identify gaps between algorithm predictions and real user behavior, feeding improvements into the ranking model.",
+      "Shifted decision-making toward real-time experiment reads, enabling PM + Design to make changes the same day instead of waiting for long reporting cycles."
+    ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png",
     themeColor: 'red',
+    skills: [
+      { label: "Clickstream Analytics", description: "Tracking full user paths (scroll → click → convert) to guide UI decisions." },
+      { label: "A/B Testing", description: "Releasing multiple UI versions and measuring which performs better." },
+      { label: "ML Feedback", description: "Evaluating ranking model outputs and providing improvement signals." },
+      { label: "UI Behavior", description: "Interpreting how users interact with interface elements." }
+    ],
+    differentiator: "Learned to operate in an environment where design and product decisions must be made within hours, shaping a bias toward rapid iteration powered by real user behavior rather than assumptions.",
+    featureCards: [
+      {
+        title: "Homepage & Search Performance",
+        subtitle: "Senior Product Analyst",
+        summary: "Analyzed how homepage and search changes impacted discovery, listing selection and ranking accuracy across ~10M daily users.",
+        expandedSummary: "Evaluated clickstream behavior to understand how users scrolled, interacted and selected restaurants. These analytics guided UI enhancement decisions such as module placement, listing size, card order and search interaction patterns. Worked with the ML ranking team to analyze where algorithmic suggestions failed user intent and provided feedback that shaped how ranking logic was tuned and validated.",
+        pills: [
+          { label: "Clickstream Analytics", description: "Tracking full user paths (scroll → click → convert) to guide UI." },
+          { label: "A/B Testing", description: "Releasing multiple UI versions and choosing based on performance." },
+          { label: "CTR Analysis", description: "CTR = Click-Through-Rate, % of users who click after seeing a module." },
+          { label: "Ranking Logic", description: "Evaluating how algorithm-sorted results align with real user behavior." }
+        ],
+        details: [
+          "Identified high-impact modules and reduced UI noise that created empty scroll",
+          "Guided homepage UI and ranking tweaks with data instead of intuition",
+          "Enabled PM decisions through real-time experiment evaluation"
+        ],
+        skills: [
+          { label: "Clickstream Analytics", description: "Full-path user behavior tracking for UI optimization." },
+          { label: "A/B Testing", description: "Statistical experiment design and analysis." },
+          { label: "ML-Model Feedback", description: "Translating user behavior into ranking model improvements." },
+          { label: "UI Behavior Interpretation", description: "Understanding user intent from interface interactions." }
+        ]
+      },
+      {
+        title: "Friends Recommendation",
+        subtitle: "Lead Analyst",
+        summary: "Led analytics for Friends Recommendation, a social-proof feature sponsored by Zomato's founder, measuring how friend activity influenced ordering behavior.",
+        expandedSummary: "Evaluated how seeing a friend's order impacted trust, selection and repeat-rate. Built social-graph analytics to understand which clusters of users behaved similarly and how influence spread. Took the feature from zero to rollout, analyzing prototypes, UI variants, placement logic and marketing versions, and helping PM + Design decide when and where signals should surface.",
+        pills: [
+          { label: "Social Proof", description: "Ordering increases when users see 'someone like them' chose it." },
+          { label: "Social Graph Analytics", description: "Identifying clusters of connected users and shared behavior." },
+          { label: "Influence Patterns", description: "Tracking when one user's order triggers another's." },
+          { label: "Cohort Behaviour", description: "Comparing connected vs. unconnected user groups over time." }
+        ],
+        details: [
+          "Defined how social signals should trigger and where they should appear",
+          "Interpreted influence patterns across connected user groups"
+        ],
+        skills: [
+          { label: "Social-Graph Analytics", description: "Analyzing connected user networks and behavior spread." },
+          { label: "Behavioral Segmentation", description: "Grouping users by behavioral patterns for targeted features." },
+          { label: "Feature Prioritization", description: "Ranking feature variations by impact potential." },
+          { label: "PM Partnership", description: "Collaborating closely with product managers on decisions." }
+        ]
+      },
+      {
+        title: "Food Rescue (Waste Reduction)",
+        subtitle: "Sole Product Analyst",
+        summary: "Powered a system that surfaced expiring inventory at discounts, reducing waste and creating revenue from previously lost orders.",
+        expandedSummary: "Food Rescue surfaced time-sensitive surplus inventory via targeted discounts. Analytics determined what discount to show, to which segment, and how long. Experimentation across cuisines, user segments and times of day showed how elastic each user / price / cuisine group was (how likely they were to buy when price changed). This work enabled restaurants and ops to convert inventory that otherwise would have been lost.",
+        pills: [
+          { label: "Sell-Through", description: "% of surplus inventory successfully sold." },
+          { label: "Elasticity Testing", description: "Measuring how demand changes when price changes." },
+          { label: "Eligibility Logic", description: "Deciding which items appear in Food Rescue." },
+          { label: "Discount-Depth", description: "How steep pricing must go before conversion lifts." }
+        ],
+        details: [
+          "Reduced food wastage pan-India by ~60%",
+          "Generated pure incremental revenue from previously lost orders"
+        ],
+        skills: [
+          { label: "Pricing Analytics", description: "Analyzing optimal discount levels for conversion." },
+          { label: "Elasticity Testing", description: "Measuring price sensitivity across segments." },
+          { label: "SKU-Level Modeling", description: "Building item-level demand and supply models." },
+          { label: "Demand Triggers", description: "Identifying what drives purchase decisions." }
+        ]
+      }
+    ],
     caseStudy: {
       title: "Food Rescue",
       summary: "Preventing food wastage by redirecting cancelled orders to nearby customers at discounted rates.",
@@ -53,7 +142,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
           type: 'cover',
           title: 'Food Rescue',
           content: {
-            subtitle: 'A real-time cancelled-order recovery feature in India’s Largest Food Delivery App',
+            subtitle: "A real-time cancelled-order recovery feature in India's Largest Food Delivery App",
             description: 'Reducing food wastage by enabling users to claim freshly prepared but unserved orders at a discounted price.',
             role: 'Adi Agarwal - Senior Product Analyst'
           }
@@ -86,8 +175,8 @@ export const TIMELINE_DATA: TimelineItem[] = [
           title: 'Media Coverage',
           content: {
             quotes: [
-              { text: "Zomato has a new plan to stop food wastage, and how this ‘Flash Sale’ is good news for users.", source: "Times of India" },
-              { text: "Zomato Launches ‘Rescue’ Service To Combat Food Wastage. How Does It Work?", source: "NDTV" },
+              { text: "Zomato has a new plan to stop food wastage, and how this 'Flash Sale' is good news for users.", source: "Times of India" },
+              { text: "Zomato Launches 'Rescue' Service To Combat Food Wastage. How Does It Work?", source: "NDTV" },
               { text: "Zomato introduces Food Rescue initiative to reduce food wastage", source: "Verdict Foodservice" }
             ]
           }
@@ -112,7 +201,16 @@ export const TIMELINE_DATA: TimelineItem[] = [
       "Designed custom 3D-printed enclosure and open-sourced the library."
     ],
     videoUrl: "https://www.youtube.com/watch?v=3aCWb3PsAQs",
-    skills: ["AI", "3D Print", "IOT", "Maixduino", "MQTT", "Home Assistant", "C++", "Arduino"],
+    skills: [
+      { label: "AI", description: "Artificial intelligence for voice recognition and command processing." },
+      { label: "3D Print", description: "Custom enclosure design and additive manufacturing." },
+      { label: "IOT", description: "Internet of Things device integration and communication." },
+      { label: "Maixduino", description: "AI-capable microcontroller board with neural network acceleration." },
+      { label: "MQTT", description: "Lightweight messaging protocol for IoT device communication." },
+      { label: "Home Assistant", description: "Open-source home automation platform for smart device control." },
+      { label: "C++", description: "Low-level programming language for embedded systems." },
+      { label: "Arduino", description: "Microcontroller platform for rapid hardware prototyping." }
+    ],
     projectLinks: [
       { label: "GitHub", url: "https://github.com/adiind/diy-jarvis" },
       { label: "Circuit Digest", url: "https://circuitdigest.com/microcontroller-projects/voice-controlled-smart-home-assistant" }
@@ -140,7 +238,15 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
       "Laser-cut layered geometry inspired by solar patterns; integrated custom electronics and precision servo control.",
       "Explored emotion-driven interaction design, translating time, distance, and connection into mechanical motion."
     ],
-    skills: ["Interaction Design", "Physical Computing", "Laser Cutting", "Electronics", "Arduino", "Kinetic Sculpture", "Prototyping"],
+    skills: [
+      { label: "Interaction Design", description: "Designing responsive behaviors and user engagement patterns." },
+      { label: "Physical Computing", description: "Integrating sensors, actuators and code into physical objects." },
+      { label: "Laser Cutting", description: "Precision fabrication of layered geometric components." },
+      { label: "Electronics", description: "Circuit design and component integration for custom hardware." },
+      { label: "Arduino", description: "Microcontroller programming for servo and sensor control." },
+      { label: "Kinetic Sculpture", description: "Mechanical art with programmed, time-based motion." },
+      { label: "Prototyping", description: "Iterative building and testing of physical designs." }
+    ],
     projectLinks: [
       { label: "Process Reel", url: "https://www.instagram.com/reel/DPm6dEjjCmO/?igsh=MXM4cHo0d2huZ3ZzMQ==" },
       { label: "Build Notes", url: "https://github.com/adiind/surya" }
@@ -188,7 +294,12 @@ Since then, I have been thinking about how tools can help people express themsel
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Udaanlogo.png",
     themeColor: 'orange',
-    skills: ["Supply Chain", "Marketplace", "Product Analytics", "Platform Building"],
+    skills: [
+      { label: "Supply Chain", description: "End-to-end logistics from procurement to last-mile delivery." },
+      { label: "Marketplace", description: "Platform dynamics connecting buyers and sellers at scale." },
+      { label: "Product Analytics", description: "Data-driven insights powering feature decisions and UX optimization." },
+      { label: "Platform Building", description: "Creating internal tools and systems that enable teams to self-serve." }
+    ],
     differentiator: "Experience across both marketplace operations and temporary warehouse-ownership pilots, giving rare visibility into how shifting supply risk changes economics, metrics and workflow design.",
     featureCards: [
       {
@@ -207,7 +318,12 @@ Since then, I have been thinking about how tools can help people express themsel
           "Automated procurement actions that previously required manual reconciliation",
           "Defined supply-chain decision metrics adopted by operations leadership"
         ],
-        skills: ["SQL", "Real-time Dashboarding", "Metric Definition", "Workflow Automation"]
+        skills: [
+          { label: "SQL", description: "Structured query language for database operations and complex analytics." },
+          { label: "Real-time Dashboarding", description: "Live visualizations refreshing data as operations happen." },
+          { label: "Metric Definition", description: "Designing KPIs that accurately measure business health." },
+          { label: "Workflow Automation", description: "Replacing manual tasks with triggered, rule-based processes." }
+        ]
       },
       {
         title: "Wondermart (Mobile-First B2C Commerce)",
@@ -224,7 +340,11 @@ Since then, I have been thinking about how tools can help people express themsel
           "Led weekly roadmap prioritization with dev team",
           "Drove UX fixes based on funnel-stage loss"
         ],
-        skills: ["Funnel Analytics", "PM Decision-Making", "Quantified UX Prioritization"]
+        skills: [
+          { label: "Funnel Analytics", description: "Tracking user drop-off at each stage of a conversion flow." },
+          { label: "PM Decision-Making", description: "Prioritizing features based on impact, effort, and strategic fit." },
+          { label: "Quantified UX Prioritization", description: "Using data to rank UX improvements by measurable user impact." }
+        ]
       },
       {
         title: "Percept Insights (Analytics Platform)",
@@ -241,7 +361,11 @@ Since then, I have been thinking about how tools can help people express themsel
           "Created dashboard patterns reused across product teams",
           "Trained non-technical users to self-serve data"
         ],
-        skills: ["Platform Thinking", "Internal Enablement", "Analytics Training"]
+        skills: [
+          { label: "Platform Thinking", description: "Building reusable systems that serve multiple teams and use cases." },
+          { label: "Internal Enablement", description: "Empowering colleagues to work independently with data and tools." },
+          { label: "Analytics Training", description: "Teaching non-technical stakeholders to interpret and act on data." }
+        ]
       }
     ],
     caseStudy: {
@@ -346,6 +470,13 @@ Since then, I have been thinking about how tools can help people express themsel
     end: "2022-09-30",
     summary: "Ad-Revenue & Infrastructure.",
     bullets: ["Automated warehouse forecasting.", "Increased Ad Revenue by 14%."],
+    skills: [
+      { label: "Ad-Tech Analytics", description: "Performance measurement and optimization for advertising products." },
+      { label: "Revenue Attribution", description: "Tracing revenue back to specific ad actions and campaigns." },
+      { label: "Supply Chain", description: "Logistics and inventory management for e-commerce operations." },
+      { label: "Data Pipelines", description: "Automated data flows powering analytics and decision systems." }
+    ],
+    differentiator: "Rare combination of ad-tech revenue optimization and supply-chain infrastructure experience, bridging the gap between monetization strategy and operational execution.",
     award: {
       title: "Above and Beyond",
       summary: "Awarded for exceptional contribution to the Ad-Tech revenue optimization project.",
@@ -356,7 +487,7 @@ Since then, I have been thinking about how tools can help people express themsel
         title: "Seller Ads Intelligence System",
         subtitle: "Analytics Owner",
         summary: "Launched analytics foundation powering CPC, CPT, & banner ad products. Automated revenue attribution & forecasting driving ad bidding logic.",
-        expandedSummary: "Owned analytics and data pipelines for Snapdeal’s seller advertising systems, supporting performance measurement, pricing evaluation, experiments and seller ROI understanding across multiple ad formats.",
+        expandedSummary: "Owned analytics and data pipelines for Snapdeal's seller advertising systems, supporting performance measurement, pricing evaluation, experiments and seller ROI understanding across multiple ad formats.",
         pills: [
           { label: "CPC", description: "Cost Per Click. Advertisers are charged only when a user clicks on their ad." },
           { label: "CPT", description: "Cost Per Transaction. Advertisers pay a commission only when a sale occurs." },
@@ -368,13 +499,19 @@ Since then, I have been thinking about how tools can help people express themsel
           "Analyzing pricing and performance patterns across CPT, CPC, and banner ads",
           "Supporting internal product and business decisions around ad effectiveness",
           "Upkeep of algo pipelines that charge individual seller, audit with finance team"
+        ],
+        skills: [
+          { label: "SQL", description: "Structured query language for complex data analysis." },
+          { label: "Revenue Attribution", description: "Tracking revenue to specific ad interactions." },
+          { label: "A/B Testing", description: "Controlled experiments to measure ad effectiveness." },
+          { label: "Pricing Analytics", description: "Analyzing optimal pricing strategies for ad products." }
         ]
       },
       {
         title: "First-Party Warehousing Setup",
         subtitle: "Analytics Owner",
-        summary: "Contributed to Snapdeal’s first attempt at first-party warehousing, focusing on analytics and data systems supporting procurement automation.",
-        expandedSummary: "Contributed to Snapdeal’s first attempt at first-party warehousing, focusing on analytics and data systems supporting procurement automation, inventory visibility, and operational decision-making.",
+        summary: "Contributed to Snapdeal's first attempt at first-party warehousing, focusing on analytics and data systems supporting procurement automation.",
+        expandedSummary: "Contributed to Snapdeal's first attempt at first-party warehousing, focusing on analytics and data systems supporting procurement automation, inventory visibility, and operational decision-making.",
         pills: [
           { label: "Warehousing", description: "Optimization of physical storage, layout, and fulfillment center operations." },
           { label: "Procurement", description: "Automated purchasing workflows and supplier management systems." },
@@ -384,6 +521,11 @@ Since then, I have been thinking about how tools can help people express themsel
           "Working on analytics for Snapdeal-owned inventory instead of pure seller fulfillment",
           "Supporting automated procurement and inventory tracking workflows",
           "Analyzing warehouse- and SKU-level patterns affecting availability and fulfillment"
+        ],
+        skills: [
+          { label: "Forecasting", description: "Predicting future demand and inventory needs." },
+          { label: "Inventory Analytics", description: "Analyzing stock levels, turnover, and availability." },
+          { label: "Operational Dashboards", description: "Real-time monitoring of warehouse operations." }
         ]
       }
     ],
