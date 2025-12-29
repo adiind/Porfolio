@@ -13,6 +13,7 @@ import ProjectModal from './components/ProjectModal';
 import TinkerVerseModal from './components/TinkerVerseModal';
 import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
+// Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
 
 const App: React.FC = () => {
@@ -377,6 +378,8 @@ const App: React.FC = () => {
   const contentHeight = totalMonths * pixelsPerMonth;
   const totalContainerHeight = contentHeight + 400;
 
+
+
   // Animation Transition Configuration - fast tween for smooth GPU-accelerated animation
   const pageTransition = {
     type: "tween" as const,
@@ -386,6 +389,8 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative z-10">
+
+      {/* Background removed for performance - keeping it clean and minimal */}
 
       {/* Spotlight Overlay */}
       <motion.div
