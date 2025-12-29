@@ -8,45 +8,62 @@ export const TIMELINE_DATA: TimelineItem[] = [
     lane: 1,
     title: "P&G Design Project",
     company: "Northwestern",
+    headline: "Innovation strategy for a mature hair-care category.",
     type: "corporate",
     subtype: 'role',
     start: "2025-09-01",
     end: "2025-12-31",
-    summary: "Leading Hair-care UX Research & Prototyping initiative.",
-    bullets: ["Conducted 8 in-home ethnographic studies & 16 central-site user visits.", "Developed high-fidelity physical-digital prototypes for executive review."],
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Procter_%26_Gamble_logo.svg/2560px-Procter_%26_Gamble_logo.svg.png"
+    summary: "Exploring innovation in a mature, habit-driven hair-care category. Under NDA.",
+    bullets: [
+      "Worked in a highly saturated hair-care space where users are deeply conditioned to existing formats.",
+      "Studied why meaningful innovation is difficult in categories shaped by routine, expectation, and legacy design.",
+      "Conducted in-home and on-site user research to understand behavior beyond stated needs.",
+      "Built and iterated physical–digital prototypes within real-world brand and manufacturing constraints."
+    ],
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Procter_%26_Gamble_logo.svg/2560px-Procter_%26_Gamble_logo.svg.png",
+    differentiator: "Worked in a category where users already had strong preferences, making meaningful change difficult to introduce."
   },
   {
     id: "ms-edi",
     lane: 0,
     title: "MS Engineering Design Innovation",
-    company: "Northwestern University",
+    company: "Northwestern University | Segal Design Institute",
+    headline: "Deepening design engineering skills to build what matters.",
     type: "education",
     subtype: 'role',
-    start: "2025-01-01",
+    start: "2025-08-01",
     end: "2025-12-31",
-    summary: "Specializing in Human-Centered Design. Bridging the gap between engineering feasibility and user desirability.",
-    bullets: ["Thesis: AI-Human collaboration in creative workflows."],
+    summary: "Learning to decide what is worth building, and how to make it real.",
+    bullets: [
+      "Graduate program centered on human-centered design, systems thinking, and real-world problem solving",
+      "Studio-led work in ambiguous problem spaces with an emphasis on framing the right problem before building",
+      "Strong focus on user research, synthesis, and translating insight into concrete decisions",
+      "Regular exposure to trade-offs between technical feasibility, user needs, and execution constraints",
+      "Hands-on prototyping across physical and digital artifacts to validate ideas early",
+      "Collaborative, critique-driven environment that prioritizes clarity of thinking and intent"
+    ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Northwestern_Wildcats_logo.svg/1200px-Northwestern_Wildcats_logo.svg.png",
     skills: [
-      { label: "Rapid Prototyping", description: "Quickly building functional models to test and iterate on ideas." },
-      { label: "Service Design", description: "Designing end-to-end experiences across touchpoints and stakeholders." },
-      { label: "Interaction Design", description: "Crafting intuitive interfaces and user flows for digital products." },
-      { label: "Physical Computing", description: "Blending hardware and software to create interactive physical objects." },
-      { label: "Ethnographic Research", description: "Understanding user behavior through immersive observation and interviews." },
-      { label: "Figma", description: "Industry-standard tool for UI/UX design and collaborative prototyping." }
-    ]
+      { label: "User Research", description: "Qualitative and quantitative methods to uncover user needs." },
+      { label: "Interaction Design", description: "Crafting intuitive interfaces and user flows." },
+      { label: "Rapid Prototyping", description: "Iterative testing with physical and digital models." },
+      { label: "Design Strategy", description: "Aligning design decisions with business and user goals." },
+      { label: "Physical Computing", description: "Building interactive hardware systems." },
+      { label: "Figma", description: "Interface design and prototyping tool." }
+    ],
+    differentiator: "In an age where technology makes building fast and easy, this program sharpens my ability to decide what is worth building, and refines how I approach making it real."
   },
   {
     id: "zomato",
     lane: 1,
     title: "Senior Product Analyst",
     company: "Zomato",
+    headline: "Driving decisions for India's largest food delivery home screen.",
     type: "corporate",
     subtype: 'role',
     start: "2024-10-01",
     end: "2025-07-31",
-    summary: "Homepage & Search.",
+    summary: "Analytics for the highest-leverage surface in India's largest food delivery app.",
     bullets: [
       "Senior Product Analyst on Zomato's Homepage & Search team, the highest-leverage surface through which ~80% of all orders were placed.",
       "Worked directly with product, engineering and design teams on UI layout, listing size, module ordering, ranking logic and surface interactions.",
@@ -190,6 +207,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     title: "Jarvis Assistant",
     company: "IOT and Edge AI Electronics Design Contest Top 10 Winner",
     companyUrl: "https://circuitdigest.com/tags/iot-and-edge-ai-electronics-design-contest-2024",
+    headline: "Voice-controlled AI home assistant built from scratch.",
     type: "competition",
     subtype: 'role',
     start: "2024-11-01",
@@ -228,6 +246,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     lane: 2,
     title: "Surya",
     company: "Northwestern University",
+    headline: "Kinetic sculpture syncing mechanical flowers to global time zones.",
     type: "project",
     subtype: "role",
     start: "2025-09-01",
@@ -259,6 +278,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     lane: 2,
     title: "Vignette — The Plotter That Drew My Voice",
     company: "Personal Reflection",
+    headline: "A brief reflection on voice, imperfection, and plotting.",
     type: "vignette",
     subtype: "role",
     start: "2025-06-01",
@@ -279,11 +299,12 @@ Since then, I have been thinking about how tools can help people express themsel
     lane: 1,
     title: "Product Analyst",
     company: "Udaan",
+    headline: "Scaling supply chain & marketplace ops via data intelligence.",
     type: "corporate",
     subtype: 'role',
     start: "2023-02-01",
     end: "2024-09-30",
-    summary: "Supply Chain, Marketplace, Product Analytics, Platform Building.",
+    summary: "Built analytics and decision systems across supply chain, marketplace, and product at national scale.",
     bullets: [
       "Worked full-time across Udaan's supply-chain vertical, supporting marketplace and inventory models at national scale.",
       "Owned reporting systems, procurement and availability analytics, and operational decision-intelligence used by product managers, central ops, warehousing, catalogue, pricing and CX teams.",
@@ -460,15 +481,41 @@ Since then, I have been thinking about how tools can help people express themsel
     }
   },
   {
+    id: "schmooze",
+    lane: 1,
+    title: "Product and Growth Analyst",
+    company: "Schmooze",
+    headline: "Zero-to-one analytics for a meme-based dating app.",
+    type: "corporate",
+    subtype: 'role',
+    start: "2022-10-01",
+    end: "2022-12-31",
+    summary: "Pre-PMF analytics at a seed-stage dating app exploring meme-based matching.",
+    bullets: [
+      "Second analyst in the company working in a multifunctional role across product, basic growth, and user behavior.",
+      "Set up the V0 top down dashboards for creator management at scale.",
+      "Tested early tech implementations and strategies to validate whether the concept had traction."
+    ],
+    logoUrl: "https://play-lh.googleusercontent.com/oxwoyND_20iYZnGTGmO1hQNn0D8bvrOCT8MLc6ZO-WxpgPyyb1ocusYwJJsYwr9IunrN=s512-rw",
+    differentiator: "Analytics here happened before product market fit, where data is incomplete, experiments are messy, and signal has to be created from zero.",
+    skills: [
+      { label: "Exploration–Exploitation", description: "Balancing testing new ideas with repeating what is already working." },
+      { label: "User Session Analysis", description: "Manually watching individual sessions to understand behavior." },
+      { label: "V0 Dashboards", description: "First directional dashboards created for decision-making." },
+      { label: "Mixpanel", description: "Event-based product analytics for tracking user interactions and funnels." }
+    ]
+  },
+  {
     id: "snapdeal",
     lane: 1,
     title: "Data Analyst",
     company: "Snapdeal",
+    headline: "Optimizing ad revenue and warehousing logic at scale.",
     type: "corporate",
     subtype: 'role',
     start: "2020-06-01",
     end: "2022-09-30",
-    summary: "Ad-Revenue & Infrastructure.",
+    summary: "Built ad-tech analytics and first-party warehousing systems for e-commerce at scale.",
     bullets: ["Automated warehouse forecasting.", "Increased Ad Revenue by 14%."],
     skills: [
       { label: "Ad-Tech Analytics", description: "Performance measurement and optimization for advertising products." },
@@ -536,38 +583,119 @@ Since then, I have been thinking about how tools can help people express themsel
     lane: 2,
     title: "Founder & Creator",
     company: "Tinker Verse",
+    headline: "A sandbox for physical computing and creative tech.",
     type: "personal",
     subtype: 'role',
     start: "2024-02-01",
     end: "2025-12-31",
-    summary: "Design, Hardware & Storytelling.",
+    summary: "Personal lab for physical computing, generative art, and expressive hardware.",
     bullets: ["Voice-controlled home assistant.", "Generative drawing plotter."],
-    logoUrl: TINKERVERSE_LOGO
-  },
-  {
-    id: "rightbiotic",
-    lane: 2,
-    title: "Product Lead",
-    company: "Rightbiotic",
-    type: "foundational",
-    subtype: 'role',
-    start: "2019-09-01",
-    end: "2020-05-30",
-    summary: "Medical Device Design.",
-    bullets: ["Antimicrobial Resistance Analyzer.", "65% volume reduction."]
+    logoUrl: TINKERVERSE_LOGO,
+    projects: [
+      {
+        id: "jarvis",
+        title: "Jarvis Home Assistant",
+        description: "A voice-controlled home automation system built with Maixduino and MQTT. Features local voice recognition, motion detection, and seamless integration with Home Assistant.",
+        imageUrl: "https://img.youtube.com/vi/3aCWb3PsAQs/maxresdefault.jpg",
+        videoUrl: "https://www.youtube.com/watch?v=3aCWb3PsAQs",
+        tags: ["IoT", "AI", "C++"],
+        link: "https://github.com/adiind/diy-jarvis"
+      },
+      {
+        id: "plotter",
+        title: "Voice Plotter",
+        description: "A generative art machine that translates spoken words into physical drawings. Explores the imperfection of translation between digital voice and analog motion.",
+        imageUrl: "https://i.ibb.co/v6nVSTw9/IMG-8392-2.jpg",
+        tags: ["Generative Art", "Robotics", "Python"],
+        link: "#"
+      },
+      {
+        id: "surya",
+        title: "Surya",
+        description: "Kinetic sculpture that syncs mechanical flowers to global time zones. A physical representation of connection across distance.",
+        imageUrl: "https://i.ibb.co/5gWPHd62/IMG-1438.jpg",
+        tags: ["Kinetic Art", "Interaction Design", "Arduino"],
+        link: "https://github.com/adiind/surya"
+      }
+    ]
   },
   {
     id: "bits",
     lane: 0,
-    title: "MSc Bio Science + B.Tech Civil Engineering",
-    company: "BITS Pilani",
+    title: "B.Tech Civil Engineering + M.Sc. Biological Sciences",
+    company: "BITS Pilani, Hyderabad Campus",
+    headline: "Foundational dual-degree in Engineering & Biology.",
     type: "education",
     subtype: 'role',
     start: "2016-08-01",
     end: "2021-05-30",
-    summary: "Dual Degree. Integrated Masters.",
-    bullets: ["TEDx Stage Design Head."],
+    summary: "Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives.",
+    bullets: [
+      "Dual-degree education spanning civil engineering and biological sciences, enabling systems-level thinking across physical and biological domains.",
+      "Early exposure to medical innovation and bio-design through structured workshops and healthcare-focused projects.",
+      "Led and contributed to healthcare and sanitation design projects addressing real-world constraints and usability.",
+      "Stage Design Head for TEDx BITS Hyderabad, responsible for concept development and execution.",
+      "Secretary, Synapsis (Biological Science Association), driving academic engagement and student-led initiatives.",
+      "Founder and Instructor, Inferno (Self Defense Society), trained and mentored students with a focus on fitness and personal safety.",
+      "Hockey A Team member, representing the institute in competitive sports."
+    ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/en/d/d3/BITS_Pilani-Logo.svg",
-
+    differentiator: "This phase shaped my interdisciplinary instincts by working across biology, engineering, and design long before it became a formal specialization.",
+    skills: [
+      { label: "Healthcare Instrumentation", description: "Designing medical devices and testing systems for clinical use." },
+      { label: "Product Design", description: "End-to-end physical product development from concept to prototype." },
+      { label: "Electronics Design", description: "PCB layout, component selection, and hardware integration." },
+      { label: "Sustainability", description: "Resource-conscious design considering environmental impact." },
+      { label: "Human-Centered Infrastructure", description: "Designing systems that prioritize user comfort and accessibility." },
+      { label: "Systems Thinking", description: "Approaching problems as interconnected systems rather than isolated parts." }
+    ],
+    featureCards: [
+      {
+        title: "Rightbiotic: Antimicrobial Testing Machine",
+        subtitle: "Healthcare Instrumentation",
+        summary: "Collaborated on a low-cost antimicrobial resistance testing system to reduce test turnaround from days to hours.",
+        expandedSummary: "Worked under the guidance of Dr. Suman Kapur (late) to repurpose a UTI analysis machine for antimicrobial resistance testing. Owned the product design layer, working with multiple PCB vendors and proposing a compact redesign using smaller, more efficient components. Co-developed a simple, lab-friendly app with a software collaborator to improve usability for technicians. Project could not be fabricated due to COVID-19 disruptions and health constraints, but reflects real-world healthcare innovation under pressure.",
+        pills: [
+          { label: "AMR Testing", description: "Antimicrobial Resistance testing to identify drug-resistant bacteria." },
+          { label: "PCB Design", description: "Printed circuit board layout and component integration." },
+          { label: "Medical Devices", description: "Healthcare instrumentation designed for clinical environments." },
+          { label: "Rapid Diagnostics", description: "Reducing test turnaround time from days to hours." }
+        ],
+        details: [
+          "Repurposed UTI analysis machine for antimicrobial resistance testing",
+          "Proposed compact redesign with smaller, more efficient components",
+          "Co-developed lab-friendly app for technician usability"
+        ],
+        skills: [
+          { label: "Healthcare Instrumentation", description: "Designing medical devices for clinical use." },
+          { label: "PCB Design", description: "Circuit board layout and vendor coordination." },
+          { label: "Product Design", description: "Physical product development and prototyping." },
+          { label: "Cross-Functional Collaboration", description: "Working with software and hardware teams." }
+        ]
+      },
+      {
+        title: "Modular Water Closet System",
+        subtitle: "Sanitation Design",
+        summary: "Designed a modular water closet system adaptable to multiple settings with a focus on efficiency and sustainability.",
+        expandedSummary: "Approached sanitation as a systems design problem balancing user comfort, resource use, and scalability. Integrated water-saving flush mechanisms, ergonomic interactions, and responsible material selection. Developed concept renders featuring an adjustable ergonomic handle with angle and force control, along with an attachable bidet compatible with standard Western toilets.",
+        pills: [
+          { label: "Sustainability", description: "Water-saving and resource-conscious design principles." },
+          { label: "Ergonomics", description: "Designing for user comfort and physical interaction." },
+          { label: "Modular Design", description: "Adaptable systems for multiple settings and use cases." },
+          { label: "Sanitation", description: "Infrastructure focused on hygiene and accessibility." }
+        ],
+        details: [
+          "Integrated water-saving flush mechanisms",
+          "Designed adjustable ergonomic handle with angle and force control",
+          "Created attachable bidet compatible with standard Western toilets"
+        ],
+        skills: [
+          { label: "Sustainability", description: "Resource-conscious design considering environmental impact." },
+          { label: "Ergonomic Design", description: "Optimizing for user comfort and physical interaction." },
+          { label: "Systems Design", description: "Balancing user comfort, resource use, and scalability." },
+          { label: "Concept Rendering", description: "Visualizing product concepts for stakeholder review." }
+        ]
+      }
+    ]
   }
 ];
