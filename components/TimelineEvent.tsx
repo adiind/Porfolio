@@ -44,13 +44,6 @@ const TimelineEvent: React.FC<Props> = ({
   // Helper to check scrolling status (combining Prop and Ref for best accuracy)
   const isActuallyScrolling = () => isScrolling || (isScrollingRef?.current === true);
 
-  // Manage which feature card is expanded (by index)
-  const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null);
-
-  // State for toolkit skill tooltips
-  const [hoveredToolkitSkill, setHoveredToolkitSkill] = useState<string | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
-
   // When scrolling stops and mouse is over card, trigger hover
   useEffect(() => {
     const wasScrolling = prevIsScrollingRef.current;
@@ -171,7 +164,7 @@ const TimelineEvent: React.FC<Props> = ({
     if (isVignette) {
       return (
         <motion.div
-          layout
+          layoutId={`card-${item.id}`} // Shared layout transition
           initial={{ opacity: 0, x: -20 }}
           animate={{ top, opacity: 1, x: 0, zIndex: isHovered ? 60 : 10 }}
           style={{
@@ -256,7 +249,7 @@ const TimelineEvent: React.FC<Props> = ({
 
     return (
       <motion.div
-        layout
+        layoutId={`card-${item.id}`} // Shared layout transition
         initial={{ opacity: 0, x: -50 }}
         animate={{
           top: top,
@@ -442,6 +435,15 @@ const TimelineEvent: React.FC<Props> = ({
   // --- STANDARD CARD RENDER ---
   return (
     <motion.div
+      layoutId={`card-${item.id}`} // Shared layout transition
+      id={`timeline-card-${item.id}`}
+      onClick={(e) => {
+        if (!isFit) {
+          e.stopPropagation();
+          console.log('[TimelineEvent] Click detected, calling onOpenProject for:', item.id);
+          onOpenProject && onOpenProject(item);
+        }
+      }}
       onMouseEnter={() => {
         isMouseOverRef.current = true;
         if (!isActuallyScrolling()) {
@@ -468,6 +470,7 @@ const TimelineEvent: React.FC<Props> = ({
       animate={{
         top: top,
         opacity: isDimmed ? 0.1 : 1,
+        // Slightly larger hover scale
         scale: isDimmed ? 0.98 : isHovered ? 1.05 : 1,
         y: 0,
         filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
@@ -479,29 +482,37 @@ const TimelineEvent: React.FC<Props> = ({
         damping: 25,
         layout: { duration: 0.4, ease: 'easeOut' }
       }}
-      style={{
-        position: 'absolute',
-        ...laneStyle,
-        ...(isHovered && !isFit ? {
-          height: 'auto',
-          width: '450px',
-          maxWidth: '85vw',
-          left: laneStyle.left,
-          right: 'auto',
-          minHeight: `${height}px`
-        } : {
-          height: `${height}px`,
-          minHeight: `${height}px`
-        }),
-      }}
+      style={(() => {
+        const hoverActive = isHovered && !isFit;
+        if (hoverActive) {
+          console.log('[TimelineEvent] Hover ACTIVE for:', item.id, { isHovered, isFit, mode });
+        }
+        return {
+          position: 'absolute' as const,
+          ...laneStyle,
+          // EXPANDED HOVER WIDTH
+          ...(hoverActive ? {
+            height: 'auto',
+            width: '800px', // Even wider hover state
+            maxWidth: '90vw',
+            left: laneStyle.left,
+            right: 'auto',
+            minHeight: `${height}px`
+          } : {
+            height: `${height}px`,
+            minHeight: `${height}px`
+          }),
+        };
+      })()}
       className={`
-        rounded-lg md:rounded-xl backdrop-blur-md cursor-pointer overflow-hidden group
+        rounded-lg md:rounded-xl backdrop-blur-md cursor-pointer group
         transition-colors duration-500 border border-transparent
         flex flex-col
         ${s.glass} ${!isFit && s.hoverGlass}
       `}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 pointer-events-none" />
+
       <div className={`flex flex-col relative z-10 ${isFit ? 'h-full p-2 justify-center' : 'p-3 md:p-4'}`}>
         <div className="flex justify-between items-start gap-2">
           <motion.div className="flex-1 min-w-0 relative">
@@ -541,166 +552,49 @@ const TimelineEvent: React.FC<Props> = ({
               {item.company}
             </motion.p>
           </motion.div>
+
+          {/* Date Badge */}
+          <div className={`text-[9px] font-mono opacity-60 whitespace-nowrap ${s.subtext}`}>
+            {formatDate(item.start)}
+          </div>
         </div>
 
+        {/* Content (Only show details when hovered or fit mode) */}
         <AnimatePresence>
-          {(isHovered && !isFit) && (
+          {(isHovered || !isFit) && (
             <motion.div
-              layout
-              initial={{ opacity: 0, maxHeight: 0 }}
-              animate={{ opacity: 1, maxHeight: 2000 }}
-              exit={{ opacity: 0, maxHeight: 0 }}
-              transition={{
-                maxHeight: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
-                opacity: { duration: 0.3 }
-              }}
-              style={{ overflow: 'hidden' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
               className="mt-3 pt-3 border-t border-white/10"
             >
-              <p className={`text-xs leading-relaxed mb-3 opacity-90 ${s.text}`}>{item.summary}</p>
-              <ul className={`space-y-1.5 text-xs ${s.subtext}`}>
-                {item.bullets?.map((bullet, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-60 shrink-0" />
-                    <span className="opacity-90">{bullet}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className={`text-xs md:text-sm leading-relaxed mb-3 opacity-90 ${s.text}`}>
+                {item.summary}
+              </p>
 
-              {/* SKILLS PILLS (Footer) with Hover Effects & Tooltips */}
+              {/* Bullets (only on hover) */}
+              {item.bullets && (
+                <ul className="space-y-1.5 mb-3">
+                  {item.bullets.slice(0, 3).map((bullet, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-[10px] opacity-80">
+                      <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-60 shrink-0" />
+                      <span className="leading-relaxed">{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* Skills */}
               {item.skills && (
                 <motion.div layout className="mt-4 pt-3 border-t border-white/10">
                   <div className="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-2">Toolkit</div>
                   <div className="flex flex-wrap gap-2">
                     {item.skills.map((skill, idx) => (
-                      <motion.div
-                        key={idx}
-                        onMouseEnter={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltipPos({
-                            top: rect.top + window.scrollY,
-                            left: rect.left + rect.width / 2 + window.scrollX
-                          });
-                          setHoveredToolkitSkill(skill.label);
-                        }}
-                        onMouseLeave={() => setHoveredToolkitSkill(null)}
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: item.lane === 0
-                            ? '0 0 12px rgba(244,63,94,0.4)'
-                            : '0 0 12px rgba(255,255,255,0.2)'
-                        }}
-                        className={`text-[9px] uppercase tracking-wide border px-2 py-1 rounded-full bg-white/5 whitespace-nowrap cursor-help transition-all duration-200 ${hoveredToolkitSkill === skill.label
-                            ? (item.lane === 0
-                              ? 'border-rose-400/60 text-rose-50 bg-rose-500/15'
-                              : 'border-white/50 text-white bg-white/15')
-                            : (item.lane === 0
-                              ? 'border-rose-500/30 text-rose-100 hover:border-rose-400/50 hover:text-rose-50 hover:bg-rose-500/10'
-                              : 'border-white/20 text-white/80 hover:border-white/40 hover:text-white hover:bg-white/10')
-                          }`}
-                      >
+                      <span key={idx} className="px-2 py-0.5 rounded text-[10px] bg-white/5 border border-white/5 opacity-70 whitespace-nowrap">
                         {skill.label}
-                      </motion.div>
+                      </span>
                     ))}
-                  </div>
-
-                  {/* Toolkit Skill Tooltip Portal */}
-                  {hoveredToolkitSkill && ReactDOM.createPortal(
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      style={{
-                        position: 'absolute',
-                        top: tooltipPos.top - 15,
-                        left: tooltipPos.left,
-                        zIndex: 99999,
-                        transform: 'translate(-50%, -100%)'
-                      }}
-                      className={`w-56 p-4 rounded-xl bg-[#0a0a0a] shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden pointer-events-none ${item.lane === 0 ? 'border border-rose-500/40' : 'border border-white/30'
-                        }`}
-                    >
-                      <div className={`absolute top-0 left-0 w-full h-1 ${item.lane === 0 ? 'bg-gradient-to-r from-rose-600 to-rose-300' : 'bg-gradient-to-r from-gray-500 to-gray-300'
-                        }`} />
-                      <div className={`text-[9px] uppercase font-bold mb-1.5 tracking-wider ${item.lane === 0 ? 'text-rose-400' : 'text-gray-400'
-                        }`}>
-                        {hoveredToolkitSkill}
-                      </div>
-                      <div className="text-xs text-gray-200 leading-snug font-medium">
-                        {item.skills?.find(s => s.label === hoveredToolkitSkill)?.description}
-                      </div>
-                      <div className={`absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0a0a0a] rotate-45 ${item.lane === 0 ? 'border-r border-b border-rose-500/40' : 'border-r border-b border-white/30'
-                        }`} />
-                    </motion.div>,
-                    document.body
-                  )}
-                </motion.div>
-              )}
-
-              {/* AWARD MODULE (Gold Theme) */}
-              {item.award && (
-                <motion.div layout className="mt-4 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg p-3 text-amber-900 shadow-lg relative overflow-hidden border border-yellow-200">
-                  <div className="flex gap-3 items-center relative z-10">
-                    <div className="w-10 h-10 rounded-full bg-yellow-300 flex items-center justify-center text-yellow-700 shadow-inner flex-shrink-0">
-                      <Trophy size={20} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[10px] uppercase font-bold tracking-widest text-amber-700 mb-0.5">Achievement</div>
-                      <h4 className="text-xs font-bold leading-tight truncate">{item.award.title}</h4>
-                      <p className="text-[10px] text-amber-800/80 mt-1 line-clamp-2">{item.award.summary}</p>
-                    </div>
-                  </div>
-                  {/* Decoration */}
-                  <div className="absolute -right-4 -bottom-4 text-yellow-500/10">
-                    <Trophy size={80} />
-                  </div>
-                </motion.div>
-              )}
-
-              {/* DIFFERENTIATOR CALLOUT - Enhanced & Above Projects */}
-              {item.differentiator && (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="mt-4 relative rounded-xl overflow-hidden"
-                >
-                  {/* Animated gradient border */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600 opacity-30 blur-sm" />
-                  <div className="absolute inset-[1px] rounded-xl bg-[#0a0a0a]" />
-
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute inset-0 opacity-20">
-                      <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]"
-                        style={{ animation: 'shimmer 3s infinite linear' }} />
-                    </div>
-                  </div>
-
-                  <div className="relative p-4">
-                    <div className="flex items-start gap-4">
-                      {/* Icon with glow */}
-                      <div className="relative flex-shrink-0">
-                        <div className="absolute inset-0 bg-violet-500/30 rounded-xl blur-md" />
-                        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center border border-violet-500/40">
-                          <svg className="w-5 h-5 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-[9px] uppercase tracking-widest font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                            What Sets Me Apart
-                          </span>
-                          <div className="flex-1 h-px bg-gradient-to-r from-violet-500/30 to-transparent" />
-                        </div>
-                        <p className="text-sm text-gray-200 leading-relaxed font-medium">{item.differentiator}</p>
-                      </div>
-                    </div>
                   </div>
                 </motion.div>
               )}
@@ -710,8 +604,9 @@ const TimelineEvent: React.FC<Props> = ({
                 <SnapdealAdsCard
                   key={idx}
                   data={card}
-                  isExpanded={expandedCardIndex === idx}
-                  onToggle={() => setExpandedCardIndex(expandedCardIndex === idx ? null : idx)}
+                  // We don't have expanded logic here anymore, just show collapsed
+                  isExpanded={false}
+                  onToggle={() => { }}
                 />
               ))}
 
