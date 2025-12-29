@@ -2,34 +2,72 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { USER_IMAGE_URL, SOCIAL_LINKS } from '../constants';
-import { Mail, Copy, Check } from 'lucide-react';
+import { Mail, Copy, Check, BarChart3, Code, Palette, Cpu, Printer } from 'lucide-react';
+import RadialOrbitalTimeline from './ui/radial-orbital-timeline';
+
+const skillsTimelineData = [
+  {
+    id: 1,
+    title: "Analytics",
+    date: "Core Skill",
+    content: "Data analysis, insights generation, and metrics-driven decision making.",
+    category: "Data",
+    icon: BarChart3,
+    relatedIds: [2, 3],
+    status: "completed" as const,
+    energy: 95,
+  },
+  {
+    id: 2,
+    title: "Development",
+    date: "Core Skill",
+    content: "Full-stack software engineering, from prototypes to production systems.",
+    category: "Engineering",
+    icon: Code,
+    relatedIds: [1, 3, 4],
+    status: "completed" as const,
+    energy: 90,
+  },
+  {
+    id: 3,
+    title: "Design",
+    date: "Core Skill",
+    content: "UI/UX design, user research, and creating delightful experiences.",
+    category: "Creative",
+    icon: Palette,
+    relatedIds: [1, 2],
+    status: "completed" as const,
+    energy: 85,
+  },
+  {
+    id: 4,
+    title: "Electronics",
+    date: "Core Skill",
+    content: "Hardware design, circuit prototyping, and embedded systems.",
+    category: "Hardware",
+    icon: Cpu,
+    relatedIds: [2, 5],
+    status: "in-progress" as const,
+    energy: 80,
+  },
+  {
+    id: 5,
+    title: "3D Printing",
+    date: "Core Skill",
+    content: "Additive manufacturing, CAD modeling, and rapid prototyping.",
+    category: "Making",
+    icon: Printer,
+    relatedIds: [4],
+    status: "in-progress" as const,
+    energy: 75,
+  },
+];
 
 interface Props {
   onOpenProfile?: () => void;
 }
 
-// 3D Fluent Emoji Assets (High quality, clay/3D style)
-const ASSETS = {
-  code: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Laptop.png",
-  design: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Artist%20Palette.png",
-  data: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Chart%20Increasing.png",
-  electronics: "https://cdn3d.iconscout.com/3d/premium/thumb/microcontroller-5654959-4712959.png", 
-  print: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Gear.png"
-};
 
-// Expanded orbit layout - much more spaced out
-const skills = [
-  // Top-left - far out
-  { id: 'data', img: ASSETS.data, label: 'Data', x: -480, y: -180, color: '#10b981', delay: 4 }, 
-  // Top-center - higher
-  { id: 'code', img: ASSETS.code, label: 'Code', x: 0, y: -350, color: '#6366f1', delay: 0 }, 
-  // Top-right - far out
-  { id: 'design', img: ASSETS.design, label: 'Design', x: 480, y: -180, color: '#f43f5e', delay: 1 }, 
-  // Bottom-left - far out and down
-  { id: 'electronics', img: ASSETS.electronics, label: 'Electronics', x: -420, y: 320, color: '#eab308', delay: 3 }, 
-  // Bottom-right - far out and down
-  { id: 'print', img: ASSETS.print, label: '3D Printing', x: 420, y: 320, color: '#f97316', delay: 2 }, 
-];
 
 const Hero: React.FC<Props> = ({ onOpenProfile }) => {
   const [copied, setCopied] = useState(false);
@@ -52,16 +90,16 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
   return (
     <div className="relative flex flex-col items-center justify-start h-full w-full pointer-events-none perspective-[1200px] pt-24 md:pt-32">
-      
+
       {/* Central Interactive Composition */}
       <div className="relative w-[320px] h-[320px] md:w-[480px] md:h-[480px] flex items-center justify-center group/hero">
-        
+
         {/* SPEECH BUBBLE - positioned to right of head with tail pointing to head */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, x: 50 }}
-          animate={{ 
-            opacity: 1, 
-            scale: 1, 
+          animate={{
+            opacity: 1,
+            scale: 1,
             x: 0,
             transition: { delay: 1.5, type: 'spring' }
           }}
@@ -77,30 +115,30 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
             {/* Main bubble */}
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-w-[320px] md:max-w-md">
               <p className="text-white text-sm md:text-base font-medium leading-relaxed mb-3 whitespace-nowrap">
-                <span className="text-2xl mr-1">👋</span> 
+                <span className="text-2xl mr-1">👋</span>
                 Hey I am <span className="font-bold text-white">Adi</span>, welcome to my <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">vibe coded</span> portfolio!
               </p>
-              
+
               <div className="space-y-3">
                 <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold whitespace-nowrap">
                   Open for Summer 2026 Internships
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {['Product Management', 'Design', 'Development', 'Research'].map((role, i) => (
-                    <span 
-                      key={i} 
+                    <span
+                      key={i}
                       className={`px-2 py-1 rounded-md border text-[10px] md:text-xs transition-colors cursor-default ${pillColors[i % pillColors.length]}`}
                     >
                       {role}
                     </span>
                   ))}
                 </div>
-                
+
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                  <a 
+                  <a
                     href={SOCIAL_LINKS.email}
                     className="flex items-center gap-2 text-xs font-bold text-white/80 hover:text-white transition-colors group"
-                    onClick={(e) => e.stopPropagation()} 
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <div className="p-1.5 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors">
                       <Mail size={12} />
@@ -120,13 +158,13 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                 </div>
               </div>
             </div>
-            
+
             {/* Speech bubble tail - pointing left towards head */}
             <div className="absolute left-0 top-8 -translate-x-full">
               <svg width="24" height="20" viewBox="0 0 24 20" fill="none" className="drop-shadow-lg">
-                <path 
-                  d="M24 0 L24 20 L0 10 Z" 
-                  fill="rgba(255,255,255,0.1)" 
+                <path
+                  d="M24 0 L24 20 L0 10 Z"
+                  fill="rgba(255,255,255,0.1)"
                   stroke="rgba(255,255,255,0.2)"
                   strokeWidth="1"
                 />
@@ -135,106 +173,110 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           </motion.div>
         </motion.div>
 
-        {/* Main Character (Front) */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "backOut" }}
-          className="relative z-20 w-full h-full filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] cursor-pointer pointer-events-auto"
-          onClick={onOpenProfile}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {/* Hover Glow Ring */}
-          <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl opacity-0 group-hover/hero:opacity-100 transition-opacity duration-500" />
-          
-          {/* Gentle Float Animation */}
+        {/* Radial Orbital Timeline with Skills */}
+        <RadialOrbitalTimeline timelineData={skillsTimelineData}>
+          {/* Main Character (Front) */}
           <motion.div
-             animate={{ y: [-8, 8, -8] }}
-             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-             className="w-full h-full"
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "backOut" }}
+            className="relative z-20 w-[200px] h-[200px] md:w-[280px] md:h-[280px] filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] cursor-pointer pointer-events-auto"
+            onClick={onOpenProfile}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <img 
-               src={USER_IMAGE_URL} 
-               alt="Profile" 
-               className="w-full h-full object-contain" 
-             />
-          </motion.div>
-          
-          {/* Click Hint */}
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/hero:opacity-100 transition-opacity duration-300 text-[10px] uppercase tracking-widest text-white/50 whitespace-nowrap bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
-            Click to View Profile
-          </div>
-        </motion.div>
+            {/* Hover Glow Ring */}
+            <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl opacity-0 group-hover/hero:opacity-100 transition-opacity duration-500" />
 
-        {/* Floating 3D Icons */}
-        {skills.map((skill, i) => (
-          <motion.div
-            key={skill.id}
-            initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              x: skill.x, 
-              y: skill.y 
-            }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 40, 
-              damping: 15,
-              delay: 0.2 + i * 0.1,
-              duration: 1.5
-            }}
-            className="absolute z-30 flex flex-col items-center gap-2 group"
-          >
-            {/* 3D Asset Image with Hover Growth */}
+            {/* Gentle Float Animation */}
             <motion.div
-              whileHover={{ scale: 1.4 }}
-              animate={{ 
-                y: [0, -15, 0],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ 
-                y: { duration: 4 + i, repeat: Infinity, delay: skill.delay, ease: "easeInOut" },
-                rotate: { duration: 6 + i, repeat: Infinity, delay: skill.delay, ease: "easeInOut" }
-              }}
-              className="cursor-pointer pointer-events-auto filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.3)]"
+              animate={{ y: [-8, 8, -8] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="w-full h-full"
             >
-              <img 
-                src={skill.img} 
-                alt={skill.label}
-                className="w-20 h-20 md:w-28 md:h-28 object-contain"
+              <img
+                src={USER_IMAGE_URL}
+                alt="Profile"
+                className="w-full h-full object-contain"
               />
             </motion.div>
-            
-            {/* Minimal Label */}
-            <div 
-              className="opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 
-              text-[10px] md:text-[11px] font-black tracking-widest uppercase text-white/90 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md shadow-xl border border-white/10"
-              style={{ color: skill.color }}
-            >
-              {skill.label}
+
+            {/* Click Hint */}
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/hero:opacity-100 transition-opacity duration-300 text-[10px] uppercase tracking-widest text-white/50 whitespace-nowrap bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
+              Click to View Profile
             </div>
           </motion.div>
-        ))}
+        </RadialOrbitalTimeline>
+
+
       </div>
 
       {/* Intro Text - moved up closer to character */}
-      <motion.div 
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="-mt-4 md:-mt-8 text-center relative z-20"
-      >
-        <h1 
-          className="text-5xl md:text-8xl font-normal tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
+      {/* Intro Text - Staggered Reveal */}
+      <div className="-mt-4 md:-mt-8 text-center relative z-20 overflow-hidden">
+        <motion.h1
+          className="text-5xl md:text-8xl font-normal tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4"
+          initial="hidden"
+          animate="visible"
         >
-          <span className="font-bold">Adi</span> Agarwal
-        </h1>
-        <p className="text-sm md:text-lg text-white/60 uppercase tracking-[0.3em] font-bold">
+          {/* Adi */}
+          <div className="flex">
+            {Array.from("Adi").map((char, i) => (
+              <motion.span
+                key={`adi-${i}`}
+                custom={i}
+                variants={{
+                  hidden: { opacity: 0, y: 50 },
+                  visible: (i) => ({
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      delay: 0.1 + (i * 0.1),
+                      duration: 0.8,
+                      ease: [0.2, 0.65, 0.3, 0.9],
+                    }
+                  })
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </div>
+
+          {/* Agarwal */}
+          <div className="flex font-bold">
+            {Array.from("Agarwal").map((char, i) => (
+              <motion.span
+                key={`agarwal-${i}`}
+                custom={i + 3} // Offset index
+                variants={{
+                  hidden: { opacity: 0, y: 50 },
+                  visible: (i) => ({
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      delay: 0.1 + (i * 0.1),
+                      duration: 0.8,
+                      ease: [0.2, 0.65, 0.3, 0.9],
+                    }
+                  })
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </div>
+        </motion.h1>
+
+        <motion.p
+          className="text-sm md:text-lg text-white/60 uppercase tracking-[0.3em] font-bold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+        >
           Product | Engineering | Data | Design
-        </p>
-      </motion.div>
+        </motion.p>
+      </div>
     </div>
   );
 };

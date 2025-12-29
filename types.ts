@@ -48,6 +48,7 @@ export interface TimelineItem {
   title: string;
   company: string;
   companyUrl?: string; // Optional URL for company/competition
+  headline?: string; // Brief one-liner visible before hover
   type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project' | 'vignette';
   subtype?: 'role' | 'post';
   start: string; // YYYY-MM-DD
@@ -78,6 +79,9 @@ export interface TimelineItem {
 
   // Differentiator callout for company cards
   differentiator?: string;
+
+  // TinkerVerse Projects
+  projects?: TinkerProject[];
 }
 
 export interface SocialPost {
@@ -93,6 +97,16 @@ export interface SocialPost {
 export interface TimelineConfig {
   startDate: string;
   endDate: string;
+}
+
+export interface TinkerProject {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  tags: string[];
+  link?: string;
 }
 
 export type TimelineMode = 'intro' | 'fit' | 'normal' | 'detail';

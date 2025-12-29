@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
@@ -17,6 +17,7 @@ interface Props {
   mode: TimelineMode;
   onOpenCaseStudy: (study: CaseStudy) => void;
   onOpenProject?: (project: TimelineItem) => void;
+  onOpenTinkerVerse?: () => void;
   isScrolling?: boolean;
   isScrollingRef?: React.MutableRefObject<boolean>;
 }
@@ -31,6 +32,7 @@ const TimelineEvent: React.FC<Props> = ({
   mode,
   onOpenCaseStudy,
   onOpenProject,
+  onOpenTinkerVerse,
   isScrolling = false,
   isScrollingRef
 }) => {
@@ -50,6 +52,28 @@ const TimelineEvent: React.FC<Props> = ({
   // State for toolkit skill tooltips
   const [hoveredToolkitSkill, setHoveredToolkitSkill] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
+
+
+  // 3D Tilt Logic
+  const tiltX = useMotionValue(0.5);
+  const tiltY = useMotionValue(0.5);
+  const springX = useSpring(tiltX, { stiffness: 300, damping: 30 });
+  const springY = useSpring(tiltY, { stiffness: 300, damping: 30 });
+  const rotateX = useTransform(springY, [0, 1], [15, -15]); // Exaggerated tilt (was 3deg)
+  const rotateY = useTransform(springX, [0, 1], [-15, 15]);
+
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    tiltX.set(x);
+    tiltY.set(y);
+  };
+
+  const handleTiltLeave = () => {
+    tiltX.set(0.5);
+    tiltY.set(0.5);
+  };
 
   // When scrolling stops and mouse is over card, trigger hover
   useEffect(() => {
@@ -395,7 +419,7 @@ const TimelineEvent: React.FC<Props> = ({
   // --- TINKERVERSE RENDER ---
   if (isTinkerVerse) {
     return (
-      <div
+      <motion.div
         className={`rounded-lg md:rounded-xl backdrop-blur-md transition-colors duration-500 border border-transparent ${s.glass}`}
         style={{
           position: 'absolute',
@@ -406,25 +430,42 @@ const TimelineEvent: React.FC<Props> = ({
           minHeight: height,
           opacity: isDimmed ? 0.1 : 1,
           filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
-          zIndex: isHovered ? 50 : 10
+          zIndex: isHovered ? 50 : 10,
+          perspective: 1000,
+          rotateX: isHovered && !isScrolling ? rotateX : 0,
+          rotateY: isHovered && !isScrolling ? rotateY : 0,
         }}
-        onMouseEnter={() => {
+        animate={{
+          scale: isHovered ? 1.15 : 1,
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 100,
+          damping: 25,
+          layout: { duration: 0.4, ease: 'easeOut' }
+        }}
+        onMouseEnter={(e) => {
           isMouseOverRef.current = true;
           if (!isScrolling) {
             onHover(item.id);
             onLaneHover(item.lane);
+            handleTiltMove(e);
           }
         }}
-        onMouseMove={() => {
+        onMouseMove={(e) => {
           if (!isScrolling && hoveredId !== item.id) {
             onHover(item.id);
             onLaneHover(item.lane);
+          }
+          if (!isScrolling) {
+            handleTiltMove(e);
           }
         }}
         onMouseLeave={() => {
           isMouseOverRef.current = false;
           onHover(null);
           onLaneHover(null);
+          handleTiltLeave();
         }}
       >
         <TinkerVerseGrid
@@ -434,30 +475,36 @@ const TimelineEvent: React.FC<Props> = ({
           pixelsPerMonth={pixelsPerMonth}
           styles={s}
           isFit={isFit}
+          onClick={() => !isScrolling && onOpenTinkerVerse && onOpenTinkerVerse()}
         />
-      </div>
+      </motion.div>
     );
   }
 
   // --- STANDARD CARD RENDER ---
   return (
     <motion.div
-      onMouseEnter={() => {
+      onMouseEnter={(e) => {
         isMouseOverRef.current = true;
         if (!isActuallyScrolling()) {
           onHover(item.id);
           onLaneHover(item.lane);
+          handleTiltMove(e);
         }
       }}
-      onMouseMove={() => {
+      onMouseMove={(e) => {
         // Also trigger on mouse move - handles case where card scrolls under cursor
-        if (!isActuallyScrolling() && hoveredId !== item.id) {
-          onHover(item.id);
-          onLaneHover(item.lane);
+        if (!isActuallyScrolling()) {
+          if (hoveredId !== item.id) {
+            onHover(item.id);
+            onLaneHover(item.lane);
+          }
+          handleTiltMove(e);
         }
       }}
       onMouseLeave={() => {
         isMouseOverRef.current = false;
+        handleTiltLeave();
         // Only clear hover if NOT scrolling
         if (!isActuallyScrolling()) {
           onHover(null);
@@ -484,11 +531,32 @@ const TimelineEvent: React.FC<Props> = ({
         ...laneStyle,
         ...(isHovered && !isFit ? {
           height: 'auto',
-          width: '450px',
-          maxWidth: '85vw',
-          left: laneStyle.left,
-          right: 'auto',
-          minHeight: `${height}px`
+          // Wider expansion to reduce vertical overflow
+          width: '600px',
+          maxWidth: '90vw',
+          minHeight: `${height}px`,
+          zIndex: 50, // Ensure z-index is high when hovered
+          perspective: 1000, // Add perspective for 3D effect
+          rotateX: !isScrolling ? rotateX : 0, // Apply tilt only when not scrolling
+          rotateY: !isScrolling ? rotateY : 0,
+          // Lane-aware positioning:
+          // Lane 0 (left): anchor left edge, expand right
+          // Lane 1 (middle): center expansion using calc() instead of transform to avoid flicker
+          // Lane 2 (right): anchor right edge, expand left
+          ...(item.lane === 0 ? {
+            left: laneStyle.left,
+            right: 'auto',
+            transform: 'none'
+          } : item.lane === 1 ? {
+            left: 'calc(50% - 300px)', // Strictly center 600px width
+            right: 'auto',
+            minWidth: '30%', // Ensure we don't shrink smaller than the lane
+            transform: 'none'
+          } : {
+            left: 'auto',
+            right: '0%',
+            transform: 'none'
+          })
         } : {
           height: `${height}px`,
           minHeight: `${height}px`
@@ -540,6 +608,11 @@ const TimelineEvent: React.FC<Props> = ({
             <motion.p className={`font-medium mt-0.5 truncate group-hover:whitespace-normal ${s.subtext} ${isFit ? 'text-[9px] md:text-xs opacity-70' : 'text-xs'}`}>
               {item.company}
             </motion.p>
+            {item.headline && !isFit && (
+              <motion.p className={`mt-2 text-xs leading-relaxed opacity-80 ${s.text} line-clamp-2`}>
+                {item.headline}
+              </motion.p>
+            )}
           </motion.div>
         </div>
 
@@ -591,12 +664,12 @@ const TimelineEvent: React.FC<Props> = ({
                             : '0 0 12px rgba(255,255,255,0.2)'
                         }}
                         className={`text-[9px] uppercase tracking-wide border px-2 py-1 rounded-full bg-white/5 whitespace-nowrap cursor-help transition-all duration-200 ${hoveredToolkitSkill === skill.label
-                            ? (item.lane === 0
-                              ? 'border-rose-400/60 text-rose-50 bg-rose-500/15'
-                              : 'border-white/50 text-white bg-white/15')
-                            : (item.lane === 0
-                              ? 'border-rose-500/30 text-rose-100 hover:border-rose-400/50 hover:text-rose-50 hover:bg-rose-500/10'
-                              : 'border-white/20 text-white/80 hover:border-white/40 hover:text-white hover:bg-white/10')
+                          ? (item.lane === 0
+                            ? 'border-rose-400/60 text-rose-50 bg-rose-500/15'
+                            : 'border-white/50 text-white bg-white/15')
+                          : (item.lane === 0
+                            ? 'border-rose-500/30 text-rose-100 hover:border-rose-400/50 hover:text-rose-50 hover:bg-rose-500/10'
+                            : 'border-white/20 text-white/80 hover:border-white/40 hover:text-white hover:bg-white/10')
                           }`}
                       >
                         {skill.label}
@@ -781,8 +854,9 @@ const TinkerVerseGrid: React.FC<{
   height: number,
   pixelsPerMonth: number,
   styles: any,
-  isFit: boolean
-}> = ({ item, posts, height, pixelsPerMonth, styles, isFit }) => {
+  isFit: boolean,
+  onClick?: () => void
+}> = ({ item, posts, height, pixelsPerMonth, styles, isFit, onClick }) => {
   const startDate = parseDate(item.start);
   const endDate = parseDate(item.end);
   const [hoveredPost, setHoveredPost] = useState<SocialPost | null>(null);
@@ -826,10 +900,20 @@ const TinkerVerseGrid: React.FC<{
   }
 
   return (
-    <div className="relative w-full p-2 pb-4 flex flex-col items-center pointer-events-auto">
-      <div className="flex items-center gap-2 mb-2 w-full px-2 opacity-80 sticky top-0 z-10">
-        <img src={TINKERVERSE_LOGO} alt="TV" className="w-4 h-4 rounded-sm bg-white p-[1px] object-cover" />
-        <span className={`text-xs font-bold uppercase tracking-widest ${styles.text}`}>TinkerVerse</span>
+    <div
+      onClick={onClick}
+      className="relative w-full p-2 pb-4 flex flex-col items-center pointer-events-auto cursor-pointer"
+    >
+      <div className="flex flex-col w-full px-2 mb-2 sticky top-0 z-10">
+        <div className="flex items-center gap-2 opacity-80">
+          <img src={TINKERVERSE_LOGO} alt="TV" className="w-4 h-4 rounded-sm bg-white p-[1px] object-cover" />
+          <span className={`text-xs font-bold uppercase tracking-widest ${styles.text}`}>TinkerVerse</span>
+        </div>
+        {item.headline && (
+          <p className={`text-[10px] leading-tight opacity-70 mt-1 ${styles.subtext}`}>
+            {item.headline}
+          </p>
+        )}
       </div>
       <div className="w-full flex-1 flex flex-col relative">
         {rows.map((row, idx) => (

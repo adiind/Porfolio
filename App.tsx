@@ -1,8 +1,8 @@
 
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { TIMELINE_DATA, CONFIG } from './constants';
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
 import TimelineEvent from './components/TimelineEvent';
 import TimelineRail from './components/TimelineRail';
@@ -10,6 +10,7 @@ import Hero from './components/Hero';
 import CaseStudyModal from './components/CaseStudyModal';
 import ProfileModal from './components/ProfileModal';
 import ProjectModal from './components/ProjectModal';
+import TinkerVerseModal from './components/TinkerVerseModal';
 import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 import { useScrollDetection } from './hooks/useScrollDetection';
@@ -19,6 +20,11 @@ const App: React.FC = () => {
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
   const [filter, setFilter] = useState<'all' | 'corporate' | 'education' | 'personal'>('all');
   const [scrollTop, setScrollTop] = useState(0);
+
+  // Mouse tracking for Spotlight
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
 
   // Timeline Logic
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +53,7 @@ const App: React.FC = () => {
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
   const [activeProject, setActiveProject] = useState<TimelineItem | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
 
   // 1. Handle Zoom Transitions - simplified
   const handleZoom = useCallback((targetMode: TimelineMode) => {
@@ -98,7 +105,7 @@ const App: React.FC = () => {
   // 2. Scroll Logic - scroll down from intro triggers timeline
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
-      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject) return;
+      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
       if (mode !== 'intro') return;
       if (mode === 'intro' && e.deltaY > 5) {
         handleZoom('normal');
@@ -109,7 +116,7 @@ const App: React.FC = () => {
     };
     window.addEventListener('wheel', handleGlobalWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleGlobalWheel);
-  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, handleZoom]);
+  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, handleZoom]);
 
   // Scroll-back to intro: Hybrid approach - track scroll direction + position with smart debouncing
   const scrollBackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -248,14 +255,16 @@ const App: React.FC = () => {
   // Track mouse position for hover detection after scroll (tracked globally)
   const mousePositionRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Track mouse position globally so we capture it even when over intro/hero
+  // Track mouse position globally for logic AND spotlight
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       mousePositionRef.current = { x: e.clientX, y: e.clientY };
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
     window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
-  }, []);
+  }, [mouseX, mouseY]);
 
   // Clear hover during animation or intro mode only
   // DO NOT clear during scroll - this causes jarring card collapse
@@ -378,6 +387,15 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative z-10">
 
+      {/* Spotlight Overlay */}
+      <motion.div
+        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300"
+        style={{
+          background: useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(99, 102, 241, 0.07), transparent 80%)`,
+        }}
+      />
+
+
       {/* --- CASE STUDY MODAL --- */}
       <AnimatePresence>
         {activeCaseStudy && (
@@ -402,6 +420,17 @@ const App: React.FC = () => {
       <AnimatePresence>
         {isProfileOpen && (
           <ProfileModal onClose={() => setIsProfileOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* --- TINKERVERSE MODAL --- */}
+      <AnimatePresence>
+        {isTinkerVerseOpen && (
+          <TinkerVerseModal
+            item={TIMELINE_DATA.find(i => i.id === 'tinkerverse')!}
+            posts={SOCIAL_POSTS}
+            onClose={() => setIsTinkerVerseOpen(false)}
+          />
         )}
       </AnimatePresence>
 
@@ -585,6 +614,7 @@ const App: React.FC = () => {
                   mode={mode}
                   onOpenCaseStudy={setActiveCaseStudy}
                   onOpenProject={setActiveProject}
+                  onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
                   isScrolling={!canHover}
                 />
               ))}

@@ -75,6 +75,39 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
+      
+      /* Orbital Timeline Animations */
+      @keyframes orbital-pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      @keyframes orbital-ping {
+        75%, 100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+
+      .animate-pulse {
+        animation: orbital-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      .animate-ping {
+        animation: orbital-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+      }
+
+      .backdrop-blur-lg {
+        backdrop-filter: blur(16px);
+      }
+
+      .backdrop-blur-xl {
+        backdrop-filter: blur(24px);
+      }
     </style>
   </head>
   <body>
