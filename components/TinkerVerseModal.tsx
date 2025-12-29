@@ -118,130 +118,52 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
 };
 
 const SocialGrid: React.FC<{ posts: SocialPost[] }> = ({ posts }) => {
-    // Calculate max metrics for scaling
     const maxLikes = Math.max(...posts.map(p => p.likes));
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6 p-4">
-            {posts.map((post) => (
-                <LiquidCard key={post.id} post={post} maxLikes={maxLikes} />
-            ))}
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+            {posts.map((post) => {
+                const fillHeight = Math.max(15, (post.likes / maxLikes) * 100);
+
+                return (
+                    <a
+                        key={post.id}
+                        href={post.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative aspect-square rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] hover:border-amber-500/50 hover:scale-105 hover:z-10 transition-all duration-200 ease-out"
+                    >
+                        {/* Liquid fill - pure CSS */}
+                        <div
+                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-amber-500/30 to-amber-400/10 transition-all duration-300"
+                            style={{ height: `${fillHeight}%` }}
+                        />
+
+                        {/* Content */}
+                        <div className="relative z-10 h-full p-2.5 flex flex-col justify-between">
+                            <div className="flex justify-between items-start">
+                                <span className="text-[8px] font-mono text-white/30">{post.date}</span>
+                                <ExternalLink size={8} className="text-white/20 group-hover:text-white/60 transition-colors" />
+                            </div>
+
+                            <div>
+                                <p className="text-[9px] text-gray-400 line-clamp-2 mb-2 group-hover:text-gray-200 transition-colors">
+                                    {post.caption}
+                                </p>
+                                <div className="flex gap-2 text-[9px] font-mono">
+                                    <span className={`flex items-center gap-1 ${post.likes > 100 ? 'text-amber-400' : 'text-gray-500'}`}>
+                                        <Heart size={9} /> {post.likes}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-gray-600">
+                                        <MessageCircle size={9} /> {post.comments}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                );
+            })}
         </div>
-    );
-}
-
-const LiquidCard: React.FC<{ post: SocialPost; maxLikes: number }> = ({ post, maxLikes }) => {
-    // 3D Tilt Logic - 30 degree range
-    const tiltX = useMotionValue(0.5);
-    const tiltY = useMotionValue(0.5);
-    const springX = useSpring(tiltX, { stiffness: 150, damping: 15 }); // Bouncier spring for shaky effect
-    const springY = useSpring(tiltY, { stiffness: 150, damping: 15 });
-    const rotateX = useTransform(springY, [0, 1], [30, -30]); // 30 degree tilt
-    const rotateY = useTransform(springX, [0, 1], [-30, 30]);
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top) / rect.height;
-        tiltX.set(x);
-        tiltY.set(y);
-    };
-
-    const handleMouseLeave = () => {
-        tiltX.set(0.5);
-        tiltY.set(0.5);
-    };
-
-    const fillHeight = `${Math.max(15, (post.likes / maxLikes) * 100)}%`;
-
-    return (
-        <motion.a
-            href={post.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative w-full aspect-[3/4] rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 bg-white/5 group"
-            style={{
-                perspective: 1000,
-                rotateX,
-                rotateY,
-                transformStyle: 'preserve-3d',
-            }}
-            whileHover={{
-                scale: 1.3, // 30% expansion
-                zIndex: 20,
-                transition: {
-                    type: 'spring',
-                    stiffness: 200,
-                    damping: 12 // Bouncy/shaky effect
-                }
-            }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-        >
-            {/* Liquid Fill Container */}
-            <div className="absolute inset-0 z-0 overflow-hidden">
-                <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: fillHeight }}
-                    transition={{ duration: 1.5, ease: "circOut" }}
-                    className="absolute bottom-0 left-0 right-0"
-                >
-                    {/* Liquid body */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-amber-500/40 via-amber-400/25 to-amber-300/15 backdrop-blur-[2px]" />
-
-                    {/* Animated Wave surface */}
-                    <motion.div
-                        className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-amber-300/60 to-transparent"
-                        animate={{
-                            y: [0, -2, 0, 2, 0],
-                            scaleX: [1, 1.02, 1, 0.98, 1],
-                        }}
-                        transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }}
-                    />
-
-                    {/* Bubbles */}
-                    <div className="absolute inset-0 overflow-hidden">
-                        <div className="absolute bottom-1/4 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-[float_3s_infinite_ease-in-out]" />
-                        <div className="absolute bottom-1/3 right-1/3 w-1.5 h-1.5 bg-white/15 rounded-full animate-[float_4s_0.5s_infinite_ease-in-out]" />
-                        <div className="absolute bottom-1/2 left-1/2 w-1 h-1 bg-white/10 rounded-full animate-[float_3.5s_1s_infinite_ease-in-out]" />
-                    </div>
-
-                    {/* Glow at top of liquid */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-amber-400/80 blur-sm shadow-[0_0_15px_rgba(251,191,36,0.6)]" />
-                </motion.div>
-            </div>
-
-            {/* Glass Reflection/Sheen */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent opacity-70 pointer-events-none z-20" />
-            <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent pointer-events-none z-20" />
-
-            {/* Content */}
-            <div className="relative z-30 h-full p-4 flex flex-col justify-between">
-                <div className="flex justify-between items-start opacity-60 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[9px] font-mono text-white/50">{post.date}</span>
-                    <ExternalLink size={10} className="text-white/30" />
-                </div>
-
-                <div className="space-y-4">
-                    <p className="text-xs text-gray-300 line-clamp-3 font-light leading-relaxed group-hover:text-white transition-colors shadow-black drop-shadow-md">
-                        {post.caption}
-                    </p>
-
-                    <div className="flex gap-4 text-xs font-mono">
-                        <span className={`flex items-center gap-1.5 ${post.likes > 100 ? 'text-amber-300' : 'text-gray-400'} drop-shadow-md`}>
-                            <Heart size={12} className={post.likes > 100 ? "fill-amber-500/50" : ""} /> {post.likes}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-gray-500 group-hover:text-blue-300 drop-shadow-md transition-colors">
-                            <MessageCircle size={12} /> {post.comments}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </motion.a>
     );
 }
 
