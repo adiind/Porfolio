@@ -7,39 +7,38 @@ import { TimelineItem } from '../types';
 interface Props {
   project: TimelineItem;
   onClose: () => void;
-  layoutId?: string;
 }
 
-const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
+const ProjectModal: React.FC<Props> = ({ project, onClose }) => {
   // Robust ID extraction handling optional query params like &t= or &list=
   const videoId = project.videoUrl ? project.videoUrl.split('v=')[1]?.split('&')[0] : '';
   const imageUrl = project.imageUrl;
   const isVignette = project.type === 'vignette';
 
   // THEME CONFIGURATION
-  const theme = isVignette
+  const theme = isVignette 
     ? {
-      overlay: 'bg-white/80 backdrop-blur-xl',
-      bg: 'bg-gradient-to-br from-white to-gray-100 border-white/50',
-      text: 'text-gray-900',
-      subText: 'text-gray-500',
-      closeBtn: 'bg-black/5 hover:bg-black/10 text-black/50 hover:text-black',
-      tagBg: 'bg-gray-200 text-gray-700',
-      accent: 'bg-black text-white',
-      bullet: 'bg-gray-400',
-      glow: 'shadow-[0_0_100px_rgba(255,255,255,0.8)]'
-    }
+        overlay: 'bg-white/80 backdrop-blur-xl',
+        bg: 'bg-gradient-to-br from-white to-gray-100 border-white/50',
+        text: 'text-gray-900',
+        subText: 'text-gray-500',
+        closeBtn: 'bg-black/5 hover:bg-black/10 text-black/50 hover:text-black',
+        tagBg: 'bg-gray-200 text-gray-700',
+        accent: 'bg-black text-white',
+        bullet: 'bg-gray-400',
+        glow: 'shadow-[0_0_100px_rgba(255,255,255,0.8)]'
+      }
     : {
-      overlay: 'bg-black/90 backdrop-blur-xl',
-      bg: 'bg-[#0f0f0f]/90 bg-gradient-to-br from-[#1a1a1a] to-[#050505] border-purple-500/30',
-      text: 'text-white',
-      subText: 'text-gray-300',
-      closeBtn: 'bg-black/50 hover:bg-white/10 text-white/50 hover:text-white',
-      tagBg: 'bg-black/40 text-teal-200 border border-white/10',
-      accent: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      bullet: 'bg-teal-500',
-      glow: 'shadow-2xl'
-    };
+        overlay: 'bg-black/90 backdrop-blur-xl',
+        bg: 'bg-[#0f0f0f]/90 bg-gradient-to-br from-[#1a1a1a] to-[#050505] border-purple-500/30',
+        text: 'text-white',
+        subText: 'text-gray-300',
+        closeBtn: 'bg-black/50 hover:bg-white/10 text-white/50 hover:text-white',
+        tagBg: 'bg-black/40 text-teal-200 border border-white/10',
+        accent: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        bullet: 'bg-teal-500',
+        glow: 'shadow-2xl'
+      };
 
   // Splash colors for skill pills
   const splashColors = [
@@ -68,7 +67,6 @@ const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
       )}
 
       <motion.div
-        layoutId={layoutId}
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -86,7 +84,7 @@ const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
           {/* Header Media */}
           {videoId ? (
             <div className="w-full aspect-video bg-black relative shadow-2xl">
-              <iframe
+              <iframe 
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1`}
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -96,9 +94,9 @@ const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
             </div>
           ) : imageUrl && (
             <div className="w-full aspect-video bg-black relative shadow-2xl overflow-hidden">
-              <img
-                src={imageUrl}
-                alt={project.title}
+              <img 
+                src={imageUrl} 
+                alt={project.title} 
                 className="w-full h-full object-cover"
               />
               {!isVignette && <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-60" />}
@@ -110,18 +108,18 @@ const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
               <div>
                 <div className="flex items-center gap-3 mb-3">
                   <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-full border shadow-[0_0_15px_rgba(0,0,0,0.2)] ${project.type === 'competition' ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : project.type === 'vignette' ? 'bg-black text-white border-black' : 'bg-teal-500/20 text-teal-300 border-teal-500/30'}`}>
-                    {project.type === 'competition' ? 'Competition Winner' : project.type === 'vignette' ? 'Vignette' : project.type === 'education' ? 'Education' : project.type === 'work' ? 'Work Experience' : project.type === 'foundational' ? 'Foundation' : 'Project'}
+                    {project.type === 'competition' ? 'Competition Winner' : project.type === 'vignette' ? 'Vignette' : 'Project'}
                   </span>
                   <span className={`${isVignette ? 'text-gray-400' : 'text-gray-500'} text-xs font-mono`}>{project.start}</span>
                 </div>
                 <h2 className={`text-3xl md:text-5xl font-bold mb-2 tracking-tight ${theme.text}`}>{project.title}</h2>
                 <p className={`font-medium text-sm tracking-wide uppercase ${isVignette ? 'text-gray-400' : project.type === 'competition' ? 'text-purple-400' : 'text-teal-400'}`}>{project.company}</p>
               </div>
-
+              
               {project.projectLinks && (
                 <div className="flex flex-wrap gap-3">
                   {project.projectLinks.map((link, i) => (
-                    <a
+                    <a 
                       key={i}
                       href={link.url}
                       target="_blank"
@@ -145,7 +143,7 @@ const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
                 ) : (
                   <p>{project.summary}</p>
                 )}
-
+                
                 {project.bullets && project.bullets.length > 0 && (
                   <div className={`mt-8 pt-8 border-t ${isVignette ? 'border-gray-200' : 'border-white/10'}`}>
                     <h4 className={`text-xs font-bold mb-6 uppercase tracking-widest opacity-70 ${theme.text}`}>Key Highlights</h4>
@@ -169,11 +167,11 @@ const ProjectModal: React.FC<Props> = ({ project, onClose, layoutId }) => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {project.skills?.map((skill, i) => (
-                        <span
-                          key={i}
+                        <span 
+                          key={i} 
                           className={`px-3 py-1.5 rounded-md text-xs font-mono transition-colors cursor-default border ${isVignette ? 'bg-white text-gray-600 border-gray-200' : splashColors[i % splashColors.length]}`}
                         >
-                          {typeof skill === 'object' && skill !== null ? (skill as { label: string }).label : String(skill)}
+                          {skill}
                         </span>
                       ))}
                     </div>

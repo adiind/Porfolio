@@ -116,7 +116,7 @@ const App: React.FC = () => {
           <CaseStudyModal caseStudy={activeCaseStudy} onClose={closeCaseStudy} />
         )}
         {activeProject && (
-          <ProjectModal project={activeProject} onClose={closeProject} layoutId={`card-${activeProject.id}`} />
+          <ProjectModal project={activeProject} onClose={closeProject} />
         )}
         {isProfileOpen && (
           <ProfileModal onClose={closeProfile} />

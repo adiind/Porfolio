@@ -460,30 +460,6 @@ Since then, I have been thinking about how tools can help people express themsel
     }
   },
   {
-    id: "schmooze",
-    lane: 1,
-    title: "Product and Growth Analyst",
-    company: "Schmooze",
-    type: "corporate",
-    subtype: 'role',
-    start: "2022-10-01",
-    end: "2022-12-31",
-    summary: "Seed funded startup exploring a novel dating app concept using memes as personality and content based matching.",
-    bullets: [
-      "Second analyst in the company working in a multifunctional role across product, basic growth, and user behavior.",
-      "Set up the V0 top down dashboards for creator management at scale.",
-      "Tested early tech implementations and strategies to validate whether the concept had traction."
-    ],
-    logoUrl: "https://ui-avatars.com/api/?name=Schmooze&background=random",
-    differentiator: "Analytics here happened before product market fit, where data is incomplete, experiments are messy, and signal has to be created from zero.",
-    skills: [
-      { label: "Exploration–Exploitation", description: "Balancing testing new ideas with repeating what is already working." },
-      { label: "User Session Analysis", description: "Manually watching individual sessions to understand behavior." },
-      { label: "V0 Dashboards", description: "First directional dashboards created for decision-making." },
-      { label: "Mixpanel", description: "Event-based product analytics for tracking user interactions and funnels." }
-    ]
-  },
-  {
     id: "snapdeal",
     lane: 1,
     title: "Data Analyst",
