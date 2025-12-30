@@ -11,10 +11,11 @@ import CaseStudyModal from './components/CaseStudyModal';
 import ProfileModal from './components/ProfileModal';
 import ProjectModal from './components/ProjectModal';
 import TinkerVerseModal from './components/TinkerVerseModal';
-import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus } from 'lucide-react';
+import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
+
 
 const App: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -45,9 +46,7 @@ const App: React.FC = () => {
 
   // Track hoveredId state changes
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H4', location: 'App.tsx:hoveredId-state', message: 'hoveredId state changed', data: { hoveredId, isScrolling, mode, isAnimating }, timestamp: Date.now() }) }).catch(() => { });
-    // #endregion agent log
+    // Debug logging removed
   }, [hoveredId, isScrolling, mode, isAnimating]);
 
   // Modal State
@@ -63,9 +62,9 @@ const App: React.FC = () => {
     isAnimatingRef.current = true;
     setIsAnimating(true);
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1', location: 'App.tsx:handleZoom', message: 'enter handleZoom', data: { targetMode, mode, scrollTop: scrollContainerRef.current?.scrollTop ?? null, isAnimating }, timestamp: Date.now() }) }).catch(() => { });
-    // #endregion agent log
+
+    // Debug logging removed
+
 
     // Reset scroll when going to intro
     if (targetMode === 'intro' && scrollContainerRef.current) {
@@ -88,9 +87,8 @@ const App: React.FC = () => {
     setTimeout(() => {
       setIsAnimating(false);
       isAnimatingRef.current = false;
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1', location: 'App.tsx:handleZoom', message: 'exit handleZoom', data: { targetMode, modeAfter: mode, isAnimating: false }, timestamp: Date.now() }) }).catch(() => { });
-      // #endregion agent log
+      // Debug logging removed
+
     }, 550);
   }, [isAnimating, mode]);
 
@@ -110,9 +108,8 @@ const App: React.FC = () => {
       if (mode !== 'intro') return;
       if (mode === 'intro' && e.deltaY > 5) {
         handleZoom('normal');
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H2', location: 'App.tsx:handleGlobalWheel', message: 'intro->normal triggered', data: { deltaY: e.deltaY, mode }, timestamp: Date.now() }) }).catch(() => { });
-        // #endregion agent log
+        // Debug logging removed
+
       }
     };
     window.addEventListener('wheel', handleGlobalWheel, { passive: true });
@@ -181,9 +178,8 @@ const App: React.FC = () => {
         if (finalScrollTop < 1 && !isAnimatingRef.current && (modeRef.current === 'normal' || modeRef.current === 'fit')) {
           // Require at least 200ms at top to avoid accidental triggers on fast scrolls
           if (timeAtTop >= 200) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H2', location: 'App.tsx:handleScrollBack', message: 'scroll->intro triggered', data: { scrollTop: finalScrollTop, mode: modeRef.current, timeAtTop }, timestamp: Date.now() }) }).catch(() => { });
-            // #endregion agent log
+            // Debug logging removed
+
             handleZoom('intro');
           }
         }
@@ -204,9 +200,8 @@ const App: React.FC = () => {
 
       // For gentle scrolls at top, allow immediate trigger
       if (!scrollBackTimeoutRef.current && !isAnimatingRef.current) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H2', location: 'App.tsx:handleWheelAtTop', message: 'gentle wheel->intro triggered', data: { deltaY: e.deltaY, scrollTop: container.scrollTop, mode: modeRef.current }, timestamp: Date.now() }) }).catch(() => { });
-        // #endregion agent log
+        // Debug logging removed
+
         e.preventDefault();
         handleZoom('intro');
       }
@@ -233,18 +228,15 @@ const App: React.FC = () => {
   const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
 
   const handleHover = useCallback((id: string | null) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H2', location: 'App.tsx:handleHover', message: 'handleHover called', data: { id, mode, isAnimating, isScrolling, currentHoveredId: hoveredId }, timestamp: Date.now() }) }).catch(() => { });
-    // #endregion agent log
+    // Debug logging removed
+
     if (mode === 'intro' || isAnimating || isScrolling) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H2', location: 'App.tsx:handleHover', message: 'handleHover BLOCKED', data: { blockedBy: mode === 'intro' ? 'intro' : isAnimating ? 'animating' : 'scrolling' }, timestamp: Date.now() }) }).catch(() => { });
-      // #endregion agent log
+      // Debug logging removed
+
       return;
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H2', location: 'App.tsx:handleHover', message: 'handleHover SETTING hoveredId', data: { id, previousId: hoveredId }, timestamp: Date.now() }) }).catch(() => { });
-    // #endregion agent log
+    // Debug logging removed
+
     setHoveredId(id);
   }, [mode, isAnimating, isScrolling, hoveredId]);
 
@@ -271,9 +263,8 @@ const App: React.FC = () => {
   // DO NOT clear during scroll - this causes jarring card collapse
   useEffect(() => {
     if (isAnimating || mode === 'intro') {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H3', location: 'App.tsx:clearHover', message: 'CLEARING hover', data: { isAnimating, mode, currentHoveredId: hoveredId }, timestamp: Date.now() }) }).catch(() => { });
-      // #endregion agent log
+      // Debug logging removed
+
       setHoveredId(null);
       setHoveredLane(null);
     }
@@ -286,14 +277,12 @@ const App: React.FC = () => {
 
   // Helper function to detect and hover item under mouse
   const detectAndHoverItemUnderMouse = useCallback(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H5', location: 'App.tsx:detectAndHoverItemUnderMouse', message: 'detectAndHoverItemUnderMouse called', data: { hasMousePos: !!mousePositionRef.current, hasContainer: !!scrollContainerRef.current, mode, isAnimating: isAnimatingRef.current, isScrolling: isScrollingRef.current }, timestamp: Date.now() }) }).catch(() => { });
-    // #endregion agent log
+    // Debug logging removed
+
     if (!mousePositionRef.current || !scrollContainerRef.current) return;
     if (mode === 'intro' || isAnimatingRef.current || isScrollingRef.current) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H5', location: 'App.tsx:detectAndHoverItemUnderMouse', message: 'detect blocked early', data: { blockedBy: mode === 'intro' ? 'intro' : isAnimatingRef.current ? 'animating' : 'scrolling' }, timestamp: Date.now() }) }).catch(() => { });
-      // #endregion agent log
+      // Debug logging removed
+
       return;
     }
 
@@ -304,18 +293,16 @@ const App: React.FC = () => {
     requestAnimationFrame(() => {
       // Double-check scrolling state after frame
       if (isScrollingRef.current) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H5', location: 'App.tsx:detectAndHoverItemUnderMouse', message: 'detect blocked by scrolling after RAF', data: { isScrolling: isScrollingRef.current }, timestamp: Date.now() }) }).catch(() => { });
-        // #endregion agent log
+        // Debug logging removed
+
         return;
       }
 
       // Get element at mouse position
       const elementAtPoint = document.elementFromPoint(x, y);
       if (!elementAtPoint) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H5', location: 'App.tsx:detectAndHoverItemUnderMouse', message: 'no element at point', data: { x, y }, timestamp: Date.now() }) }).catch(() => { });
-        // #endregion agent log
+        // Debug logging removed
+
         return;
       }
 
@@ -326,9 +313,8 @@ const App: React.FC = () => {
         if (itemId) {
           const item = filteredData.find(i => i.id === itemId);
           if (item) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H5', location: 'App.tsx:detectAndHoverItemUnderMouse', message: 'found item, calling handleHover', data: { itemId: item.id, itemTitle: item.title }, timestamp: Date.now() }) }).catch(() => { });
-            // #endregion agent log
+            // Debug logging removed
+
             handleHover(item.id);
             handleLaneHover(item.lane);
             return;
@@ -375,7 +361,9 @@ const App: React.FC = () => {
   }, [filteredData, hoveredId]);
 
   const totalMonths = getMonthDiff(parseDate(CONFIG.startDate), parseDate(CONFIG.endDate));
-  const contentHeight = totalMonths * pixelsPerMonth;
+  // Reduce total height significantly - logarithmic positioning will compress older items into this space
+  const compressionMultiplier = 0.5; // 50% of linear height
+  const contentHeight = totalMonths * pixelsPerMonth * compressionMultiplier;
   const totalContainerHeight = contentHeight + 400;
 
 
@@ -465,7 +453,8 @@ const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm">
+
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm pointer-events-auto">
             <Filter size={14} className="text-white/40 ml-2 mr-1" />
             {(['all', 'education', 'corporate', 'personal'] as const).map((f) => (
               <button
@@ -485,8 +474,12 @@ const App: React.FC = () => {
         </motion.div>
       </header>
 
+      {/* --- SECTION NAVIGATION RAIL --- */}
+
+
       {/* --- HERO SECTION (Parallax Exit) --- */}
       <motion.div
+        id="profile"
         className="absolute inset-0 z-40 will-change-transform"
         animate={{
           opacity: mode === 'intro' ? 1 : 0,
@@ -519,6 +512,7 @@ const App: React.FC = () => {
 
       {/* --- TIMELINE SECTION (Slide Up Entrance) --- */}
       <motion.div
+        id="resume"
         className="flex-1 relative w-full h-full will-change-transform"
         animate={{
           opacity: mode === 'intro' ? 0.3 : 1,
@@ -574,13 +568,14 @@ const App: React.FC = () => {
           >
             <TimelineRail
               pixelsPerMonth={pixelsPerMonth}
+              totalHeight={totalContainerHeight}
               onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, top)}
               currentScrollTop={scrollTop}
               hoveredItem={hoveredItem}
             />
 
-            {/* Content & Background Wrapper - Offset by Rail Width */}
-            <div className="absolute top-0 left-20 md:left-24 right-4 md:right-0 bottom-0">
+            {/* Content & Background Wrapper - Offset by Rail Width (increased for larger rail) */}
+            <div className="absolute top-0 left-28 md:left-36 right-4 md:right-0 bottom-0">
 
               {/* Hover Background Columns */}
               <div className="absolute inset-0 flex pointer-events-none z-0">
@@ -616,6 +611,7 @@ const App: React.FC = () => {
                   onLaneHover={handleLaneHover}
                   isDimmed={hoveredId !== null && hoveredId !== item.id}
                   pixelsPerMonth={pixelsPerMonth}
+                  totalHeight={totalContainerHeight}
                   mode={mode}
                   onOpenCaseStudy={setActiveCaseStudy}
                   onOpenProject={setActiveProject}
