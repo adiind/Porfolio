@@ -621,6 +621,66 @@ const App: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* --- PROJECTS SECTION --- */}
+          <section id="projects" className="relative w-full max-w-6xl mx-auto px-6 py-24 border-t border-white/5 mt-20">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                Selected Work
+              </h2>
+              <p className="text-white/50 text-lg mb-12 max-w-xl">
+                Systems and experiments built outside job titles.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Surya Card */}
+                <div className="group relative bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 cursor-pointer text-left">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <Zap size={20} className="text-amber-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-amber-200 transition-colors">Surya</h3>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    Solar-powered IoT monitoring system for remote agricultural deployments.
+                  </p>
+                </div>
+
+                {/* Plotter Card */}
+                <div className="group relative bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 cursor-pointer text-left">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-teal-500/20 rounded-lg">
+                      <PenTool size={20} className="text-teal-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-teal-200 transition-colors">Plotter</h3>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    CNC pen plotter built from scratch for generative art and precision drawings.
+                  </p>
+                </div>
+
+                {/* Jarvis Card */}
+                <div className="group relative bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 cursor-pointer text-left">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-indigo-500/20 rounded-lg">
+                      <Bot size={20} className="text-indigo-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-indigo-200 transition-colors">Jarvis</h3>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    Edge AI voice assistant with local processing and smart home integration.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </section>
+
+          <div className="h-32 w-full" />
         </div>
       </motion.div>
     </div>
