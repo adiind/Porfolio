@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from
 import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
-import { getMonthDiff, parseDate, formatDate } from '../utils';
+import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight } from '../utils';
 import { Briefcase, GraduationCap, User, Sparkles, Heart, MessageCircle, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
   onLaneHover: (lane: number | null) => void;
   isDimmed: boolean;
   pixelsPerMonth: number;
+  totalHeight: number;
   mode: TimelineMode;
   onOpenCaseStudy: (study: CaseStudy) => void;
   onOpenProject?: (project: TimelineItem) => void;
@@ -29,6 +30,7 @@ const TimelineEvent: React.FC<Props> = ({
   onLaneHover,
   isDimmed,
   pixelsPerMonth,
+  totalHeight,
   mode,
   onOpenCaseStudy,
   onOpenProject,
@@ -87,11 +89,7 @@ const TimelineEvent: React.FC<Props> = ({
     }
   }, [isScrolling, hoveredId, item.id, item.lane, onHover, onLaneHover]);
 
-  // #region agent log
-  React.useEffect(() => {
-    fetch('http://127.0.0.1:7242/ingest/6fde9818-753e-4df5-be34-d19024eb2017', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'H1', location: 'TimelineEvent.tsx:isHovered', message: 'isHovered calculated', data: { itemId: item.id, hoveredId, isScrolling, isHovered, itemTitle: item.title }, timestamp: Date.now() }) }).catch(() => { });
-  }, [hoveredId, isScrolling, item.id, isHovered]);
-  // #endregion agent log
+
   const isFit = mode === 'fit' || mode === 'intro';
   const isZoomedOut = pixelsPerMonth < 20;
   const isTinkerVerse = item.id === 'tinkerverse';
@@ -99,27 +97,31 @@ const TimelineEvent: React.FC<Props> = ({
   const isProject = item.type === 'project';
   const isVignette = item.type === 'vignette';
 
-  // Calculate position and height
+  // Calculate position and height using logarithmic scaling
   const { top, height, isVisible } = useMemo(() => {
     const startDate = parseDate(item.start);
     const endDate = parseDate(item.end);
     const timelineEnd = parseDate(CONFIG.endDate);
+    const timelineStart = parseDate(CONFIG.startDate);
+    const totalMonths = getMonthDiff(timelineStart, timelineEnd);
 
     const monthsFromTop = getMonthDiff(endDate, timelineEnd);
     const durationMonths = getMonthDiff(startDate, endDate);
 
-    const calculatedTop = monthsFromTop * pixelsPerMonth;
+    // Use logarithmic positioning for compressed older items
+    const calculatedTop = getLogarithmicPosition(monthsFromTop, totalMonths, totalHeight);
 
     // Auto-height adjustment for TinkerVerse to prevent clipping content
-    const minHeight = isFit ? (isTinkerVerse ? 20 : 30) : (isZoomedOut ? 40 : 80);
-    const calculatedHeight = Math.max(durationMonths * pixelsPerMonth, minHeight);
+    // Increased minHeight to prevent empty box rendering with aggressive compression
+    const minHeight = isFit ? (isTinkerVerse ? 30 : 40) : (isZoomedOut ? 80 : 100);
+    const calculatedHeight = getLogarithmicHeight(monthsFromTop, durationMonths, totalMonths, totalHeight, minHeight);
 
     return {
       top: calculatedTop,
       height: calculatedHeight,
       isVisible: calculatedTop >= -1000
     };
-  }, [item, pixelsPerMonth, isZoomedOut, isFit, isTinkerVerse]);
+  }, [item, pixelsPerMonth, totalHeight, isZoomedOut, isFit, isTinkerVerse]);
 
   if (!isVisible) return null;
 
@@ -231,7 +233,7 @@ const TimelineEvent: React.FC<Props> = ({
           {/* Glowing Horizontal Line */}
           <div className={`w-full h-[1px] bg-white/50 relative transition-all duration-300 ${!isScrolling ? 'group-hover:w-[140%] group-hover:h-[3px] group-hover:bg-white group-hover:shadow-[0_0_35px_rgba(255,255,255,1)]' : 'blur-[1px]'} rounded-full`}>
             {/* Bigger Eye Icon at the LEFT End */}
-            <div className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-sm border border-white/30 p-1.5 rounded-full ${!isScrolling ? 'group-hover:scale-125 group-hover:bg-black group-hover:border-white group-hover:shadow-[0_0_25px_white]' : ''} transition-all duration-300`}>
+            <div className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-black/60 border border-white/30 p-1.5 rounded-full ${!isScrolling ? 'group-hover:scale-125 group-hover:bg-black group-hover:border-white group-hover:shadow-[0_0_25px_white]' : ''} transition-all duration-300`}>
               <Eye size={18} className={`transition-colors duration-300 ${!isScrolling ? 'text-white/50 group-hover:text-white' : 'text-white/30'}`} />
             </div>
           </div>
@@ -243,7 +245,7 @@ const TimelineEvent: React.FC<Props> = ({
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 30 }}
                 exit={{ opacity: 0 }}
-                className="absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/50 px-3 py-1.5 rounded text-xs font-mono tracking-widest text-white uppercase shadow-[0_0_25px_rgba(255,255,255,0.5)]"
+                className="absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-black/80 border border-white/50 px-3 py-1.5 rounded text-xs font-mono tracking-widest text-white uppercase shadow-[0_0_25px_rgba(255,255,255,0.5)]"
               >
                 {item.title}
               </motion.div>
@@ -317,7 +319,7 @@ const TimelineEvent: React.FC<Props> = ({
         {/* The Bookmark Tab */}
         <div className={`
           w-full h-full rounded-l-md bg-gradient-to-r ${theme.grad}
-          border-y border-l backdrop-blur-md
+          border-y border-l
           flex flex-col items-center justify-center gap-2 p-1 cursor-pointer
           transition-all duration-300 ${!isScrolling ? 'group-hover:w-[5.5rem] group-hover:brightness-125' : ''}
         `}>
@@ -420,7 +422,7 @@ const TimelineEvent: React.FC<Props> = ({
   if (isTinkerVerse) {
     return (
       <motion.div
-        className={`rounded-lg md:rounded-xl backdrop-blur-md transition-colors duration-500 border border-transparent ${s.glass}`}
+        className={`rounded-lg md:rounded-xl transition-colors duration-500 border border-transparent ${s.glass}`}
         style={{
           position: 'absolute',
           ...laneStyle,
@@ -563,7 +565,7 @@ const TimelineEvent: React.FC<Props> = ({
         }),
       }}
       className={`
-        rounded-lg md:rounded-xl backdrop-blur-md cursor-pointer overflow-hidden group
+        rounded-lg md:rounded-xl cursor-pointer overflow-hidden group
         transition-colors duration-500 border border-transparent
         flex flex-col
         ${s.glass} ${!isFit && s.hoverGlass}
@@ -602,10 +604,10 @@ const TimelineEvent: React.FC<Props> = ({
               )}
             </div>
 
-            <motion.h3 className={`font-bold leading-tight truncate group-hover:whitespace-normal ${s.text} ${isFit ? 'text-[11px] md:text-sm' : 'text-sm md:text-base'} ${item.logoUrl ? 'pr-2' : ''}`}>
+            <motion.h3 className={`font-bold leading-tight ${s.text} ${isFit ? 'text-[11px] md:text-sm truncate' : 'text-sm md:text-base'} ${item.logoUrl ? 'pr-2' : ''}`}>
               {item.title}
             </motion.h3>
-            <motion.p className={`font-medium mt-0.5 truncate group-hover:whitespace-normal ${s.subtext} ${isFit ? 'text-[9px] md:text-xs opacity-70' : 'text-xs'}`}>
+            <motion.p className={`font-medium mt-0.5 ${s.subtext} ${isFit ? 'text-[9px] md:text-xs opacity-70 truncate' : 'text-xs'}`}>
               {item.company}
             </motion.p>
             {item.headline && !isFit && (
