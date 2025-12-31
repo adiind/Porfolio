@@ -109,12 +109,32 @@ const App: React.FC = () => {
       if (mode !== 'intro') return;
       if (mode === 'intro' && e.deltaY > 5) {
         handleZoom('normal');
-        // Debug logging removed
-
       }
     };
+
+    // Touch support for mobile
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
+      if (mode !== 'intro') return;
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchStartY - touchY; // Positive = swiping up (scrolling down)
+      if (deltaY > 30) { // Threshold for swipe
+        handleZoom('normal');
+      }
+    };
+
     window.addEventListener('wheel', handleGlobalWheel, { passive: true });
-    return () => window.removeEventListener('wheel', handleGlobalWheel);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', handleGlobalWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, handleZoom]);
 
   // Scroll-back to intro: Hybrid approach - track scroll direction + position with smart debouncing
