@@ -89,89 +89,91 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
   ];
 
   return (
-    <div className="relative flex flex-col items-center justify-start h-full w-full pointer-events-none perspective-[1200px] pt-24 md:pt-32">
+    <div className="relative flex flex-col items-center justify-start h-full w-full pointer-events-none perspective-[1200px] pt-44 md:pt-40">
 
       {/* Central Interactive Composition */}
       <div className="relative w-[320px] h-[320px] md:w-[480px] md:h-[480px] flex items-center justify-center group/hero">
 
-        {/* SPEECH BUBBLE - positioned to right of head with tail pointing to head */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, x: 50 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            x: 0,
-            transition: { delay: 1.5, type: 'spring' }
-          }}
-          className="absolute -top-8 md:-top-4 right-[-280px] md:right-[-340px] z-50 pointer-events-auto cursor-pointer"
-          onClick={onOpenProfile}
-          whileHover={{ scale: 1.05 }}
-        >
+        {/* SPEECH BUBBLE - centered above head */}
+        <div className="absolute -top-[160px] md:-top-[140px] left-1/2 -translate-x-1/2 z-50">
           <motion.div
-            animate={{ y: [-5, 5, -5] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="relative"
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              transition: { delay: 1.5, type: 'spring' }
+            }}
+            className="pointer-events-auto cursor-pointer"
+            onClick={onOpenProfile}
+            whileHover={{ scale: 1.05 }}
           >
-            {/* Main bubble */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-w-[320px] md:max-w-md">
-              <p className="text-white text-sm md:text-base font-medium leading-relaxed mb-3 whitespace-nowrap">
-                <span className="text-2xl mr-1">👋</span>
-                Hey I am <span className="font-bold text-white">Adi</span>, welcome to my <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">vibe coded</span> portfolio!
-              </p>
+            <motion.div
+              animate={{ y: [-5, 5, -5] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="relative"
+            >
+              {/* Main bubble */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-[280px] md:w-[360px]">
+                <p className="text-white text-sm md:text-base font-medium leading-relaxed mb-3 text-center md:text-left">
+                  <span className="text-2xl mr-1">👋</span>
+                  Hey I am <span className="font-bold text-white">Adi</span>, welcome to my <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">vibe coded</span> portfolio!
+                </p>
 
-              <div className="space-y-3">
-                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold whitespace-nowrap">
-                  Open for Summer 2026 Internships
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {['Product Management', 'Design', 'Development', 'Research'].map((role, i) => (
-                    <span
-                      key={i}
-                      className={`px-2 py-1 rounded-md border text-[10px] md:text-xs transition-colors cursor-default ${pillColors[i % pillColors.length]}`}
+                <div className="space-y-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                    Open for Summer 2026 Internships
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Product Management', 'Design', 'Development', 'Research'].map((role, i) => (
+                      <span
+                        key={i}
+                        className={`px-2 py-1 rounded-md border text-[10px] md:text-xs transition-colors cursor-default ${pillColors[i % pillColors.length]}`}
+                      >
+                        {role}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                    <a
+                      href={SOCIAL_LINKS.email}
+                      className="flex items-center gap-2 text-xs font-bold text-white/80 hover:text-white transition-colors group"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {role}
-                    </span>
-                  ))}
-                </div>
+                      <div className="p-1.5 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors">
+                        <Mail size={12} />
+                      </div>
+                      <span>Let's Chat</span>
+                    </a>
 
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                  <a
-                    href={SOCIAL_LINKS.email}
-                    className="flex items-center gap-2 text-xs font-bold text-white/80 hover:text-white transition-colors group"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="p-1.5 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors">
-                      <Mail size={12} />
-                    </div>
-                    <span>Let's Chat</span>
-                  </a>
-
-                  <button
-                    onClick={handleCopyEmail}
-                    className="group/copy relative p-1.5 text-white/40 hover:text-white transition-colors"
-                  >
-                    {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
-                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black px-2 py-1 rounded text-[10px] opacity-0 group-hover/copy:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-white/10">
-                      {copied ? 'Copied!' : 'Copy Email'}
-                    </span>
-                  </button>
+                    <button
+                      onClick={handleCopyEmail}
+                      className="group/copy relative p-1.5 text-white/40 hover:text-white transition-colors"
+                    >
+                      {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
+                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black px-2 py-1 rounded text-[10px] opacity-0 group-hover/copy:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-white/10">
+                        {copied ? 'Copied!' : 'Copy Email'}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Speech bubble tail - pointing left towards head */}
-            <div className="absolute left-0 top-8 -translate-x-full">
-              <svg width="24" height="20" viewBox="0 0 24 20" fill="none" className="drop-shadow-lg">
-                <path
-                  d="M24 0 L24 20 L0 10 Z"
-                  fill="rgba(255,255,255,0.1)"
-                  stroke="rgba(255,255,255,0.2)"
-                  strokeWidth="1"
-                />
-              </svg>
-            </div>
+              {/* Speech bubble tail - pointing down towards head */}
+              <div className="absolute left-1/2 -bottom-[18px] -translate-x-1/2 drop-shadow-lg">
+                <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
+                  <path
+                    d="M0 0 L24 0 L12 20 Z"
+                    fill="rgba(255,255,255,0.1)"
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth="1"
+                  />
+                </svg>
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Radial Orbital Timeline with Skills */}
         <RadialOrbitalTimeline timelineData={skillsTimelineData}>
@@ -213,7 +215,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
       {/* Intro Text - moved up closer to character */}
       {/* Intro Text - Staggered Reveal */}
-      <div className="-mt-4 md:-mt-8 text-center relative z-20 overflow-hidden">
+      <div className="mt-16 md:-mt-8 text-center relative z-20 overflow-hidden">
         <motion.h1
           className="text-5xl md:text-8xl font-normal tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4"
           initial="hidden"

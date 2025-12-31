@@ -11,6 +11,7 @@ import CaseStudyModal from './components/CaseStudyModal';
 import ProfileModal from './components/ProfileModal';
 import ProjectModal from './components/ProjectModal';
 import TinkerVerseModal from './components/TinkerVerseModal';
+import MobileTimeline from './components/MobileTimeline';
 import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 // Background removed for performance
@@ -442,7 +443,7 @@ const App: React.FC = () => {
             y: mode === 'intro' ? -20 : 0
           }}
           transition={pageTransition}
-          className="relative max-w-6xl mx-auto flex items-start justify-between pointer-events-auto"
+          className="relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 pointer-events-auto"
         >
           <div className="cursor-pointer group" onClick={() => handleZoom('intro')}>
             <h1 className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors">
@@ -453,15 +454,14 @@ const App: React.FC = () => {
             </p>
           </div>
 
-
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm pointer-events-auto">
-            <Filter size={14} className="text-white/40 ml-2 mr-1" />
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm pointer-events-auto w-fit overflow-x-auto no-scrollbar mx-auto md:mx-0 scale-[0.85] md:scale-100 origin-center">
+            <Filter size={14} className="text-white/40 ml-2 mr-1 shrink-0" />
             {(['all', 'education', 'corporate', 'personal'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`
-                   px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all
+                   px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all shrink-0
                    ${filter === f
                     ? 'bg-white text-black shadow-lg shadow-white/10'
                     : 'text-white/50 hover:text-white hover:bg-white/5'}
@@ -521,8 +521,8 @@ const App: React.FC = () => {
         }}
         transition={pageTransition}
       >
-        {/* Zoom Controls */}
-        <div className="absolute top-24 right-6 flex flex-col gap-2 z-40">
+        {/* Zoom Controls - Desktop only */}
+        <div className="hidden md:flex absolute top-24 right-6 flex-col gap-2 z-40">
           <button
             onClick={() => handleManualZoom('in')}
             className="p-2 rounded-full border transition-all bg-black/40 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
@@ -562,8 +562,19 @@ const App: React.FC = () => {
           onScroll={handleScroll}
           className="h-full overflow-y-auto overflow-x-hidden relative no-scrollbar"
         >
+          {/* Mobile Layout - Stacked Sections */}
+          <div className="block md:hidden mt-[150px] pb-20">
+            <MobileTimeline
+              items={filteredData}
+              onOpenCaseStudy={setActiveCaseStudy}
+              onOpenProject={setActiveProject}
+              onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+            />
+          </div>
+
+          {/* Desktop Layout - Column Timeline */}
           <div
-            className="relative w-full max-w-6xl mx-auto mt-[160px]"
+            className="hidden md:block relative w-full max-w-6xl mx-auto mt-[160px]"
             style={{ height: `${totalContainerHeight}px` }}
           >
             <TimelineRail

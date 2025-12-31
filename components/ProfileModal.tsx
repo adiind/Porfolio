@@ -33,12 +33,12 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
         </button>
 
         {/* Left Column: Image */}
-        <div className="w-full md:w-2/5 relative h-64 md:h-auto overflow-hidden">
+        <div className="w-full md:w-2/5 relative h-72 md:h-auto overflow-hidden bg-black">
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#0a0a0a] z-10 opacity-80" />
           <img
             src={REAL_USER_IMAGE}
             alt="Adi Agarwal"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
 

@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useInView } from 'framer-motion';
 import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
@@ -44,6 +44,13 @@ const TimelineEvent: React.FC<Props> = ({
   // Track if mouse is currently over this card
   const isMouseOverRef = useRef(false);
   const prevIsScrollingRef = useRef(isScrolling);
+
+  // Scroll-triggered reveal animation
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(cardRef, {
+    once: true,           // Only animate once (don't re-hide on scroll up)
+    margin: "-80px"       // Trigger when card is 80px into viewport
+  });
 
   // Helper to check scrolling status (combining Prop and Ref for best accuracy)
   const isActuallyScrolling = () => isScrolling || (isScrollingRef?.current === true);
@@ -197,9 +204,10 @@ const TimelineEvent: React.FC<Props> = ({
     if (isVignette) {
       return (
         <motion.div
+          ref={cardRef}
           layout
           initial={{ opacity: 0, x: -20 }}
-          animate={{ top, opacity: 1, x: 0, zIndex: isHovered ? 60 : 10 }}
+          animate={{ top, opacity: isInView ? 1 : 0, x: isInView ? 0 : -20, zIndex: isHovered ? 60 : 10 }}
           style={{
             position: 'absolute',
             left: '-6rem', // Start from rail area
@@ -232,10 +240,6 @@ const TimelineEvent: React.FC<Props> = ({
         >
           {/* Glowing Horizontal Line */}
           <div className={`w-full h-[1px] bg-white/50 relative transition-all duration-300 ${!isScrolling ? 'group-hover:w-[140%] group-hover:h-[3px] group-hover:bg-white group-hover:shadow-[0_0_35px_rgba(255,255,255,1)]' : 'blur-[1px]'} rounded-full`}>
-            {/* Bigger Eye Icon at the LEFT End */}
-            <div className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-black/60 border border-white/30 p-1.5 rounded-full ${!isScrolling ? 'group-hover:scale-125 group-hover:bg-black group-hover:border-white group-hover:shadow-[0_0_25px_white]' : ''} transition-all duration-300`}>
-              <Eye size={18} className={`transition-colors duration-300 ${!isScrolling ? 'text-white/50 group-hover:text-white' : 'text-white/30'}`} />
-            </div>
           </div>
 
           {/* Simple Tooltip */}
@@ -282,12 +286,13 @@ const TimelineEvent: React.FC<Props> = ({
 
     return (
       <motion.div
+        ref={cardRef}
         layout
         initial={{ opacity: 0, x: -50 }}
         animate={{
           top: top,
-          opacity: 1,
-          x: 0,
+          opacity: isInView ? 1 : 0,
+          x: isInView ? 0 : -50,
           zIndex: isHovered ? 60 : 10
         }}
         style={{
@@ -422,6 +427,8 @@ const TimelineEvent: React.FC<Props> = ({
   if (isTinkerVerse) {
     return (
       <motion.div
+        ref={cardRef}
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
         className={`rounded-lg md:rounded-xl transition-colors duration-500 border border-transparent ${s.glass}`}
         style={{
           position: 'absolute',
@@ -430,7 +437,6 @@ const TimelineEvent: React.FC<Props> = ({
           // Auto height to fit grid content + padding
           height: isFit ? height : 'auto',
           minHeight: height,
-          opacity: isDimmed ? 0.1 : 1,
           filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
           zIndex: isHovered ? 50 : 10,
           perspective: 1000,
@@ -438,7 +444,9 @@ const TimelineEvent: React.FC<Props> = ({
           rotateY: isHovered && !isScrolling ? rotateY : 0,
         }}
         animate={{
-          scale: isHovered ? 1.15 : 1,
+          opacity: isInView ? (isDimmed ? 0.1 : 1) : 0,
+          y: isInView ? 0 : 40,
+          scale: isInView ? (isHovered ? 1.15 : 1) : 0.95,
         }}
         transition={{
           type: 'spring',
@@ -486,6 +494,8 @@ const TimelineEvent: React.FC<Props> = ({
   // --- STANDARD CARD RENDER ---
   return (
     <motion.div
+      ref={cardRef}
+      data-item-id={item.id}
       onMouseEnter={(e) => {
         isMouseOverRef.current = true;
         if (!isActuallyScrolling()) {
@@ -513,12 +523,13 @@ const TimelineEvent: React.FC<Props> = ({
           onLaneHover(null);
         }
       }}
-      initial={{ opacity: 0, y: 100 }}
+      initial={{ opacity: 0, y: 60, scale: 0.95 }}
       animate={{
         top: top,
-        opacity: isDimmed ? 0.1 : 1,
-        scale: isDimmed ? 0.98 : isHovered ? 1.05 : 1,
-        y: 0,
+        // Scroll-triggered reveal: fade in when card enters viewport
+        opacity: isInView ? (isDimmed ? 0.1 : 1) : 0,
+        scale: isInView ? (isDimmed ? 0.98 : isHovered ? 1.05 : 1) : 0.95,
+        y: isInView ? 0 : 60,
         filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
         zIndex: isHovered ? 50 : 10,
       }}
@@ -611,7 +622,7 @@ const TimelineEvent: React.FC<Props> = ({
               {item.company}
             </motion.p>
             {item.headline && !isFit && (
-              <motion.p className={`mt-2 text-xs leading-relaxed opacity-80 ${s.text} line-clamp-2`}>
+              <motion.p className={`hidden md:block mt-2 text-xs leading-relaxed opacity-80 ${s.text} line-clamp-2`}>
                 {item.headline}
               </motion.p>
             )}
@@ -925,11 +936,11 @@ const TinkerVerseGrid: React.FC<{
             style={{ height: `${rowHeight}px`, minHeight: '24px' }}
           >
             {rowHeight > 20 && (
-              <div className="w-8 text-[9px] font-mono text-amber-200/40 text-right shrink-0">
+              <div className="hidden md:block w-8 text-[9px] font-mono text-amber-200/40 text-right shrink-0">
                 {row.date.toLocaleDateString('en-US', { month: 'short' })}
               </div>
             )}
-            <div className="flex-1 flex flex-wrap gap-1 items-center content-center h-full">
+            <div className="hidden md:flex flex-1 flex-wrap gap-1 items-center content-center h-full">
               {Array.from({ length: 8 }).map((_, i) => {
                 const post = row.posts[i];
                 const hasPost = !!post;

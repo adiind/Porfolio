@@ -59,7 +59,7 @@ const TimelineRail: React.FC<Props> = ({ pixelsPerMonth, totalHeight, onYearClic
   if (!isVisible) return null;
 
   return (
-    <div className="absolute left-0 top-0 bottom-0 w-28 md:w-36 border-r border-white/10 z-20 pointer-events-none select-none h-full bg-gradient-to-r from-black/20 to-transparent">
+    <div className="hidden md:block absolute left-0 top-0 bottom-0 w-28 md:w-36 border-r border-white/10 z-20 pointer-events-none select-none h-full bg-gradient-to-r from-black/20 to-transparent">
 
       {/* --- HOVER BOOKMARK INDICATOR --- */}
       <AnimatePresence>
