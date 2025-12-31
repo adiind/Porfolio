@@ -11,6 +11,7 @@ import CaseStudyModal from './components/CaseStudyModal';
 import ProfileModal from './components/ProfileModal';
 import ProjectModal from './components/ProjectModal';
 import TinkerVerseModal from './components/TinkerVerseModal';
+import MobileTimeline from './components/MobileTimeline';
 import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 // Background removed for performance
@@ -442,7 +443,7 @@ const App: React.FC = () => {
             y: mode === 'intro' ? -20 : 0
           }}
           transition={pageTransition}
-          className="relative max-w-6xl mx-auto flex items-start justify-between pointer-events-auto"
+          className="relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 pointer-events-auto"
         >
           <div className="cursor-pointer group" onClick={() => handleZoom('intro')}>
             <h1 className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors">
@@ -453,15 +454,14 @@ const App: React.FC = () => {
             </p>
           </div>
 
-
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm pointer-events-auto">
-            <Filter size={14} className="text-white/40 ml-2 mr-1" />
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm pointer-events-auto w-fit overflow-x-auto no-scrollbar mx-auto md:mx-0 scale-[0.85] md:scale-100 origin-center">
+            <Filter size={14} className="text-white/40 ml-2 mr-1 shrink-0" />
             {(['all', 'education', 'corporate', 'personal'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`
-                   px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all
+                   px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all shrink-0
                    ${filter === f
                     ? 'bg-white text-black shadow-lg shadow-white/10'
                     : 'text-white/50 hover:text-white hover:bg-white/5'}
@@ -521,8 +521,8 @@ const App: React.FC = () => {
         }}
         transition={pageTransition}
       >
-        {/* Zoom Controls */}
-        <div className="absolute top-24 right-6 flex flex-col gap-2 z-40">
+        {/* Zoom Controls - Desktop only */}
+        <div className="hidden md:flex absolute top-24 right-6 flex-col gap-2 z-40">
           <button
             onClick={() => handleManualZoom('in')}
             className="p-2 rounded-full border transition-all bg-black/40 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
@@ -562,8 +562,19 @@ const App: React.FC = () => {
           onScroll={handleScroll}
           className="h-full overflow-y-auto overflow-x-hidden relative no-scrollbar"
         >
+          {/* Mobile Layout - Stacked Sections */}
+          <div className="block md:hidden mt-[150px] pb-20">
+            <MobileTimeline
+              items={filteredData}
+              onOpenCaseStudy={setActiveCaseStudy}
+              onOpenProject={setActiveProject}
+              onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+            />
+          </div>
+
+          {/* Desktop Layout - Column Timeline */}
           <div
-            className="relative w-full max-w-6xl mx-auto mt-[160px]"
+            className="hidden md:block relative w-full max-w-6xl mx-auto mt-[160px]"
             style={{ height: `${totalContainerHeight}px` }}
           >
             <TimelineRail
@@ -621,6 +632,66 @@ const App: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* --- PROJECTS SECTION --- */}
+          <section id="projects" className="relative w-full max-w-6xl mx-auto px-6 py-24 border-t border-white/5 mt-20">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                Selected Work
+              </h2>
+              <p className="text-white/50 text-lg mb-12 max-w-xl">
+                Systems and experiments built outside job titles.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Surya Card */}
+                <div className="group relative bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 cursor-pointer text-left">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <Zap size={20} className="text-amber-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-amber-200 transition-colors">Surya</h3>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    Solar-powered IoT monitoring system for remote agricultural deployments.
+                  </p>
+                </div>
+
+                {/* Plotter Card */}
+                <div className="group relative bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 cursor-pointer text-left">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-teal-500/20 rounded-lg">
+                      <PenTool size={20} className="text-teal-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-teal-200 transition-colors">Plotter</h3>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    CNC pen plotter built from scratch for generative art and precision drawings.
+                  </p>
+                </div>
+
+                {/* Jarvis Card */}
+                <div className="group relative bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 cursor-pointer text-left">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-indigo-500/20 rounded-lg">
+                      <Bot size={20} className="text-indigo-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-indigo-200 transition-colors">Jarvis</h3>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    Edge AI voice assistant with local processing and smart home integration.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </section>
+
+          <div className="h-32 w-full" />
         </div>
       </motion.div>
     </div>
