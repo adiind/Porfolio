@@ -9,7 +9,7 @@ export { TIMELINE_DATA, USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO };
 export const SOCIAL_LINKS = {
   linkedin: "https://linkedin.com/in/adiind",
   resume: "#", // Replace with actual resume URL
-  email: "mailto:adi@example.com"
+  email: "mailto:kriitya@gmail.com"
 };
 
 export const PROFILE_BIO = `I am Aditya Agarwal, a student in Northwestern’s Engineering Design Innovation program. My path began in product analytics, where I worked on e-commerce, ads, supply chain, and food delivery, learning how algorithms can shape experiences at scale. Alongside this, I’ve always had the drive to make things with my hands, whether sculpting, tinkering with electronics, and building prototypes that tell stories through design.

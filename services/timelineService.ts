@@ -60,12 +60,12 @@ export const timelineService = {
    * Get lane style for positioning
    */
   getLaneStyle: (lane: 0 | 1 | 2): { left: string; width: string } => {
-    const laneWidth = '30%';
+    const laneWidth = '33%';
     switch (lane) {
       case 0: return { left: '0%', width: laneWidth };
-      case 1: return { left: '35%', width: laneWidth };
-      case 2: return { left: '70%', width: laneWidth };
-      default: return { left: '35%', width: laneWidth };
+      case 1: return { left: '33.5%', width: laneWidth };
+      case 2: return { left: '67%', width: laneWidth };
+      default: return { left: '33.5%', width: laneWidth };
     }
   },
 };

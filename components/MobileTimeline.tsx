@@ -70,32 +70,50 @@ const MobileTimeline: React.FC<Props> = ({
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`w-full p-4 rounded-xl border ${getCardStyle(item.type)} cursor-pointer active:scale-[0.98] transition-transform`}
+                className={`w-full p-4 rounded-xl border ${getCardStyle(item.type)} shadow-[0_4px_16px_rgba(0,0,0,0.3)] cursor-pointer active:scale-[0.98] transition-all relative overflow-hidden group`}
                 onClick={() => handleCardTap(item)}
             >
+                {/* Visual "Interactive" Highlight on Tap */}
+                <div className="absolute inset-0 bg-white/5 opacity-0 active:opacity-100 transition-opacity pointer-events-none" />
+
                 {/* Header with icon and type */}
-                <div className="flex items-center gap-2 mb-2">
-                    {getIcon(item.type)}
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-white/60">
-                        {item.type}
-                    </span>
-                    <span className="ml-auto text-[9px] text-white/40">
-                        {formatDate(item.start)} - {formatDate(item.end)}
-                    </span>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                        <div className={`p-1.5 rounded-lg bg-black/40 border border-white/10 ${isExpanded ? 'scale-110 text-white' : 'text-white/70'} transition-all`}>
+                            {getIcon(item.type)}
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-white/50">
+                                {item.type}
+                            </span>
+                            <span className="text-[10px] text-white/80 font-mono">
+                                {formatDate(item.start)} - {formatDate(item.end)}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Explicit Chevron for Interactivity */}
+                    <div className={`p-1 rounded-full bg-white/5 border border-white/5 text-white/50 transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-white/10 text-white' : ''}`}>
+                        <ChevronDown size={14} />
+                    </div>
                 </div>
 
                 {/* Title and Company */}
-                <h3 className="font-bold text-white text-sm leading-tight">{item.title}</h3>
-                <p className="text-xs text-white/60 mt-0.5">{item.company}</p>
+                <div className="flex items-start justify-between gap-2">
+                    <div>
+                        <h3 className="font-bold text-white text-base leading-tight">{item.title}</h3>
+                        <p className="text-xs text-white/60 mt-0.5">{item.company}</p>
+                    </div>
+                    {/* Optional Logo */}
+                    {item.logoUrl && (
+                        <img
+                            src={item.logoUrl}
+                            alt="Logo"
+                            className={`w-8 h-8 object-contain ${item.id === 'ms-edi' ? 'filter brightness-0 invert opacity-60' : 'opacity-80'}`}
+                        />
+                    )}
+                </div>
 
-                {/* Optional Logo */}
-                {item.logoUrl && (
-                    <img
-                        src={item.logoUrl}
-                        alt="Logo"
-                        className={`w-8 h-8 mt-2 object-contain ${item.id === 'ms-edi' ? 'filter brightness-0 invert opacity-60' : 'opacity-80'}`}
-                    />
-                )}
 
                 {/* Expanded Content */}
                 <AnimatePresence>
@@ -109,80 +127,81 @@ const MobileTimeline: React.FC<Props> = ({
                         >
                             <div className="mt-4 pt-3 border-t border-white/10">
                                 {item.summary && (
-                                    <p className="text-xs text-white/80 mb-3 leading-relaxed">{item.summary}</p>
+                                    <p className="text-sm text-white/90 mb-4 leading-relaxed font-light">{item.summary}</p>
                                 )}
                                 {item.bullets && item.bullets.length > 0 && (
-                                    <ul className="space-y-2">
+                                    <ul className="space-y-2.5 mb-4">
                                         {item.bullets.map((bullet, idx) => (
-                                            <li key={idx} className="flex items-start gap-2 text-[11px] text-white/70">
-                                                <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-60 shrink-0" />
+                                            <li key={idx} className="flex items-start gap-3 text-xs text-white/70 leading-relaxed">
+                                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                                                 <span>{bullet}</span>
                                             </li>
                                         ))}
                                     </ul>
                                 )}
+
                                 {item.skills && item.skills.length > 0 && (
-                                    <div className="mt-3 pt-3 border-t border-white/10">
-                                        <div className="text-[9px] uppercase tracking-widest font-bold text-white/40 mb-2">Skills</div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.skills.map((skill, idx) => (
-                                                <span key={idx} className="px-2 py-1 text-[9px] bg-white/10 rounded-full text-white/70">
-                                                    {skill.label}
-                                                </span>
-                                            ))}
-                                        </div>
+                                    <div className="mt-4 mb-2 flex flex-wrap gap-1.5">
+                                        {item.skills.map((skill, idx) => (
+                                            <span key={idx} className="px-2.5 py-1 text-[10px] bg-white/5 border border-white/5 rounded-md text-white/60">
+                                                {skill.label}
+                                            </span>
+                                        ))}
                                     </div>
                                 )}
+
                                 {/* Feature Cards / Projects */}
                                 {item.featureCards && item.featureCards.length > 0 && (
-                                    <div className="mt-3 pt-3 border-t border-white/10">
-                                        <div className="text-[9px] uppercase tracking-widest font-bold text-white/40 mb-2">Projects</div>
-                                        <div className="space-y-2">
+                                    <div className="mt-5 pt-3 border-t border-white/10">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="h-px flex-1 bg-white/10"></div>
+                                            <div className="text-[10px] uppercase tracking-widest font-bold text-white/40">Key Projects</div>
+                                            <div className="h-px flex-1 bg-white/10"></div>
+                                        </div>
+
+                                        <div className="space-y-3">
                                             {item.featureCards.map((card, idx) => {
                                                 const featureKey = `${item.id}-${idx}`;
                                                 const isFeatureExpanded = expandedFeatureId === featureKey;
                                                 return (
                                                     <div
                                                         key={idx}
-                                                        className="p-3 bg-indigo-500/20 border border-indigo-400/30 rounded-lg cursor-pointer active:scale-[0.98] transition-all"
+                                                        className={`p-3 rounded-lg border transition-all ${isFeatureExpanded ? 'bg-indigo-500/20 border-indigo-500/40 shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setExpandedFeatureId(isFeatureExpanded ? null : featureKey);
                                                         }}
                                                     >
-                                                        <div className="flex items-start gap-2">
+                                                        <div className="flex items-center justify-between gap-2">
                                                             <div className="flex-1">
-                                                                <div className="text-[12px] font-bold text-indigo-100">{card.title}</div>
-                                                                <div className="text-[10px] text-indigo-200/60">{card.subtitle}</div>
+                                                                <div className={`text-xs font-bold ${isFeatureExpanded ? 'text-indigo-200' : 'text-white/80'}`}>{card.title}</div>
+                                                                {!isFeatureExpanded && <div className="text-[10px] text-white/50 mt-0.5">{card.subtitle}</div>}
                                                             </div>
-                                                            {isFeatureExpanded ? (
-                                                                <ChevronDown size={16} className="text-indigo-300 shrink-0" />
-                                                            ) : (
-                                                                <ChevronRight size={16} className="text-indigo-300 shrink-0" />
-                                                            )}
+                                                            <div className={`p-1 rounded-full ${isFeatureExpanded ? 'bg-indigo-500/20 text-indigo-300' : 'bg-transparent text-white/30'}`}>
+                                                                {isFeatureExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                                            </div>
                                                         </div>
                                                         <AnimatePresence>
-                                                            {isFeatureExpanded ? (
+                                                            {isFeatureExpanded && (
                                                                 <motion.div
                                                                     initial={{ opacity: 0, height: 0 }}
                                                                     animate={{ opacity: 1, height: 'auto' }}
                                                                     exit={{ opacity: 0, height: 0 }}
                                                                     className="overflow-hidden"
                                                                 >
-                                                                    <p className="text-[11px] text-white/80 mt-2 leading-relaxed">{card.expandedSummary || card.summary}</p>
+                                                                    <div className="text-[11px] text-indigo-100/70 mt-2 mb-1">{card.subtitle}</div>
+                                                                    <p className="text-[11px] text-white/80 mt-2 leading-relaxed border-t border-white/5 pt-2">{card.expandedSummary || card.summary}</p>
                                                                     {card.details && card.details.length > 0 && (
-                                                                        <ul className="mt-2 space-y-1">
+                                                                        <ul className="mt-2 space-y-1.5">
                                                                             {card.details.map((d, i) => (
-                                                                                <li key={i} className="flex items-start gap-2 text-[10px] text-white/70">
-                                                                                    <span className="mt-1.5 w-1 h-1 rounded-full bg-indigo-400 shrink-0" />
+                                                                                <li key={i} className="flex items-start gap-2 text-[10px] text-white/60">
+                                                                                    <span className="mt-1 w-1 h-1 rounded-full bg-indigo-400/50 shrink-0" />
                                                                                     <span>{d}</span>
                                                                                 </li>
                                                                             ))}
                                                                         </ul>
                                                                     )}
                                                                 </motion.div>
-                                                            ) : (
-                                                                <p className="text-[10px] text-white/60 mt-1 line-clamp-1">{card.summary}</p>
                                                             )}
                                                         </AnimatePresence>
                                                     </div>
@@ -191,7 +210,18 @@ const MobileTimeline: React.FC<Props> = ({
                                         </div>
                                     </div>
                                 )}
-                                <div className="mt-3 text-[10px] text-white/40 text-center">Tap to collapse</div>
+
+                                <div className="mt-4 pt-4 border-t border-white/5 flex justify-center">
+                                    <button
+                                        className="text-[10px] uppercase tracking-wider text-white/30 flex items-center gap-1 px-3 py-1 rounded-full bg-white/5"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setExpandedId(null);
+                                        }}
+                                    >
+                                        Collapse <ChevronDown size={10} className="rotate-180" />
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     )}

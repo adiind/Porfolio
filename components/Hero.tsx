@@ -1,9 +1,13 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { USER_IMAGE_URL, SOCIAL_LINKS } from '../constants';
-import { Mail, Copy, Check, BarChart3, Code, Palette, Cpu, Printer } from 'lucide-react';
+import { Mail, Copy, Check, BarChart3, Code, Palette, Cpu, Printer, X, Zap, Link, ArrowRight } from 'lucide-react';
 import RadialOrbitalTimeline from './ui/radial-orbital-timeline';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const skillsTimelineData = [
   {
@@ -71,6 +75,27 @@ interface Props {
 
 const Hero: React.FC<Props> = ({ onOpenProfile }) => {
   const [copied, setCopied] = useState(false);
+  const [activeSkillId, setActiveSkillId] = useState<number | null>(null);
+
+  // Computed property for easy access
+  const skillExpanded = activeSkillId !== null;
+
+  const handleActiveNodeChange = (nodeId: number | null) => {
+    setActiveSkillId(nodeId);
+  };
+
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "text-white bg-black border-white";
+      case "in-progress":
+        return "text-black bg-white border-black";
+      case "pending":
+        return "text-white bg-black/40 border-white/50";
+      default:
+        return "text-white bg-black/40 border-white/50";
+    }
+  };
 
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -81,11 +106,12 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  /* Removed old handler */
+
   const pillColors = [
     'bg-indigo-500/20 text-indigo-200 border-indigo-500/30 hover:bg-indigo-500/30',
     'bg-rose-500/20 text-rose-200 border-rose-500/30 hover:bg-rose-500/30',
     'bg-teal-500/20 text-teal-200 border-teal-500/30 hover:bg-teal-500/30',
-    'bg-amber-500/20 text-amber-200 border-amber-500/30 hover:bg-amber-500/30',
   ];
 
   return (
@@ -95,7 +121,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
       <div className="relative w-[320px] h-[320px] md:w-[480px] md:h-[480px] flex items-center justify-center group/hero">
 
         {/* SPEECH BUBBLE - centered above head */}
-        <div className="absolute -top-[160px] md:-top-[140px] left-1/2 -translate-x-1/2 z-50">
+        <div className={`absolute -top-[160px] md:-top-[140px] left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{
@@ -124,11 +150,11 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                   <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
                     Open for Summer 2026 Internships
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['Product Management', 'Design', 'Development', 'Research'].map((role, i) => (
+                  <div className="flex flex-nowrap gap-1">
+                    {['Product Management', 'Design', 'Development'].map((role, i) => (
                       <span
                         key={i}
-                        className={`px-2 py-1 rounded-md border text-[10px] md:text-xs transition-colors cursor-default ${pillColors[i % pillColors.length]}`}
+                        className={`px-1.5 py-0.5 rounded-md border text-[8px] md:text-xs transition-colors cursor-default whitespace-nowrap ${pillColors[i % pillColors.length]}`}
                       >
                         {role}
                       </span>
@@ -176,15 +202,19 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
         </div>
 
         {/* Radial Orbital Timeline with Skills */}
-        <RadialOrbitalTimeline timelineData={skillsTimelineData}>
+        <RadialOrbitalTimeline
+          timelineData={skillsTimelineData}
+          activeNodeId={activeSkillId}
+          onActiveNodeChange={handleActiveNodeChange}
+        >
           {/* Main Character (Front) */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "backOut" }}
-            className="relative z-20 w-[200px] h-[200px] md:w-[280px] md:h-[280px] filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] cursor-pointer pointer-events-auto"
+            className="relative z-20 w-[230px] h-[230px] md:w-[280px] md:h-[280px] filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] cursor-pointer pointer-events-auto"
             onClick={onOpenProfile}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.2, rotate: 2 }}
             whileTap={{ scale: 0.95 }}
           >
             {/* Hover Glow Ring */}
@@ -210,6 +240,105 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           </motion.div>
         </RadialOrbitalTimeline>
 
+        {/* EXPANDED SKILL CARD - PORTAL FIX */}
+        {activeSkillId && typeof document !== 'undefined' && createPortal(
+          <AnimatePresence>
+            <div
+              className="fixed inset-0 z-[99999] flex items-start justify-center pt-4 md:pt-10 pointer-events-auto bg-black/60 backdrop-blur-sm"
+              onClick={() => setActiveSkillId(null)}
+            >
+              <div
+                className="relative w-[85%] md:w-[600px]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 10 }} // Keep exit animation
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="w-full bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-white/10 overflow-visible">
+                    <CardHeader className="pb-1 p-4">
+                      <div className="flex justify-between items-center">
+                        <Badge
+                          className={`px-2 py-0 h-5 text-[10px] ${getStatusStyles(skillsTimelineData.find(i => i.id === activeSkillId)?.status || 'pending')}`}
+                        >
+                          {skillsTimelineData.find(i => i.id === activeSkillId)?.status === "completed" ? "COMPLETE" : skillsTimelineData.find(i => i.id === activeSkillId)?.status === "in-progress" ? "IN PROGRESS" : "PENDING"}
+                        </Badge>
+                        <span className="text-[10px] font-mono text-white/50">
+                          {skillsTimelineData.find(i => i.id === activeSkillId)?.date}
+                        </span>
+                      </div>
+                      <CardTitle className="text-sm mt-1 text-white">
+                        {skillsTimelineData.find(i => i.id === activeSkillId)?.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-xs text-white/80 p-4 pt-0">
+                      <p className="line-clamp-2 md:line-clamp-none leading-relaxed">{skillsTimelineData.find(i => i.id === activeSkillId)?.content}</p>
+
+                      <div className="mt-3 pt-2 border-t border-white/10 flex items-center gap-3">
+                        <span className="flex items-center text-white/60 shrink-0 text-[10px] uppercase tracking-wider">
+                          <Zap size={10} className="mr-1" />
+                          Proficiency
+                        </span>
+                        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                            style={{ width: `${skillsTimelineData.find(i => i.id === activeSkillId)?.energy || 0}%` }}
+                          ></div>
+                        </div>
+                        <span className="font-mono text-white/80 text-[10px] shrink-0">{skillsTimelineData.find(i => i.id === activeSkillId)?.energy}%</span>
+                      </div>
+
+                      {(skillsTimelineData.find(i => i.id === activeSkillId)?.relatedIds.length || 0) > 0 && (
+                        <div className="mt-2 pt-2 border-t border-white/10 flex items-center gap-2">
+                          <Link size={10} className="text-white/50 shrink-0" />
+                          <div className="flex flex-wrap gap-1">
+                            {skillsTimelineData.find(i => i.id === activeSkillId)?.relatedIds.map((relatedId) => {
+                              const relatedItem = skillsTimelineData.find(i => i.id === relatedId);
+                              return (
+                                <button
+                                  key={relatedId}
+                                  className="flex items-center h-5 px-2 py-0 text-[10px] rounded-sm border border-white/20 bg-transparent hover:bg-white/10 text-white/80 hover:text-white transition-all cursor-pointer pointer-events-auto"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveSkillId(relatedId);
+                                  }}
+                                >
+                                  {relatedItem?.title}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* CLOSE BUTTON - PORTAL VERSION */}
+                <button
+                  className="absolute -top-5 -right-5 z-[999999] p-2 bg-black rounded-full border border-white/20 text-white shadow-[0_0_15px_rgba(0,0,0,1)] hover:bg-white hover:text-black transition-all cursor-pointer outline-none pointer-events-auto active:scale-95"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveSkillId(null);
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveSkillId(null);
+                  }}
+                  type="button"
+                  aria-label="Close"
+                >
+                  <X size={20} strokeWidth={3} />
+                </button>
+              </div>
+            </div>
+          </AnimatePresence>,
+          document.body
+        )}
 
       </div>
 
