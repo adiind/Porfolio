@@ -508,15 +508,20 @@ Since then, I have been thinking about how tools can help people express themsel
   {
     id: "snapdeal",
     lane: 1,
-    title: "Data Analyst",
+    title: "Data Analyst · Ads & Supply Infrastructure",
     company: "Snapdeal",
-    headline: "Optimizing ad revenue and warehousing logic at scale.",
+    headline: "Building ads analytics and supply infrastructure during Snapdeal's first-party transition.",
     type: "corporate",
     subtype: 'role',
     start: "2020-06-01",
     end: "2022-09-30",
-    summary: "Built ad-tech analytics and first-party warehousing systems for e-commerce at scale.",
-    bullets: ["Automated warehouse forecasting.", "Increased Ad Revenue by 14%."],
+    summary: "Building ads analytics and supply infrastructure during Snapdeal's first-party transition.",
+    bullets: [
+      "Set up data pipelines to support Snapdeal's first-party product rollout",
+      "Built replenishment logic for newly established warehouse operations",
+      "Enabled inventory planning as Snapdeal scaled owned supply and fulfillment",
+      "Contributed to ads revenue optimization, resulting in a 14% uplift"
+    ],
     skills: [
       { label: "Ad-Tech Analytics", description: "Performance measurement and optimization for advertising products." },
       { label: "Revenue Attribution", description: "Tracing revenue back to specific ad actions and campaigns." },
@@ -533,8 +538,8 @@ Since then, I have been thinking about how tools can help people express themsel
       {
         title: "Seller Ads Intelligence System",
         subtitle: "Analytics Owner",
-        summary: "Launched analytics foundation powering CPC, CPT, & banner ad products. Automated revenue attribution & forecasting driving ad bidding logic.",
-        expandedSummary: "Owned analytics and data pipelines for Snapdeal's seller advertising systems, supporting performance measurement, pricing evaluation, experiments and seller ROI understanding across multiple ad formats.",
+        summary: "Worked on ads revenue analytics and supply-side data infrastructure during Snapdeal's shift toward first-party products and in-house warehousing.",
+        expandedSummary: "Worked on ads revenue analytics and supply-side data infrastructure during Snapdeal's shift toward first-party products and in-house warehousing. Set up data pipelines, built replenishment logic, and enabled inventory planning as Snapdeal scaled owned supply and fulfillment.",
         pills: [
           { label: "CPC", description: "Cost Per Click. Advertisers are charged only when a user clicks on their ad." },
           { label: "CPT", description: "Cost Per Transaction. Advertisers pay a commission only when a sale occurs." },
