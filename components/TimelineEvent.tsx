@@ -174,12 +174,12 @@ const TimelineEvent: React.FC<Props> = ({
   const s = getStyles();
 
   const getLaneStyle = () => {
-    const laneWidth = '30%';
+    const laneWidth = '33%';
     switch (item.lane) {
       case 0: return { left: '0%', width: laneWidth };
-      case 1: return { left: '35%', width: laneWidth };
-      case 2: return { left: '70%', width: laneWidth };
-      default: return { left: '35%', width: laneWidth };
+      case 1: return { left: '33.5%', width: laneWidth };
+      case 2: return { left: '67%', width: laneWidth };
+      default: return { left: '33.5%', width: laneWidth };
     }
   };
 

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowRight, Link, Zap } from "lucide-react";
+import { ArrowRight, Link, Zap, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,15 +20,22 @@ interface TimelineItem {
 interface RadialOrbitalTimelineProps {
     timelineData: TimelineItem[];
     children?: React.ReactNode;
+    activeNodeId?: number | null;
+    onActiveNodeChange?: (nodeId: number | null) => void;
 }
 
 export default function RadialOrbitalTimeline({
     timelineData,
     children,
+    activeNodeId: controlledActiveNodeId,
+    onActiveNodeChange,
 }: RadialOrbitalTimelineProps) {
-    const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
-        {}
-    );
+    const [internalActiveNodeId, setInternalActiveNodeId] = useState<number | null>(null);
+
+    // Use controlled state if provided, otherwise internal
+    const activeNodeId = controlledActiveNodeId !== undefined ? controlledActiveNodeId : internalActiveNodeId;
+
+    const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>({});
     const [rotationAngle, setRotationAngle] = useState<number>(0);
     const [autoRotate, setAutoRotate] = useState<boolean>(true);
     const [pulseEffect, setPulseEffect] = useState<Record<number, boolean>>({});
@@ -36,51 +43,51 @@ export default function RadialOrbitalTimeline({
         x: 0,
         y: 0,
     });
-    const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
+
+    // Sync expandedItems with activeNodeId
+    useEffect(() => {
+        if (activeNodeId === null) {
+            setExpandedItems({});
+            setAutoRotate(true);
+            setPulseEffect({});
+        } else {
+            setExpandedItems({ [activeNodeId]: true });
+            setAutoRotate(false);
+            // Trigger pulse for related
+            const related = getRelatedItems(activeNodeId);
+            const newPulse: Record<number, boolean> = {};
+            related.forEach(id => newPulse[id] = true);
+            setPulseEffect(newPulse);
+
+            centerViewOnNode(activeNodeId);
+        }
+    }, [activeNodeId]);
+
     const containerRef = useRef<HTMLDivElement>(null);
     const orbitRef = useRef<HTMLDivElement>(null);
     const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
     const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === containerRef.current || e.target === orbitRef.current) {
-            setExpandedItems({});
-            setActiveNodeId(null);
-            setPulseEffect({});
-            setAutoRotate(true);
+            handleNodeSelect(null);
+        }
+    };
+
+    const handleNodeSelect = (id: number | null) => {
+        if (controlledActiveNodeId !== undefined) {
+            onActiveNodeChange?.(id);
+        } else {
+            setInternalActiveNodeId(id);
+            onActiveNodeChange?.(id);
         }
     };
 
     const toggleItem = (id: number) => {
-        setExpandedItems((prev) => {
-            const newState = { ...prev };
-            Object.keys(newState).forEach((key) => {
-                if (parseInt(key) !== id) {
-                    newState[parseInt(key)] = false;
-                }
-            });
-
-            newState[id] = !prev[id];
-
-            if (!prev[id]) {
-                setActiveNodeId(id);
-                setAutoRotate(false);
-
-                const relatedItems = getRelatedItems(id);
-                const newPulseEffect: Record<number, boolean> = {};
-                relatedItems.forEach((relId) => {
-                    newPulseEffect[relId] = true;
-                });
-                setPulseEffect(newPulseEffect);
-
-                centerViewOnNode(id);
-            } else {
-                setActiveNodeId(null);
-                setAutoRotate(true);
-                setPulseEffect({});
-            }
-
-            return newState;
-        });
+        if (activeNodeId === id) {
+            handleNodeSelect(null);
+        } else {
+            handleNodeSelect(id);
+        }
     };
 
     useEffect(() => {
@@ -101,6 +108,8 @@ export default function RadialOrbitalTimeline({
             }
         };
     }, [autoRotate]);
+
+    // Removed redundant useEffect for onActiveNodeChange since we call it directly
 
     const centerViewOnNode = (nodeId: number) => {
         if (!nodeRefs.current[nodeId]) return;
@@ -168,10 +177,10 @@ export default function RadialOrbitalTimeline({
                 }}
             >
                 {/* Orbit ring */}
-                <div className="absolute w-[360px] h-[360px] rounded-full border border-white/10"></div>
+                <div className="absolute w-[360px] h-[360px] rounded-full border border-white/10 pointer-events-none"></div>
 
                 {/* Second orbit ring for depth */}
-                <div className="absolute w-[380px] h-[380px] rounded-full border border-white/5"></div>
+                <div className="absolute w-[380px] h-[380px] rounded-full border border-white/5 pointer-events-none"></div>
 
                 {/* Orbital nodes */}
                 {timelineData.map((item, index) => {
@@ -183,7 +192,7 @@ export default function RadialOrbitalTimeline({
 
                     const nodeStyle = {
                         transform: `translate(${position.x}px, ${position.y}px)`,
-                        zIndex: isExpanded ? 200 : position.zIndex,
+                        zIndex: isExpanded ? 1000 : 100 + position.zIndex, // Ensure high z-index
                         opacity: isExpanded ? 1 : position.opacity,
                     };
 
@@ -244,96 +253,19 @@ export default function RadialOrbitalTimeline({
                                 {item.title}
                             </div>
 
-                            {isExpanded && (
-                                <Card className="absolute top-20 left-1/2 -translate-x-1/2 w-64 bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-white/10 overflow-visible">
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-white/50"></div>
-                                    <CardHeader className="pb-2">
-                                        <div className="flex justify-between items-center">
-                                            <Badge
-                                                className={`px-2 text-xs ${getStatusStyles(
-                                                    item.status
-                                                )}`}
-                                            >
-                                                {item.status === "completed"
-                                                    ? "COMPLETE"
-                                                    : item.status === "in-progress"
-                                                        ? "IN PROGRESS"
-                                                        : "PENDING"}
-                                            </Badge>
-                                            <span className="text-xs font-mono text-white/50">
-                                                {item.date}
-                                            </span>
-                                        </div>
-                                        <CardTitle className="text-sm mt-2 text-white">
-                                            {item.title}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-xs text-white/80">
-                                        <p>{item.content}</p>
-
-                                        <div className="mt-4 pt-3 border-t border-white/10">
-                                            <div className="flex justify-between items-center text-xs mb-1">
-                                                <span className="flex items-center text-white/60">
-                                                    <Zap size={10} className="mr-1" />
-                                                    Proficiency
-                                                </span>
-                                                <span className="font-mono text-white/80">{item.energy}%</span>
-                                            </div>
-                                            <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                                                    style={{ width: `${item.energy}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-
-                                        {item.relatedIds.length > 0 && (
-                                            <div className="mt-4 pt-3 border-t border-white/10">
-                                                <div className="flex items-center mb-2">
-                                                    <Link size={10} className="text-white/70 mr-1" />
-                                                    <h4 className="text-xs uppercase tracking-wider font-medium text-white/70">
-                                                        Related Skills
-                                                    </h4>
-                                                </div>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {item.relatedIds.map((relatedId) => {
-                                                        const relatedItem = timelineData.find(
-                                                            (i) => i.id === relatedId
-                                                        );
-                                                        return (
-                                                            <Button
-                                                                key={relatedId}
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="flex items-center h-6 px-2 py-0 text-xs rounded-none border-white/20 bg-transparent hover:bg-white/10 text-white/80 hover:text-white transition-all"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    toggleItem(relatedId);
-                                                                }}
-                                                            >
-                                                                {relatedItem?.title}
-                                                                <ArrowRight
-                                                                    size={8}
-                                                                    className="ml-1 text-white/60"
-                                                                />
-                                                            </Button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            )}
+                            {/* Card removed from here */}
                         </div>
                     );
                 })}
             </div>
 
             {/* Center content (children - profile image) */}
-            <div className="relative z-10">
+            <div className={`relative transition-all duration-300 ${activeNodeId ? 'z-0' : 'z-10'}`}>
                 {children}
             </div>
+
+            {/* Top Center Expanded Card */}
+            {/* Top Center Expanded Card Removed - Rendered by Parent */}
         </div>
     );
 }

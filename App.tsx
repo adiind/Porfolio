@@ -12,7 +12,7 @@ import ProfileModal from './components/ProfileModal';
 import ProjectModal from './components/ProjectModal';
 import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
-import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User } from 'lucide-react';
+import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
@@ -221,18 +221,37 @@ const App: React.FC = () => {
 
       // For gentle scrolls at top, allow immediate trigger
       if (!scrollBackTimeoutRef.current && !isAnimatingRef.current) {
-        // Debug logging removed
-
         e.preventDefault();
         handleZoom('intro');
       }
     };
 
+    // Touch support for scroll-back to intro on mobile
+    let touchStartYBack = 0;
+    const handleTouchStartBack = (e: TouchEvent) => {
+      if (container.scrollTop < 5) { // Only track when near top
+        touchStartYBack = e.touches[0].clientY;
+      }
+    };
+    const handleTouchMoveBack = (e: TouchEvent) => {
+      if (isAnimatingRef.current || modeRef.current === 'intro') return;
+      if (container.scrollTop > 5) return; // Must be near top
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchY - touchStartYBack; // Positive = swiping down (pulling to go back)
+      if (deltaY > 50) { // Threshold for swipe down
+        handleZoom('intro');
+      }
+    };
+
     container.addEventListener('wheel', handleWheelAtTop, { passive: false });
+    container.addEventListener('touchstart', handleTouchStartBack, { passive: true });
+    container.addEventListener('touchmove', handleTouchMoveBack, { passive: true });
 
     return () => {
       container.removeEventListener('scroll', handleScrollBack);
       container.removeEventListener('wheel', handleWheelAtTop);
+      container.removeEventListener('touchstart', handleTouchStartBack);
+      container.removeEventListener('touchmove', handleTouchMoveBack);
       if (scrollBackTimeoutRef.current) {
         clearTimeout(scrollBackTimeoutRef.current);
       }
@@ -583,13 +602,28 @@ const App: React.FC = () => {
           className="h-full overflow-y-auto overflow-x-hidden relative no-scrollbar"
         >
           {/* Mobile Layout - Stacked Sections */}
-          <div className="block md:hidden mt-[150px] pb-20">
+          <div className="block md:hidden mt-[150px] pb-6">
             <MobileTimeline
               items={filteredData}
               onOpenCaseStudy={setActiveCaseStudy}
               onOpenProject={setActiveProject}
               onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
             />
+
+            {/* Mobile-only Back to Home Button */}
+            <div className="fixed bottom-6 right-6 z-50">
+              <button
+                onClick={() => {
+                  if (scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTop = 0;
+                  }
+                  handleZoom('intro');
+                }}
+                className="p-3 rounded-full bg-indigo-500/80 text-white shadow-lg shadow-indigo-500/30 active:scale-95 transition-transform"
+              >
+                <Home size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Desktop Layout - Column Timeline */}
@@ -618,9 +652,9 @@ const App: React.FC = () => {
                       position: 'absolute',
                       top: 0,
                       bottom: 0,
-                      width: '30%',
-                      // Aligned with TimelineEvent logic: 0%, 35%, 70%
-                      left: lane === 0 ? '0%' : lane === 1 ? '35%' : '70%',
+                      width: '33%',
+                      // Aligned with TimelineEvent logic: 0%, 33.5%, 67%
+                      left: lane === 0 ? '0%' : lane === 1 ? '33.5%' : '67%',
                       background: hoveredLane === lane
                         ? `linear-gradient(to bottom, ${lane === 0 ? 'rgba(244,63,94,0.05)' :
                           lane === 1 ? 'rgba(99,102,241,0.05)' :
@@ -654,7 +688,7 @@ const App: React.FC = () => {
           </div>
 
           {/* --- PROJECTS SECTION --- */}
-          <section id="projects" className="relative w-full max-w-6xl mx-auto px-6 py-24 border-t border-white/5 mt-20">
+          <section id="projects" className="relative w-full max-w-6xl mx-auto px-6 py-12 md:py-24 border-t border-white/5 mt-6 md:mt-20">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
