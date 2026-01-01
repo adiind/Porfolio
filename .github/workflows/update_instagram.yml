@@ -1,0 +1,30 @@
+name: Update Instagram Data
+
+on:
+  schedule:
+    # Run daily at midnight
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-instagram:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Update Instagram Data
+        env:
+          APIFY_API_TOKEN: ${{ secrets.APIFY_API_TOKEN }}
+        run: node scripts/update-instagram-data.js
+
+      - name: Commit and Push if changed
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add data/instagram_posts.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update instagram data" && git push)

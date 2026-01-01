@@ -1,6 +1,6 @@
 
 import { TimelineConfig, SocialPost } from './types';
-import RAW_INSTAGRAM_POSTS from './dataset_instagram-post-scraper_2025-12-05_08-56-36-834.json';
+import RAW_INSTAGRAM_POSTS from './data/instagram_posts.json';
 import { TIMELINE_DATA } from './data/timeline';
 import { USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO } from './assets';
 
@@ -8,7 +8,7 @@ export { TIMELINE_DATA, USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO };
 
 export const SOCIAL_LINKS = {
   linkedin: "https://linkedin.com/in/adiind",
-  resume: "#", // Replace with actual resume URL
+  resume: "/Adi_resume.pdf",
   email: "mailto:kriitya@gmail.com"
 };
 
