@@ -8,7 +8,7 @@ export { TIMELINE_DATA, USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO };
 
 export const SOCIAL_LINKS = {
   linkedin: "https://linkedin.com/in/adiind",
-  resume: "/Adi_resume.pdf",
+  resume: "/Adi_Agarwal_Resume_2025.pdf",
   email: "mailto:kriitya@gmail.com"
 };
 
@@ -28,12 +28,22 @@ export const CONFIG: TimelineConfig = {
   endDate: '2025-12-31'
 };
 
-export const SOCIAL_POSTS: SocialPost[] = (RAW_INSTAGRAM_POSTS as any[]).map((post: any) => ({
-  id: post.url,
-  date: post.timestamp.split('T')[0],
-  summary: post.caption,
-  url: post.url,
-  caption: post.caption,
-  likes: post.likesCount,
-  comments: post.commentsCount
-}));
+export const SOCIAL_POSTS: SocialPost[] = (RAW_INSTAGRAM_POSTS as any[]).map((post: any) => {
+  // Handle both 'timestamp' (ISO format) and 'date' (YYYY-MM-DD) fields
+  let dateStr = '';
+  if (post.timestamp) {
+    dateStr = post.timestamp.split('T')[0];
+  } else if (post.date) {
+    dateStr = post.date;
+  }
+
+  return {
+    id: post.url || post.id,
+    date: dateStr,
+    summary: post.caption || post.summary || '',
+    url: post.url,
+    caption: post.caption || '',
+    likes: post.likesCount ?? post.likes ?? 0,
+    comments: post.commentsCount ?? post.comments ?? 0
+  };
+});
