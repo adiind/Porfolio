@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Linkedin, FileText, ExternalLink } from 'lucide-react';
 import { REAL_USER_IMAGE, PROFILE_BIO, PROFILE_SKILLS, SOCIAL_LINKS } from '../constants';
 
