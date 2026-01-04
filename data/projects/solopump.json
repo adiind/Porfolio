@@ -1,0 +1,77 @@
+{
+    "id": "solopump",
+    "hero": {
+        "title": "SoloPump – One-Handed Liquid Dispenser",
+        "oneLiner": "An automated drink dispensing machine that pours measured drinks or shots, with manual control and a web interface to adjust output."
+    },
+    "context": {
+        "text": "Pouring consistent drinks is unreliable. Free-pouring varies by person, speed, and attention, especially in social settings. I wanted a system that could dispense repeatable quantities on demand, work hands-free when needed, and still allow manual control. The constraint was to keep it simple, affordable, and suitable for DIY deployment rather than a commercial bar system."
+    },
+    "build": {
+        "bullets": [
+            "Automated liquid pumping and dispensing mechanism",
+            "Microcontroller-based control system",
+            "Manual dispense input for quick pours",
+            "Web-based UI to configure pour quantity and modes",
+            "Calibrated flow control logic for repeatable output",
+            "Power management and safety circuitry",
+            "3D-printed structural and mounting components"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Web UI control vs physical-only controls",
+            "why": "Allowed quick reconfiguration of pour volumes without rebuilding hardware.",
+            "tradeoff": "Required networking and basic frontend work."
+        },
+        {
+            "decision": "Calibration-based dosing vs flow sensors",
+            "why": "Reduced cost and mechanical complexity.",
+            "tradeoff": "Required periodic recalibration."
+        },
+        {
+            "decision": "Manual override mode vs fully automated system",
+            "why": "Preserved usability during network failure or casual use.",
+            "tradeoff": "Added logic complexity."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Calibration-based pours stayed consistent across repeated use.",
+            "Web UI made adjusting drink sizes fast and intuitive.",
+            "Manual mode ensured the system remained usable at all times."
+        ],
+        "didnt": [
+            "Different liquid viscosities affected accuracy more than expected."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "SoloPump became a reliable automated drink dispensing system capable of consistent pours in both manual and automated modes. It demonstrated how low-cost electronics and simple control logic can replace skill-based tasks with repeatable outcomes.",
+        "proof": "https://www.instagram.com/p/DOsbHNcgLmK/",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "This project clarified how software control and calibration can replace human skill in repeatable physical tasks without over-engineering the system."
+    },
+    "themeColor": "teal",
+    "icon": "bot",
+    "skills": [
+        {
+            "label": "Full Stack IoT",
+            "description": "End-to-end device control from web interface to hardware action."
+        },
+        {
+            "label": "Microcontrollers",
+            "description": "Embedded logic for real-time dispensing control."
+        },
+        {
+            "label": "3D Modeling",
+            "description": "Custom enclosure and mounting design."
+        },
+        {
+            "label": "Calibration Logic",
+            "description": "Software-based accuracy tuning for physical outputs."
+        }
+    ]
+}

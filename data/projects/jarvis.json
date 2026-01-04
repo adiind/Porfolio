@@ -1,0 +1,82 @@
+{
+    "id": "jarvis",
+    "hero": {
+        "title": "Jarvis – Voice-Controlled Smart Home Assistant",
+        "oneLiner": "A local, voice-controlled smart assistant that triggers real-world actions without relying on cloud-first voice ecosystems."
+    },
+    "context": {
+        "text": "Commercial voice assistants felt opaque, slow, and over-scoped. Simple actions required internet dependency, rigid phrasing, and cloud processing. I wanted a system I could fully understand, control, and extend, one that reacted instantly to voice input and integrated directly with my own hardware and automations. The constraint was to keep it lightweight, local-first, and hackable."
+    },
+    "build": {
+        "bullets": [
+            "Custom wake-word–based voice recognition system",
+            "Embedded hardware running local inference",
+            "LED-based visual feedback system",
+            "MQTT communication layer",
+            "Integration with Home Assistant automations",
+            "Physical enclosure and internal wiring",
+            "Firmware for voice models, thresholds, and state handling"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Local voice recognition vs cloud APIs",
+            "why": "Reduced latency, preserved privacy, and allowed full system control.",
+            "tradeoff": "Required careful tuning of models and thresholds."
+        },
+        {
+            "decision": "Wake-word + command models vs continuous listening",
+            "why": "Prevented false triggers and reduced processing load",
+            "tradeoff": "Added a two-step interaction."
+        },
+        {
+            "decision": "MQTT messaging vs direct device control",
+            "why": "Enabled scalable, decoupled integration with multiple devices.",
+            "tradeoff": "Introduced system-level complexity."
+        },
+        {
+            "decision": "LED feedback vs audio responses",
+            "why": "Provided instant, non-intrusive confirmation without noise.",
+            "tradeoff": "Less expressive than speech output."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Local processing made responses feel immediate and reliable.",
+            "Visual feedback reduced uncertainty during interaction.",
+            "MQTT allowed easy expansion across devices."
+        ],
+        "didnt": [
+            "Voice recognition accuracy dropped in noisy environments."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "Jarvis became a functional, extensible voice interface for controlling lights, sensors, and automations in my environment. The project placed in the Top 10 nationally at the Edge IoT Challenge, validating its technical robustness and design clarity.",
+        "proof": "https://www.instagram.com/p/DCMjkgEMbsA/",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "Jarvis demonstrated how local-first voice systems can outperform cloud assistants for speed, control, and trust when scoped to real environments."
+    },
+    "themeColor": "violet",
+    "icon": "cpu",
+    "skills": [
+        {
+            "label": "Edge AI",
+            "description": "Local voice inference on embedded hardware."
+        },
+        {
+            "label": "IoT / MQTT",
+            "description": "Decoupled device communication."
+        },
+        {
+            "label": "Embedded C++",
+            "description": "Firmware for real-time audio processing."
+        },
+        {
+            "label": "Home Assistant",
+            "description": "Integration with smart home ecosystem."
+        }
+    ]
+}

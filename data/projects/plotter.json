@@ -1,0 +1,77 @@
+{
+    "id": "plotter",
+    "hero": {
+        "title": "Plotter – Speech-to-Draw Machine",
+        "oneLiner": "A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code."
+    },
+    "context": {
+        "text": "Most “voice” interfaces stop at transcription. I wanted voice to become a physical output, something you could hold and keep. The trigger was realizing that creative expression is often blocked by software skill and tooling. The constraint was to build a pipeline that felt magical but stayed understandable: speak, preview, plot, without expensive hardware or closed ecosystems."
+    },
+    "build": {
+        "bullets": [
+            "DIY XY plotter hardware with pen lift mechanism",
+            "Motion control firmware using G-code",
+            "Speech-to-text pipeline to capture spoken input",
+            "Text-to-vector stroke conversion (line fonts)",
+            "G-code generation script for plotting within bounds",
+            "Plot preview + settings UI (bounds, scale, font selection)",
+            "Calibration routines for origin, scaling, and pen behavior"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Speech-to-text + plotting pipeline vs manual typing",
+            "why": "Made creation faster and more accessible, with a “speak it into existence” feel.",
+            "tradeoff": "Needed error handling for transcription mistakes."
+        },
+        {
+            "decision": "Bounds-based scaling near origin vs full-bed auto layout",
+            "why": "Ensured predictable output and avoided edge crashes.",
+            "tradeoff": "Required users to think in a constrained canvas."
+        },
+        {
+            "decision": "Servo pen-lift vs third-axis stepper",
+            "why": "Simpler mechanics and cheaper implementation for pen up/down.",
+            "tradeoff": "More tuning for consistent lift height and timing."
+        }
+    ],
+    "review": {
+        "worked": [
+            "The end-to-end flow (voice → plot) created a strong “physical computing” moment.",
+            "Stroke-font rendering produced clean, plotter-friendly paths.",
+            "User-defined bounds prevented most mechanical overrun issues."
+        ],
+        "didnt": [
+            "Pen-up timing and final-stroke completion were inconsistent and required repeated tuning."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "The plotter reliably converted spoken input into plotted text and drawings, producing repeatable physical artifacts from voice. It became a platform for experimenting with typography, constraints, and computational art, not just a one-off build.",
+        "proof": "https://www.instagram.com/p/DOcq0bHjLHT/",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "This project clarified how a simple pipeline design can turn a familiar input (voice) into a surprising medium (paper), as long as constraints are explicit and controllable."
+    },
+    "themeColor": "rose",
+    "icon": "pen-tool",
+    "skills": [
+        {
+            "label": "CNC / G-code",
+            "description": "Motion control logic for physical plotting."
+        },
+        {
+            "label": "Python",
+            "description": "Text-to-vector processing pipeline."
+        },
+        {
+            "label": "Mechatronics",
+            "description": "Custom XY gantry design and assembly."
+        },
+        {
+            "label": "Speech API",
+            "description": "Voice recognition integration."
+        }
+    ]
+}

@@ -1,0 +1,77 @@
+{
+    "id": "helios",
+    "hero": {
+        "title": "Helios – Mechanical Kinetic Lamp",
+        "oneLiner": "A mechanical lamp that uses gears and physical motion to restore tactile interaction in an otherwise app-driven lighting world."
+    },
+    "context": {
+        "text": "Smart lighting has optimized control but removed interaction. Most lamps are reduced to sliders, presets, or voice commands, making light feel passive and disposable. I wanted to design a lamp where changing light felt intentional and physical, something you engage with using your hands, not an app. The constraint was to make the mechanism visible, understandable, and satisfying rather than hidden."
+    },
+    "build": {
+        "bullets": [
+            "Fully 3D-printed mechanical lamp body",
+            "Ring gear with eight interlinked spur gears",
+            "Manual rotary input for controlling light behavior",
+            "Integrated LED light source",
+            "Gear-driven linkage translating rotation into light modulation",
+            "Modular print design requiring minimal supports",
+            "CAD files and print-optimized part geometry"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Manual mechanical control vs electronic dimming",
+            "why": "Preserved tactile feedback and physical effort as part of the experience.",
+            "tradeoff": "Less precise control compared to digital dimming. Not wireless."
+        },
+        {
+            "decision": "Ring gear architecture vs linear linkage",
+            "why": "Allowed synchronized, expressive motion across multiple elements.",
+            "tradeoff": "Increased print time and alignment complexity."
+        },
+        {
+            "decision": "3D printing vs off-the-shelf components",
+            "why": "Enabled full control over form, scale, and mechanical behavior.",
+            "tradeoff": "Iteration speed depended on print cycles."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Gear-driven motion made interaction slow, deliberate, and satisfying.",
+            "Visible mechanics helped users immediately understand cause and effect.",
+            "Print-first design reduced assembly complexity."
+        ],
+        "didnt": [
+            "Small tolerance errors amplified across the gear train and required multiple iterations."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "Helios resulted in a fully functional kinetic lamp where light is shaped through motion rather than settings. It stands as a proof that mechanical interaction can coexist with modern lighting without relying on software or automation.",
+        "proof": "https://www.instagram.com/p/DDqweMUT021/",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "Helios reinforced that physical resistance, motion, and visibility can make everyday interactions feel intentional rather than optimized away."
+    },
+    "themeColor": "amber",
+    "icon": "layers",
+    "skills": [
+        {
+            "label": "3D Printing",
+            "description": "Design for additive manufacturing."
+        },
+        {
+            "label": "CAD / Mechanical Design",
+            "description": "Complex gear train and linkage geometry."
+        },
+        {
+            "label": "Kinetic Mechanisms",
+            "description": "Translating input torque into synchronized motion."
+        },
+        {
+            "label": "Product Design",
+            "description": "Integrating function, form, and tactile user experience."
+        }
+    ]
+}
