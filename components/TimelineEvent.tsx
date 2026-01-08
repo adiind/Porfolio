@@ -893,10 +893,11 @@ const TinkerVerseGrid: React.FC<{
 
   if (isFit) {
     const allPosts = rows.flatMap(r => r.posts);
-    const visiblePosts = allPosts.slice(0, 48);
+    // Show more dots for the tall "poster" view
+    const visiblePosts = allPosts.slice(0, 200);
     return (
       <div className="w-full h-full flex flex-col p-2 overflow-hidden relative">
-        <div className="flex flex-wrap content-start gap-[2px] mb-1 overflow-hidden h-[60%] opacity-80">
+        <div className="flex flex-wrap content-start gap-[2px] mb-1 overflow-hidden flex-1 opacity-80">
           {visiblePosts.map((post, i) => (
             <div key={i} className="w-1.5 h-1.5 rounded-[1px] bg-amber-400" />
           ))}

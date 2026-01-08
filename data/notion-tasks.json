@@ -1,0 +1,169 @@
+{
+  "lastSync": "2026-01-08T07:37:37.188Z",
+  "sprintName": "Sprint 1",
+  "sprintId": "2e249d45-669f-812b-8063-d55959e2a423",
+  "tasks": [
+    {
+      "id": "2e249d45-669f-8002-b4d6-d4d111b978de",
+      "name": "Replace floating intro bubble with primary identity headline",
+      "status": "Done",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "\nCurrent floating intro bubble feels tacky and competes with the hero section. It hides the core value proposition and doesn’t clearly explain who I am or what “human-centered / design thinking” means."
+        },
+        {
+          "type": "paragraph",
+          "text": "Proposed change:\n– Add a large, static identity headline at the top of the page\n– Use interactive keyword chips (human-centered, data-driven, design thinking, maker) with hover explanations\n– Remove or de-emphasize floating intro bubble\n– Keep contact CTA visible but secondary"
+        },
+        {
+          "type": "paragraph",
+          "text": "Acceptance criteria:\n– First viewport clearly communicates identity without clicking\n– Keywords are understandable on hover\n– No floating UI blocking hero visuals\n– Contact CTA still accessible"
+        },
+        {
+          "type": "paragraph",
+          "text": "Tags\nPortfolio, UX, Identity, Sprint"
+        },
+        {
+          "type": "paragraph",
+          "text": ""
+        }
+      ],
+      "url": "https://www.notion.so/Replace-floating-intro-bubble-with-primary-identity-headline-2e249d45669f8002b4d6d4d111b978de",
+      "createdTime": "2026-01-08T05:59:00.000Z",
+      "lastModified": "2026-01-08T07:17:00.000Z",
+      "_original": {
+        "status": "Done"
+      }
+    },
+    {
+      "id": "2e249d45-669f-8056-af04-c81faa929d95",
+      "name": "Vertical nav bar not updating",
+      "status": "Done",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "image",
+          "text": "[image]"
+        }
+      ],
+      "url": "https://www.notion.so/Vertical-nav-bar-not-updating-2e249d45669f8056af04c81faa929d95",
+      "createdTime": "2026-01-08T05:42:00.000Z",
+      "lastModified": "2026-01-08T06:08:00.000Z",
+      "_original": {
+        "status": "Done"
+      }
+    },
+    {
+      "id": "2e249d45-669f-8110-8b0c-ec8fbc16acee",
+      "name": "Implement local Notion tasks cache system",
+      "status": "Done",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "heading_2",
+          "text": "Implementation Details"
+        },
+        {
+          "type": "bulleted_list_item",
+          "text": "Created scripts/notion-sync.cjs with pull/push/list/status/set/create commands"
+        },
+        {
+          "type": "bulleted_list_item",
+          "text": "Local cache stored in data/notion-tasks.json with _original field for diff tracking"
+        },
+        {
+          "type": "bulleted_list_item",
+          "text": "Auto-pull on npm run dev (added to package.json scripts)"
+        },
+        {
+          "type": "bulleted_list_item",
+          "text": "Added sync:pull, sync:push, sync:list, sync:status npm scripts"
+        },
+        {
+          "type": "bulleted_list_item",
+          "text": "Created .agent/workflows/notion-sync.md for workflow documentation"
+        }
+      ],
+      "url": "https://www.notion.so/Implement-local-Notion-tasks-cache-system-2e249d45669f81108b0cec8fbc16acee",
+      "createdTime": "2026-01-08T07:10:00.000Z",
+      "lastModified": "2026-01-08T07:15:00.000Z",
+      "_original": {
+        "status": "Done"
+      }
+    },
+    {
+      "id": "2e249d45-669f-804e-bd79-da5f948224bd",
+      "name": "Add Images to experiences",
+      "status": "Not Started",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "paragraph",
+          "text": ""
+        }
+      ],
+      "url": "https://www.notion.so/Add-Images-to-experiences-2e249d45669f804ebd79da5f948224bd",
+      "createdTime": "2026-01-08T07:21:00.000Z",
+      "lastModified": "2026-01-08T07:21:00.000Z",
+      "_original": {
+        "status": "Not Started"
+      }
+    },
+    {
+      "id": "2e249d45-669f-80d4-a72f-cadaf2d3c8dd",
+      "name": "Add Images to projects",
+      "status": "Not Started",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "paragraph",
+          "text": ""
+        }
+      ],
+      "url": "https://www.notion.so/Add-Images-to-projects-2e249d45669f80d4a72fcadaf2d3c8dd",
+      "createdTime": "2026-01-08T07:21:00.000Z",
+      "lastModified": "2026-01-08T07:21:00.000Z",
+      "_original": {
+        "status": "Not Started"
+      }
+    },
+    {
+      "id": "2e249d45-669f-8009-aa2e-d63d65cb9031",
+      "name": "Show",
+      "status": "Not Started",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "paragraph",
+          "text": ""
+        }
+      ],
+      "url": "https://www.notion.so/Show-2e249d45669f8009aa2ed63d65cb9031",
+      "createdTime": "2026-01-08T07:22:00.000Z",
+      "lastModified": "2026-01-08T07:22:00.000Z",
+      "_original": {
+        "status": "Not Started"
+      }
+    }
+  ]
+}

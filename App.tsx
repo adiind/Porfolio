@@ -13,6 +13,7 @@ import ProjectModal from './components/ProjectModal';
 import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
+import VerticalNavbar from './components/VerticalNavbar'; // Added
 import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 // Background removed for performance
@@ -24,6 +25,7 @@ const App: React.FC = () => {
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
   const [filter, setFilter] = useState<'all' | 'corporate' | 'education' | 'personal'>('all');
   const [scrollTop, setScrollTop] = useState(0);
+  const [activeSection, setActiveSection] = useState<'profile' | 'experiences' | 'projects'>('profile'); // Added
 
 
 
@@ -267,6 +269,51 @@ const App: React.FC = () => {
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
 
+  // Sync activeSection with mode
+  useEffect(() => {
+    if (mode === 'intro') {
+      setActiveSection('profile');
+    } else {
+      // When switching to timeline from profile, default to experiences
+      setActiveSection((prev) => prev === 'profile' ? 'experiences' : prev);
+    }
+  }, [mode]);
+
+  // Intersection Observer for Projects Section
+  useEffect(() => {
+    if (mode === 'intro') return;
+
+    let observer: IntersectionObserver | null = null;
+    const projectsEl = document.getElementById('projects');
+
+    if (projectsEl) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection('projects');
+            } else {
+              // If the projects section is below the viewport (top > 0), means we are above it
+              if (entry.boundingClientRect.top > 0) {
+                setActiveSection('experiences');
+              }
+            }
+          });
+        },
+        {
+          // Trigger when the element hits the middle of the viewport
+          rootMargin: '-50% 0px -50% 0px'
+        }
+      );
+
+      observer.observe(projectsEl);
+    }
+
+    return () => {
+      if (observer) observer.disconnect();
+    };
+  }, [mode]);
+
   // Simple hover handlers - block during animation, intro, or scrolling
   const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
 
@@ -416,6 +463,38 @@ const App: React.FC = () => {
     type: "tween" as const,
     duration: 0.5,
     ease: [0.32, 0.72, 0, 1] // Custom cubic-bezier for smooth feel
+  };
+
+  const handleNavigate = (section: 'profile' | 'experiences' | 'projects') => {
+    if (section === 'profile') {
+      handleZoom('intro');
+    } else {
+      // If currently in intro, switch to normal first
+      if (mode === 'intro') {
+        handleZoom('normal');
+        // Small delay to allow state to settle before scrolling request
+        setTimeout(() => {
+          if (section === 'experiences') {
+            if (scrollContainerRef.current) smoothScrollTo(scrollContainerRef.current, 0);
+          } else if (section === 'projects') {
+            const projectsEl = document.getElementById('projects');
+            if (projectsEl && scrollContainerRef.current) {
+              smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50); // Small buffer
+            }
+          }
+        }, 100);
+      } else {
+        // Already in timeline mode, just scroll
+        if (section === 'experiences') {
+          if (scrollContainerRef.current) smoothScrollTo(scrollContainerRef.current, 0);
+        } else if (section === 'projects') {
+          const projectsEl = document.getElementById('projects');
+          if (projectsEl && scrollContainerRef.current) {
+            smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50);
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -696,6 +775,12 @@ const App: React.FC = () => {
           <div className="h-32 w-full" />
         </div>
       </motion.div>
+
+      {/* --- VERTICAL NAVIGATION --- */}
+      <VerticalNavbar
+        activeSection={activeSection}
+        onNavigate={handleNavigate}
+      />
     </div>
   );
 };
