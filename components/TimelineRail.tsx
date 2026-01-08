@@ -21,9 +21,9 @@ const TimelineRail: React.FC<Props> = ({ pixelsPerMonth, totalHeight, onYearClic
   // Show quarters if zoomed in slightly
   const showQuarters = pixelsPerMonth > 15;
 
-  // Hide everything if too zoomed out (Fit Mode) to show clean Poster View
-  // Increase threshold so fit mode (usually ppm < 5) hides it
-  const isVisible = pixelsPerMonth > 8;
+  // Always show rail unless explicitly hidden by parent logic (0 height etc), but Fit mode sets small PPM.
+  // We want to see the rail even in Fit/Intro mode now.
+  const isVisible = pixelsPerMonth > 0;
 
   // Determine active year based on scroll position proximity
   const getIsActive = (top: number) => {

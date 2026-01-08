@@ -71,11 +71,48 @@ interface Props {
   onOpenProfile?: () => void;
 }
 
+// Inline chip component for sentence-integrated keywords
+const InlineChip: React.FC<{
+  label: string;
+  description: string;
+  color: 'indigo' | 'emerald' | 'amber' | 'rose';
+  delay: number;
+}> = ({ label, description, color, delay }) => {
+  const colorStyles = {
+    indigo: 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40 hover:bg-indigo-500/40 hover:border-indigo-400/60',
+    emerald: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40 hover:bg-emerald-500/40 hover:border-emerald-400/60',
+    amber: 'bg-amber-500/20 text-amber-200 border-amber-500/40 hover:bg-amber-500/40 hover:border-amber-400/60',
+    rose: 'bg-rose-500/20 text-rose-200 border-rose-500/40 hover:bg-rose-500/40 hover:border-rose-400/60',
+  };
 
+  return (
+    <motion.span
+      className="group relative inline-block"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      <span
+        className={`px-2.5 py-1 rounded-full border text-sm md:text-base lg:text-lg font-semibold cursor-default transition-all duration-300 inline-block ${colorStyles[color]}`}
+      >
+        {label}
+      </span>
+
+      {/* Hover tooltip */}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/95 backdrop-blur-lg border border-white/20 rounded-lg text-xs text-white/80 w-52 text-center opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none transform scale-95 group-hover:scale-100 shadow-xl z-50">
+        {description}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+          <div className="border-4 border-transparent border-t-black/95"></div>
+        </div>
+      </div>
+    </motion.span>
+  );
+};
 
 const Hero: React.FC<Props> = ({ onOpenProfile }) => {
   const [copied, setCopied] = useState(false);
   const [activeSkillId, setActiveSkillId] = useState<number | null>(null);
+  const [hoveredKeyword, setHoveredKeyword] = useState<string | null>(null);
 
   // Computed property for easy access
   const skillExpanded = activeSkillId !== null;
@@ -106,100 +143,67 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  /* Removed old handler */
-
-  const pillColors = [
-    'bg-indigo-500/20 text-indigo-200 border-indigo-500/30 hover:bg-indigo-500/30',
-    'bg-rose-500/20 text-rose-200 border-rose-500/30 hover:bg-rose-500/30',
-    'bg-teal-500/20 text-teal-200 border-teal-500/30 hover:bg-teal-500/30',
+  // Keyword definitions for hover explanations
+  const keywords = [
+    { id: 'human-centered', label: 'Human-centered', description: 'I design for real people, not personas. Every decision starts with understanding user needs.' },
+    { id: 'data-driven', label: 'Data-driven', description: 'I validate ideas with research and measure outcomes to inform design decisions.' },
+    { id: 'design-thinking', label: 'Design thinking', description: 'I use iterative cycles of research, ideation, prototyping, and testing.' },
+    { id: 'development', label: 'Hands-on development', description: 'I build what I design — from code to hardware to physical prototypes.' },
   ];
 
+
   return (
-    <div className="relative flex flex-col items-center justify-start h-full w-full pointer-events-none perspective-[1200px] pt-44 md:pt-40">
+    <div className="relative flex flex-col items-center justify-start h-full w-full pointer-events-none pt-24 md:pt-20">
 
-      {/* Central Interactive Composition */}
-      <div className="relative w-[320px] h-[320px] md:w-[480px] md:h-[480px] flex items-center justify-center group/hero">
+      {/* HERO TEXT BLOCK - Compact, one thought */}
+      <div className={`relative z-50 w-full max-w-[700px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
 
-        {/* SPEECH BUBBLE - centered above head */}
-        <div className={`absolute -top-[160px] md:-top-[140px] left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              transition: { delay: 1.5, type: 'spring' }
-            }}
-            className="pointer-events-auto cursor-pointer"
-            onClick={onOpenProfile}
-            whileHover={{ scale: 1.05 }}
-          >
-            <motion.div
-              animate={{ y: [-5, 5, -5] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="relative"
-            >
-              {/* Main bubble */}
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-[280px] md:w-[360px]">
-                <p className="text-white text-sm md:text-base font-medium leading-relaxed mb-3 text-center md:text-left">
-                  <span className="text-2xl mr-1">👋</span>
-                  Hey I am <span className="font-bold text-white">Adi</span>, welcome to my <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">vibe coded</span> portfolio!
-                </p>
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="text-center"
+        >
+          {/* Primary Headline - No "Hi I'm Adi", name comes below */}
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-white/95 leading-snug tracking-tight mb-2">
+            A human-centered, data-driven product designer and maker.
+          </h1>
 
-                <div className="space-y-3">
-                  <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
-                    Open for Summer 2026 Internships
-                  </div>
-                  <div className="flex flex-nowrap gap-1">
-                    {['Product Management', 'Design', 'Development'].map((role, i) => (
-                      <span
-                        key={i}
-                        className={`px-1.5 py-0.5 rounded-md border text-[8px] md:text-xs transition-colors cursor-default whitespace-nowrap ${pillColors[i % pillColors.length]}`}
-                      >
-                        {role}
-                      </span>
-                    ))}
-                  </div>
+          {/* Secondary Descriptor - Tighter gap */}
+          <p className="text-base md:text-lg text-white/45 font-light mb-3">
+            Blending design thinking with hands-on development.
+          </p>
 
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                    <a
-                      href={SOCIAL_LINKS.email}
-                      className="flex items-center gap-2 text-xs font-bold text-white/80 hover:text-white transition-colors group"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="p-1.5 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors">
-                        <Mail size={12} />
-                      </div>
-                      <span>Let's Chat</span>
-                    </a>
+          {/* Keyword Chips - Demoted to annotations, almost invisible */}
+          <div className="flex flex-wrap justify-center gap-1.5 mb-2">
+            {keywords.map((keyword) => (
+              <div
+                key={keyword.id}
+                className="relative group"
+                onMouseEnter={() => setHoveredKeyword(keyword.id)}
+                onMouseLeave={() => setHoveredKeyword(null)}
+              >
+                <span className="px-2 py-0.5 text-[10px] md:text-xs text-white/35 font-normal cursor-default transition-all duration-200 hover:text-white/70 inline-block">
+                  {keyword.label}
+                </span>
 
-                    <button
-                      onClick={handleCopyEmail}
-                      className="group/copy relative p-1.5 text-white/40 hover:text-white transition-colors"
-                    >
-                      {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
-                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black px-2 py-1 rounded text-[10px] opacity-0 group-hover/copy:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-white/10">
-                        {copied ? 'Copied!' : 'Copy Email'}
-                      </span>
-                    </button>
-                  </div>
+                {/* Tooltip */}
+                <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-neutral-900 border border-white/10 rounded text-[11px] text-white/60 w-52 text-center transition-all duration-200 pointer-events-none z-50 ${hoveredKeyword === keyword.id ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+                  {keyword.description}
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* Speech bubble tail - pointing down towards head */}
-              <div className="absolute left-1/2 -bottom-[18px] -translate-x-1/2 drop-shadow-lg">
-                <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
-                  <path
-                    d="M0 0 L24 0 L12 20 Z"
-                    fill="rgba(255,255,255,0.1)"
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth="1"
-                  />
-                </svg>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
+          {/* Status only - CTA moved below avatar */}
+          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/25 font-normal">
+            Open for Summer 2026 Internships
+          </span>
+        </motion.div>
+      </div>
+
+      {/* VISUAL ELEMENT - Secondary */}
+      <div className={`relative mt-6 md:mt-8 w-[280px] h-[280px] md:w-[380px] md:h-[380px] flex items-center justify-center transition-all duration-500 ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>
 
         {/* Radial Orbital Timeline with Skills */}
         <RadialOrbitalTimeline
@@ -207,36 +211,21 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           activeNodeId={activeSkillId}
           onActiveNodeChange={handleActiveNodeChange}
         >
-          {/* Main Character (Front) */}
+          {/* Avatar - Reduced prominence */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "backOut" }}
-            className="relative z-20 w-[230px] h-[230px] md:w-[280px] md:h-[280px] filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] cursor-pointer pointer-events-auto"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="relative z-20 w-[180px] h-[180px] md:w-[220px] md:h-[220px] cursor-pointer pointer-events-auto opacity-85 hover:opacity-100 transition-opacity duration-300"
             onClick={onOpenProfile}
-            whileHover={{ scale: 1.2, rotate: 2 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
           >
-            {/* Hover Glow Ring */}
-            <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl opacity-0 group-hover/hero:opacity-100 transition-opacity duration-500" />
-
-            {/* Gentle Float Animation */}
-            <motion.div
-              animate={{ y: [-8, 8, -8] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="w-full h-full"
-            >
-              <img
-                src={USER_IMAGE_URL}
-                alt="Profile"
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
-
-            {/* Click Hint */}
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/hero:opacity-100 transition-opacity duration-300 text-[10px] uppercase tracking-widest text-white/50 whitespace-nowrap bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
-              Click to View Profile
-            </div>
+            <img
+              src={USER_IMAGE_URL}
+              alt="Profile"
+              className="w-full h-full object-contain"
+            />
           </motion.div>
         </RadialOrbitalTimeline>
 
@@ -342,72 +331,31 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
       </div>
 
-      {/* Intro Text - moved up closer to character */}
-      {/* Intro Text - Staggered Reveal */}
-      <div className="mt-16 md:-mt-8 text-center relative z-20 overflow-hidden">
-        <motion.h1
-          className="text-5xl md:text-8xl font-normal tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4"
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Adi */}
-          <div className="flex">
-            {Array.from("Adi").map((char, i) => (
-              <motion.span
-                key={`adi-${i}`}
-                custom={i}
-                variants={{
-                  hidden: { opacity: 0, y: 50 },
-                  visible: (i) => ({
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      delay: 0.1 + (i * 0.1),
-                      duration: 0.8,
-                      ease: [0.2, 0.65, 0.3, 0.9],
-                    }
-                  })
-                }}
-              >
-                {char}
-              </motion.span>
-            ))}
-          </div>
+      {/* Name Display - Now the introduction, hits harder after headline */}
+      <motion.div
+        className="mt-4 text-center relative z-20 pointer-events-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+      >
+        <h2 className="text-5xl md:text-7xl font-light tracking-tight text-white/95 mb-1">
+          Adi <span className="font-normal">Agarwal</span>
+        </h2>
+        <p className="text-[10px] md:text-xs text-white/35 uppercase tracking-[0.25em] font-normal mb-6">
+          Product · Engineering · Data · Design
+        </p>
 
-          {/* Agarwal */}
-          <div className="flex font-bold">
-            {Array.from("Agarwal").map((char, i) => (
-              <motion.span
-                key={`agarwal-${i}`}
-                custom={i + 3} // Offset index
-                variants={{
-                  hidden: { opacity: 0, y: 50 },
-                  visible: (i) => ({
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      delay: 0.1 + (i * 0.1),
-                      duration: 0.8,
-                      ease: [0.2, 0.65, 0.3, 0.9],
-                    }
-                  })
-                }}
-              >
-                {char}
-              </motion.span>
-            ))}
-          </div>
-        </motion.h1>
-
-        <motion.p
-          className="text-sm md:text-lg text-white/60 uppercase tracking-[0.3em] font-bold"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-        >
-          Product | Engineering | Data | Design
-        </motion.p>
-      </div>
+        {/* Terminal CTA - After the story */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs text-white/40 font-light">Interested in working together?</span>
+          <a
+            href={SOCIAL_LINKS.email}
+            className="px-4 py-1.5 text-sm text-white/60 font-normal transition-all duration-200 hover:text-white/90"
+          >
+            Let's Chat →
+          </a>
+        </div>
+      </motion.div>
     </div>
   );
 };
