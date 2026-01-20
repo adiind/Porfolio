@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useIn
 import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
-import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight } from '../utils';
+import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight, mapTimelineItemToProject } from '../utils';
 import { Briefcase, GraduationCap, User, Sparkles, Heart, MessageCircle, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
 
 interface Props {
@@ -21,6 +21,9 @@ interface Props {
   onOpenTinkerVerse?: () => void;
   isScrolling?: boolean;
   isScrollingRef?: React.MutableRefObject<boolean>;
+  layoutMode?: 'absolute' | 'grid';
+  isExpanded?: boolean;
+  onExpand?: (cardId: string | null) => void;
 }
 
 const TimelineEvent: React.FC<Props> = ({
@@ -36,7 +39,10 @@ const TimelineEvent: React.FC<Props> = ({
   onOpenProject,
   onOpenTinkerVerse,
   isScrolling = false,
-  isScrollingRef
+  isScrollingRef,
+  layoutMode = 'absolute',
+  isExpanded = false,
+  onExpand
 }) => {
   // Once hoveredId is set, show it regardless of isScrolling (isScrolling check only prevents setting hover, not showing it)
   const isHovered = hoveredId === item.id;
@@ -68,8 +74,8 @@ const TimelineEvent: React.FC<Props> = ({
   const tiltY = useMotionValue(0.5);
   const springX = useSpring(tiltX, { stiffness: 300, damping: 30 });
   const springY = useSpring(tiltY, { stiffness: 300, damping: 30 });
-  const rotateX = useTransform(springY, [0, 1], [15, -15]); // Exaggerated tilt (was 3deg)
-  const rotateY = useTransform(springX, [0, 1], [-15, 15]);
+  const rotateX = useTransform(springY, [0, 1], [8, -8]); // Reduced tilt to 8deg
+  const rotateY = useTransform(springX, [0, 1], [-8, 8]);
 
   const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -102,7 +108,142 @@ const TimelineEvent: React.FC<Props> = ({
   const isTinkerVerse = item.id === 'tinkerverse';
   const isCompetition = item.type === 'competition';
   const isProject = item.type === 'project';
-  const isVignette = item.type === 'vignette';
+  const isVignette = false;
+
+  // --- GRID MODE RENDER (Original Design - DO NOT MODIFY) ---
+  // This is the collapsed view that serves as the visual anchor
+  if (layoutMode === 'grid') {
+    const handleGridClick = () => {
+      if (isTinkerVerse && onOpenTinkerVerse) {
+        onOpenTinkerVerse();
+      } else if (onOpenProject) {
+        onOpenProject(item);
+      }
+    };
+
+    const handleCaseStudyClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (item.caseStudy) {
+        onOpenCaseStudy(item.caseStudy);
+      }
+    };
+
+    // Dynamic height based on item type (no expansion needed)
+    const getHeightClass = () => {
+      if (item.type === 'education' || item.type === 'foundational') return 'h-48';
+      if (item.id === 'tinkerverse') return 'h-96 md:h-[600px]';
+      return 'h-28';
+    };
+
+    // TinkerVerse special case
+    if (isTinkerVerse) {
+      const tinkerStyles = {
+        glass: 'bg-amber-500/10 border-t-amber-400/20 border-amber-500/5 shadow-[0_4px_30px_rgba(245,158,11,0.02)]',
+        hoverGlass: '',
+        text: 'text-amber-50',
+        subtext: 'text-amber-200/90',
+        icon: 'text-amber-200'
+      };
+      return (
+        <motion.div
+          layoutId={`timeline-card-${item.id}`}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{
+            type: 'tween',
+            duration: 0.5,
+            ease: [0.32, 0.72, 0, 1],
+            layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
+          }}
+          className="relative w-full h-96 md:h-[600px] rounded-xl overflow-hidden cursor-pointer border border-amber-500/20 bg-amber-500/10 hover:border-amber-400/40 transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] group"
+          onClick={handleGridClick}
+        >
+          <TinkerVerseGrid
+            item={item}
+            posts={SOCIAL_POSTS}
+            height={600}
+            pixelsPerMonth={pixelsPerMonth}
+            styles={tinkerStyles}
+            isFit={true}
+            onClick={handleGridClick}
+          />
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.div
+        layoutId={`timeline-card-${item.id}`}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{
+          type: 'tween',
+          duration: 0.5,
+          ease: [0.32, 0.72, 0, 1],
+          layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
+        }}
+        className={`relative w-full ${getHeightClass()} rounded-xl overflow-hidden cursor-pointer border border-white/5 bg-white/5 hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] group`}
+        onClick={handleGridClick}
+      >
+        {/* Background Image */}
+        {item.imageUrl && (
+          <>
+            <motion.img
+              layoutId={`timeline-image-${item.id}`}
+              src={item.imageUrl}
+              alt={item.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 opacity-60 group-hover:opacity-40 group-hover:scale-105"
+            />
+            <div
+              className={`absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90`}
+            />
+          </>
+        )}
+
+        {!item.imageUrl && (
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${item.type === 'education' ? 'from-rose-900/40' :
+              item.type === 'foundational' ? 'from-emerald-900/40' :
+                item.id === 'tinkerverse' ? 'from-amber-900/40' :
+                  'from-indigo-900/40'
+              } via-black to-black opacity-80`}
+          />
+        )}
+
+        {/* Content */}
+        <div
+          className="relative z-10 h-full flex flex-col p-4 justify-end"
+        >
+          <div
+            className="absolute top-3 right-3 text-[9px] font-mono opacity-50 bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-sm border border-white/5"
+          >
+            {formatDate(item.start)} — {formatDate(item.end)}
+          </div>
+          {item.logoUrl && (
+            <img
+              src={item.logoUrl}
+              className={`absolute top-3 left-3 w-6 h-6 object-contain opacity-70 ${item.id === 'ms-edi' ? 'invert' : ''}`}
+              alt="Logo"
+            />
+          )}
+          <h3
+            className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 transition-colors"
+          >
+            {item.title}
+          </h3>
+          <div
+            className="text-[10px] text-white/60 font-medium uppercase tracking-wide truncate"
+          >
+            {item.company}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // --- ABSOLUTE LAYOUT (Legacy/Mobile Internal logic?) ---
 
   // Calculate position and height using logarithmic scaling
   const { top, height, isVisible } = useMemo(() => {
@@ -130,7 +271,7 @@ const TimelineEvent: React.FC<Props> = ({
     };
   }, [item, pixelsPerMonth, totalHeight, isZoomedOut, isFit, isTinkerVerse]);
 
-  if (!isVisible) return null;
+  if (!isVisible && layoutMode === 'absolute') return null;
 
   const getStyles = () => {
     if (item.type === 'foundational') {
@@ -188,7 +329,7 @@ const TimelineEvent: React.FC<Props> = ({
   const Icon = () => {
     if (item.type === 'competition') return <Trophy size={isFit ? 12 : 14} className="text-purple-200" />;
     if (item.type === 'project') return <Flower size={isFit ? 12 : 14} className="text-teal-200" />;
-    if (item.type === 'vignette') return <Eye size={12} className="text-white" />;
+
     if (item.type === 'education') return <GraduationCap size={isFit ? 12 : 14} className={s.icon} />;
     if (item.type === 'personal') return <User size={isFit ? 12 : 14} className={s.icon} />;
     if (item.type === 'foundational') return <Sparkles size={isFit ? 12 : 14} className={s.icon} />;
@@ -196,68 +337,11 @@ const TimelineEvent: React.FC<Props> = ({
   };
 
   // --- SPECIAL RENDER FOR COMPETITION OR PROJECT OR VIGNETTE (BOOKMARK STYLE) ---
-  if (isCompetition || isProject || isVignette) {
+  if ((isCompetition || isProject) && layoutMode !== 'grid') {
     const videoId = item.videoUrl ? (item.videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) || [])[1] : null;
     const imageUrl = item.imageUrl;
 
-    // Vignette Style: Minimalist White Horizontal Line
-    if (isVignette) {
-      return (
-        <motion.div
-          ref={cardRef}
-          layout
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ top, opacity: isInView ? 1 : 0, x: isInView ? 0 : -20, zIndex: isHovered ? 60 : 10 }}
-          style={{
-            position: 'absolute',
-            left: '-6rem', // Start from rail area
-            width: '5.5rem', // Extend towards timeline
-            height: '40px', // Hit area
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start' // Place items at start (left)
-          }}
-          onMouseEnter={() => {
-            isMouseOverRef.current = true;
-            if (!isScrolling) {
-              onHover(item.id);
-              onLaneHover(null);
-            }
-          }}
-          onMouseMove={() => {
-            if (!isScrolling && hoveredId !== item.id) {
-              onHover(item.id);
-              onLaneHover(null);
-            }
-          }}
-          onMouseLeave={() => {
-            isMouseOverRef.current = false;
-            onHover(null);
-            onLaneHover(null);
-          }}
-          onClick={() => onOpenProject && onOpenProject(item)}
-          className="group cursor-pointer flex-row-reverse" // Flex reverse or manual placement
-        >
-          {/* Glowing Horizontal Line */}
-          <div className={`w-full h-[1px] bg-white/50 relative transition-all duration-300 ${!isScrolling ? 'group-hover:w-[140%] group-hover:h-[3px] group-hover:bg-white group-hover:shadow-[0_0_35px_rgba(255,255,255,1)]' : 'blur-[1px]'} rounded-full`}>
-          </div>
 
-          {/* Simple Tooltip */}
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 30 }}
-                exit={{ opacity: 0 }}
-                className="absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-black/80 border border-white/50 px-3 py-1.5 rounded text-xs font-mono tracking-widest text-white uppercase shadow-[0_0_25px_rgba(255,255,255,0.5)]"
-              >
-                {item.title}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      );
-    }
 
     // Theme logic: Purple for Competition, Teal for Project
     const theme = isCompetition
@@ -452,7 +536,7 @@ const TimelineEvent: React.FC<Props> = ({
           type: 'spring',
           stiffness: 100,
           damping: 25,
-          layout: { duration: 0.4, ease: 'easeOut' }
+          layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
         }}
         onMouseEnter={(e) => {
           isMouseOverRef.current = true;
@@ -494,8 +578,10 @@ const TimelineEvent: React.FC<Props> = ({
   // --- STANDARD CARD RENDER ---
   return (
     <motion.div
+      layoutId={`timeline-card-${item.id}`}
       ref={cardRef}
       data-item-id={item.id}
+      onClick={() => onOpenProject && onOpenProject(item)}
       onMouseEnter={(e) => {
         isMouseOverRef.current = true;
         if (!isActuallyScrolling()) {
@@ -528,16 +614,16 @@ const TimelineEvent: React.FC<Props> = ({
         top: top,
         // Scroll-triggered reveal: fade in when card enters viewport
         opacity: isInView ? (isDimmed ? 0.1 : 1) : 0,
-        scale: isInView ? (isDimmed ? 0.98 : isHovered ? 1.05 : 1) : 0.95,
+        scale: isInView ? (isDimmed ? 0.98 : isHovered ? 1.02 : 1) : 0.95,
         y: isInView ? 0 : 60,
         filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
         zIndex: isHovered ? 50 : 10,
       }}
       transition={{
-        type: 'spring',
-        stiffness: 100,
-        damping: 25,
-        layout: { duration: 0.4, ease: 'easeOut' }
+        type: 'tween',
+        duration: 0.5,
+        ease: [0.32, 0.72, 0, 1],
+        layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
       }}
       style={{
         position: 'absolute',
@@ -545,7 +631,7 @@ const TimelineEvent: React.FC<Props> = ({
         ...(isHovered && !isFit ? {
           height: 'auto',
           // Wider expansion to reduce vertical overflow
-          width: '600px',
+          width: '700px',
           maxWidth: '90vw',
           minHeight: `${height}px`,
           zIndex: 50, // Ensure z-index is high when hovered
@@ -561,7 +647,7 @@ const TimelineEvent: React.FC<Props> = ({
             right: 'auto',
             transform: 'none'
           } : item.lane === 1 ? {
-            left: 'calc(50% - 300px)', // Strictly center 600px width
+            left: 'calc(50% - 350px)', // Strictly center 700px width
             right: 'auto',
             minWidth: '30%', // Ensure we don't shrink smaller than the lane
             transform: 'none'
@@ -582,51 +668,87 @@ const TimelineEvent: React.FC<Props> = ({
         ${s.glass} ${!isFit && s.hoverGlass}
       `}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 pointer-events-none" />
-      <div className={`flex flex-col relative z-10 ${isFit ? 'h-full p-2 justify-center' : 'p-3 md:p-4'}`}>
-        <div className="flex justify-between items-start gap-2">
-          <motion.div className="flex-1 min-w-0 relative">
-            {/* Header Row */}
-            <div className="flex justify-between items-start w-full">
-              {(!isZoomedOut || isHovered) && !isFit && (
-                <div className="flex items-center gap-2 mb-1.5">
-                  <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className={`flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold ${s.subtext}`}
-                  >
-                    <Icon />
-                    <span>{item.type}</span>
-                  </motion.div>
-                </div>
-              )}
-              {/* Optional University/Corporate Logo in Header */}
-              {item.logoUrl && !isFit && (
-                <div className="flex-shrink-0 ml-2">
-                  <img
-                    src={item.logoUrl}
-                    alt="Logo"
-                    // CONDITIONAL FILTER: Keep white monochrome only for Northwestern
-                    className={`w-8 h-8 md:w-10 md:h-10 object-contain ${item.id === 'ms-edi'
-                      ? 'opacity-80 filter brightness-0 invert'
-                      : 'opacity-100'
-                      }`}
-                  />
-                </div>
-              )}
+      {/* --- BACKGROUND IMAGE (Unified with Grid Mode) --- */}
+      {item.imageUrl && (
+        <>
+          {/* Solid Black Backing for Expanded State (matches ExperienceDetail base) */}
+          {!isFit && <div className="absolute inset-0 bg-[#0a0a0a] z-0" />}
+
+          <div
+            className={`absolute transition-all duration-700 ease-out z-0 ${!isFit
+              ? (isHovered ? 'top-0 right-0 w-[60%] h-64' : 'top-0 left-0 w-full h-64') // Expanded: Shift Right (Hover) vs Full Banner (Default). Both h-64.
+              : 'inset-0 h-full' // Collapsed: Full Cover
+              }`}
+          >
+            <motion.img
+              layoutId={`timeline-image-${item.id}`}
+              src={item.imageUrl}
+              alt={item.title}
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out"
+              style={{
+                objectPosition: 'center top' // Anchor to top
+              }}
+            />
+
+            {/* Overlays */}
+            {(!isFit && isHovered) ? (
+              // Hover State (Timeline only): ExperienceDetail style gradients (Left + Bottom)
+              <>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+              </>
+            ) : (
+              // Default State (Collapsed OR Timeline Not Hovered): Existing black gradient
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90" />
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Glass overlay for non-image cards (Matches Grid Mode) */}
+      {!item.imageUrl && (
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 pointer-events-none" />
+      )}
+
+      {/* --- CONTENT SECTION (Overlay) --- */}
+      <div className={`flex flex-col relative z-10 h-full p-4 ${(!isFit && isHovered) ? 'justify-start' : 'justify-end'}`}>
+
+        {/* Header Row: Date & Logo (PINNED like Grid Mode) */}
+        {!isFit && (
+          <>
+            <div className="absolute top-3 right-3 text-[9px] font-mono opacity-60 bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-sm border border-white/5">
+              {formatDate(item.start)} — {formatDate(item.end)}
             </div>
 
-            <motion.h3 className={`font-bold leading-tight ${s.text} ${isFit ? 'text-[11px] md:text-sm truncate' : 'text-sm md:text-base'} ${item.logoUrl ? 'pr-2' : ''}`}>
-              {item.title}
-            </motion.h3>
-            <motion.p className={`font-medium mt-0.5 ${s.subtext} ${isFit ? 'text-[9px] md:text-xs opacity-70 truncate' : 'text-xs'}`}>
-              {item.company}
-            </motion.p>
-            {item.headline && !isFit && (
-              <motion.p className={`hidden md:block mt-2 text-xs leading-relaxed opacity-80 ${s.text} line-clamp-2`}>
-                {item.headline}
-              </motion.p>
+            {/* Logo pinned Top Left */}
+            {item.logoUrl && (
+              <img
+                src={item.logoUrl}
+                alt="Logo"
+                className={`absolute top-3 left-3 object-contain transition-all duration-500 ${isHovered && !isFit ? 'w-10 h-10 md:w-16 md:h-16' : 'w-6 h-6 md:w-8 md:h-8'
+                  } ${item.id === 'ms-edi' ? 'opacity-80 filter brightness-0 invert' : 'opacity-80'
+                  }`}
+              />
             )}
-          </motion.div>
+
+            {/* Type Badge Removed as per request */}
+          </>
+        )}
+
+        {/* Spacer: In Grid mode, NO margin (center). In Expanded, margin below image. */}
+        <div className={`transition-all duration-500 flex flex-col justify-end ${(!isFit && isHovered) ? 'mt-32' : 'mt-0'}`}>
+          <h3 className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 transition-colors">
+            {item.title}
+          </h3>
+          <p className="text-[10px] text-white/60 font-medium uppercase tracking-wide truncate">
+            {item.company}
+          </p>
+
+          {item.headline && !isFit && (
+            <motion.p className={`hidden md:block mt-2 text-xs md:text-sm leading-relaxed text-white/80 line-clamp-2 mix-blend-plus-lighter`}>
+              {item.headline}
+            </motion.p>
+          )}
         </div>
 
         <AnimatePresence>
@@ -641,17 +763,20 @@ const TimelineEvent: React.FC<Props> = ({
                 opacity: { duration: 0.3 }
               }}
               style={{ overflow: 'hidden' }}
-              className="mt-3 pt-3 border-t border-white/10"
+              className="mt-4 pt-4 border-t border-white/10"
             >
-              <p className={`text-xs leading-relaxed mb-3 opacity-90 ${s.text}`}>{item.summary}</p>
-              <ul className={`space-y-1.5 text-xs ${s.subtext}`}>
-                {item.bullets?.map((bullet, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-60 shrink-0" />
-                    <span className="opacity-90">{bullet}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* Text Content */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm leading-relaxed mb-4 text-white/90 drop-shadow-sm">{item.summary}</p>
+                <ul className="space-y-2 text-xs md:text-sm text-white/80">
+                  {item.bullets?.map((bullet, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-60 shrink-0" />
+                      <span className="opacity-90">{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               {/* SKILLS PILLS (Footer) with Hover Effects & Tooltips */}
               {item.skills && (
@@ -857,7 +982,7 @@ const TimelineEvent: React.FC<Props> = ({
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </motion.div >
   );
 };
 

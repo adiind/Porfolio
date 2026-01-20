@@ -1,7 +1,7 @@
 
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate, LayoutGroup } from 'framer-motion';
 import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
 import TimelineEvent from './components/TimelineEvent';
@@ -9,13 +9,17 @@ import TimelineRail from './components/TimelineRail';
 import Hero from './components/Hero';
 import CaseStudyModal from './components/CaseStudyModal';
 import ProfileModal from './components/ProfileModal';
+import ProjectDetail from './components/ProjectDetail';
 import ProjectModal from './components/ProjectModal';
+import ExperienceDetail from './components/ExperienceDetail';
 import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
-import { Filter, Maximize, Minimize, MousePointer2, Plus, Minus, Zap, PenTool, Bot, User, Home } from 'lucide-react';
+import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
+import { Project } from './types/Project';
+import { PROJECTS } from './data/projects';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
 
@@ -23,7 +27,6 @@ import { useScrollDetection } from './hooks/useScrollDetection';
 const App: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
-  const [filter, setFilter] = useState<'all' | 'corporate' | 'education' | 'personal'>('all');
   const [scrollTop, setScrollTop] = useState(0);
   const [activeSection, setActiveSection] = useState<'profile' | 'experiences' | 'projects'>('profile'); // Added
 
@@ -58,8 +61,17 @@ const App: React.FC = () => {
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
   const [activeProject, setActiveProject] = useState<TimelineItem | null>(null);
+
+  const richProject = useMemo(() => {
+    return activeProject ? PROJECTS.find(p => p.id === activeProject.id) : null;
+  }, [activeProject]);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+
+  const handleCardExpand = useCallback((cardId: string | null) => {
+    setExpandedCardId(prev => prev === cardId ? null : cardId);
+  }, []);
 
   // 1. Handle Zoom Transitions - simplified
   const handleZoom = useCallback((targetMode: TimelineMode) => {
@@ -107,13 +119,33 @@ const App: React.FC = () => {
     });
   };
 
-  // 2. Scroll Logic - scroll down from intro triggers timeline
+  // 2. Scroll Logic - Two-step scroll flow: intro → fit → normal
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
-      if (mode !== 'intro') return;
+
+      // Scroll down from intro → go to fit (collapsed view)
       if (mode === 'intro' && e.deltaY > 5) {
+        handleZoom('fit');
+        return;
+      }
+
+      // Scroll down from fit → go to normal (expanded timeline)
+      if (mode === 'fit' && e.deltaY > 5) {
         handleZoom('normal');
+        return;
+      }
+
+      // Scroll up from fit → go back to intro
+      if (mode === 'fit' && e.deltaY < -5) {
+        handleZoom('intro');
+        return;
+      }
+
+      // Scroll up from normal → go back to fit (when at top)
+      if (mode === 'normal' && e.deltaY < -10 && scrollContainerRef.current && scrollContainerRef.current.scrollTop <= 5) {
+        handleZoom('fit');
+        return;
       }
     };
 
@@ -124,11 +156,25 @@ const App: React.FC = () => {
     };
     const handleTouchMove = (e: TouchEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
-      if (mode !== 'intro') return;
       const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY; // Positive = swiping up (scrolling down)
-      if (deltaY > 30) { // Threshold for swipe
+      const deltaY = touchStartY - touchY; // Positive = swiping up (scrolling down), Negative = swiping down
+
+      // Swipe up from intro → go to fit
+      if (mode === 'intro' && deltaY > 30) {
+        handleZoom('fit');
+        return;
+      }
+
+      // Swipe up from fit → go to normal
+      if (mode === 'fit' && deltaY > 30) {
         handleZoom('normal');
+        return;
+      }
+
+      // Swipe down from fit → go back to intro
+      if (mode === 'fit' && deltaY < -30) {
+        handleZoom('intro');
+        return;
       }
     };
 
@@ -201,12 +247,11 @@ const App: React.FC = () => {
         const finalScrollTop = container.scrollTop;
         const timeAtTop = Date.now() - scrollStartTimeRef.current;
 
-        if (finalScrollTop < 1 && !isAnimatingRef.current && (modeRef.current === 'normal' || modeRef.current === 'fit')) {
+        if (finalScrollTop < 1 && !isAnimatingRef.current && modeRef.current === 'normal') {
           // Require at least 200ms at top to avoid accidental triggers on fast scrolls
           if (timeAtTop >= 200) {
-            // Debug logging removed
-
-            handleZoom('intro');
+            // Scroll up from normal → go to fit (collapsed view)
+            handleZoom('fit');
           }
         }
 
@@ -224,27 +269,36 @@ const App: React.FC = () => {
       if (container.scrollTop > 1) return; // Must be at top
       if (e.deltaY >= -20) return; // Only gentle scroll up (avoid momentum flings)
 
-      // For gentle scrolls at top, allow immediate trigger
-      if (!scrollBackTimeoutRef.current && !isAnimatingRef.current) {
+      // For gentle scrolls at top, allow immediate trigger (normal → fit)
+      if (!scrollBackTimeoutRef.current && !isAnimatingRef.current && modeRef.current === 'normal') {
         e.preventDefault();
-        handleZoom('intro');
+        handleZoom('fit');
       }
     };
 
-    // Touch support for scroll-back to intro on mobile
+    // Touch support for scroll-back on mobile (normal → fit, fit → intro)
     let touchStartYBack = 0;
     const handleTouchStartBack = (e: TouchEvent) => {
-      if (container.scrollTop < 5) { // Only track when near top
+      // Track touch start for both near top (normal mode) and fit mode
+      if (container.scrollTop < 5 || modeRef.current === 'fit') {
         touchStartYBack = e.touches[0].clientY;
       }
     };
     const handleTouchMoveBack = (e: TouchEvent) => {
       if (isAnimatingRef.current || modeRef.current === 'intro') return;
-      if (container.scrollTop > 5) return; // Must be near top
       const touchY = e.touches[0].clientY;
       const deltaY = touchY - touchStartYBack; // Positive = swiping down (pulling to go back)
-      if (deltaY > 50) { // Threshold for swipe down
+
+      // From fit mode → go back to intro
+      if (modeRef.current === 'fit' && deltaY > 50) {
         handleZoom('intro');
+        return;
+      }
+
+      // From normal mode at top → go back to fit
+      if (modeRef.current === 'normal' && container.scrollTop < 5 && deltaY > 50) {
+        handleZoom('fit');
+        return;
       }
     };
 
@@ -360,10 +414,7 @@ const App: React.FC = () => {
     }
   }, [isAnimating, mode]);
 
-  const filteredData = useMemo(() => {
-    if (filter === 'all') return TIMELINE_DATA;
-    return TIMELINE_DATA.filter(item => item.type === filter || (item.type === 'foundational' && filter === 'corporate'));
-  }, [filter]);
+  // Use all timeline data (no filtering)
 
   // Helper function to detect and hover item under mouse
   const detectAndHoverItemUnderMouse = useCallback(() => {
@@ -401,7 +452,7 @@ const App: React.FC = () => {
       while (current && current !== container) {
         const itemId = current.getAttribute('data-item-id');
         if (itemId) {
-          const item = filteredData.find(i => i.id === itemId);
+          const item = TIMELINE_DATA.find(i => i.id === itemId);
           if (item) {
             // Debug logging removed
 
@@ -413,7 +464,7 @@ const App: React.FC = () => {
         current = current.parentElement;
       }
     });
-  }, [mode, filteredData, handleHover, handleLaneHover]);
+  }, [mode, handleHover, handleLaneHover]);
 
   // When scroll stops, check which item is under the mouse and hover it
   useEffect(() => {
@@ -447,8 +498,8 @@ const App: React.FC = () => {
 
   // Find currently hovered item object for bookmark logic
   const hoveredItem = useMemo(() => {
-    return filteredData.find(item => item.id === hoveredId) || null;
-  }, [filteredData, hoveredId]);
+    return TIMELINE_DATA.find(item => item.id === hoveredId) || null;
+  }, [hoveredId]);
 
   const totalMonths = getMonthDiff(parseDate(CONFIG.startDate), parseDate(CONFIG.endDate));
   // Reduce total height significantly - logarithmic positioning will compress older items into this space
@@ -521,12 +572,13 @@ const App: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* --- PROJECT MODAL --- */}
+      {/* --- EXPERIENCE DETAIL PAGE --- */}
       <AnimatePresence>
         {activeProject && (
-          <ProjectModal
-            project={activeProject}
+          <ExperienceDetail
+            item={activeProject}
             onClose={() => setActiveProject(null)}
+            onOpenCaseStudy={setActiveCaseStudy}
           />
         )}
       </AnimatePresence>
@@ -575,23 +627,7 @@ const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 backdrop-blur-sm pointer-events-auto w-fit overflow-x-auto no-scrollbar mx-auto md:mx-0 scale-[0.85] md:scale-100 origin-center">
-            <Filter size={14} className="text-white/40 ml-2 mr-1 shrink-0" />
-            {(['all', 'education', 'corporate', 'personal'] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`
-                   px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all shrink-0
-                   ${filter === f
-                    ? 'bg-white text-black shadow-lg shadow-white/10'
-                    : 'text-white/50 hover:text-white hover:bg-white/5'}
-                 `}
-              >
-                {f === 'personal' ? 'TinkerVerse' : f}
-              </button>
-            ))}
-          </div>
+
         </motion.div>
       </header>
 
@@ -686,7 +722,7 @@ const App: React.FC = () => {
           {/* Mobile Layout - Stacked Sections */}
           <div className="block md:hidden mt-[150px] pb-6">
             <MobileTimeline
-              items={filteredData}
+              items={TIMELINE_DATA}
               onOpenCaseStudy={setActiveCaseStudy}
               onOpenProject={setActiveProject}
               onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
@@ -708,66 +744,202 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Desktop Layout - Column Timeline */}
-          <div
-            className="hidden md:block relative w-full max-w-6xl mx-auto mt-[160px]"
-            style={{ height: `${totalContainerHeight}px` }}
-          >
-            <TimelineRail
-              pixelsPerMonth={pixelsPerMonth}
-              totalHeight={totalContainerHeight}
-              onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, top)}
-              currentScrollTop={scrollTop}
-              hoveredItem={hoveredItem}
-            />
+          {/* Desktop Layout - 3 Column Grid (replacing Rail) */}
+          {/* Desktop Layout */}
+          <LayoutGroup>
+            <div
+              className="hidden md:block relative w-full max-w-7xl mx-auto mt-[160px]"
+              style={{ height: mode === 'fit' ? 'auto' : `${totalContainerHeight}px` }}
+            >
+              {mode === 'fit' ? (
+                /* --- GRID MODE (Collapsed) - Aligned with Timeline Rail --- */
+                <div className="flex pb-32">
+                  {/* Spacer matching timeline rail width */}
+                  <div className="hidden md:block w-28 md:w-36 flex-shrink-0" />
 
-            {/* Content & Background Wrapper - Offset by Rail Width (increased for larger rail) */}
-            <div className="absolute top-0 left-28 md:left-36 right-4 md:right-0 bottom-0">
+                  {/* 3-Column Grid aligned with timeline lanes */}
+                  <div className="flex-1 grid grid-cols-3 gap-3 items-start px-4 md:pr-0 md:pl-0">
 
-              {/* Hover Background Columns */}
-              <div className="absolute inset-0 flex pointer-events-none z-0">
-                {[0, 1, 2].map((lane) => (
-                  <motion.div
-                    key={lane}
-                    className="h-full transition-colors duration-500"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      bottom: 0,
-                      width: '33%',
-                      // Aligned with TimelineEvent logic: 0%, 33.5%, 67%
-                      left: lane === 0 ? '0%' : lane === 1 ? '33.5%' : '67%',
-                      background: hoveredLane === lane
-                        ? `linear-gradient(to bottom, ${lane === 0 ? 'rgba(244,63,94,0.05)' :
-                          lane === 1 ? 'rgba(99,102,241,0.05)' :
-                            'rgba(245,158,11,0.05)'
-                        }, transparent)`
-                        : 'transparent'
-                    }}
+                    {/* COLUMN 1: EDUCATION */}
+                    <div className="space-y-3">
+                      <h2 className="text-[10px] uppercase tracking-widest font-bold text-rose-400 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                        Education
+                      </h2>
+                      {TIMELINE_DATA
+                        .filter(i => i.type === 'education' || i.type === 'foundational')
+                        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+                        .map(item => (
+                          <TimelineEvent
+                            key={item.id}
+                            item={item}
+                            hoveredId={hoveredId}
+                            onHover={handleHover}
+                            onLaneHover={handleLaneHover}
+                            isDimmed={hoveredId !== null && hoveredId !== item.id}
+                            pixelsPerMonth={pixelsPerMonth}
+                            totalHeight={totalContainerHeight}
+                            mode={mode}
+                            onOpenCaseStudy={setActiveCaseStudy}
+                            onOpenProject={setActiveProject}
+                            onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                            isScrolling={false}
+                            layoutMode="grid"
+                            isExpanded={expandedCardId === item.id}
+                            onExpand={handleCardExpand}
+                          />
+                        ))}
+                    </div>
+
+                    {/* COLUMN 2: EXPERIENCE */}
+                    <div className="space-y-3">
+                      <h2 className="text-[10px] uppercase tracking-widest font-bold text-indigo-400 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                        Experience
+                      </h2>
+                      {TIMELINE_DATA
+                        .filter(i => (i.type === 'corporate' || i.type === 'project' || i.type === 'competition') && i.id !== 'tinkerverse')
+                        .filter(i => !i.title.toLowerCase().includes('jarvis'))
+                        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+                        .map(item => (
+                          <TimelineEvent
+                            key={item.id}
+                            item={item}
+                            hoveredId={hoveredId}
+                            onHover={handleHover}
+                            onLaneHover={handleLaneHover}
+                            isDimmed={hoveredId !== null && hoveredId !== item.id}
+                            pixelsPerMonth={pixelsPerMonth}
+                            totalHeight={totalContainerHeight}
+                            mode={mode}
+                            onOpenCaseStudy={setActiveCaseStudy}
+                            onOpenProject={setActiveProject}
+                            onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                            isScrolling={false}
+                            layoutMode="grid"
+                            isExpanded={expandedCardId === item.id}
+                            onExpand={handleCardExpand}
+                          />
+                        ))}
+                    </div>
+
+                    {/* COLUMN 3: TINKERVERSE / CREATIVE */}
+                    <div className="space-y-3">
+                      <h2 className="text-[10px] uppercase tracking-widest font-bold text-amber-400 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        TinkerVerse
+                      </h2>
+                      {TIMELINE_DATA
+                        .filter(i => i.id === 'tinkerverse')
+                        .map(item => (
+                          <TimelineEvent
+                            key={item.id}
+                            item={item}
+                            hoveredId={hoveredId}
+                            onHover={handleHover}
+                            onLaneHover={handleLaneHover}
+                            isDimmed={hoveredId !== null && hoveredId !== item.id}
+                            pixelsPerMonth={pixelsPerMonth}
+                            totalHeight={totalContainerHeight}
+                            mode={mode}
+                            onOpenCaseStudy={setActiveCaseStudy}
+                            onOpenProject={setActiveProject}
+                            onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                            isScrolling={false}
+                            layoutMode="grid"
+                            isExpanded={expandedCardId === item.id}
+                            onExpand={handleCardExpand}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* --- RAIL MODE (Normal/Detail) --- */
+                <>
+                  <TimelineRail
+                    pixelsPerMonth={pixelsPerMonth}
+                    totalHeight={totalContainerHeight}
+                    onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, top)}
+                    currentScrollTop={scrollTop}
+                    hoveredItem={hoveredItem}
                   />
-                ))}
-              </div>
 
-              {/* Timeline Events */}
-              {filteredData.map((item) => (
-                <TimelineEvent
-                  key={item.id}
-                  item={item}
-                  hoveredId={hoveredId}
-                  onHover={handleHover}
-                  onLaneHover={handleLaneHover}
-                  isDimmed={hoveredId !== null && hoveredId !== item.id}
-                  pixelsPerMonth={pixelsPerMonth}
-                  totalHeight={totalContainerHeight}
-                  mode={mode}
-                  onOpenCaseStudy={setActiveCaseStudy}
-                  onOpenProject={setActiveProject}
-                  onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
-                  isScrolling={!canHover}
-                />
-              ))}
+                  {/* Content & Background Wrapper */}
+                  <div className="absolute top-0 left-28 md:left-36 right-4 md:right-0 bottom-0">
+
+                    {/* Column Headers (Timeline Mode) */}
+                    <div className="absolute top-0 left-0 right-0 h-10 z-20 pointer-events-none flex">
+                      {/* Education */}
+                      <div className="absolute left-0 w-[33%] pl-2">
+                        <h2 className="text-[10px] uppercase tracking-widest font-bold text-rose-400 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                          Education
+                        </h2>
+                      </div>
+                      {/* Experience */}
+                      <div className="absolute left-[33.5%] w-[33%] pl-2">
+                        <h2 className="text-[10px] uppercase tracking-widest font-bold text-indigo-400 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                          Experience
+                        </h2>
+                      </div>
+                      {/* TinkerVerse */}
+                      <div className="absolute left-[67%] w-[33%] pl-2">
+                        <h2 className="text-[10px] uppercase tracking-widest font-bold text-amber-400 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          TinkerVerse
+                        </h2>
+                      </div>
+                    </div>
+
+                    {/* Hover Background Columns */}
+                    <div className="absolute inset-0 flex pointer-events-none z-0">
+                      {[0, 1, 2].map((lane) => (
+                        <motion.div
+                          key={lane}
+                          className="h-full transition-colors duration-500"
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            width: '33%',
+                            left: lane === 0 ? '0%' : lane === 1 ? '33.5%' : '67%',
+                            background: hoveredLane === lane
+                              ? `linear-gradient(to bottom, ${lane === 0 ? 'rgba(244,63,94,0.05)' :
+                                lane === 1 ? 'rgba(99,102,241,0.05)' :
+                                  'rgba(245,158,11,0.05)'
+                              }, transparent)`
+                              : 'transparent'
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Timeline Events (Absolute) */}
+                    {TIMELINE_DATA.map((item) => (
+                      <TimelineEvent
+                        key={item.id}
+                        item={item}
+                        hoveredId={hoveredId}
+                        onHover={handleHover}
+                        onLaneHover={handleLaneHover}
+                        isDimmed={hoveredId !== null && hoveredId !== item.id}
+                        pixelsPerMonth={pixelsPerMonth}
+                        totalHeight={totalContainerHeight}
+                        mode={mode}
+                        onOpenCaseStudy={setActiveCaseStudy}
+                        onOpenProject={setActiveProject}
+                        onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                        isScrolling={!canHover}
+                      // layoutMode defaults to absolute
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          </LayoutGroup>
 
           {/* --- PROJECTS SECTION --- */}
           <ProjectsSection />
@@ -780,6 +952,7 @@ const App: React.FC = () => {
       <VerticalNavbar
         activeSection={activeSection}
         onNavigate={handleNavigate}
+        mode={mode}
       />
     </div>
   );

@@ -1,3 +1,6 @@
+import { TimelineItem } from './types';
+import { Project } from './types/Project';
+
 /**
  * Parses a YYYY-MM-DD string into a Date object
  */
@@ -94,4 +97,45 @@ export const getLogarithmicHeight = (
   const startPos = getLogarithmicPosition(monthsFromTop, totalMonths, totalHeight, compressionFactor);
   const endPos = getLogarithmicPosition(monthsFromTop + durationMonths, totalMonths, totalHeight, compressionFactor);
   return Math.max(endPos - startPos, minHeight);
+};
+
+/**
+ * Maps a simple TimelineItem to a full Project structure
+ * used for displaying ProjectDetail modal for generic items.
+ */
+export const mapTimelineItemToProject = (item: TimelineItem): Project => {
+  return {
+    id: item.id,
+    hero: {
+      title: item.title,
+      oneLiner: item.headline || item.summary,
+    },
+    context: {
+      text: item.summary + (item.differentiator ? `\n\n${item.differentiator}` : ''),
+    },
+    build: {
+      bullets: item.bullets || [],
+    },
+    decisions: [], // Generic items might not have decisions
+    review: {
+      worked: [],
+      didnt: [],
+    },
+    outcome: {
+      status: 'shipped', // Default status
+      text: `Role/Project Duration: ${formatDate(item.start)} - ${formatDate(item.end)}`,
+      proof: item.companyUrl,
+    },
+    reflection: {
+      text: item.headline || "A key step in my professional journey.",
+    },
+    themeColor: (item.themeColor === 'red' ? 'rose' :
+      item.themeColor === 'blue' ? 'indigo' :
+        item.themeColor === 'green' ? 'emerald' :
+          item.themeColor === 'orange' ? 'amber' :
+            item.themeColor === 'violet' ? 'violet' :
+              'indigo'),
+    heroImage: item.imageUrl,
+    skills: item.skills,
+  };
 };

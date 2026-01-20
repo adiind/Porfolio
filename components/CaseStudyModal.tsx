@@ -26,7 +26,7 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
         border: 'border-orange-500',
         button: 'hover:bg-orange-100'
       };
-      case 'red': 
+      case 'red':
       default: return {
         text: 'text-red-500',
         bg: 'bg-red-500',
@@ -39,13 +39,13 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
   const tc = getThemeClasses();
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl"
     >
-      <button 
+      <button
         onClick={onClose}
         className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 text-white transition-colors z-50"
       >
@@ -75,15 +75,15 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
             {caseStudy.title} • {currentSlide + 1} / {slides.length}
           </div>
           <div className="flex gap-2">
-            <button 
-              onClick={prevSlide} 
+            <button
+              onClick={prevSlide}
               disabled={currentSlide === 0}
               className={`p-2 rounded-full disabled:opacity-30 transition-colors ${tc.button}`}
             >
               <ChevronLeft size={20} className="text-gray-600" />
             </button>
-            <button 
-              onClick={nextSlide} 
+            <button
+              onClick={nextSlide}
               disabled={currentSlide === slides.length - 1}
               className={`p-2 rounded-full disabled:opacity-30 transition-colors ${tc.button}`}
             >
@@ -196,7 +196,7 @@ const renderSlide = (slide: any, tc: any) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {slide.content.features.map((f: any, i: number) => (
               <div key={i} className="bg-gray-800 text-white p-6 rounded-xl shadow-xl">
-                <h4 className={`text-xl font-bold mb-3 ${i===0 ? 'text-yellow-400' : i===1 ? 'text-blue-400' : 'text-green-400'}`}>
+                <h4 className={`text-xl font-bold mb-3 ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-blue-400' : 'text-green-400'}`}>
                   {f.title}
                 </h4>
                 <p className="text-sm text-gray-300 leading-relaxed opacity-90">{f.desc}</p>
@@ -274,7 +274,7 @@ const renderSlide = (slide: any, tc: any) => {
       return (
         <div className="flex flex-col h-full">
           <div className={`${tc.text} font-black text-2xl uppercase tracking-tighter leading-none mb-8 border-l-4 ${tc.border} pl-3`}>
-            Structural <br/> Breakdown
+            Structural <br /> Breakdown
           </div>
           <div className={`${tc.lightBg} p-4 rounded-lg text-center mb-8`}>
             <p className="font-bold text-gray-800 text-lg">Opportunity 🚀</p>
@@ -302,13 +302,13 @@ const renderSlide = (slide: any, tc: any) => {
       return (
         <div className="flex flex-col h-full relative">
           <div className={`${tc.text} font-black text-2xl uppercase tracking-tighter leading-none mb-4 border-l-4 ${tc.border} pl-3`}>
-            Final <br/> Solution
+            Final <br /> Solution
           </div>
           <div className="flex-1 relative flex items-center justify-center">
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-               <div className={`w-[500px] h-[500px] border-4 ${tc.border} rounded-full flex items-center justify-center`}>
-                 <div className="w-[300px] h-[300px] border-4 border-green-500 rounded-full" />
-               </div>
+              <div className={`w-[500px] h-[500px] border-4 ${tc.border} rounded-full flex items-center justify-center`}>
+                <div className="w-[300px] h-[300px] border-4 border-green-500 rounded-full" />
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-8 w-full z-10">
               {slide.content.steps.map((step: any, i: number) => (
@@ -326,7 +326,7 @@ const renderSlide = (slide: any, tc: any) => {
       return (
         <div className="flex flex-col h-full justify-center">
           <div className={`${tc.text} font-black text-4xl uppercase tracking-tighter leading-none mb-12 border-l-8 ${tc.border} pl-6`}>
-            Media <br/> Coverage
+            Media <br /> Coverage
           </div>
           <div className="space-y-8 max-w-3xl">
             {slide.content.quotes.map((q: any, i: number) => (
@@ -338,7 +338,7 @@ const renderSlide = (slide: any, tc: any) => {
           </div>
         </div>
       );
-      
+
     default:
       return null;
   }
