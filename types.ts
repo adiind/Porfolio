@@ -10,6 +10,7 @@ export interface CaseStudy {
   title: string;
   summary: string;
   thumbnailUrl?: string; // Optional image URL
+  imageUrl?: string; // Optional main image URL
   linkUrl?: string;
   themeColor?: 'red' | 'orange' | 'blue' | 'green';
   slides?: CaseStudySlide[];
@@ -40,6 +41,7 @@ export interface FeatureCard {
   }[];
   details: string[]; // Bullet points for open state
   skills?: { label: string; description: string }[]; // Skills with descriptions for this project
+  imageUrl?: string; // Optional image for hover view and detail page
 }
 
 export interface TimelineItem {
@@ -49,7 +51,7 @@ export interface TimelineItem {
   company: string;
   companyUrl?: string; // Optional URL for company/competition
   headline?: string; // Brief one-liner visible before hover
-  type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project' | 'vignette';
+  type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project';
   subtype?: 'role' | 'post';
   start: string; // YYYY-MM-DD
   end: string;   // YYYY-MM-DD

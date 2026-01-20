@@ -73,5 +73,6 @@
             "label": "Calibration Logic",
             "description": "Software-based accuracy tuning for physical outputs."
         }
-    ]
+    ],
+    "heroImage": "/images/solopump.png"
 }

@@ -92,12 +92,11 @@ const App: React.FC = () => {
   // Calculate glow positions for competition/project/vignette items
   const glowItems = useMemo(() => {
     return filteredData
-      .filter(item => ['competition', 'project', 'vignette'].includes(item.type))
+      .filter(item => ['competition', 'project'].includes(item.type))
       .map(item => {
         const position = timelineService.calculateItemPosition(item, pixelsPerMonth, 60);
         let glowColor = 'from-purple-600/50 via-purple-500/30';
         if (item.type === 'project') glowColor = 'from-cyan-600/50 via-teal-500/30';
-        if (item.type === 'vignette') glowColor = 'from-white/30 via-gray-100/10';
 
         return {
           ...item,

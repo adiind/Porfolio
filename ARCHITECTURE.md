@@ -137,7 +137,7 @@ Break down large components:
   - `TimelineEventCard` (standard cards)
   - `TimelineEventBookmark` (competition/project bookmarks)
   - `TimelineEventTinkerVerse` (TinkerVerse grid)
-  - `TimelineEventVignette` (vignette line)
+
 
 **Benefits**:
 - Smaller, focused components

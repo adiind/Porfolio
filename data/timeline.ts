@@ -21,6 +21,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       "Built and iterated physical–digital prototypes within real-world brand and manufacturing constraints."
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Procter_%26_Gamble_logo.svg/2560px-Procter_%26_Gamble_logo.svg.png",
+    imageUrl: "/images/pg-design-project.jpg",
     differentiator: "Worked in a category where users already had strong preferences, making meaningful change difficult to introduce."
   },
   {
@@ -43,6 +44,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       "Collaborative, critique-driven environment that prioritizes clarity of thinking and intent"
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Northwestern_Wildcats_logo.svg/1200px-Northwestern_Wildcats_logo.svg.png",
+    imageUrl: "/images/northwestern_ford.png",
     skills: [
       { label: "User Research", description: "Qualitative and quantitative methods to uncover user needs." },
       { label: "Interaction Design", description: "Crafting intuitive interfaces and user flows." },
@@ -72,6 +74,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       "Shifted decision-making toward real-time experiment reads, enabling PM + Design to make changes the same day instead of waiting for long reporting cycles."
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png",
+    imageUrl: "/images/zomato_eternal.jpg",
     themeColor: 'red',
     skills: [
       { label: "Clickstream Analytics", description: "Tracking full user paths (scroll → click → convert) to guide UI decisions." },
@@ -146,13 +149,15 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Elasticity Testing", description: "Measuring price sensitivity across segments." },
           { label: "SKU-Level Modeling", description: "Building item-level demand and supply models." },
           { label: "Demand Triggers", description: "Identifying what drives purchase decisions." }
-        ]
+        ],
+        imageUrl: "/images/food_rescue.png"
       }
     ],
     caseStudy: {
       title: "Food Rescue",
       summary: "Preventing food wastage by redirecting cancelled orders to nearby customers at discounted rates.",
       thumbnailUrl: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Leafy%20Green.png",
+      imageUrl: "/images/food_rescue.png",
       themeColor: 'red',
       slides: [
         {
@@ -241,59 +246,7 @@ The challenge was to create an Edge AI and IoT project using specific boards. Du
 
 The entire microcontroller was programmed using Arduino, and I enhanced its functionality by releasing my own version of the library with improved algorithms. I also designed and 3D-printed a custom case for the board and its peripherals, which I supplied as part of the project. Given the challenge’s time constraints, I prioritized creating a complete and functional product. While this limited software optimization, the final outcome included fully working open-source code and 3D models, making it a comprehensive and accessible project.`
   },
-  {
-    id: "surya-kinetic-sun",
-    lane: 2,
-    title: "Surya",
-    company: "Northwestern University",
-    headline: "Kinetic sculpture syncing mechanical flowers to global time zones.",
-    type: "project",
-    subtype: "role",
-    start: "2025-09-01",
-    end: "2025-09-15",
-    summary: "A kinetic time-synchronized sculpture with blooming mechanical flowers representing family across global time zones.",
-    bullets: [
-      "Designed and built a kinetic mandala sculpture with servo-driven flowers that open and close based on real-time sunrise cycles.",
-      "Laser-cut layered geometry inspired by solar patterns; integrated custom electronics and precision servo control.",
-      "Explored emotion-driven interaction design, translating time, distance, and connection into mechanical motion."
-    ],
-    skills: [
-      { label: "Interaction Design", description: "Designing responsive behaviors and user engagement patterns." },
-      { label: "Physical Computing", description: "Integrating sensors, actuators and code into physical objects." },
-      { label: "Laser Cutting", description: "Precision fabrication of layered geometric components." },
-      { label: "Electronics", description: "Circuit design and component integration for custom hardware." },
-      { label: "Arduino", description: "Microcontroller programming for servo and sensor control." },
-      { label: "Kinetic Sculpture", description: "Mechanical art with programmed, time-based motion." },
-      { label: "Prototyping", description: "Iterative building and testing of physical designs." }
-    ],
-    projectLinks: [
-      { label: "Process Reel", url: "https://www.instagram.com/reel/DPm6dEjjCmO/?igsh=MXM4cHo0d2huZ3ZzMQ==" },
-      { label: "Build Notes", url: "https://github.com/adiind/surya" }
-    ],
-    imageUrl: "https://i.ibb.co/5gWPHd62/IMG-1438.jpg",
-    extendedDescription: "Surya is a kinetic installation created during the Engineering Design Innovation orientation at Northwestern. The prompt was to build something that represents 'True North.' For me, that direction pointed toward home. Living across time zones had made even small moments of connection feel delayed and fractured, so I set out to build a sculpture that could make time visible and shared again.\n\nThe final installation features a layered wooden mandala with mechanical flowers driven by micro-servos. Each flower represents a family member in a different part of the world. Using custom code and a precise calibration workflow, the petals open and close in sync with the light cycle of each time zone. The motion is slow and intentional, creating the sense of a living object responding to its own rhythm.\n\nThe most challenging part of the build was achieving smooth motion across all flowers. This required repeated rewiring, tuning of servo ranges, and refinements to torque compensation in the code. After a long night of debugging, the moment the first flower opened cleanly in sync with its programmed sunrise became the emotional turning point of the project. It shifted Surya from a technical prototype to a meaningful artifact that embodied the idea of staying connected across distance.\n\nBeyond its final form, Surya reflects my approach to design: translating abstract feelings into tangible interactions, blending engineering precision with expressive gesture, and using motion as a medium for storytelling. It was an early example of how I embed emotion into mechanical systems and create objects that communicate through behavior rather than screens."
-  },
-  {
-    id: "plotter-vignette",
-    lane: 2,
-    title: "Vignette — The Plotter That Drew My Voice",
-    company: "Personal Reflection",
-    headline: "A brief reflection on voice, imperfection, and plotting.",
-    type: "vignette",
-    subtype: "role",
-    start: "2025-06-01",
-    end: "2025-06-15",
-    summary: "Reflecting on the imperfect translation of voice to physical form.",
-    bullets: [],
-    imageUrl: "https://i.ibb.co/v6nVSTw9/IMG-8392-2.jpg",
-    extendedDescription: `I had been troubleshooting the speech to text pipeline for most of the evening. The audio model worked by itself and the plotter worked by itself, but getting them to talk to each other felt impossible. The first few attempts produced empty G-code files, then random symbols, then nothing at all. I kept adjusting the preprocessing, fixing small bugs, and sending new commands to the ESP32, hoping the pen would finally move the way it was supposed to.
 
-Eventually, I tried again. I said a simple word into the microphone, waited for the conversion to finish, watched the G-code appear, and sent it to the plotter. The pen lifted, moved across the frame, touched the paper, and drew something that looked vaguely like the word I had spoken. It was mirrored and incomplete. The last stroke stopped early. But it was still clearly my voice translated into a physical mark on the page.
-
-That moment changed the project for me. Until then, it had been a technical problem that needed to be solved. Once I saw my spoken word appear as a line drawing, even in an imperfect form, the work began to feel more expressive. The machine was no longer just executing instructions. It was capturing something personal and giving it form.
-
-Since then, I have been thinking about how tools can help people express themselves in ways they do not expect. The flawed drawing on the paper reminded me that expression does not need to be perfect to be meaningful. Sometimes the imperfections are what make it feel human.`
-  },
   {
     id: "udaan",
     lane: 1,
@@ -314,6 +267,7 @@ Since then, I have been thinking about how tools can help people express themsel
       "Only analyst and acting PM for Wondermart (mobile-first B2C commerce), running weekly product reviews with developers and prioritizing features using funnel and retention data."
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Udaanlogo.png",
+    imageUrl: "/images/udaan_id.jpg",
     themeColor: 'orange',
     skills: [
       { label: "Supply Chain", description: "End-to-end logistics from procurement to last-mile delivery." },
@@ -496,7 +450,8 @@ Since then, I have been thinking about how tools can help people express themsel
       "Set up the V0 top down dashboards for creator management at scale.",
       "Tested early tech implementations and strategies to validate whether the concept had traction."
     ],
-    logoUrl: "https://play-lh.googleusercontent.com/oxwoyND_20iYZnGTGmO1hQNn0D8bvrOCT8MLc6ZO-WxpgPyyb1ocusYwJJsYwr9IunrN=s512-rw",
+    logoUrl: "/images/schmooze_logo.png",
+    imageUrl: "/images/schmooze_team.jpg",
     differentiator: "Analytics here happened before product market fit, where data is incomplete, experiments are messy, and signal has to be created from zero.",
     skills: [
       { label: "Exploration–Exploitation", description: "Balancing testing new ideas with repeating what is already working." },
@@ -581,7 +536,8 @@ Since then, I have been thinking about how tools can help people express themsel
         ]
       }
     ],
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/12/Snapdeal-Logo.png"
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/12/Snapdeal-Logo.png",
+    imageUrl: "/images/snapdeal_id.jpg"
   },
   {
     id: "tinkerverse",
@@ -613,14 +569,6 @@ Since then, I have been thinking about how tools can help people express themsel
         imageUrl: "https://i.ibb.co/v6nVSTw9/IMG-8392-2.jpg",
         tags: ["Generative Art", "Robotics", "Python"],
         link: "#"
-      },
-      {
-        id: "surya",
-        title: "Surya",
-        description: "Kinetic sculpture that syncs mechanical flowers to global time zones. A physical representation of connection across distance.",
-        imageUrl: "https://i.ibb.co/5gWPHd62/IMG-1438.jpg",
-        tags: ["Kinetic Art", "Interaction Design", "Arduino"],
-        link: "https://github.com/adiind/surya"
       }
     ]
   },
@@ -645,6 +593,7 @@ Since then, I have been thinking about how tools can help people express themsel
       "Hockey A Team member, representing the institute in competitive sports."
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/en/d/d3/BITS_Pilani-Logo.svg",
+    imageUrl: "/images/bits_hyderabad.jpg",
     differentiator: "This phase shaped my interdisciplinary instincts by working across biology, engineering, and design long before it became a formal specialization.",
     skills: [
       { label: "Healthcare Instrumentation", description: "Designing medical devices and testing systems for clinical use." },
