@@ -1,0 +1,67 @@
+{
+    "id": "portfolio-website",
+    "hero": {
+        "title": "Portfolio Website",
+        "oneLiner": "A personal portfolio built with agentic AI, showcasing the future of software development."
+    },
+    "context": {
+        "text": "This website is more than just a showcase of my work; it's a demonstration of a new way of building. Created using advanced agentic coding workflows, this project moves beyond simple 'vibe coding' to a structured, iterative, and AI-partnered development process. It represents a shift where the developer acts as a high-level architect while AI agents handle implementation, verification, and asset generation."
+    },
+    "build": {
+        "bullets": [
+            "Next.js 14 (App Router) for performance and SEO",
+            "Tailwind CSS for rapid, cohesive styling",
+            "Framer Motion for smooth, premium interactions",
+            "Agentic AI workflow (Deepmind Antigravity)",
+            "Automated screenshot generation and verification"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Agentic Coding vs Traditional Hand-Coding",
+            "why": "To explore the capabilities of modern AI in complex project management and code generation.",
+            "tradeoff": "Requires managing agent context and reviewing plans rather than just writing code."
+        },
+        {
+            "decision": "Vanilla CSS/Tailwind vs Component Libraries",
+            "why": "Maintained complete control over the 'premium' aesthetic without fighting library defaults.",
+            "tradeoff": "More initial CSS setup, but greater long-term flexibility."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Rapid iteration on design and content.",
+            "Seamless integration of new features via AI planning.",
+            "Automated tasks (like screenshots) saved manual effort."
+        ],
+        "didnt": [
+            "Occasional context limits required re-explaining project structure."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "The result is a responsive, high-performance portfolio that not only houses my work but serves as a case study in itself. It demonstrates that AI can be a partner in creativity, not just a tool for automation.",
+        "proof": null,
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "Building this portfolio with AI reinforced that the future of coding is collaborative. The 'magic' isn't in generating code, but in orchestrating intent."
+    },
+    "themeColor": "indigo",
+    "icon": "code",
+    "skills": [
+        {
+            "label": "Agentic AI Workflows",
+            "description": "Prompt engineering and context management."
+        },
+        {
+            "label": "Next.js",
+            "description": "App directory and React Server Components."
+        },
+        {
+            "label": "Tailwind CSS",
+            "description": "Utility-first styling."
+        }
+    ],
+    "heroImage": "/images/portfolio_hero.png"
+}

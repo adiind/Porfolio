@@ -4,6 +4,30 @@ import { TINKERVERSE_LOGO } from '../assets';
 
 export const TIMELINE_DATA: TimelineItem[] = [
   {
+    id: "portfolio-website",
+    lane: 2,
+    title: "Portfolio V2",
+    company: "Personal Project",
+    headline: "A portfolio built with Agentic AI.",
+    type: "personal",
+    subtype: 'project',
+    start: "2025-01-01",
+    end: "Present",
+    summary: "Building a portfolio using advanced agentic coding workflows to explore the future of human-AI collaboration.",
+    bullets: [
+      "Leveraged Google Deepmind's Antigravity agent to architect and implement the site.",
+      "Moved beyond 'vibe coding' to structured, verifiable agentic development.",
+      "Showcasing the potential of AI as a pair programmer and system architect."
+    ],
+    logoUrl: "/images/portfolio_hero.png",
+    imageUrl: "/images/portfolio_projects.png",
+    skills: [
+      { label: "Agentic AI", description: "Collaborating with autonomous agents." },
+      { label: "Next.js", description: "Modern React framework." },
+      { label: "Tailwind", description: "Utility-first styling." }
+    ]
+  },
+  {
     id: "pg-project",
     lane: 1,
     title: "P&G Design Project",

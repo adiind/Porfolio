@@ -73,5 +73,6 @@
             "label": "Product Design",
             "description": "Integrating function, form, and tactile user experience."
         }
-    ]
+    ],
+    "heroImage": "/images/helios.jpg"
 }

@@ -5,6 +5,7 @@ import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
 import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight, mapTimelineItemToProject } from '../utils';
+import { PROJECTS } from '../data/projects';
 import { Briefcase, GraduationCap, User, Sparkles, Heart, MessageCircle, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
 
 interface Props {
@@ -147,16 +148,15 @@ const TimelineEvent: React.FC<Props> = ({
       return (
         <motion.div
           layoutId={`timeline-card-${item.id}`}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
             type: 'tween',
-            duration: 0.5,
-            ease: [0.32, 0.72, 0, 1],
-            layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
+            duration: 0.3,
+            ease: 'easeOut',
+            layout: { duration: 0.3, ease: 'easeOut' }
           }}
-          className="relative w-full h-96 md:h-[600px] rounded-xl overflow-hidden cursor-pointer border border-amber-500/20 bg-amber-500/10 hover:border-amber-400/40 transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] group"
+          className="relative w-full h-96 md:h-[600px] rounded-xl overflow-hidden cursor-pointer border border-amber-500/20 bg-amber-500/10 hover:border-amber-400/40 transition-colors duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] group"
           onClick={handleGridClick}
         >
           <TinkerVerseGrid
@@ -175,29 +175,28 @@ const TimelineEvent: React.FC<Props> = ({
     return (
       <motion.div
         layoutId={`timeline-card-${item.id}`}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
         transition={{
           type: 'tween',
-          duration: 0.5,
-          ease: [0.32, 0.72, 0, 1],
-          layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
+          duration: 0.3,
+          ease: 'easeOut',
+          layout: { duration: 0.3, ease: 'easeOut' }
         }}
-        className={`relative w-full ${getHeightClass()} rounded-xl overflow-hidden cursor-pointer border border-white/5 bg-white/5 hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] group`}
+        className={`relative w-full ${getHeightClass()} rounded-xl overflow-hidden cursor-pointer border border-white/5 bg-white/5 hover:border-white/20 transition-colors duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] group`}
         onClick={handleGridClick}
       >
         {/* Background Image */}
         {item.imageUrl && (
           <>
-            <motion.img
-              layoutId={`timeline-image-${item.id}`}
+            <img
               src={item.imageUrl}
               alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 opacity-60 group-hover:opacity-40 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-105"
+              style={{ transition: 'opacity 0.3s, transform 0.5s' }}
             />
             <div
-              className={`absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90`}
+              className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90"
             />
           </>
         )}
@@ -224,7 +223,7 @@ const TimelineEvent: React.FC<Props> = ({
           {item.logoUrl && (
             <img
               src={item.logoUrl}
-              className={`absolute top-3 left-3 w-6 h-6 object-contain opacity-70 ${item.id === 'ms-edi' ? 'invert' : ''}`}
+              className={`absolute top-3 left-3 w-6 h-6 object-contain opacity-70 ${item.id === 'ms-edi' ? 'brightness-0 invert' : ''}`}
               alt="Logo"
             />
           )}
@@ -675,7 +674,7 @@ const TimelineEvent: React.FC<Props> = ({
           {!isFit && <div className="absolute inset-0 bg-[#0a0a0a] z-0" />}
 
           <div
-            className={`absolute transition-all duration-700 ease-out z-0 ${!isFit
+            className={`absolute transition-all duration-700 ease-out z-0 overflow-visible ${!isFit
               ? (isHovered ? 'top-0 right-0 w-[60%] h-64' : 'top-0 left-0 w-full h-64') // Expanded: Shift Right (Hover) vs Full Banner (Default). Both h-64.
               : 'inset-0 h-full' // Collapsed: Full Cover
               }`}
@@ -690,17 +689,24 @@ const TimelineEvent: React.FC<Props> = ({
               }}
             />
 
-            {/* Overlays */}
-            {(!isFit && isHovered) ? (
-              // Hover State (Timeline only): ExperienceDetail style gradients (Left + Bottom)
-              <>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-              </>
-            ) : (
-              // Default State (Collapsed OR Timeline Not Hovered): Existing black gradient
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90" />
-            )}
+            {/* Overlays - extended beyond bounds to cover animation lag */}
+            <div
+              className="absolute -inset-8 bg-gradient-to-t from-black via-black/70 to-transparent"
+              style={{
+                opacity: (!isFit && isHovered) ? 0 : 0.9,
+                transition: 'opacity 0.7s ease-out'
+              }}
+            />
+            <div
+              className="absolute -inset-8 pointer-events-none"
+              style={{
+                opacity: (!isFit && isHovered) ? 1 : 0,
+                transition: 'opacity 0.7s ease-out'
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+            </div>
           </div>
         </>
       )}
@@ -1016,21 +1022,42 @@ const TinkerVerseGrid: React.FC<{
 
   const rowHeight = pixelsPerMonth;
 
+  // Memoize projects for the thumbnail grid
+  const projectsToShow = useMemo(() => PROJECTS.slice(0, 3), []);
+
   if (isFit) {
-    const allPosts = rows.flatMap(r => r.posts);
-    // Show more dots for the tall "poster" view
-    const visiblePosts = allPosts.slice(0, 200);
     return (
-      <div className="w-full h-full flex flex-col p-2 overflow-hidden relative">
-        <div className="flex flex-wrap content-start gap-[2px] mb-1 overflow-hidden flex-1 opacity-80">
-          {visiblePosts.map((post, i) => (
-            <div key={i} className="w-1.5 h-1.5 rounded-[1px] bg-amber-400" />
-          ))}
-          {Array.from({ length: 30 }).map((_, i) => (
-            <div key={`fill-${i}`} className="w-1.5 h-1.5 rounded-[1px] bg-amber-900/20" />
+      <div className="w-full h-full flex flex-col p-2 overflow-hidden relative" onClick={onClick}>
+        {/* Project thumbnails grid */}
+        <div className="flex-1 grid grid-cols-2 gap-1.5 overflow-hidden">
+          {projectsToShow.map((project, i) => (
+            <div
+              key={project.id}
+              className={`relative rounded overflow-hidden ${i === 0 ? 'col-span-2 row-span-1' : ''}`}
+            >
+              <img
+                src={project.heroImage}
+                alt={project.hero.title}
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+              />
+              {/* Dark overlay for legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              {/* Mini label */}
+              <div className="absolute bottom-1 left-1 right-1">
+                <span className="text-[8px] font-medium text-white/90 line-clamp-1">
+                  {project.hero.title.split('–')[0].trim()}
+                </span>
+              </div>
+            </div>
           ))}
         </div>
-        <div className="mt-auto relative z-10 bg-gradient-to-t from-black/80 to-transparent pt-2">
+        {/* Footer info */}
+        <div className="mt-auto relative z-10 pt-2">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-[8px] font-mono text-amber-400/80 uppercase tracking-wider">
+              {PROJECTS.length} Projects
+            </span>
+          </div>
           <h3 className={`font-bold text-[10px] leading-tight ${styles.text}`}>{item.title}</h3>
           <p className={`text-[9px] opacity-70 ${styles.subtext}`}>{item.company}</p>
         </div>
