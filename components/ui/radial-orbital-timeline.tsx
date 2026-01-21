@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight, Link, Zap, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ interface RadialOrbitalTimelineProps {
     children?: React.ReactNode;
     activeNodeId?: number | null;
     onActiveNodeChange?: (nodeId: number | null) => void;
+    isExpanded?: boolean;
 }
 
 export default function RadialOrbitalTimeline({
@@ -29,6 +31,7 @@ export default function RadialOrbitalTimeline({
     children,
     activeNodeId: controlledActiveNodeId,
     onActiveNodeChange,
+    isExpanded: orbitExpanded = false,
 }: RadialOrbitalTimelineProps) {
     const [internalActiveNodeId, setInternalActiveNodeId] = useState<number | null>(null);
 
@@ -39,6 +42,7 @@ export default function RadialOrbitalTimeline({
     const [rotationAngle, setRotationAngle] = useState<number>(0);
     const [autoRotate, setAutoRotate] = useState<boolean>(true);
     const [pulseEffect, setPulseEffect] = useState<Record<number, boolean>>({});
+    const [hoveredNodeId, setHoveredNodeId] = useState<number | null>(null);
     const [centerOffset] = useState<{ x: number; y: number }>({
         x: 0,
         y: 0,
@@ -121,9 +125,11 @@ export default function RadialOrbitalTimeline({
         setRotationAngle(270 - targetAngle);
     };
 
-    const calculateNodePosition = (index: number, total: number) => {
+    const calculateNodePosition = (index: number, total: number, nodeId?: number) => {
         const angle = ((index / total) * 360 + rotationAngle) % 360;
-        const radius = 180;
+        const baseRadius = orbitExpanded ? 240 : 180;
+        // If this node is hovered, push it outward
+        const radius = nodeId !== undefined && hoveredNodeId === nodeId ? baseRadius + 50 : baseRadius;
         const radian = (angle * Math.PI) / 180;
 
         const x = radius * Math.cos(radian) + centerOffset.x;
@@ -177,84 +183,121 @@ export default function RadialOrbitalTimeline({
                 }}
             >
                 {/* Orbit ring */}
-                <div className="absolute w-[360px] h-[360px] rounded-full border border-white/10 pointer-events-none"></div>
+                <motion.div
+                    className="absolute rounded-full border border-white/10 pointer-events-none"
+                    initial={false}
+                    animate={{
+                        width: orbitExpanded ? 480 : 360,
+                        height: orbitExpanded ? 480 : 360
+                    }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
 
                 {/* Second orbit ring for depth */}
-                <div className="absolute w-[380px] h-[380px] rounded-full border border-white/5 pointer-events-none"></div>
+                <motion.div
+                    className="absolute rounded-full border border-white/5 pointer-events-none"
+                    initial={false}
+                    animate={{
+                        width: orbitExpanded ? 500 : 380,
+                        height: orbitExpanded ? 500 : 380
+                    }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
 
                 {/* Orbital nodes */}
                 {timelineData.map((item, index) => {
-                    const position = calculateNodePosition(index, timelineData.length);
+                    const position = calculateNodePosition(index, timelineData.length, item.id);
                     const isExpanded = expandedItems[item.id];
                     const isRelated = isRelatedToActive(item.id);
                     const isPulsing = pulseEffect[item.id];
+                    const isHovered = hoveredNodeId === item.id;
                     const Icon = item.icon;
 
                     const nodeStyle = {
                         transform: `translate(${position.x}px, ${position.y}px)`,
-                        zIndex: isExpanded ? 1000 : 100 + position.zIndex, // Ensure high z-index
-                        opacity: isExpanded ? 1 : position.opacity,
+                        zIndex: isExpanded ? 1000 : isHovered ? 500 : 100 + position.zIndex,
+                        opacity: isExpanded || isHovered ? 1 : position.opacity,
                     };
 
                     return (
-                        <div
+                        <motion.div
                             key={item.id}
-                            ref={(el) => (nodeRefs.current[item.id] = el)}
-                            className="absolute transition-all duration-700 cursor-pointer pointer-events-auto"
-                            style={nodeStyle}
+                            ref={(el) => {
+                                if (el) nodeRefs.current[item.id] = el;
+                            }}
+                            className="absolute cursor-pointer pointer-events-auto"
+                            initial={{ x: position.x, y: position.y }}
+                            animate={{
+                                x: position.x,
+                                y: position.y,
+                                zIndex: isExpanded ? 1000 : isHovered ? 500 : 100 + position.zIndex,
+                                opacity: isExpanded || isHovered ? 1 : position.opacity
+                            }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 toggleItem(item.id);
                             }}
+                            onMouseEnter={() => setHoveredNodeId(item.id)}
+                            onMouseLeave={() => setHoveredNodeId(null)}
                         >
+                            {/* Glow effect - enhanced on hover */}
                             <div
-                                className={`absolute rounded-full -inset-1 ${isPulsing ? "animate-pulse duration-1000" : ""
-                                    }`}
+                                className={`absolute rounded-full transition-all duration-300 ${isPulsing ? "animate-pulse" : ""}`}
                                 style={{
-                                    background: `radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)`,
-                                    width: `${item.energy * 0.5 + 40}px`,
-                                    height: `${item.energy * 0.5 + 40}px`,
-                                    left: `-${(item.energy * 0.5 + 40 - 40) / 2}px`,
-                                    top: `-${(item.energy * 0.5 + 40 - 40) / 2}px`,
+                                    background: isHovered
+                                        ? `radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(147,51,234,0.2) 50%, rgba(255,255,255,0) 70%)`
+                                        : `radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)`,
+                                    width: isHovered ? `${item.energy * 0.8 + 60}px` : `${item.energy * 0.5 + 40}px`,
+                                    height: isHovered ? `${item.energy * 0.8 + 60}px` : `${item.energy * 0.5 + 40}px`,
+                                    left: isHovered ? `-${(item.energy * 0.8 + 60 - 40) / 2}px` : `-${(item.energy * 0.5 + 40 - 40) / 2}px`,
+                                    top: isHovered ? `-${(item.energy * 0.8 + 60 - 40) / 2}px` : `-${(item.energy * 0.5 + 40 - 40) / 2}px`,
                                 }}
                             ></div>
 
                             <div
                                 className={`
-                w-10 h-10 rounded-full flex items-center justify-center
-                ${isExpanded
-                                        ? "bg-white text-black"
-                                        : isRelated
-                                            ? "bg-white/50 text-black"
-                                            : "bg-black text-white"
+                                    rounded-full flex items-center justify-center
+                                    ${isExpanded
+                                        ? "w-16 h-16 bg-white text-black"
+                                        : isHovered
+                                            ? "w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 text-white"
+                                            : isRelated
+                                                ? "w-10 h-10 bg-white/50 text-black"
+                                                : "w-10 h-10 bg-black text-white"
                                     }
-                border-2 
-                ${isExpanded
+                                    border-2 
+                                    ${isExpanded
                                         ? "border-white shadow-lg shadow-white/30"
-                                        : isRelated
-                                            ? "border-white animate-pulse"
-                                            : "border-white/40"
+                                        : isHovered
+                                            ? "border-white shadow-xl shadow-purple-500/40"
+                                            : isRelated
+                                                ? "border-white animate-pulse"
+                                                : "border-white/40 hover:border-white/80"
                                     }
-                transition-all duration-300 transform
-                ${isExpanded ? "scale-150" : "hover:scale-110"}
-              `}
+                                    transition-all duration-300 transform
+                                `}
                             >
-                                <Icon size={16} />
+                                <Icon size={isExpanded ? 24 : isHovered ? 20 : 16} />
                             </div>
 
                             <div
                                 className={`
-                absolute top-12 left-1/2 -translate-x-1/2 whitespace-nowrap
-                text-xs font-semibold tracking-wider
-                transition-all duration-300
-                ${isExpanded ? "text-white scale-125" : "text-white/70"}
-              `}
+                                    absolute left-1/2 -translate-x-1/2 whitespace-nowrap
+                                    font-semibold tracking-wider
+                                    transition-all duration-300
+                                    ${isExpanded
+                                        ? "top-20 text-sm text-white"
+                                        : isHovered
+                                            ? "top-16 text-sm text-white"
+                                            : "top-12 text-xs text-white/70"}
+                                `}
                             >
                                 {item.title}
                             </div>
 
                             {/* Card removed from here */}
-                        </div>
+                        </motion.div>
                     );
                 })}
             </div>

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { X, ExternalLink, PlayCircle, Heart, MessageCircle, Github, ArrowUpRight } from 'lucide-react';
+import { X, ExternalLink, PlayCircle, Heart, MessageCircle, Github, ArrowUpRight, Zap, PenTool, Bot, Cpu, Layers, Box, Music, Camera } from 'lucide-react';
 import { TimelineItem, SocialPost, TinkerProject } from '../types';
 import { TINKERVERSE_LOGO } from '../constants';
 import { formatDate } from '../utils';
-import { BentoGrid, BentoCard } from './ui/bento-grid';
+import { PROJECTS } from '../data/projects';
+import { Project } from '../types/Project';
+import ProjectCard from './ProjectCard';
+import ProjectDetail from './ProjectDetail';
 
 
 
@@ -14,7 +17,44 @@ interface Props {
     onClose: () => void;
 }
 
+// Projects section component for TinkerVerse modal
+const ProjectsInModal: React.FC<{
+    activeProject: Project | null;
+    setActiveProject: (project: Project | null) => void;
+}> = ({ activeProject, setActiveProject }) => {
+    return (
+        <section>
+            <div className="flex items-end gap-4 mb-8">
+                <h3 className="text-3xl font-bold text-white">Projects</h3>
+                <p className="hidden md:block text-sm text-gray-500 pb-1.5 font-mono">// Systems and experiments</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {PROJECTS.map((project, index) => (
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        index={index}
+                        onClick={() => setActiveProject(project)}
+                    />
+                ))}
+            </div>
+
+            {/* Project Detail Modal */}
+            <AnimatePresence>
+                {activeProject && (
+                    <ProjectDetail
+                        project={activeProject}
+                        onClose={() => setActiveProject(null)}
+                    />
+                )}
+            </AnimatePresence>
+        </section>
+    );
+};
+
 const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
+    const [activeProject, setActiveProject] = useState<Project | null>(null);
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
             {/* Backdrop */}
@@ -57,48 +97,8 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                 {/* Scrollable Body */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 space-y-16 custom-scrollbar">
 
-                    {/* Section 1: Featured Projects (Bento Grid) */}
-                    <section>
-                        <div className="flex items-end gap-4 mb-8">
-                            <h3 className="text-3xl font-bold text-white">Featured Projects</h3>
-                            <p className="hidden md:block text-sm text-gray-500 pb-1.5 font-mono">// Major builds & installations</p>
-                        </div>
-
-                        <BentoGrid className="lg:grid-rows-3">
-                            {item.projects?.map((project, i) => {
-                                // Determine span based on index for interesting layout
-                                // First item = large square (2x2), others regular
-                                let className = "";
-                                if (i === 0) className = "lg:row-span-2 lg:col-span-2";
-                                else className = "lg:col-span-1 lg:row-span-1";
-
-                                return (
-                                    <BentoCard
-                                        key={project.id}
-                                        name={project.title}
-                                        className={className}
-                                        background={
-                                            <div className="absolute inset-0 z-0 transition-opacity duration-300 opacity-60 group-hover:opacity-40">
-                                                {project.videoUrl ? (
-                                                    // For now just use image if available, or a gradient if not
-                                                    project.imageUrl ? <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
-                                                        : <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800" />
-                                                ) : (
-                                                    project.imageUrl ? <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
-                                                        : <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800" />
-                                                )}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                            </div>
-                                        }
-                                        Icon={() => null}
-                                        description={project.description}
-                                        href={project.link || "#"}
-                                        cta="View Project"
-                                    />
-                                )
-                            })}
-                        </BentoGrid>
-                    </section>
+                    {/* Section 1: Projects */}
+                    <ProjectsInModal activeProject={activeProject} setActiveProject={setActiveProject} />
 
 
                     {/* Section 2: The Archive (Marquee Feed) */}
@@ -116,6 +116,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
         </div>
     );
 };
+
 
 const SocialGrid: React.FC<{ posts: SocialPost[] }> = ({ posts }) => {
     const maxLikes = Math.max(...posts.map(p => p.likes));

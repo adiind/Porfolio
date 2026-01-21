@@ -73,6 +73,7 @@ const App: React.FC = () => {
     setExpandedCardId(prev => prev === cardId ? null : cardId);
   }, []);
 
+
   // 1. Handle Zoom Transitions - simplified
   const handleZoom = useCallback((targetMode: TimelineMode) => {
     if (isAnimatingRef.current || mode === targetMode) return;
@@ -110,6 +111,24 @@ const App: React.FC = () => {
     }, 550);
   }, [isAnimating, mode]);
 
+  // Listen for openProject events from skill cards in Hero
+  useEffect(() => {
+    const handleOpenProject = (e: CustomEvent<{ id: string; type: 'project' | 'experience' }>) => {
+      const { id } = e.detail;
+
+      // Find the timeline item by id
+      const timelineItem = TIMELINE_DATA.find(item => item.id === id);
+
+      if (timelineItem) {
+        // Open the experience/project detail modal
+        setActiveProject(timelineItem);
+      }
+    };
+
+    window.addEventListener('openProject', handleOpenProject as EventListener);
+    return () => window.removeEventListener('openProject', handleOpenProject as EventListener);
+  }, [handleZoom]);
+
   const handleManualZoom = (direction: 'in' | 'out') => {
     setMode('normal'); // Switch to normal mode on manual zoom
     setPixelsPerMonth(prev => {
@@ -125,19 +144,21 @@ const App: React.FC = () => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
 
       // Scroll down from intro → go to fit (collapsed view)
-      if (mode === 'intro' && e.deltaY > 5) {
+      // Balanced threshold (deltaY > 15) - prevents accidental triggers but responsive to intentional scrolls
+      if (mode === 'intro' && e.deltaY > 15) {
         handleZoom('fit');
         return;
       }
 
       // Scroll down from fit → go to normal (expanded timeline)
-      if (mode === 'fit' && e.deltaY > 5) {
+      // Balanced threshold (deltaY > 15) - prevents accidental triggers but responsive to intentional scrolls
+      if (mode === 'fit' && e.deltaY > 15) {
         handleZoom('normal');
         return;
       }
 
       // Scroll up from fit → go back to intro
-      if (mode === 'fit' && e.deltaY < -5) {
+      if (mode === 'fit' && e.deltaY < -15) {
         handleZoom('intro');
         return;
       }
@@ -576,7 +597,7 @@ const App: React.FC = () => {
       <AnimatePresence>
         {activeProject && (
           <ExperienceDetail
-            item={activeProject}
+            item={richProject ? { ...activeProject, ...richProject } as TimelineItem : activeProject}
             onClose={() => setActiveProject(null)}
             onOpenCaseStudy={setActiveCaseStudy}
           />

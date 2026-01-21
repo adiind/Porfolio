@@ -52,7 +52,7 @@ export interface TimelineItem {
   companyUrl?: string; // Optional URL for company/competition
   headline?: string; // Brief one-liner visible before hover
   type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project';
-  subtype?: 'role' | 'post';
+  subtype?: 'role' | 'post' | 'project';
   start: string; // YYYY-MM-DD
   end: string;   // YYYY-MM-DD
   summary: string;

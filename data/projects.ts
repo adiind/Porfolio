@@ -11,6 +11,7 @@ import solopumpData from './projects/solopump.json';
 import heliosData from './projects/helios.json';
 import jarvisData from './projects/jarvis.json';
 import plotterData from './projects/plotter.json';
+import portfolioWebsiteData from './projects/portfolio-website.json';
 
 // Combine all projects
 export const PROJECTS: Project[] = [
@@ -19,6 +20,7 @@ export const PROJECTS: Project[] = [
     heliosData as Project,
     jarvisData as Project,
     plotterData as Project,
+    portfolioWebsiteData as Project,
 ];
 
 export default PROJECTS;
