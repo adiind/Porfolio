@@ -42,12 +42,13 @@ const ProjectsSection: React.FC = () => {
                     {/* Projects Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {PROJECTS.map((project, index) => (
-                            <ProjectCard
-                                key={project.id}
-                                project={project}
-                                index={index}
-                                onClick={() => setActiveProject(project)}
-                            />
+                            <div key={project.id} data-project-id={project.id}>
+                                <ProjectCard
+                                    project={project}
+                                    index={index}
+                                    onClick={() => setActiveProject(project)}
+                                />
+                            </div>
                         ))}
 
                         {/* Coming Soon Placeholder Cards */}
