@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
 import {
@@ -6,6 +6,7 @@ import {
     Lightbulb, Wrench, Scale, Trophy, Sparkles
 } from 'lucide-react';
 import { Project } from '../types/Project';
+import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
 
 interface Props {
     project: Project;
@@ -31,6 +32,7 @@ const splashColors = [
 const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const colors = colorMap[project.themeColor || 'amber'];
     const statusLabels: Record<string, string> = { 'shipped': 'Shipped', 'in-progress': 'In Progress', 'archived': 'Archived', 'concept': 'Concept' };
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     return (
         <motion.div
@@ -59,15 +61,23 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                 document.body
             )}
 
+            {/* Scroll Tracker */}
+            <ScrollTracker
+                sections={projectDetailSections}
+                containerRef={scrollContainerRef}
+                accentColor={project.themeColor || 'amber'}
+            />
+
             {/* Main Content - Regular Scroll */}
             <div
+                ref={scrollContainerRef}
                 className="relative z-10 h-full overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 pt-24 md:pt-32 pb-16">
+                <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-24 md:pt-32 pb-16">
 
                     {/* ===== HERO SECTION ===== */}
-                    <section className="mb-16">
+                    <section id="section-hero" className="mb-16">
                         <span className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-full ${colors.accentLight} ${colors.accentText} border ${colors.accentBorder} w-fit mb-6`}>
                             <Trophy size={16} />
                             {statusLabels[project.outcome.status]}
@@ -102,7 +112,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                     <section className="mb-16">
                         <div className="grid md:grid-cols-2 gap-8 mb-10">
                             {/* Story */}
-                            <div>
+                            <div id="section-story">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                         <Lightbulb size={20} className={colors.accentText} />
@@ -115,7 +125,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                             </div>
 
                             {/* Build */}
-                            <div>
+                            <div id="section-build">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                         <Wrench size={20} className={colors.accentText} />
@@ -136,7 +146,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         </div>
 
                         {/* Decisions */}
-                        <div>
+                        <div id="section-decisions">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                     <Scale size={20} className={colors.accentText} />
@@ -162,7 +172,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                     {/* ===== LEARNINGS + OUTCOME SECTION ===== */}
                     <section className="mb-16">
                         {/* Learnings */}
-                        <div className="grid md:grid-cols-2 gap-8 mb-10">
+                        <div id="section-learnings" className="grid md:grid-cols-2 gap-8 mb-10">
                             <div>
                                 <h3 className="flex items-center gap-2 text-emerald-400 font-bold mb-4 text-lg">
                                     <Check size={18} />
@@ -192,7 +202,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         </div>
 
                         {/* Outcome */}
-                        <div className="mb-10">
+                        <div id="section-outcome" className="mb-10">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                     <Trophy size={20} className={colors.accentText} />
@@ -205,7 +215,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         </div>
 
                         {/* Reflection */}
-                        <div className="pt-8 border-t border-white/10">
+                        <div id="section-reflection" className="pt-8 border-t border-white/10">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                     <Sparkles size={20} className={colors.accentText} />

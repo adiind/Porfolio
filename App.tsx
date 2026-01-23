@@ -114,20 +114,57 @@ const App: React.FC = () => {
   // Listen for openProject events from skill cards in Hero
   useEffect(() => {
     const handleOpenProject = (e: CustomEvent<{ id: string; type: 'project' | 'experience' }>) => {
-      const { id } = e.detail;
+      const { id, type } = e.detail;
 
-      // Find the timeline item by id
-      const timelineItem = TIMELINE_DATA.find(item => item.id === id);
-
-      if (timelineItem) {
-        // Open the experience/project detail modal
-        setActiveProject(timelineItem);
+      // For experiences, open the timeline modal directly
+      if (type === 'experience') {
+        const timelineItem = TIMELINE_DATA.find(item => item.id === id);
+        if (timelineItem) {
+          setActiveProject(timelineItem);
+        }
+        return;
       }
+
+      // For projects, scroll to the Selected Work section and click the project card
+      // First ensure we're in normal mode so the projects section is visible
+      if (mode === 'intro') {
+        handleZoom('normal');
+      }
+
+      // Wait for mode transition and scroll to the project
+      setTimeout(() => {
+        const projectCard = document.querySelector(`[data-project-id="${id}"]`);
+        const projectsSection = document.getElementById('projects');
+
+        if (projectCard && scrollContainerRef.current) {
+          // Scroll to the projects section first
+          const container = scrollContainerRef.current;
+          if (projectsSection) {
+            container.scrollTo({
+              top: projectsSection.offsetTop - 100,
+              behavior: 'smooth'
+            });
+          }
+
+          // After scroll completes, highlight and click the card
+          setTimeout(() => {
+            projectCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Add a brief highlight effect and then click
+            setTimeout(() => {
+              const clickableCard = projectCard.querySelector('[class*="cursor-pointer"]') as HTMLElement;
+              if (clickableCard) {
+                clickableCard.click();
+              }
+            }, 400);
+          }, 500);
+        }
+      }, mode === 'intro' ? 600 : 100);
     };
 
     window.addEventListener('openProject', handleOpenProject as EventListener);
     return () => window.removeEventListener('openProject', handleOpenProject as EventListener);
-  }, [handleZoom]);
+  }, [handleZoom, mode]);
 
   const handleManualZoom = (direction: 'in' | 'out') => {
     setMode('normal'); // Switch to normal mode on manual zoom
