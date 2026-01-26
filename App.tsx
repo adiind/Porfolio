@@ -188,8 +188,16 @@ const App: React.FC = () => {
         return;
       }
 
-      // NO AUTOMATIC TRANSITION BACK TO INTRO
       // NO AUTOMATIC TRANSITION TO NORMAL MODE
+
+      // Scroll up from timeline top → go to intro
+      if ((mode === 'fit' || mode === 'normal') && scrollContainerRef.current) {
+        // If at top and scrolling up (negative deltaY)
+        if (scrollContainerRef.current.scrollTop <= 5 && e.deltaY < -20) {
+          handleZoom('intro');
+          return;
+        }
+      }
     };
 
     // Touch support for mobile
@@ -206,6 +214,15 @@ const App: React.FC = () => {
       if (mode === 'intro' && deltaY > 30) {
         handleZoom('fit');
         return;
+      }
+
+      // Swipe down from timeline top → go to intro
+      if ((mode === 'fit' || mode === 'normal') && scrollContainerRef.current) {
+        // If at top and swiping down (negative deltaY)
+        if (scrollContainerRef.current.scrollTop <= 5 && deltaY < -50) {
+          handleZoom('intro');
+          return;
+        }
       }
     };
 
