@@ -175,7 +175,8 @@ const App: React.FC = () => {
     });
   };
 
-  // 2. Scroll Logic - Two-step scroll flow: intro → fit → normal
+  // 2. Scroll Logic - RESTORED BUT MODIFIED
+  // Intro -> Fit is scrollable. Fit -> Intro is MANUAL. Fit -> Normal is MANUAL.
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
@@ -187,24 +188,8 @@ const App: React.FC = () => {
         return;
       }
 
-      // Scroll down from fit → go to normal (expanded timeline)
-      // Balanced threshold (deltaY > 15) - prevents accidental triggers but responsive to intentional scrolls
-      if (mode === 'fit' && e.deltaY > 15) {
-        handleZoom('normal');
-        return;
-      }
-
-      // Scroll up from fit → go back to intro
-      if (mode === 'fit' && e.deltaY < -15) {
-        handleZoom('intro');
-        return;
-      }
-
-      // Scroll up from normal → go back to fit (when at top)
-      if (mode === 'normal' && e.deltaY < -10 && scrollContainerRef.current && scrollContainerRef.current.scrollTop <= 5) {
-        handleZoom('fit');
-        return;
-      }
+      // NO AUTOMATIC TRANSITION BACK TO INTRO
+      // NO AUTOMATIC TRANSITION TO NORMAL MODE
     };
 
     // Touch support for mobile
@@ -222,18 +207,6 @@ const App: React.FC = () => {
         handleZoom('fit');
         return;
       }
-
-      // Swipe up from fit → go to normal
-      if (mode === 'fit' && deltaY > 30) {
-        handleZoom('normal');
-        return;
-      }
-
-      // Swipe down from fit → go back to intro
-      if (mode === 'fit' && deltaY < -30) {
-        handleZoom('intro');
-        return;
-      }
     };
 
     window.addEventListener('wheel', handleGlobalWheel, { passive: true });
@@ -246,7 +219,9 @@ const App: React.FC = () => {
     };
   }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, handleZoom]);
 
-  // Scroll-back to intro: Hybrid approach - track scroll direction + position with smart debouncing
+
+  // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
+  // but strictly checking boundaries to avoid annoyance.
   const scrollBackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollTopRef = useRef<number>(0);
   const scrollStartTimeRef = useRef<number>(0);
@@ -272,108 +247,20 @@ const App: React.FC = () => {
       // Reset scroll start time if scrolling down
       if (!wasScrollingUp) {
         scrollStartTimeRef.current = 0;
-        if (scrollBackTimeoutRef.current) {
-          clearTimeout(scrollBackTimeoutRef.current);
-          scrollBackTimeoutRef.current = null;
-        }
+        if (scrollBackTimeoutRef.current) clearTimeout(scrollBackTimeoutRef.current);
         return;
       }
 
-      // Only proceed if at/near top and conditions are met
-      if (currentScrollTop >= 1 || isAnimatingRef.current || (modeRef.current !== 'normal' && modeRef.current !== 'fit')) {
-        scrollStartTimeRef.current = 0;
-        if (scrollBackTimeoutRef.current) {
-          clearTimeout(scrollBackTimeoutRef.current);
-          scrollBackTimeoutRef.current = null;
-        }
-        return;
-      }
-
-      // We're scrolling up and at/near top - track when we FIRST reached top
-      if (scrollStartTimeRef.current === 0) {
-        scrollStartTimeRef.current = Date.now();
-      }
-
-      // Clear existing timeout
-      if (scrollBackTimeoutRef.current) {
-        clearTimeout(scrollBackTimeoutRef.current);
-      }
-
-      // Set new timeout - waits for scroll to settle at top
-      scrollBackTimeoutRef.current = setTimeout(() => {
-        // Final check before triggering
-        const finalScrollTop = container.scrollTop;
-        const timeAtTop = Date.now() - scrollStartTimeRef.current;
-
-        if (finalScrollTop < 1 && !isAnimatingRef.current && modeRef.current === 'normal') {
-          // Require at least 200ms at top to avoid accidental triggers on fast scrolls
-          if (timeAtTop >= 200) {
-            // Scroll up from normal → go to fit (collapsed view)
-            handleZoom('fit');
-          }
-        }
-
-        // Reset
-        scrollBackTimeoutRef.current = null;
-        scrollStartTimeRef.current = 0;
-      }, 300); // Wait 300ms after last scroll event at top
+      // If we are in 'fit' mode, we might want to go back to 'intro' if we keep scrolling up? 
+      // Handled by global wheel listener mostly, but let's ensure we don't trap.
     };
 
+    // We only restore the basic listeners if needed, but for now the global wheel matches user request best.
+    // Leaving this simplified/empty to avoid conflicting logic.
     container.addEventListener('scroll', handleScrollBack, { passive: true });
+    return () => container.removeEventListener('scroll', handleScrollBack);
+  }, []);
 
-    // Also handle gentle wheel scrolls at top for immediate feedback
-    const handleWheelAtTop = (e: WheelEvent) => {
-      if (isAnimatingRef.current || modeRef.current === 'intro') return;
-      if (container.scrollTop > 1) return; // Must be at top
-      if (e.deltaY >= -20) return; // Only gentle scroll up (avoid momentum flings)
-
-      // For gentle scrolls at top, allow immediate trigger (normal → fit)
-      if (!scrollBackTimeoutRef.current && !isAnimatingRef.current && modeRef.current === 'normal') {
-        e.preventDefault();
-        handleZoom('fit');
-      }
-    };
-
-    // Touch support for scroll-back on mobile (normal → fit, fit → intro)
-    let touchStartYBack = 0;
-    const handleTouchStartBack = (e: TouchEvent) => {
-      // Track touch start for both near top (normal mode) and fit mode
-      if (container.scrollTop < 5 || modeRef.current === 'fit') {
-        touchStartYBack = e.touches[0].clientY;
-      }
-    };
-    const handleTouchMoveBack = (e: TouchEvent) => {
-      if (isAnimatingRef.current || modeRef.current === 'intro') return;
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchY - touchStartYBack; // Positive = swiping down (pulling to go back)
-
-      // From fit mode → go back to intro
-      if (modeRef.current === 'fit' && deltaY > 50) {
-        handleZoom('intro');
-        return;
-      }
-
-      // From normal mode at top → go back to fit
-      if (modeRef.current === 'normal' && container.scrollTop < 5 && deltaY > 50) {
-        handleZoom('fit');
-        return;
-      }
-    };
-
-    container.addEventListener('wheel', handleWheelAtTop, { passive: false });
-    container.addEventListener('touchstart', handleTouchStartBack, { passive: true });
-    container.addEventListener('touchmove', handleTouchMoveBack, { passive: true });
-
-    return () => {
-      container.removeEventListener('scroll', handleScrollBack);
-      container.removeEventListener('wheel', handleWheelAtTop);
-      container.removeEventListener('touchstart', handleTouchStartBack);
-      container.removeEventListener('touchmove', handleTouchMoveBack);
-      if (scrollBackTimeoutRef.current) {
-        clearTimeout(scrollBackTimeoutRef.current);
-      }
-    };
-  }, [handleZoom]); // Only depend on handleZoom, use ref for mode
 
 
   // Throttled scroll handler for better performance
