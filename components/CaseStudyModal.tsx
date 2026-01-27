@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote, ExternalLink } from 'lucide-react';
 import { CaseStudy } from '../types';
 
 interface Props {
@@ -62,7 +62,7 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 p-8 md:p-12 flex flex-col"
+              className="absolute inset-0 p-8 md:p-12 flex flex-col overflow-y-auto"
             >
               {renderSlide(slides[currentSlide], tc)}
             </motion.div>
@@ -324,8 +324,8 @@ const renderSlide = (slide: any, tc: any) => {
 
     case 'impact':
       return (
-        <div className="flex flex-col h-full justify-center">
-          <div className={`${tc.text} font-black text-4xl uppercase tracking-tighter leading-none mb-12 border-l-8 ${tc.border} pl-6`}>
+        <div className="flex flex-col min-h-full justify-center py-12">
+          <div className={`${tc.text} font-black text-4xl uppercase tracking-tighter leading-none mb-8 border-l-8 ${tc.border} pl-6`}>
             Media <br /> Coverage
           </div>
           <div className="space-y-8 max-w-3xl">
@@ -336,7 +336,38 @@ const renderSlide = (slide: any, tc: any) => {
               </div>
             ))}
           </div>
-        </div>
+          {
+            slide.content.articles && slide.content.articles.length > 0 && (
+              <div className={`mt-8 pt-8 border-t border-gray-100 w-full max-w-3xl`}>
+                <h4 className={`text-xs font-bold uppercase tracking-widest text-gray-400 mb-4`}>Further Reading</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {slide.content.articles.map((article: any, i: number) => (
+                    <a
+                      key={i}
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`group block bg-gray-50 hover:bg-white border border-gray-100 hover:${tc.border} p-6 rounded-xl transition-all duration-300 hover:shadow-lg`}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div className={`p-2 bg-white rounded-lg shadow-sm group-hover:${tc.bg} group-hover:text-white transition-colors duration-300`}>
+                          <Newspaper size={20} />
+                        </div>
+                        <ExternalLink size={16} className="text-gray-400 group-hover:text-gray-600" />
+                      </div>
+                      <h5 className="font-bold text-gray-900 mb-2 leading-tight group-hover:text-gray-900 transition-colors">
+                        {article.title}
+                      </h5>
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-500">
+                        {article.source}
+                      </p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+        </div >
       );
 
     default:
