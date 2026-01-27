@@ -34,6 +34,28 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const statusLabels: Record<string, string> = { 'shipped': 'Shipped', 'in-progress': 'In Progress', 'archived': 'Archived', 'concept': 'Concept' };
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+    // 1. History Management for Browser Back Button
+    React.useEffect(() => {
+        // Push a new state when the modal opens
+        window.history.pushState({ modal: 'project' }, '', window.location.href);
+
+        const handlePopState = (event: PopStateEvent) => {
+            // When user clicks back, close the modal
+            onClose();
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [onClose]);
+
+    // 2. Manual Close Handler
+    const handleManualClose = () => {
+        window.history.back();
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -41,7 +63,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden"
-            onClick={onClose}
+            onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -52,7 +74,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             {/* Close Button */}
             {ReactDOM.createPortal(
                 <button
-                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
                     className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 shadow-2xl"
                 >
                     <X size={20} strokeWidth={2.5} />
@@ -72,9 +94,11 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             <div
                 ref={scrollContainerRef}
                 className="relative z-10 h-full overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
             >
-                <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-24 md:pt-32 pb-16">
+                <div
+                    className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-24 md:pt-32 pb-16"
+                    onClick={(e) => e.stopPropagation()}
+                >
 
                     {/* ===== HERO SECTION ===== */}
                     <section id="section-hero" className="mb-16">

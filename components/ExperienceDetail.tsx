@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, ScrollText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TimelineItem, CaseStudy, FeatureCard } from '../types';
@@ -45,13 +46,38 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
     };
     const accent = getAccentColor();
 
+    // 1. History Management for Browser Back Button
+    useEffect(() => {
+        // Push a new state when the modal opens
+        window.history.pushState({ modal: 'experience' }, '', window.location.href);
+
+        const handlePopState = (event: PopStateEvent) => {
+            // When user clicks back, close the modal
+            onClose();
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            // We rely on the user's action to pop the state (by clicking back)
+            // Or if we close manually, we pop it ourselves in handleManualClose
+        };
+    }, [onClose]);
+
+    // 2. Manual Close Handler (Close Button or Backdrop)
+    const handleManualClose = () => {
+        window.history.back();
+        // The popstate listener will trigger onClose
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden"
-            onClick={onClose}
+            className="fixed inset-0 z-[45] bg-black/95 backdrop-blur-xl overflow-hidden"
+            onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -60,15 +86,18 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
             </div>
 
             {/* Close Button */}
-            <motion.button
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={(e) => { e.stopPropagation(); onClose(); }}
-                className="fixed top-4 right-4 md:top-6 md:right-6 z-[200] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold transition-all hover:bg-gray-100 shadow-2xl"
-            >
-                <X size={20} strokeWidth={2.5} />
-                <span className="text-sm">Close</span>
-            </motion.button>
+            {ReactDOM.createPortal(
+                <motion.button
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
+                    className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold transition-all hover:bg-gray-100 shadow-2xl"
+                >
+                    <X size={20} strokeWidth={2.5} />
+                    <span className="text-sm">Close</span>
+                </motion.button>,
+                document.body
+            )}
 
             {/* Main Content */}
             <motion.div
@@ -77,9 +106,13 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                 exit={{ y: 30, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="relative z-10 h-full overflow-y-auto custom-scrollbar"
-                onClick={(e) => e.stopPropagation()}
+            // No onClick listener here that stops propagation generically
+            // We want creating a specific container for the content that stops propagation
             >
-                <div className="max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-16">
+                <div
+                    className="max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-16"
+                    onClick={(e) => e.stopPropagation()} // Stop clicks on content from closing modal
+                >
 
                     {/* Hero Section: Compact Layout with Image on Right */}
                     <div className="relative mb-8 -mx-6 md:-mx-12 px-6 md:px-12 rounded-t-3xl overflow-hidden">
@@ -411,83 +444,108 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] relative"
             >
-                {/* Header with visual flare or Image */}
-                <div className="relative h-48 flex items-end p-6 md:p-8 overflow-hidden shrink-0">
-                    {card.imageUrl ? (
-                        <>
-                            <img
-                                src={card.imageUrl}
-                                alt={card.title}
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-                        </>
-                    ) : (
-                        <div className={`absolute inset-0 bg-gradient-to-r from-${accent}-900/50 to-indigo-900/50`}>
-                            <div className="absolute inset-0 bg-grid-white/[0.05]" />
-                        </div>
-                    )}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white/70 hover:text-white transition-colors backdrop-blur-sm z-50"
+                >
+                    <X size={20} />
+                </button>
 
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white/70 hover:text-white transition-colors backdrop-blur-sm z-20"
-                    >
-                        <X size={20} />
-                    </button>
-
-                    <div className="relative z-10 w-full">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg">{card.title}</h2>
-                                <p className={`text-${accent}-300 font-medium text-sm md:text-base drop-shadow-md`}>{card.subtitle}</p>
+                <div className="overflow-y-auto custom-scrollbar flex-1">
+                    {/* Header with visual flare or Image */}
+                    <div className="relative h-[450px] flex items-end px-6 pt-6 pb-2 md:px-8 md:pt-8 md:pb-2 overflow-hidden">
+                        {card.imageUrl ? (
+                            <>
+                                <img
+                                    src={card.imageUrl}
+                                    alt={card.title}
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+                            </>
+                        ) : (
+                            <div className={`absolute inset-0 bg-gradient-to-r from-${accent}-900/50 to-indigo-900/50`}>
+                                <div className="absolute inset-0 bg-grid-white/[0.05]" />
                             </div>
-                            {!card.imageUrl && (
-                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${accent}-500 to-indigo-500 opacity-20 hidden md:block`} />
-                            )}
+                        )}
+
+                        <div className="relative z-10 w-full">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg">{card.title}</h2>
+                                    <p className={`text-${accent}-300 font-medium text-sm md:text-base drop-shadow-md`}>{card.subtitle}</p>
+                                </div>
+                                {!card.imageUrl && (
+                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${accent}-500 to-indigo-500 opacity-20 hidden md:block`} />
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Content */}
-                <div className="p-6 md:p-8 overflow-y-auto">
-                    {/* Summary */}
-                    <div className="mb-8">
-                        <p className="text-lg text-white/80 leading-relaxed font-light">
-                            {card.expandedSummary || card.summary}
-                        </p>
-                    </div>
-
-                    {/* Pills */}
-                    {card.pills && card.pills.length > 0 && (
+                    {/* Content */}
+                    <div className="p-6 md:p-8">
+                        {/* Summary */}
                         <div className="mb-8">
-                            <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Technologies & Skills</h4>
-                            <div className="flex flex-wrap gap-2">
-                                {card.pills.map((pill, i) => (
-                                    <SkillPill key={i} label={pill.label} description={pill.description} />
-                                ))}
-                            </div>
+                            <p className="text-lg text-white/80 leading-relaxed font-light">
+                                {card.expandedSummary || card.summary}
+                            </p>
                         </div>
-                    )}
 
-                    {/* Key Details / Bullets */}
-                    {card.details && card.details.length > 0 && (
-                        <div>
-                            <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Key Responsibilities & Impact</h4>
-                            <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-                                {card.details.map((detail, i) => (
-                                    <div key={i} className="p-4 border-b border-white/5 last:border-0 flex items-start gap-3 hover:bg-white/[0.02] transition-colors">
-                                        <div className={`w-1.5 h-1.5 rounded-full bg-${accent}-500 mt-2 shrink-0`} />
-                                        <p className="text-sm text-white/70 leading-relaxed">{detail}</p>
-                                    </div>
-                                ))}
+                        {/* Pills */}
+                        {card.pills && card.pills.length > 0 && (
+                            <div className="mb-8">
+                                <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Technologies & Skills</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {card.pills.map((pill, i) => (
+                                        <SkillPill key={i} label={pill.label} description={pill.description} />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+
+                        {/* Key Details / Bullets */}
+                        {card.details && card.details.length > 0 && (
+                            <div>
+                                <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Key Responsibilities & Impact</h4>
+                                <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+                                    {card.details.map((detail, i) => (
+                                        <div key={i} className="p-4 border-b border-white/5 last:border-0 flex items-start gap-3 hover:bg-white/[0.02] transition-colors">
+                                            <div className={`w-1.5 h-1.5 rounded-full bg-${accent}-500 mt-2 shrink-0`} />
+                                            <p className="text-sm text-white/70 leading-relaxed">{detail}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Project Links */}
+                        {card.projectLinks && card.projectLinks.length > 0 && (
+                            <div className="mt-8 pt-8 border-t border-white/10">
+                                <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Project Links</h4>
+                                <div className="flex flex-col gap-3">
+                                    {card.projectLinks.map((link, i) => (
+                                        <a
+                                            key={i}
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-${accent}-500/50 hover:bg-white/[0.08] transition-all group/link`}
+                                        >
+                                            <span className="text-sm font-medium text-white/80 group-hover/link:text-white transition-colors">
+                                                {link.label}
+                                            </span>
+                                            <ExternalLink size={16} className={`text-white/40 group-hover/link:text-${accent}-400 transition-colors`} />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </motion.div>
-        </div>
+            </motion.div >
+        </div >
     );
 };
 

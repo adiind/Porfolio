@@ -129,7 +129,8 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "A/B Testing", description: "Statistical experiment design and analysis." },
           { label: "ML-Model Feedback", description: "Translating user behavior into ranking model improvements." },
           { label: "UI Behavior Interpretation", description: "Understanding user intent from interface interactions." }
-        ]
+        ],
+        imageUrl: "/images/zomato_homepage.png"
       },
       {
         title: "Friends Recommendation",
@@ -142,6 +143,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Influence Patterns", description: "Tracking when one user's order triggers another's." },
           { label: "Cohort Behaviour", description: "Comparing connected vs. unconnected user groups over time." }
         ],
+        imageUrl: "/images/zomato_friends.png",
         details: [
           "Defined how social signals should trigger and where they should appear",
           "Interpreted influence patterns across connected user groups"
@@ -151,6 +153,10 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Behavioral Segmentation", description: "Grouping users by behavioral patterns for targeted features." },
           { label: "Feature Prioritization", description: "Ranking feature variations by impact potential." },
           { label: "PM Partnership", description: "Collaborating closely with product managers on decisions." }
+        ],
+        projectLinks: [
+          { label: "ImpactOnNet Article", url: "https://www.impactonnet.com/more-from-impact/zomato-launches-recommendations-from-friends-feature-9479.html" },
+          { label: "MediaNama Article", url: "https://www.medianama.com/2025/10/223-loved-by-friends-feature-zomato-private-food-choices-public-data/" }
         ]
       },
       {
@@ -174,7 +180,11 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "SKU-Level Modeling", description: "Building item-level demand and supply models." },
           { label: "Demand Triggers", description: "Identifying what drives purchase decisions." }
         ],
-        imageUrl: "/images/food_rescue.png"
+        imageUrl: "/images/food_rescue.png",
+        projectLinks: [
+          { label: "Zomato Blog", url: "https://www.zomato.com/blog/food-rescue/" },
+          { label: "Green Queen Article", url: "https://www.greenqueen.com.hk/zomato-food-rescue-waste-climate-conscious-delivery-india/" }
+        ]
       }
     ],
     caseStudy: {
@@ -224,6 +234,18 @@ export const TIMELINE_DATA: TimelineItem[] = [
               { text: "Zomato has a new plan to stop food wastage, and how this 'Flash Sale' is good news for users.", source: "Times of India" },
               { text: "Zomato Launches 'Rescue' Service To Combat Food Wastage. How Does It Work?", source: "NDTV" },
               { text: "Zomato introduces Food Rescue initiative to reduce food wastage", source: "Verdict Foodservice" }
+            ],
+            articles: [
+              {
+                title: "Zomato Launches Recommendations From Friends Feature",
+                source: "ImpactOnNet",
+                url: "https://www.impactonnet.com/more-from-impact/zomato-launches-recommendations-from-friends-feature-9479.html"
+              },
+              {
+                title: "Loved by Friends Feature: Zomato Private Food Choices Public Data",
+                source: "MediaNama",
+                url: "https://www.medianama.com/2025/10/223-loved-by-friends-feature-zomato-private-food-choices-public-data/"
+              }
             ]
           }
         }
@@ -313,6 +335,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           { label: "JIT Supply", description: "Just In Time, inventory is ordered only when demand occurs, reducing cost but increasing risk." },
           { label: "Warehousing", description: "Holding inventory in advance of demand in order to reduce delivery time and protect against supply uncertainty." }
         ],
+        imageUrl: "/images/udaan_supply_chain.png",
         details: [
           "Automated procurement actions that previously required manual reconciliation",
           "Defined supply-chain decision metrics adopted by operations leadership"
@@ -335,6 +358,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           { label: "Mixpanel-Style Analytics", description: "Event-level product usage signals rather than surface-level pageviews." },
           { label: "Repeat-Purchase", description: "Recurring orders indicating product-market fit for essentials." }
         ],
+        imageUrl: "/images/udaan_wondermart.png",
         details: [
           "Led weekly roadmap prioritization with dev team",
           "Drove UX fixes based on funnel-stage loss"
@@ -356,6 +380,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           { label: "Team Enablement", description: "Data access made part of standard workflow." },
           { label: "Product-Led Decisions", description: "Decisions made where product is built, not in BI." }
         ],
+        imageUrl: "/images/udaan_percept.png",
         details: [
           "Created dashboard patterns reused across product teams",
           "Trained non-technical users to self-serve data"
@@ -524,6 +549,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           { label: "CPT", description: "Cost Per Transaction. Advertisers pay a commission only when a sale occurs." },
           { label: "Banner Ads", description: "High-visibility visual placements on the homepage and category pages." }
         ],
+        imageUrl: "/images/snapdeal_ads.png",
         details: [
           "End-to-end ownership of data pipelines powering seller ads analytics",
           "Defining and maintaining core performance metrics beyond surface-level CTR",
@@ -548,6 +574,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           { label: "Procurement", description: "Automated purchasing workflows and supplier management systems." },
           { label: "Inventory", description: "Real-time stock tracking and SKU-level availability analysis." }
         ],
+        imageUrl: "/images/snapdeal_warehousing.png",
         details: [
           "Working on analytics for Snapdeal-owned inventory instead of pure seller fulfillment",
           "Supporting automated procurement and inventory tracking workflows",

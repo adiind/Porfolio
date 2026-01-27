@@ -207,7 +207,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
 
   return (
-    <div className="relative flex flex-col items-center justify-start h-full w-full pointer-events-none pt-8 md:pt-6">
+    <div className="relative flex flex-col items-center justify-between h-full w-full pointer-events-none py-12 md:py-16">
 
       {/* HERO TEXT BLOCK - Compact, one thought */}
       <div className={`relative z-50 w-full max-w-[700px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
@@ -218,46 +218,17 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="text-center"
         >
-          {/* Primary Headline - No "Hi I'm Adi", name comes below */}
-          <h1 className="text-lg md:text-xl lg:text-2xl font-normal text-white/95 leading-snug tracking-tight mb-2">
-            A human-centered, data-driven product designer and maker.
-          </h1>
-
-          {/* Secondary Descriptor - Tighter gap */}
-          <p className="text-base md:text-lg text-white/45 font-light mb-3">
-            Blending design thinking with hands-on development.
+          <h2 className="text-5xl md:text-7xl font-light tracking-tight text-white/95 mb-1">
+            Adi <span className="font-normal">Agarwal</span>
+          </h2>
+          <p className="text-[10px] md:text-xs text-white/35 uppercase tracking-[0.25em] font-normal mb-0">
+            Product · Engineering · Data · Design
           </p>
-
-          {/* Keyword Chips - Demoted to annotations, almost invisible */}
-          <div className="flex flex-wrap justify-center gap-1.5 mb-2">
-            {keywords.map((keyword) => (
-              <div
-                key={keyword.id}
-                className="relative group"
-                onMouseEnter={() => setHoveredKeyword(keyword.id)}
-                onMouseLeave={() => setHoveredKeyword(null)}
-              >
-                <span className="px-2 py-0.5 text-[10px] md:text-xs text-white/35 font-normal cursor-default transition-all duration-200 hover:text-white/70 inline-block">
-                  {keyword.label}
-                </span>
-
-                {/* Tooltip */}
-                <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-neutral-900 border border-white/10 rounded text-[11px] text-white/60 w-52 text-center transition-all duration-200 pointer-events-none z-50 ${hoveredKeyword === keyword.id ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
-                  {keyword.description}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Status only - CTA moved below avatar */}
-          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/25 font-normal">
-            Open for Summer 2026 Internships
-          </span>
         </motion.div>
       </div>
 
       {/* VISUAL ELEMENT - Secondary */}
-      <div className={`relative mt-0 md:mt-2 w-[360px] h-[360px] md:w-[480px] md:h-[480px] flex items-center justify-center transition-all duration-500 ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>
+      <div className={`relative w-[360px] h-[360px] md:w-[480px] md:h-[480px] flex items-center justify-center transition-all duration-500 ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>
 
         {/* Radial Orbital Timeline with Skills */}
         <RadialOrbitalTimeline
@@ -401,7 +372,6 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                   </div>
                 </motion.div>
 
-                {/* Close Button */}
                 <button
                   className="absolute -top-3 -right-3 z-[999999] p-2.5 bg-white/10 hover:bg-white rounded-full border border-white/20 text-white hover:text-black transition-all cursor-pointer outline-none pointer-events-auto active:scale-95 backdrop-blur-sm"
                   onClick={(e) => {
@@ -429,19 +399,19 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
       {/* Name Display - Now the introduction, hits harder after headline */}
       <motion.div
-        className="mt-4 text-center relative z-20 pointer-events-auto"
+        className="text-center relative z-20 pointer-events-auto max-w-[700px] px-2 md:px-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.6 }}
       >
-        <h2 className="text-5xl md:text-7xl font-light tracking-tight text-white/95 mb-1">
-          Adi <span className="font-normal">Agarwal</span>
-        </h2>
-        <p className="text-[10px] md:text-xs text-white/35 uppercase tracking-[0.25em] font-normal mb-6">
-          Product · Engineering · Data · Design
-        </p>
+        <h1 className="whitespace-nowrap text-[3vw] sm:text-[3.2vw] md:text-xl lg:text-2xl font-normal text-white/95 leading-snug tracking-tighter md:tracking-tight mb-2">
+          A human-centered, data-driven product designer and maker.
+        </h1>
 
 
+        <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/25 font-normal block mb-6">
+          Open for Summer 2026 Internships
+        </span>
       </motion.div>
     </div>
   );

@@ -42,6 +42,7 @@ export interface FeatureCard {
   details: string[]; // Bullet points for open state
   skills?: { label: string; description: string }[]; // Skills with descriptions for this project
   imageUrl?: string; // Optional image for hover view and detail page
+  projectLinks?: { label: string; url: string }[]; // Optional links
 }
 
 export interface TimelineItem {
