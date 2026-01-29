@@ -77,7 +77,35 @@ export const TIMELINE_DATA: TimelineItem[] = [
       { label: "Physical Computing", description: "Building interactive hardware systems." },
       { label: "Figma", description: "Interface design and prototyping tool." }
     ],
-    differentiator: "In an age where technology makes building fast and easy, this program sharpens my ability to decide what is worth building, and refines how I approach making it real."
+    differentiator: "In an age where technology makes building fast and easy, this program sharpens my ability to decide what is worth building, and refines how I approach making it real.",
+    featureCards: [
+      {
+        title: "NUvention: Medical",
+        subtitle: "Biodesign · Healthcare Systems · MedTech",
+        summary: "Identified unmet clinical needs and developed pitch-ready medical concepts through stakeholder interviews and regulatory analysis.",
+        expandedSummary: "Lead a biodesign project from need identification to pitch-ready concept. Conducted primary research with patients and clinicians to define defensible need statements, then evaluated solutions against real-world regulatory, adoption, and feasibility constraints.",
+        imageUrl: "/images/nuvention-medical.jpg",
+        pills: [
+          { label: "Biodesign", description: "End-to-end medical innovation process." },
+          { label: "Clinical Needs", description: "Surfacing unmet needs via stakeholder interviews." },
+          { label: "Regulatory Analysis", description: "Evaluating concepts against FDA/adoption risks." },
+          { label: "MedTech Strategy", description: "Creating pitch-ready concepts for healthcare systems." }
+        ],
+        details: [
+          "Conducted primary stakeholder interviews (patients, clinicians, caregivers) to surface unmet clinical needs",
+          "Built and screened a structured needs list to prioritize problems with real clinical and workflow impact",
+          "Defined a defensible need statement with explicit users, outcomes, and constraints",
+          "Evaluated early concepts against adoption, regulatory, and feasibility risks—not just technical novelty",
+          "Produced a pitch-ready concept grounded in clinical reality and system constraints"
+        ],
+        skills: [
+          { label: "Stakeholder Interviews", description: "Conducting primary research with clinicians and patients." },
+          { label: "Needs Finding", description: "Structuring and prioritizing unmet clinical needs." },
+          { label: "Regulatory Assessment", description: "Evaluating FDA pathways and adoption risks." },
+          { label: "Concept Validation", description: "Testing concepts against system constraints." }
+        ]
+      }
+    ]
   },
   {
     id: "zomato",
