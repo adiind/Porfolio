@@ -27,27 +27,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       { label: "Tailwind", description: "Utility-first styling." }
     ]
   },
-  {
-    id: "pg-project",
-    lane: 1,
-    title: "P&G Design Project",
-    company: "Northwestern",
-    headline: "Innovation strategy for a mature hair-care category.",
-    type: "corporate",
-    subtype: 'role',
-    start: "2025-09-01",
-    end: "2025-12-31",
-    summary: "Exploring innovation in a mature, habit-driven hair-care category. Under NDA.",
-    bullets: [
-      "Worked in a highly saturated hair-care space where users are deeply conditioned to existing formats.",
-      "Studied why meaningful innovation is difficult in categories shaped by routine, expectation, and legacy design.",
-      "Conducted in-home and on-site user research to understand behavior beyond stated needs.",
-      "Built and iterated physical–digital prototypes within real-world brand and manufacturing constraints."
-    ],
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Procter_%26_Gamble_logo.svg/2560px-Procter_%26_Gamble_logo.svg.png",
-    imageUrl: "/images/pg-design-project.jpg",
-    differentiator: "Worked in a category where users already had strong preferences, making meaningful change difficult to introduce."
-  },
+
   {
     id: "ms-edi",
     lane: 0,
@@ -103,6 +83,31 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Needs Finding", description: "Structuring and prioritizing unmet clinical needs." },
           { label: "Regulatory Assessment", description: "Evaluating FDA pathways and adoption risks." },
           { label: "Concept Validation", description: "Testing concepts against system constraints." }
+        ]
+      },
+      {
+        title: "P&G Design Project",
+        subtitle: "Innovation Strategy",
+        summary: "Innovation strategy for a mature hair-care category.",
+        expandedSummary: "Exploring innovation in a mature, habit-driven hair-care category. Under NDA. Worked in a category where users already had strong preferences, making meaningful change difficult to introduce.",
+        pills: [
+          { label: "Design Strategy", description: "Strategic innovation in mature markets." },
+          { label: "User Research", description: "In-home and on-site user behavior analysis." },
+          { label: "Prototyping", description: "Physical-digital prototyping under constraints." },
+          { label: "Consumer Insights", description: "Understanding deep-rooted user habits." }
+        ],
+        details: [
+          "Worked in a highly saturated hair-care space where users are deeply conditioned to existing formats.",
+          "Studied why meaningful innovation is difficult in categories shaped by routine, expectation, and legacy design.",
+          "Conducted in-home and on-site user research to understand behavior beyond stated needs.",
+          "Built and iterated physical–digital prototypes within real-world brand and manufacturing constraints."
+        ],
+        imageUrl: "/images/pg-design-project.jpg",
+        skills: [
+          { label: "Design Strategy", description: "Strategic innovation within market constraints." },
+          { label: "User Research", description: "Ethnographic research and behavior analysis." },
+          { label: "Rapid Prototyping", description: "Iterative testing of physical and digital concepts." },
+          { label: "Design for Manufacturing", description: "Designing within real-world production constraints." }
         ]
       }
     ]
