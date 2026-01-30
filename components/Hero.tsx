@@ -405,7 +405,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         <h1 className="whitespace-nowrap text-[3vw] sm:text-[3.2vw] md:text-xl lg:text-2xl font-normal text-white/95 leading-snug tracking-tighter md:tracking-tight mb-2">
-          A human-centered, data-driven product designer and maker.
+          A human-centered, data-driven, design-first product innovator.
         </h1>
 
 

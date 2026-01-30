@@ -15,6 +15,7 @@ import ExperienceDetail from './components/ExperienceDetail';
 import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
+import BlogSection from './components/BlogSection';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
@@ -28,7 +29,7 @@ const App: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
-  const [activeSection, setActiveSection] = useState<'profile' | 'experiences' | 'projects'>('profile'); // Added
+  const [activeSection, setActiveSection] = useState<'profile' | 'experiences' | 'projects' | 'writings'>('profile'); // Added
 
 
 
@@ -295,38 +296,54 @@ const App: React.FC = () => {
     }
   }, [mode]);
 
-  // Intersection Observer for Projects Section
+  // Intersection Observer for all sections
   useEffect(() => {
     if (mode === 'intro') return;
 
-    let observer: IntersectionObserver | null = null;
     const projectsEl = document.getElementById('projects');
+    const writingsEl = document.getElementById('writings');
 
-    if (projectsEl) {
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveSection('projects');
-            } else {
-              // If the projects section is below the viewport (top > 0), means we are above it
-              if (entry.boundingClientRect.top > 0) {
-                setActiveSection('experiences');
-              }
-            }
-          });
-        },
-        {
-          // Trigger when the element hits the middle of the viewport
-          rootMargin: '-50% 0px -50% 0px'
-        }
-      );
+    // Track which sections are currently intersecting
+    let projectsIntersecting = false;
+    let writingsIntersecting = false;
 
-      observer.observe(projectsEl);
-    }
+    const updateActiveSection = () => {
+      if (writingsIntersecting) {
+        setActiveSection('writings');
+      } else if (projectsIntersecting) {
+        setActiveSection('projects');
+      } else {
+        // Neither projects nor writings is in view - we're in experiences
+        setActiveSection('experiences');
+      }
+    };
+
+    const projectsObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          projectsIntersecting = entry.isIntersecting;
+          updateActiveSection();
+        });
+      },
+      { rootMargin: '-40% 0px -40% 0px' }
+    );
+
+    const writingsObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          writingsIntersecting = entry.isIntersecting;
+          updateActiveSection();
+        });
+      },
+      { rootMargin: '-40% 0px -40% 0px' }
+    );
+
+    if (projectsEl) projectsObserver.observe(projectsEl);
+    if (writingsEl) writingsObserver.observe(writingsEl);
 
     return () => {
-      if (observer) observer.disconnect();
+      projectsObserver.disconnect();
+      writingsObserver.disconnect();
     };
   }, [mode]);
 
@@ -478,7 +495,7 @@ const App: React.FC = () => {
     ease: [0.32, 0.72, 0, 1] // Custom cubic-bezier for smooth feel
   };
 
-  const handleNavigate = (section: 'profile' | 'experiences' | 'projects') => {
+  const handleNavigate = (section: 'profile' | 'experiences' | 'projects' | 'writings') => {
     if (section === 'profile') {
       handleZoom('intro');
     } else {
@@ -494,6 +511,11 @@ const App: React.FC = () => {
             if (projectsEl && scrollContainerRef.current) {
               smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50); // Small buffer
             }
+          } else if (section === 'writings') {
+            const writingsEl = document.getElementById('writings');
+            if (writingsEl && scrollContainerRef.current) {
+              smoothScrollTo(scrollContainerRef.current, writingsEl.offsetTop - 50);
+            }
           }
         }, 100);
       } else {
@@ -504,6 +526,11 @@ const App: React.FC = () => {
           const projectsEl = document.getElementById('projects');
           if (projectsEl && scrollContainerRef.current) {
             smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50);
+          }
+        } else if (section === 'writings') {
+          const writingsEl = document.getElementById('writings');
+          if (writingsEl && scrollContainerRef.current) {
+            smoothScrollTo(scrollContainerRef.current, writingsEl.offsetTop - 50);
           }
         }
       }
@@ -905,6 +932,9 @@ const App: React.FC = () => {
 
           {/* --- PROJECTS SECTION --- */}
           <ProjectsSection />
+
+          {/* --- WRITINGS SECTION --- */}
+          <BlogSection />
 
           <div className="h-32 w-full" />
         </div>
