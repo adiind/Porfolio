@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Grid } from 'lucide-react';
+import { User, Briefcase, Grid, BookOpen } from 'lucide-react';
 import { TimelineMode } from '../types';
 
 interface VerticalNavbarProps {
-    activeSection: 'profile' | 'experiences' | 'projects';
-    onNavigate: (section: 'profile' | 'experiences' | 'projects') => void;
+    activeSection: 'profile' | 'experiences' | 'projects' | 'writings';
+    onNavigate: (section: 'profile' | 'experiences' | 'projects' | 'writings') => void;
     mode: TimelineMode;
 }
 
@@ -13,12 +13,13 @@ const navItems = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'experiences', label: 'Experiences', icon: Briefcase },
     { id: 'projects', label: 'Projects', icon: Grid },
+    { id: 'writings', label: 'Writings', icon: BookOpen },
 ] as const;
 
 const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode }) => {
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
-    const handleNavClick = (id: 'profile' | 'experiences' | 'projects') => {
+    const handleNavClick = (id: 'profile' | 'experiences' | 'projects' | 'writings') => {
         // Prevent redundant updates if already active (optional, but good for perf)
         // if (activeSection === id) return;
         onNavigate(id);
