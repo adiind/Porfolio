@@ -20,6 +20,9 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
     const handleNavClick = (id: 'profile' | 'experiences' | 'projects' | 'writings') => {
+        // Dispatch event to close any open modals (ProjectDetail, BlogDetail, etc.)
+        window.dispatchEvent(new CustomEvent('closeAllModals'));
+
         // Prevent redundant updates if already active (optional, but good for perf)
         // if (activeSection === id) return;
         onNavigate(id);

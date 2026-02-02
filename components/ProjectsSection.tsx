@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project } from '../types/Project';
 import ProjectCard from './ProjectCard';
@@ -7,6 +7,13 @@ import { PROJECTS } from '../data/projects';
 
 const ProjectsSection: React.FC = () => {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
+
+    // Listen for closeAllModals event (e.g., from navbar navigation)
+    useEffect(() => {
+        const handleCloseAll = () => setActiveProject(null);
+        window.addEventListener('closeAllModals', handleCloseAll);
+        return () => window.removeEventListener('closeAllModals', handleCloseAll);
+    }, []);
 
     return (
         <>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogPost } from '../types/BlogPost';
 import BlogCard from './BlogCard';
@@ -7,6 +7,13 @@ import { BLOG_POSTS } from '../data/posts';
 
 const BlogSection: React.FC = () => {
     const [activePost, setActivePost] = useState<BlogPost | null>(null);
+
+    // Listen for closeAllModals event (e.g., from navbar navigation)
+    useEffect(() => {
+        const handleCloseAll = () => setActivePost(null);
+        window.addEventListener('closeAllModals', handleCloseAll);
+        return () => window.removeEventListener('closeAllModals', handleCloseAll);
+    }, []);
 
     // Filter to only show public posts
     const visiblePosts = BLOG_POSTS.filter(p => p.visibility === 'public');

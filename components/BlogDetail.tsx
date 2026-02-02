@@ -75,8 +75,79 @@ const renderMarkdown = (content: string) => {
     while (i < lines.length) {
         const line = lines[i];
 
+        // Fenced code block (```language ... ```)
+        if (line.startsWith('```')) {
+            const language = line.slice(3).trim() || 'text';
+            const codeLines: string[] = [];
+            i++;
+            while (i < lines.length && !lines[i].startsWith('```')) {
+                codeLines.push(lines[i]);
+                i++;
+            }
+            // Skip the closing ```
+            elements.push(
+                <pre key={i} className="my-6 rounded-xl bg-black/50 border border-white/10 overflow-x-auto">
+                    <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-white/5">
+                        <span className="text-xs font-mono text-white/40 uppercase">{language}</span>
+                    </div>
+                    <code className="block p-4 text-sm font-mono text-emerald-300/90 leading-relaxed whitespace-pre">
+                        {codeLines.join('\n')}
+                    </code>
+                </pre>
+            );
+        }
+        // Markdown table (starts with |)
+        else if (line.startsWith('|') && line.endsWith('|')) {
+            const tableRows: string[][] = [];
+            let j = i;
+            // Collect all table rows
+            while (j < lines.length && lines[j].startsWith('|') && lines[j].endsWith('|')) {
+                const row = lines[j]
+                    .slice(1, -1) // Remove leading/trailing |
+                    .split('|')
+                    .map(cell => cell.trim());
+                // Skip separator row (contains only dashes and colons)
+                if (!row.every(cell => /^[-:]+$/.test(cell))) {
+                    tableRows.push(row);
+                }
+                j++;
+            }
+            i = j - 1; // Move index to last table row
+
+            if (tableRows.length > 0) {
+                const headerRow = tableRows[0];
+                const bodyRows = tableRows.slice(1);
+
+                elements.push(
+                    <div key={i} className="my-6 overflow-x-auto rounded-xl border border-white/10">
+                        <table className="w-full text-sm">
+                            <thead className="bg-white/5">
+                                <tr>
+                                    {headerRow.map((cell, idx) => (
+                                        <th key={idx} className="px-4 py-3 text-left font-semibold text-white/80 border-b border-white/10">
+                                            {cell}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {bodyRows.map((row, rowIdx) => (
+                                    <tr key={rowIdx} className="border-b border-white/5 last:border-0">
+                                        {row.map((cell, cellIdx) => (
+                                            <td key={cellIdx} className="px-4 py-3 text-white/60 font-mono">
+                                                {cell}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                );
+            }
+        }
         // Horizontal rule
-        if (line.trim() === '---') {
+        else if (line.trim() === '---') {
             elements.push(
                 <hr key={i} className="border-white/10 my-10" />
             );
