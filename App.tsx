@@ -16,6 +16,7 @@ import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
 import BlogSection from './components/BlogSection';
+import GitHubActivity from './components/GitHubActivity';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
@@ -939,6 +940,9 @@ const App: React.FC = () => {
           <div className="h-32 w-full" />
         </div>
       </motion.div>
+
+      {/* --- GITHUB ACTIVITY WIDGET (Fixed position) --- */}
+      <GitHubActivity />
 
       {/* --- VERTICAL NAVIGATION --- */}
       <VerticalNavbar
