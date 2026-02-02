@@ -35,14 +35,94 @@ const renderMarkdown = (content: string) => {
     const elements: React.ReactNode[] = [];
     let i = 0;
 
+    // Helper to render inline markdown (bold, italic, links)
+    const renderInline = (text: string): React.ReactNode => {
+        // Handle inline bold **text** and italic *text*
+        const parts: React.ReactNode[] = [];
+        let remaining = text;
+        let key = 0;
+
+        // Process bold and italic
+        const regex = /(\*\*(.+?)\*\*|\*(.+?)\*)/g;
+        let lastIndex = 0;
+        let match;
+
+        while ((match = regex.exec(remaining)) !== null) {
+            // Add text before match
+            if (match.index > lastIndex) {
+                parts.push(remaining.slice(lastIndex, match.index));
+            }
+
+            if (match[2]) {
+                // Bold
+                parts.push(<strong key={key++} className="font-semibold text-white">{match[2]}</strong>);
+            } else if (match[3]) {
+                // Italic
+                parts.push(<em key={key++} className="italic text-white/90">{match[3]}</em>);
+            }
+
+            lastIndex = match.index + match[0].length;
+        }
+
+        // Add remaining text
+        if (lastIndex < remaining.length) {
+            parts.push(remaining.slice(lastIndex));
+        }
+
+        return parts.length > 0 ? parts : text;
+    };
+
     while (i < lines.length) {
         const line = lines[i];
 
+        // Horizontal rule
+        if (line.trim() === '---') {
+            elements.push(
+                <hr key={i} className="border-white/10 my-10" />
+            );
+        }
+        // Image with optional caption on next line
+        else if (line.match(/^!\[.*\]\(.*\)$/)) {
+            const match = line.match(/^!\[(.*)\]\((.*)\)$/);
+            if (match) {
+                const alt = match[1];
+                const src = match[2];
+                // Check if next line is a caption (starts with *)
+                const nextLine = lines[i + 1];
+                let caption = '';
+                if (nextLine && nextLine.startsWith('*') && nextLine.endsWith('*')) {
+                    caption = nextLine.slice(1, -1);
+                    i++; // Skip the caption line
+                }
+                elements.push(
+                    <figure key={i} className="my-8">
+                        <img
+                            src={src}
+                            alt={alt}
+                            className="w-full rounded-xl shadow-lg"
+                        />
+                        {caption && (
+                            <figcaption className="text-center text-white/50 text-sm mt-3 italic">
+                                {caption}
+                            </figcaption>
+                        )}
+                    </figure>
+                );
+            }
+        }
+        // Blockquote
+        else if (line.startsWith('> ')) {
+            elements.push(
+                <blockquote key={i} className="border-l-4 border-indigo-500/50 pl-6 py-2 my-6 text-white/80 italic text-lg">
+                    {renderInline(line.slice(2))}
+                </blockquote>
+            );
+        }
         // Heading 3
-        if (line.startsWith('### ')) {
+        else if (line.startsWith('### ')) {
             elements.push(
                 <h3 key={i} className="text-xl font-bold text-white mt-8 mb-4">
-                    {line.slice(4)}
+                    {renderInline(line.slice(4))}
                 </h3>
             );
         }
@@ -50,15 +130,23 @@ const renderMarkdown = (content: string) => {
         else if (line.startsWith('## ')) {
             elements.push(
                 <h2 key={i} className="text-2xl font-bold text-white mt-10 mb-4">
-                    {line.slice(3)}
+                    {renderInline(line.slice(3))}
                 </h2>
+            );
+        }
+        // Heading 1
+        else if (line.startsWith('# ')) {
+            elements.push(
+                <h1 key={i} className="text-3xl font-bold text-white mt-12 mb-6">
+                    {renderInline(line.slice(2))}
+                </h1>
             );
         }
         // List item
         else if (line.startsWith('- ')) {
             elements.push(
-                <li key={i} className="text-white/70 text-base leading-relaxed ml-4">
-                    {line.slice(2)}
+                <li key={i} className="text-white/70 text-base leading-relaxed ml-4 mb-2">
+                    {renderInline(line.slice(2))}
                 </li>
             );
         }
@@ -70,31 +158,30 @@ const renderMarkdown = (content: string) => {
                 </p>
             );
         }
-        // Regular paragraph
-        else if (line.trim()) {
-            // Handle inline bold and italic
-            const formattedLine = line
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.+?)\*/g, '<em>$1</em>');
-
+        // Italic line (starts and ends with *)
+        else if (line.startsWith('*') && line.endsWith('*') && !line.startsWith('**')) {
             elements.push(
-                <p
-                    key={i}
-                    className="text-white/70 text-base leading-relaxed mb-4"
-                    dangerouslySetInnerHTML={{ __html: formattedLine }}
-                />
+                <p key={i} className="text-white/60 text-base italic leading-relaxed mb-4">
+                    {line.slice(1, -1)}
+                </p>
             );
         }
-        // Empty line (spacing)
-        else if (line.trim() === '') {
-            // Skip empty lines, spacing handled by margins
+        // Regular paragraph
+        else if (line.trim()) {
+            elements.push(
+                <p key={i} className="text-white/70 text-base leading-relaxed mb-4">
+                    {renderInline(line)}
+                </p>
+            );
         }
+        // Empty line (spacing) - skip
 
         i++;
     }
 
     return elements;
 };
+
 
 const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
     const colors = colorMap[post.status === 'Draft' ? 'draft' : 'published'];
