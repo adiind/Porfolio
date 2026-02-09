@@ -1,14 +1,5 @@
 [
   {
-    "id": "https://www.instagram.com/p/DTj3hHLAJsZ/",
-    "date": "2026-01-16",
-    "summary": "Update on the thermostat 🌡️\nThe bigger fan was leaking too much air and privacy all the while being super loud and allowing all noise inside the room.\nSo I’ve switched to some nice RGB 14mm fans, though the RGB does not work properly (need 5v level shifters apparently)\nThe fans were 12v and well I had to make it smart, this was an opportunity to build a PCB and this was one of the cleanest wired one I’ve ever made!\nA single barrel plug powers the 12v fan through the mosfet while a step down module powers the @seeedstudio ESP32-c3 module, the 5v then conveniently powers the RGB lights too - more on tha later\nThe ESP32 run ESP Home which connects to Home Assistant and its dashboard.\nThis was just a demo, way more to come.",
-    "url": "https://www.instagram.com/p/DTj3hHLAJsZ/",
-    "caption": "Update on the thermostat 🌡️\nThe bigger fan was leaking too much air and privacy all the while being super loud and allowing all noise inside the room.\nSo I’ve switched to some nice RGB 14mm fans, though the RGB does not work properly (need 5v level shifters apparently)\nThe fans were 12v and well I had to make it smart, this was an opportunity to build a PCB and this was one of the cleanest wired one I’ve ever made!\nA single barrel plug powers the 12v fan through the mosfet while a step down module powers the @seeedstudio ESP32-c3 module, the 5v then conveniently powers the RGB lights too - more on tha later\nThe ESP32 run ESP Home which connects to Home Assistant and its dashboard.\nThis was just a demo, way more to come.",
-    "likes": 8,
-    "comments": 0
-  },
-  {
     "id": "https://www.instagram.com/p/DTdfXvuAffw/",
     "date": "2026-01-13",
     "summary": "Upgrade your thinking partner 🧠\nHere’s my custom instructions:\n\nRole\nAct as a collaborative thinking partner. Build ideas with me, not for me. No presenting, pitching, or selling my own ideas back to me.\n\nHow to Work\n\t•\tTreat inputs as incomplete fragments\n\t•\tFill gaps, connect dots, and elevate ideas without hijacking intent\n\t•\tSimplify and sharpen, but don’t kill ambition\n\t•\tCall out overengineering or fluff plainly\n\nStyle\n\t•\tPlain, direct, conversational\n\t•\tNo hype, no TED-talk tone, no Apple-keynote structure\n\t•\tMinimal formatting, paragraphs over bullets\n\nStructure\n\t•\tUse light structure only if it reduces cognitive load\n\t•\tSummarize only to align or expose gaps, not to persuade\n\nTeaching Mode\nWhen I ask to learn something:\n\t•\tTeach like a senior expert explaining to another senior operator\n\t•\tFocus on mental models, systems, tradeoffs, and common mistakes\n\t•\tAvoid step-by-step tutorials or low-level implementation unless I ask\n\nInteraction Rules\n\t•\tAsk questions only if progress is blocked\n\t•\tNo multiple follow-ups\n\t•\tNo generic wrap-up prompts\n\nAvoid\n\t•\t“Great question”, “here’s why this matters”\n\t•\tOver-structuring\n\t•\tCompleting ideas for me instead of with me",
@@ -177,7 +168,7 @@
     "url": "https://www.instagram.com/p/DKGhVkazqCF/",
     "caption": "A simple idea, a simple solution—packed with design lessons! 🚀\nFeels like my first true multi-part 3D-print + IoT + embedded-electronics + lighting project.\n\nMy goal was to craft a physical product that shows where my design game is right now—and I think I nailed it. ✔️\n\nFunction-first dispenser:\n• Wireless control 📶\n• RGB “boob” light 🌈\n• Continuous-flow and 30 ml “peg” modes 🥃\n• Proximity sensor with quick toggle 🤖\n\nAll wrapped in clean, modular aesthetics that snap right into place. ✨ #tinkerverse",
     "likes": 204,
-    "comments": 7
+    "comments": 10
   },
   {
     "id": "https://www.instagram.com/p/DJqFANrv1TL/",
@@ -897,6 +888,15 @@
     "url": "https://www.instagram.com/p/C7Zs7MQsWWj/",
     "caption": "🚪✨ Just turned my regular door into a smart door! With an ESP8266, a servo motor, and Alexa integration, I can now wirelessly open my door using voice commands. 🌐🔓 Whether I’m at home or away, I can control it from anywhere using the Alexa app. #SmartHome #DIYTech #IoT #AlexaSkills #HomeAutomation #TechInnovation #OpenSource",
     "likes": 91,
+    "comments": 0
+  },
+  {
+    "id": "https://www.instagram.com/p/C7WaZKaMtiv/",
+    "date": "2024-05-24",
+    "summary": "🌡️🌿 **Meet the DHT11 Sensor!** 🌿🌡️\n\nThis little gadget measures both temperature and humidity, making it perfect for home automation, greenhouses, and weather stations! 🌱📡 With an accuracy of ±2°C for temperature and ±5% for humidity, it’s a reliable choice for your DIY projects. #TechTuesday #SmartHome #DIYelectronics #Arduino #Sensors #GreenTech #DHT11",
+    "url": "https://www.instagram.com/p/C7WaZKaMtiv/",
+    "caption": "🌡️🌿 **Meet the DHT11 Sensor!** 🌿🌡️\n\nThis little gadget measures both temperature and humidity, making it perfect for home automation, greenhouses, and weather stations! 🌱📡 With an accuracy of ±2°C for temperature and ±5% for humidity, it’s a reliable choice for your DIY projects. #TechTuesday #SmartHome #DIYelectronics #Arduino #Sensors #GreenTech #DHT11",
+    "likes": 6,
     "comments": 0
   }
 ]
