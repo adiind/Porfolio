@@ -5,7 +5,7 @@
     "summary": "Custom 3D printed CTA lamp 🏮\nMade this 1/1 for a friend who loves the CTA.\nPersonal project, not for sale.\n\nLogo adapted from the Chicago Transit Authority SVG (Wikipedia).",
     "url": "https://www.instagram.com/p/DUwF03Ygb2j/",
     "caption": "Custom 3D printed CTA lamp 🏮\nMade this 1/1 for a friend who loves the CTA.\nPersonal project, not for sale.\n\nLogo adapted from the Chicago Transit Authority SVG (Wikipedia).",
-    "likes": 37,
+    "likes": 38,
     "comments": 5
   },
   {
@@ -16,15 +16,6 @@
     "caption": "Upgrade your thinking partner 🧠\nHere’s my custom instructions:\n\nRole\nAct as a collaborative thinking partner. Build ideas with me, not for me. No presenting, pitching, or selling my own ideas back to me.\n\nHow to Work\n\t•\tTreat inputs as incomplete fragments\n\t•\tFill gaps, connect dots, and elevate ideas without hijacking intent\n\t•\tSimplify and sharpen, but don’t kill ambition\n\t•\tCall out overengineering or fluff plainly\n\nStyle\n\t•\tPlain, direct, conversational\n\t•\tNo hype, no TED-talk tone, no Apple-keynote structure\n\t•\tMinimal formatting, paragraphs over bullets\n\nStructure\n\t•\tUse light structure only if it reduces cognitive load\n\t•\tSummarize only to align or expose gaps, not to persuade\n\nTeaching Mode\nWhen I ask to learn something:\n\t•\tTeach like a senior expert explaining to another senior operator\n\t•\tFocus on mental models, systems, tradeoffs, and common mistakes\n\t•\tAvoid step-by-step tutorials or low-level implementation unless I ask\n\nInteraction Rules\n\t•\tAsk questions only if progress is blocked\n\t•\tNo multiple follow-ups\n\t•\tNo generic wrap-up prompts\n\nAvoid\n\t•\t“Great question”, “here’s why this matters”\n\t•\tOver-structuring\n\t•\tCompleting ideas for me instead of with me",
     "likes": 12,
     "comments": 5
-  },
-  {
-    "id": "https://www.instagram.com/p/DS4OqtJgjBo/",
-    "date": "2025-12-30",
-    "summary": "RC car in action with my amazing driving skills #F1",
-    "url": "https://www.instagram.com/p/DS4OqtJgjBo/",
-    "caption": "RC car in action with my amazing driving skills #F1",
-    "likes": 8,
-    "comments": 0
   },
   {
     "id": "https://www.instagram.com/p/DSzLYXbFJGW/",
@@ -897,6 +888,15 @@
     "url": "https://www.instagram.com/p/C7Zs7MQsWWj/",
     "caption": "🚪✨ Just turned my regular door into a smart door! With an ESP8266, a servo motor, and Alexa integration, I can now wirelessly open my door using voice commands. 🌐🔓 Whether I’m at home or away, I can control it from anywhere using the Alexa app. #SmartHome #DIYTech #IoT #AlexaSkills #HomeAutomation #TechInnovation #OpenSource",
     "likes": 91,
+    "comments": 0
+  },
+  {
+    "id": "https://www.instagram.com/p/C7WaZKaMtiv/",
+    "date": "2024-05-24",
+    "summary": "🌡️🌿 **Meet the DHT11 Sensor!** 🌿🌡️\n\nThis little gadget measures both temperature and humidity, making it perfect for home automation, greenhouses, and weather stations! 🌱📡 With an accuracy of ±2°C for temperature and ±5% for humidity, it’s a reliable choice for your DIY projects. #TechTuesday #SmartHome #DIYelectronics #Arduino #Sensors #GreenTech #DHT11",
+    "url": "https://www.instagram.com/p/C7WaZKaMtiv/",
+    "caption": "🌡️🌿 **Meet the DHT11 Sensor!** 🌿🌡️\n\nThis little gadget measures both temperature and humidity, making it perfect for home automation, greenhouses, and weather stations! 🌱📡 With an accuracy of ±2°C for temperature and ±5% for humidity, it’s a reliable choice for your DIY projects. #TechTuesday #SmartHome #DIYelectronics #Arduino #Sensors #GreenTech #DHT11",
+    "likes": 6,
     "comments": 0
   }
 ]
