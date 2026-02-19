@@ -95,7 +95,7 @@
     "summary": "Quick update, I made it! ✨\n\nTinkering and creating has been my passion and I’m glad to be taking a definitive step in the right direction by joining one the most prestigious universities in USA.\nI’ll be pursuing the Master’s in Engineering Design Innovation (EDI) at Northwestern University, a program that perfectly blends design, engineering, and innovation.\nThanks to a lotta you that actually helped me out in this journey, you helped me grow a lot❤️",
     "url": "https://www.instagram.com/p/DONVSj6jH9y/",
     "caption": "Quick update, I made it! ✨\n\nTinkering and creating has been my passion and I’m glad to be taking a definitive step in the right direction by joining one the most prestigious universities in USA.\nI’ll be pursuing the Master’s in Engineering Design Innovation (EDI) at Northwestern University, a program that perfectly blends design, engineering, and innovation.\nThanks to a lotta you that actually helped me out in this journey, you helped me grow a lot❤️",
-    "likes": 88,
+    "likes": 89,
     "comments": 13
   },
   {
@@ -150,7 +150,7 @@
     "url": "https://www.instagram.com/p/DMDR2I8vupq/",
     "caption": "End of Air Mouse ( Air Gun) experiment v5 🔫\nWe’ve added some tactile buttons along with some nice fillets for a great grip, the overall ergonomics has been greatly improved!",
     "likes": 17,
-    "comments": 2
+    "comments": 1
   },
   {
     "id": "https://www.instagram.com/p/DKSf8flzrLH/",
@@ -167,17 +167,8 @@
     "summary": "A simple idea, a simple solution—packed with design lessons! 🚀\nFeels like my first true multi-part 3D-print + IoT + embedded-electronics + lighting project.\n\nMy goal was to craft a physical product that shows where my design game is right now—and I think I nailed it. ✔️\n\nFunction-first dispenser:\n• Wireless control 📶\n• RGB “boob” light 🌈\n• Continuous-flow and 30 ml “peg” modes 🥃\n• Proximity sensor with quick toggle 🤖\n\nAll wrapped in clean, modular aesthetics that snap right into place. ✨ #tinkerverse",
     "url": "https://www.instagram.com/p/DKGhVkazqCF/",
     "caption": "A simple idea, a simple solution—packed with design lessons! 🚀\nFeels like my first true multi-part 3D-print + IoT + embedded-electronics + lighting project.\n\nMy goal was to craft a physical product that shows where my design game is right now—and I think I nailed it. ✔️\n\nFunction-first dispenser:\n• Wireless control 📶\n• RGB “boob” light 🌈\n• Continuous-flow and 30 ml “peg” modes 🥃\n• Proximity sensor with quick toggle 🤖\n\nAll wrapped in clean, modular aesthetics that snap right into place. ✨ #tinkerverse",
-    "likes": 204,
+    "likes": 205,
     "comments": 10
-  },
-  {
-    "id": "https://www.instagram.com/p/DJqFANrv1TL/",
-    "date": "2025-05-15",
-    "summary": "DIY Sunflower 🌻",
-    "url": "https://www.instagram.com/p/DJqFANrv1TL/",
-    "caption": "DIY Sunflower 🌻",
-    "likes": 42,
-    "comments": 7
   },
   {
     "id": "https://www.instagram.com/p/DJWxBECvEKl/",
@@ -259,15 +250,6 @@
     "caption": "The perfectionist in me didn’t work properly without my perfect conditions, I needed some soul quenching warm light to light my setup, it of course had to be concentrated to my desk for that smartphone’s sensor and it had to be top down.\nObviously it won’t be a Tinker Verse project without it being smart, I had a smart switch breaker lying around so used that, maybe I’ll create another PIR sensor setup for the desk later.\n#diy #lighting #desksetup #smart #smarthome",
     "likes": 187,
     "comments": 13
-  },
-  {
-    "id": "https://www.instagram.com/p/DCMjkgEMbsA/",
-    "date": "2024-11-10",
-    "summary": "You too can make your own Alfred/Jarvis! 👨‍💻\nCheckout my YouTube channel for the full video and GitHub for all files to recreate your own assistant!\n#jarvis #alfred #ai #iot #smarthome",
-    "url": "https://www.instagram.com/p/DCMjkgEMbsA/",
-    "caption": "You too can make your own Alfred/Jarvis! 👨‍💻\nCheckout my YouTube channel for the full video and GitHub for all files to recreate your own assistant!\n#jarvis #alfred #ai #iot #smarthome",
-    "likes": 128,
-    "comments": 8
   },
   {
     "id": "https://www.instagram.com/p/DAI3nmbPb5W/",
@@ -360,15 +342,6 @@
     "comments": 0
   },
   {
-    "id": "https://www.instagram.com/p/C-x-BKqysf4/",
-    "date": "2024-08-17",
-    "summary": "Here I’ve achieved a feat on my 8yr old MI tablet running super old android that I couldn’t on my latest and greatest iPhone 15 pro!\nYes you read that right, I can’t do this on an iPhone.\nThis is due to security restrictions and need for permissions for everything in ios, it has definitely made it more secure but we did lose some functionality.\nSo here I was able to fetch the device orientation details as yaw pitch and role (alpha beta gamma), then I was able to map it to steering control, I tried mapping the movement to forward and backward tilt but I’m not good enough driver to control it like that.\nAnyway,  I was also able to have some proper mapping and create a AsyncWebserver with a websocket for fast and reliable connection. This was one of the biggest problem statement for me as typical R.C modules cost 10x the actual cost of this project. (7-10k)\n\nRequest me in the comments to share steps and how to create this on @instructables, and if actually people want it , I’ll make it!\n\n#tinkertronics #diy #electronics #esp8266 \n#microcontroller #car #rc #rccars #mechanicalengineering  #Conceptbytes",
-    "url": "https://www.instagram.com/p/C-x-BKqysf4/",
-    "caption": "Here I’ve achieved a feat on my 8yr old MI tablet running super old android that I couldn’t on my latest and greatest iPhone 15 pro!\nYes you read that right, I can’t do this on an iPhone.\nThis is due to security restrictions and need for permissions for everything in ios, it has definitely made it more secure but we did lose some functionality.\nSo here I was able to fetch the device orientation details as yaw pitch and role (alpha beta gamma), then I was able to map it to steering control, I tried mapping the movement to forward and backward tilt but I’m not good enough driver to control it like that.\nAnyway,  I was also able to have some proper mapping and create a AsyncWebserver with a websocket for fast and reliable connection. This was one of the biggest problem statement for me as typical R.C modules cost 10x the actual cost of this project. (7-10k)\n\nRequest me in the comments to share steps and how to create this on @instructables, and if actually people want it , I’ll make it!\n\n#tinkertronics #diy #electronics #esp8266 \n#microcontroller #car #rc #rccars #mechanicalengineering  #Conceptbytes",
-    "likes": 33,
-    "comments": 4
-  },
-  {
     "id": "https://www.instagram.com/p/C-pmAFYvpb8/",
     "date": "2024-08-14",
     "summary": "Small step for mechanical modeling, huge leap for Tinker Verse! ⚙️\n\n#fusion360 #mechanic #mechanicalengineering #diy #engineering #3d #3dprinting",
@@ -392,7 +365,7 @@
     "summary": "TAARZAN works now! I can’t believe I actually got to this stage, it was too goofy of an idea to even commit to it but damm it did it!\nNext I’ll try to design the chassis for it!\n\n#tinkerverse #diy #rccars #electronics #cinematic #taarzanthewondercar",
     "url": "https://www.instagram.com/p/C-hmt49vWMe/",
     "caption": "TAARZAN works now! I can’t believe I actually got to this stage, it was too goofy of an idea to even commit to it but damm it did it!\nNext I’ll try to design the chassis for it!\n\n#tinkerverse #diy #rccars #electronics #cinematic #taarzanthewondercar",
-    "likes": 376,
+    "likes": 377,
     "comments": 10
   },
   {
@@ -414,15 +387,6 @@
     "comments": 0
   },
   {
-    "id": "https://www.instagram.com/p/C920EbHSlVv/",
-    "date": "2024-07-25",
-    "summary": "Can anyone guess what’s going on here!?\n\n#Lighting #DIY #LED #WLED #Hyperion #Setup #DreamSetup",
-    "url": "https://www.instagram.com/p/C920EbHSlVv/",
-    "caption": "Can anyone guess what’s going on here!?\n\n#Lighting #DIY #LED #WLED #Hyperion #Setup #DreamSetup",
-    "likes": 38,
-    "comments": 0
-  },
-  {
     "id": "https://www.instagram.com/p/C90Ckkzs9oS/",
     "date": "2024-07-24",
     "summary": "Guys these came out way better than expected!",
@@ -430,15 +394,6 @@
     "caption": "Guys these came out way better than expected!",
     "likes": 30,
     "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C9xswRxsWxi/",
-    "date": "2024-07-23",
-    "summary": "Obviously I omitted a few of the steps to make the print look good, comment below your doubts or if you need the print files for the same!",
-    "url": "https://www.instagram.com/p/C9xswRxsWxi/",
-    "caption": "Obviously I omitted a few of the steps to make the print look good, comment below your doubts or if you need the print files for the same!",
-    "likes": 122,
-    "comments": 4
   },
   {
     "id": "https://www.instagram.com/p/C9tvTOhs91U/",
@@ -456,15 +411,6 @@
     "url": "https://www.instagram.com/p/C9sGrtpMyml/",
     "caption": "Aruco markers are powerful tools in computer vision! Enhance AR, robotics, and drone navigation with precise tracking and unique IDs.\n\n•Applications: AR object placement, robot navigation, drone landing, camera calibration\n•Unique IDs for accurate identification and tracking\n•Integration: Easily use with OpenCV\n•Revolutionizing tech with accurate position and orientation detection\n\n#TechInnovation #ComputerVision #AR #Robotics",
     "likes": 21,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9o-4GosYTo/",
-    "date": "2024-07-20",
-    "summary": "This test is not measuring token input or output, rather it counts the characters generated, I’ve made 2 metrics one to purely check the back end and one to see the real world front end difference. Let me know if you want to see the metrics for all tests, but in general model’s character generation speed increases with total generated size, ie. Character generation speed is higher for bigger paragraphs.\nHere’s some other basic details on the new GPT-4o Mini model;\n\nReplaces GPT-3.5 Turbo: OpenAI’s new GPT-4o Mini is designed to replace the GPT-3.5 Turbo.\n\nCost: 30 times cheaper than GPT-4o and significantly more affordable than GPT-3.5 Turbo.\n\nIntelligence: Outperforms other mini models like Anthropic’s Claude Haiku and Google’s Gemini Flash in intelligence and capabilities.",
-    "url": "https://www.instagram.com/p/C9o-4GosYTo/",
-    "caption": "This test is not measuring token input or output, rather it counts the characters generated, I’ve made 2 metrics one to purely check the back end and one to see the real world front end difference. Let me know if you want to see the metrics for all tests, but in general model’s character generation speed increases with total generated size, ie. Character generation speed is higher for bigger paragraphs.\nHere’s some other basic details on the new GPT-4o Mini model;\n\nReplaces GPT-3.5 Turbo: OpenAI’s new GPT-4o Mini is designed to replace the GPT-3.5 Turbo.\n\nCost: 30 times cheaper than GPT-4o and significantly more affordable than GPT-3.5 Turbo.\n\nIntelligence: Outperforms other mini models like Anthropic’s Claude Haiku and Google’s Gemini Flash in intelligence and capabilities.",
-    "likes": 29,
     "comments": 0
   },
   {
@@ -486,15 +432,6 @@
     "comments": 0
   },
   {
-    "id": "https://www.instagram.com/p/C9cfmzdsdce/",
-    "date": "2024-07-15",
-    "summary": "Let’s checkout the coolest thing I’ve made with my printer…\nA Lithopane!",
-    "url": "https://www.instagram.com/p/C9cfmzdsdce/",
-    "caption": "Let’s checkout the coolest thing I’ve made with my printer…\nA Lithopane!",
-    "likes": 41,
-    "comments": 2
-  },
-  {
     "id": "https://www.instagram.com/p/C9ag1OIsP28/",
     "date": "2024-07-14",
     "summary": "Air Mouse has evolved into air gun!",
@@ -510,393 +447,6 @@
     "url": "https://www.instagram.com/p/C9X-61-MgdN/",
     "caption": "I’m sorry if I sound robotic, some setups are just what they are.\nA Setup.\nMore to come.",
     "likes": 16,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9Xhj7xsy0C/",
-    "date": "2024-07-13",
-    "summary": "Here’s how you fix how much material your printer prints per extrusion / length.",
-    "url": "https://www.instagram.com/p/C9Xhj7xsy0C/",
-    "caption": "Here’s how you fix how much material your printer prints per extrusion / length.",
-    "likes": 14,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9UbwMcM-oC/",
-    "date": "2024-07-12",
-    "summary": "These Momentary Tactile Push Buttons are the most basic input device. If I’m purely doing electronics project I might have to solder it to a PCB or use it on a breadboard, but 3D printing enclosures is the fastest way for me to rapidly prototype physical products.",
-    "url": "https://www.instagram.com/p/C9UbwMcM-oC/",
-    "caption": "These Momentary Tactile Push Buttons are the most basic input device. If I’m purely doing electronics project I might have to solder it to a PCB or use it on a breadboard, but 3D printing enclosures is the fastest way for me to rapidly prototype physical products.",
-    "likes": 70,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9SX5aws2hG/",
-    "date": "2024-07-11",
-    "summary": "Comment literally anything below and I’ll send it to you, even if you’re on android",
-    "url": "https://www.instagram.com/p/C9SX5aws2hG/",
-    "caption": "Comment literally anything below and I’ll send it to you, even if you’re on android",
-    "likes": 43,
-    "comments": 5
-  },
-  {
-    "id": "https://www.instagram.com/p/C9M8iNjoYBY/",
-    "date": "2024-07-09",
-    "summary": "I want to 3D print the light diffuser for a permanent open lightsaber. 3 considerations that I’ve iterated on here are:\n1. The wall thickness and infill for desired diffusion.\n2. The internal rail that will hold the LED strip.\n3. The connecting mechanism for the printed parts due to size constraints.",
-    "url": "https://www.instagram.com/p/C9M8iNjoYBY/",
-    "caption": "I want to 3D print the light diffuser for a permanent open lightsaber. 3 considerations that I’ve iterated on here are:\n1. The wall thickness and infill for desired diffusion.\n2. The internal rail that will hold the LED strip.\n3. The connecting mechanism for the printed parts due to size constraints.",
-    "likes": 20,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9K4W7doMZB/",
-    "date": "2024-07-08",
-    "summary": "I have a serious interest in Human Computer Interaction and this is one of those tests/projects where I am exploring methods to interact with my own computer.",
-    "url": "https://www.instagram.com/p/C9K4W7doMZB/",
-    "caption": "I have a serious interest in Human Computer Interaction and this is one of those tests/projects where I am exploring methods to interact with my own computer.",
-    "likes": 60,
-    "comments": 1
-  },
-  {
-    "id": "https://www.instagram.com/p/C9IN41rsqT-/",
-    "date": "2024-07-07",
-    "summary": "Just tying wires together wasn’t working out for me, so I decided to make my projects a little more professional.",
-    "url": "https://www.instagram.com/p/C9IN41rsqT-/",
-    "caption": "Just tying wires together wasn’t working out for me, so I decided to make my projects a little more professional.",
-    "likes": 11,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9F43qHMd6H/",
-    "date": "2024-07-06",
-    "summary": "Here’s an overhaul and upgrade walkthrough of my WLED setup!\nI’ve used ESP8266 as the base and printed enclosure and connectors for it.\nAfter installing WLED on it, we need to connect the correct GPIO with the LED strip.\nAddressable RGB LED strips only have 3 pins- power, ground and input. Thus the setup is pretty straightforward.\nI’ve made sure to use a nice 5V 5A power supply to achieve high brightness and power such long strips.\nHonestly lot of effort went into just creating the case and connectors, but man now it looks so professional. I love it.",
-    "url": "https://www.instagram.com/p/C9F43qHMd6H/",
-    "caption": "Here’s an overhaul and upgrade walkthrough of my WLED setup!\nI’ve used ESP8266 as the base and printed enclosure and connectors for it.\nAfter installing WLED on it, we need to connect the correct GPIO with the LED strip.\nAddressable RGB LED strips only have 3 pins- power, ground and input. Thus the setup is pretty straightforward.\nI’ve made sure to use a nice 5V 5A power supply to achieve high brightness and power such long strips.\nHonestly lot of effort went into just creating the case and connectors, but man now it looks so professional. I love it.",
-    "likes": 20,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C9Dq8Ltsw2V/",
-    "date": "2024-07-05",
-    "summary": "Many iterations for a project, but I love how this came to be. I had to make it robust and finally I ditched ChatGPT and wrote the code myself, did not take more than 30 min tbh, sometimes ChatGPT just takes you down an hallucinating pathway.\nAnyway, it’s quite robust and listens well over internet, really no complaints here. Though, I’d love to add a door close servo, and a door bell/ camera and a rfid/nfc reader. Way in the future that is.",
-    "url": "https://www.instagram.com/p/C9Dq8Ltsw2V/",
-    "caption": "Many iterations for a project, but I love how this came to be. I had to make it robust and finally I ditched ChatGPT and wrote the code myself, did not take more than 30 min tbh, sometimes ChatGPT just takes you down an hallucinating pathway.\nAnyway, it’s quite robust and listens well over internet, really no complaints here. Though, I’d love to add a door close servo, and a door bell/ camera and a rfid/nfc reader. Way in the future that is.",
-    "likes": 16,
-    "comments": 3
-  },
-  {
-    "id": "https://www.instagram.com/p/C9ArY1ZP580/",
-    "date": "2024-07-04",
-    "summary": "Here’s the results for the temperature tower!\nI’ll try to add a video on every test each week",
-    "url": "https://www.instagram.com/p/C9ArY1ZP580/",
-    "caption": "Here’s the results for the temperature tower!\nI’ll try to add a video on every test each week",
-    "likes": 15,
-    "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C8-NcopsRPz/",
-    "date": "2024-07-03",
-    "summary": "Setting up Orcaslicer coz the geniuses at Reddit said so!\nHonestly I did not realise how customisable these are, I can literally make my setup wireless in future and it has so many calibration tests and fields to tweak with amazing features like fuzzy walls. Follow me to explore more 3D printing!",
-    "url": "https://www.instagram.com/p/C8-NcopsRPz/",
-    "caption": "Setting up Orcaslicer coz the geniuses at Reddit said so!\nHonestly I did not realise how customisable these are, I can literally make my setup wireless in future and it has so many calibration tests and fields to tweak with amazing features like fuzzy walls. Follow me to explore more 3D printing!",
-    "likes": 14,
-    "comments": 4
-  },
-  {
-    "id": "https://www.instagram.com/p/C87Y00LMSwP/",
-    "date": "2024-07-02",
-    "summary": "Weekdays are for organising things, with so many projects piling up I definitely needed a screw draws for all the M4 and M3 screws.",
-    "url": "https://www.instagram.com/p/C87Y00LMSwP/",
-    "caption": "Weekdays are for organising things, with so many projects piling up I definitely needed a screw draws for all the M4 and M3 screws.",
-    "likes": 17,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C84-HiWswc3/",
-    "date": "2024-07-01",
-    "summary": "Ability to create anything and I ended up mimicking the character that can adapt to anything.\n#JJK #mahoraga #sukuna",
-    "url": "https://www.instagram.com/p/C84-HiWswc3/",
-    "caption": "Ability to create anything and I ended up mimicking the character that can adapt to anything.\n#JJK #mahoraga #sukuna",
-    "likes": 10,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C81FNsXs380/",
-    "date": "2024-06-30",
-    "summary": "It’s end to end videos like these that fill me with joy",
-    "url": "https://www.instagram.com/p/C81FNsXs380/",
-    "caption": "It’s end to end videos like these that fill me with joy",
-    "likes": 26,
-    "comments": 1
-  },
-  {
-    "id": "https://www.instagram.com/p/C8yqpEsMwbm/",
-    "date": "2024-06-29",
-    "summary": "Guess who added ESP NOW to their door opener 🚪",
-    "url": "https://www.instagram.com/p/C8yqpEsMwbm/",
-    "caption": "Guess who added ESP NOW to their door opener 🚪",
-    "likes": 16,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8xSDTLMDFC/",
-    "date": "2024-06-28",
-    "summary": "Enter the Dragon! 🐉 \nThe Ender 3 v3 SE Unboxing, follow for the setup video!\n\nBig thanks to @wol3dindia to make this available in India.\nAnd much love to @creality3d",
-    "url": "https://www.instagram.com/p/C8xSDTLMDFC/",
-    "caption": "Enter the Dragon! 🐉 \nThe Ender 3 v3 SE Unboxing, follow for the setup video!\n\nBig thanks to @wol3dindia to make this available in India.\nAnd much love to @creality3d",
-    "likes": 24,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8uPg7JM_Ss/",
-    "date": "2024-06-27",
-    "summary": "Here’s a basic rundown of all the things I’ve added in here:\n\nA type C charging and discharging module with over current and low voltage protection\n\nA lithium polymer 1000mah battery\n\nA 5v boost converter",
-    "url": "https://www.instagram.com/p/C8uPg7JM_Ss/",
-    "caption": "Here’s a basic rundown of all the things I’ve added in here:\n\nA type C charging and discharging module with over current and low voltage protection\n\nA lithium polymer 1000mah battery\n\nA 5v boost converter",
-    "likes": 17,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8rh3cusnj-/",
-    "date": "2024-06-26",
-    "summary": "This is the minecraft light I was working on in the previous non Ender Era, we call it before ender or B.E. for short.\n.\nAnyway, lots of learning’s here, how does clear filament distort light being one of the most fascinating ones.\n.\nOne thing I realised here was that my slicer is lacking a lot of features, there’s bad seam lines on my prints with different pla and the retraction settings -(which are absent from my current creality slicer) need to be tweaked.",
-    "url": "https://www.instagram.com/p/C8rh3cusnj-/",
-    "caption": "This is the minecraft light I was working on in the previous non Ender Era, we call it before ender or B.E. for short.\n.\nAnyway, lots of learning’s here, how does clear filament distort light being one of the most fascinating ones.\n.\nOne thing I realised here was that my slicer is lacking a lot of features, there’s bad seam lines on my prints with different pla and the retraction settings -(which are absent from my current creality slicer) need to be tweaked.",
-    "likes": 10,
-    "comments": 6
-  },
-  {
-    "id": "https://www.instagram.com/p/C8o_WQmPzoq/",
-    "date": "2024-06-25",
-    "summary": "Why would I even do that though!\nHere I’ve setup local server with GPT-4o API.\nI’ve then setup IOS Shortcuts to effectively pass the images and text to the API and fetch the results.\nNow ChatGPT is already available to download on my iPad why would I even do this, essentially this was a test to automate workflows. While ChatGPT app is there, there’s limited automation capabilities, which is opened up by the shortcuts app.\nSecondly and the import part why I had to host a server, I want to essentially call GPT api’s through microcontrollers, more on why I want to do that later.",
-    "url": "https://www.instagram.com/p/C8o_WQmPzoq/",
-    "caption": "Why would I even do that though!\nHere I’ve setup local server with GPT-4o API.\nI’ve then setup IOS Shortcuts to effectively pass the images and text to the API and fetch the results.\nNow ChatGPT is already available to download on my iPad why would I even do this, essentially this was a test to automate workflows. While ChatGPT app is there, there’s limited automation capabilities, which is opened up by the shortcuts app.\nSecondly and the import part why I had to host a server, I want to essentially call GPT api’s through microcontrollers, more on why I want to do that later.",
-    "likes": 9,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8li24Nobhl/",
-    "date": "2024-06-24",
-    "summary": "Battery enclosure designing process with type c charging and independent compartment for battery, battery charger and step up module.",
-    "url": "https://www.instagram.com/p/C8li24Nobhl/",
-    "caption": "Battery enclosure designing process with type c charging and independent compartment for battery, battery charger and step up module.",
-    "likes": 5,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8hbgLcMgFh/",
-    "date": "2024-06-22",
-    "summary": "Just got my hands on Ai thinker’s VC-02 offline voice recognition module and can definitely say this is super fast and accurate.\nThanks to @techiesms for the voice in the video, and making it available in India along with making all the guides on it that one would need.❤️",
-    "url": "https://www.instagram.com/p/C8hbgLcMgFh/",
-    "caption": "Just got my hands on Ai thinker’s VC-02 offline voice recognition module and can definitely say this is super fast and accurate.\nThanks to @techiesms for the voice in the video, and making it available in India along with making all the guides on it that one would need.❤️",
-    "likes": 16,
-    "comments": 8
-  },
-  {
-    "id": "https://www.instagram.com/p/C8goszjMX4s/",
-    "date": "2024-06-22",
-    "summary": "Can’t believe how it turned out to look so professional 👨‍🏫 \n.\nWhat was important here was the learnings, how to make a stable camera feed, add an antenna by making your smallest solder ever, 3D printing a chassis for the camera.\nGetting a battery for it, getting a charging module for the battery, getting a step down module to get correct voltage, mess up the input voltage limits and get the correct converter, realise the converted value isn’t enough to power the board, get a boost converter for that, now make a chassis for the battery system.\n.\nLight work.",
-    "url": "https://www.instagram.com/p/C8goszjMX4s/",
-    "caption": "Can’t believe how it turned out to look so professional 👨‍🏫 \n.\nWhat was important here was the learnings, how to make a stable camera feed, add an antenna by making your smallest solder ever, 3D printing a chassis for the camera.\nGetting a battery for it, getting a charging module for the battery, getting a step down module to get correct voltage, mess up the input voltage limits and get the correct converter, realise the converted value isn’t enough to power the board, get a boost converter for that, now make a chassis for the battery system.\n.\nLight work.",
-    "likes": 20,
-    "comments": 1
-  },
-  {
-    "id": "https://www.instagram.com/p/C8ftxLUs9Ru/",
-    "date": "2024-06-21",
-    "summary": "Declaration of love.",
-    "url": "https://www.instagram.com/p/C8ftxLUs9Ru/",
-    "caption": "Declaration of love.",
-    "likes": 10,
-    "comments": 4
-  },
-  {
-    "id": "https://www.instagram.com/p/C8aW0oes46U/",
-    "date": "2024-06-19",
-    "summary": "",
-    "url": "https://www.instagram.com/p/C8aW0oes46U/",
-    "caption": "",
-    "likes": 5,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8XhfUkM3Ru/",
-    "date": "2024-06-18",
-    "summary": "Here’s how I integrate new filaments into my workflow and get the settings right.\n.\nReplacing the filament is pretty easy.\n.\nI use a 16test to test out adhesion and temperature setttings.\n.\nOnce that is done, remember to create a print profile for future use.\n.\nPrint Happily Ever After.",
-    "url": "https://www.instagram.com/p/C8XhfUkM3Ru/",
-    "caption": "Here’s how I integrate new filaments into my workflow and get the settings right.\n.\nReplacing the filament is pretty easy.\n.\nI use a 16test to test out adhesion and temperature setttings.\n.\nOnce that is done, remember to create a print profile for future use.\n.\nPrint Happily Ever After.",
-    "likes": 7,
-    "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C8U9ogrMBsX/",
-    "date": "2024-06-17",
-    "summary": "Here I’ve explored GPT-4o and TTS model from @openai \nThe 4o has some interesting vision capabilities that we will eventually get to, for now I wanted to create an ai assistant that can talk to me.\nThe basic code can be used to create fun small games for events where each voice can be given a different personality and instruction set. Creating a murder mystery game with interactive AI bots can be one of my next projects too!",
-    "url": "https://www.instagram.com/p/C8U9ogrMBsX/",
-    "caption": "Here I’ve explored GPT-4o and TTS model from @openai \nThe 4o has some interesting vision capabilities that we will eventually get to, for now I wanted to create an ai assistant that can talk to me.\nThe basic code can be used to create fun small games for events where each voice can be given a different personality and instruction set. Creating a murder mystery game with interactive AI bots can be one of my next projects too!",
-    "likes": 5,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8OtsUUsKpl/",
-    "date": "2024-06-15",
-    "summary": "Smart Curtain Bot #2\nWe’ve successfully created a roller for the curtain rod, while one of the roller will be moved by the stepper motor, the other one needs to move freely and I’ll need a lot more experience to be able to 3D print an axle with proper tolerances. \nThankfully I had an extra ball bearing that now I’m thinking of attaching to the other roller and now both the rollers can be joined by the stepper motor holder that and ball bearing connector.",
-    "url": "https://www.instagram.com/p/C8OtsUUsKpl/",
-    "caption": "Smart Curtain Bot #2\nWe’ve successfully created a roller for the curtain rod, while one of the roller will be moved by the stepper motor, the other one needs to move freely and I’ll need a lot more experience to be able to 3D print an axle with proper tolerances. \nThankfully I had an extra ball bearing that now I’m thinking of attaching to the other roller and now both the rollers can be joined by the stepper motor holder that and ball bearing connector.",
-    "likes": 7,
-    "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C8BxAFHsykZ/",
-    "date": "2024-06-10",
-    "summary": "Might have lost a few night’s sleep and the parts still don’t fit perfectly",
-    "url": "https://www.instagram.com/p/C8BxAFHsykZ/",
-    "caption": "Might have lost a few night’s sleep and the parts still don’t fit perfectly",
-    "likes": 5,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7_SVhhsmtO/",
-    "date": "2024-06-09",
-    "summary": "Episode 2 \nThe heat of the great soldering iron has melted all plastic, and our Z fighter has uncovered the great machine.",
-    "url": "https://www.instagram.com/p/C7_SVhhsmtO/",
-    "caption": "Episode 2 \nThe heat of the great soldering iron has melted all plastic, and our Z fighter has uncovered the great machine.",
-    "likes": 5,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C79-1H_MCf7/",
-    "date": "2024-06-08",
-    "summary": "Can you guess?",
-    "url": "https://www.instagram.com/p/C79-1H_MCf7/",
-    "caption": "Can you guess?",
-    "likes": 7,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C78-1jXMgFB/",
-    "date": "2024-06-08",
-    "summary": "Might have hit a wall here, fact of the matter is - if you want proper linear force you have to use the right mechanism.\nWhat I was trying to achieve was using an off axis servo’s force component in one direction transferred to another plane.\nThis heavy duty servo should be able to push the button in theory, if aligned to the button.\n\nWhat would work here though?\nLinear force requires linear actuators, they use electromagnetic solenoid to move a shaft linearly.\nMight actually make this later someday to try it out but the hopes for a door closing mechanism seems distant for now.\nI did try lighter servo oriented correctly but they were too light it seems.",
-    "url": "https://www.instagram.com/p/C78-1jXMgFB/",
-    "caption": "Might have hit a wall here, fact of the matter is - if you want proper linear force you have to use the right mechanism.\nWhat I was trying to achieve was using an off axis servo’s force component in one direction transferred to another plane.\nThis heavy duty servo should be able to push the button in theory, if aligned to the button.\n\nWhat would work here though?\nLinear force requires linear actuators, they use electromagnetic solenoid to move a shaft linearly.\nMight actually make this later someday to try it out but the hopes for a door closing mechanism seems distant for now.\nI did try lighter servo oriented correctly but they were too light it seems.",
-    "likes": 3,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C78V8zBs-D0/",
-    "date": "2024-06-08",
-    "summary": "Usually the open source community has most things available readily but this is one those things that I noticed the open source community does not have any replacement for.\nMost smart home appliances the idea is quite simple- just take a output device like a relay for a smart switch breaker,  a servo for switch bot, IR emitter for IR automation box, RGB Lights and so on. This project is dependent on controlling a stepper motor.",
-    "url": "https://www.instagram.com/p/C78V8zBs-D0/",
-    "caption": "Usually the open source community has most things available readily but this is one those things that I noticed the open source community does not have any replacement for.\nMost smart home appliances the idea is quite simple- just take a output device like a relay for a smart switch breaker,  a servo for switch bot, IR emitter for IR automation box, RGB Lights and so on. This project is dependent on controlling a stepper motor.",
-    "likes": 4,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C75jB79McLe/",
-    "date": "2024-06-07",
-    "summary": "🚪✨ Smart Door Sensor! ✨🚪\n\nKnow instantly if your door is open or closed with this smart sensor! Using a magnetic reed switch and an OLED display, it shows real-time status updates.\n\n🔧 How It Works:\n\n\t•\tMagnetic reed switch detects door position.\n\t•\tMicrocontroller reads sensor state.\n\t•\tOLED displays “Closed” or “Open” with animations.\n\n💡 Utility:\nPerfect for home automation to monitor door activity and enhance security.\n\nStay tuned for more innovative projects! 🚀🔍\n\n#SmartHome #HomeAutomation #IoT #TechInnovation #DIYProjects #Electronics #Arduino #ESP8266 #SmartSensor",
-    "url": "https://www.instagram.com/p/C75jB79McLe/",
-    "caption": "🚪✨ Smart Door Sensor! ✨🚪\n\nKnow instantly if your door is open or closed with this smart sensor! Using a magnetic reed switch and an OLED display, it shows real-time status updates.\n\n🔧 How It Works:\n\n\t•\tMagnetic reed switch detects door position.\n\t•\tMicrocontroller reads sensor state.\n\t•\tOLED displays “Closed” or “Open” with animations.\n\n💡 Utility:\nPerfect for home automation to monitor door activity and enhance security.\n\nStay tuned for more innovative projects! 🚀🔍\n\n#SmartHome #HomeAutomation #IoT #TechInnovation #DIYProjects #Electronics #Arduino #ESP8266 #SmartSensor",
-    "likes": 40,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C74Iw6mMoza/",
-    "date": "2024-06-06",
-    "summary": "Can you guess what I’m building!",
-    "url": "https://www.instagram.com/p/C74Iw6mMoza/",
-    "caption": "Can you guess what I’m building!",
-    "likes": 1,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C71tXTYMAJ9/",
-    "date": "2024-06-05",
-    "summary": "I don’t want to get carried away so this is the best way to ensure I stick to my projects. While doing the other fun ones, wait for car chase vol 2.0",
-    "url": "https://www.instagram.com/p/C71tXTYMAJ9/",
-    "caption": "I don’t want to get carried away so this is the best way to ensure I stick to my projects. While doing the other fun ones, wait for car chase vol 2.0",
-    "likes": 2,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7uncjJStmM/",
-    "date": "2024-06-02",
-    "summary": "Wanted to add like 3 shelves and had to settle for 1.\nFixed and setup the lamp with some special geometric pink prints.\nAdded another lampshade to the overhead light for more soft lighting.\nWas able to mount the spool holder to the wall to minimise any wobble.\nUpgraded to an ikea bin.\nAdded the Allen key kit and filament cutter holder.\nPowered the whole setup with my own smart spike.",
-    "url": "https://www.instagram.com/p/C7uncjJStmM/",
-    "caption": "Wanted to add like 3 shelves and had to settle for 1.\nFixed and setup the lamp with some special geometric pink prints.\nAdded another lampshade to the overhead light for more soft lighting.\nWas able to mount the spool holder to the wall to minimise any wobble.\nUpgraded to an ikea bin.\nAdded the Allen key kit and filament cutter holder.\nPowered the whole setup with my own smart spike.",
-    "likes": 4,
-    "comments": 1
-  },
-  {
-    "id": "https://www.instagram.com/p/C7qfYbCMM39/",
-    "date": "2024-06-01",
-    "summary": "Keep watching to know what happens next! 👀",
-    "url": "https://www.instagram.com/p/C7qfYbCMM39/",
-    "caption": "Keep watching to know what happens next! 👀",
-    "likes": 7,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7opiI6sKKh/",
-    "date": "2024-05-31",
-    "summary": "The white filament had a lot of adhesion issues which mostly I was able to solve but after this failed attempt I did realise the hilt needed to be black. While downloading and 3D print I’m ready made files has its own hassles, the real game begins now, how do I paint it to look realistic.",
-    "url": "https://www.instagram.com/p/C7opiI6sKKh/",
-    "caption": "The white filament had a lot of adhesion issues which mostly I was able to solve but after this failed attempt I did realise the hilt needed to be black. While downloading and 3D print I’m ready made files has its own hassles, the real game begins now, how do I paint it to look realistic.",
-    "likes": 44,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7mG9AvMQvr/",
-    "date": "2024-05-30",
-    "summary": "🚀 Using stepper motors to create a linear rail! Here’s why stepper motors are essential:\n\n- **Precise Control:** Allows for exact positioning.\n- **High Torque:** Great for demanding applications.\n- **Reliability:** Consistent performance over time.\n\n**Types of Motors:**\n- **DC Motor:** Simple, variable speed, but less precise.\n- **Servo Motor:** Offers high precision with feedback control.\n- **Stepper Motor:** Combines precision and control, perfect for projects requiring exact movement.\n\nStay tuned to see the results! 🔧✨ #TechInnovation #StepperMotor #DIYProjects #MakersGonnaMake",
-    "url": "https://www.instagram.com/p/C7mG9AvMQvr/",
-    "caption": "🚀 Using stepper motors to create a linear rail! Here’s why stepper motors are essential:\n\n- **Precise Control:** Allows for exact positioning.\n- **High Torque:** Great for demanding applications.\n- **Reliability:** Consistent performance over time.\n\n**Types of Motors:**\n- **DC Motor:** Simple, variable speed, but less precise.\n- **Servo Motor:** Offers high precision with feedback control.\n- **Stepper Motor:** Combines precision and control, perfect for projects requiring exact movement.\n\nStay tuned to see the results! 🔧✨ #TechInnovation #StepperMotor #DIYProjects #MakersGonnaMake",
-    "likes": 14,
-    "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C7hzlDXsht_/",
-    "date": "2024-05-28",
-    "summary": "OLED displays with SPI are perfect for creating interactive and dynamic projects! \n\nThis 128x64 pixel module offers high contrast, low power consumption, and fast updates, making it ideal for animations, real-time feedback, and sleek UI elements in your DIY electronics.\n\nWatch as a simple button press triggers a responsive animation on the OLED screen! 🎥🔄\n\n#OLED #SPI #Electronics #DIY #Tech #Microcontroller #ESP8266",
-    "url": "https://www.instagram.com/p/C7hzlDXsht_/",
-    "caption": "OLED displays with SPI are perfect for creating interactive and dynamic projects! \n\nThis 128x64 pixel module offers high contrast, low power consumption, and fast updates, making it ideal for animations, real-time feedback, and sleek UI elements in your DIY electronics.\n\nWatch as a simple button press triggers a responsive animation on the OLED screen! 🎥🔄\n\n#OLED #SPI #Electronics #DIY #Tech #Microcontroller #ESP8266",
-    "likes": 3,
-    "comments": 1
-  },
-  {
-    "id": "https://www.instagram.com/p/C7eAvlDMneP/",
-    "date": "2024-05-27",
-    "summary": "Built my own programmable RGB light bar with addressable LED strips, an ESP8266, and WLED firmware! 🎨✨ Addressable means each LED can be individually controlled for awesome custom effects. Perfect for setting the vibe just right. #DIYProject #RGBLights #SmartLighting #ESP8266 #WLED",
-    "url": "https://www.instagram.com/p/C7eAvlDMneP/",
-    "caption": "Built my own programmable RGB light bar with addressable LED strips, an ESP8266, and WLED firmware! 🎨✨ Addressable means each LED can be individually controlled for awesome custom effects. Perfect for setting the vibe just right. #DIYProject #RGBLights #SmartLighting #ESP8266 #WLED",
-    "likes": 14,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7b2MSnMoOX/",
-    "date": "2024-05-26",
-    "summary": "🔍 **OpenCV & Mediapipe: Transforming Visual Technology**\n\nOpenCV is a powerful tool for image and video processing, making it easier to work with visual data. Mediapipe specializes in real-time, cross-platform machine learning solutions.\n\nWith these technologies, you can:\n- Track hand movements for interactive applications 🖐️\n- Apply facial filters and effects for enhanced selfies 📸\n- Develop gesture-based controls for smart devices 📱\n\nThese tools open up endless possibilities for creativity and innovation in technology.\n\n#OpenCV #Mediapipe #ComputerVision #TechInnovation #HandTracking #MachineLearning",
-    "url": "https://www.instagram.com/p/C7b2MSnMoOX/",
-    "caption": "🔍 **OpenCV & Mediapipe: Transforming Visual Technology**\n\nOpenCV is a powerful tool for image and video processing, making it easier to work with visual data. Mediapipe specializes in real-time, cross-platform machine learning solutions.\n\nWith these technologies, you can:\n- Track hand movements for interactive applications 🖐️\n- Apply facial filters and effects for enhanced selfies 📸\n- Develop gesture-based controls for smart devices 📱\n\nThese tools open up endless possibilities for creativity and innovation in technology.\n\n#OpenCV #Mediapipe #ComputerVision #TechInnovation #HandTracking #MachineLearning",
-    "likes": 4,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7Zs7MQsWWj/",
-    "date": "2024-05-25",
-    "summary": "🚪✨ Just turned my regular door into a smart door! With an ESP8266, a servo motor, and Alexa integration, I can now wirelessly open my door using voice commands. 🌐🔓 Whether I’m at home or away, I can control it from anywhere using the Alexa app. #SmartHome #DIYTech #IoT #AlexaSkills #HomeAutomation #TechInnovation #OpenSource",
-    "url": "https://www.instagram.com/p/C7Zs7MQsWWj/",
-    "caption": "🚪✨ Just turned my regular door into a smart door! With an ESP8266, a servo motor, and Alexa integration, I can now wirelessly open my door using voice commands. 🌐🔓 Whether I’m at home or away, I can control it from anywhere using the Alexa app. #SmartHome #DIYTech #IoT #AlexaSkills #HomeAutomation #TechInnovation #OpenSource",
-    "likes": 91,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C7WaZKaMtiv/",
-    "date": "2024-05-24",
-    "summary": "🌡️🌿 **Meet the DHT11 Sensor!** 🌿🌡️\n\nThis little gadget measures both temperature and humidity, making it perfect for home automation, greenhouses, and weather stations! 🌱📡 With an accuracy of ±2°C for temperature and ±5% for humidity, it’s a reliable choice for your DIY projects. #TechTuesday #SmartHome #DIYelectronics #Arduino #Sensors #GreenTech #DHT11",
-    "url": "https://www.instagram.com/p/C7WaZKaMtiv/",
-    "caption": "🌡️🌿 **Meet the DHT11 Sensor!** 🌿🌡️\n\nThis little gadget measures both temperature and humidity, making it perfect for home automation, greenhouses, and weather stations! 🌱📡 With an accuracy of ±2°C for temperature and ±5% for humidity, it’s a reliable choice for your DIY projects. #TechTuesday #SmartHome #DIYelectronics #Arduino #Sensors #GreenTech #DHT11",
-    "likes": 6,
     "comments": 0
   }
 ]
