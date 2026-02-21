@@ -44,10 +44,18 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             onClose();
         };
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                window.history.back();
+            }
+        };
+
         window.addEventListener('popstate', handlePopState);
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('keydown', handleKeyDown);
         };
     }, [onClose]);
 

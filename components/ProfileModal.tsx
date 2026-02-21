@@ -8,13 +8,39 @@ interface Props {
 }
 
 const ProfileModal: React.FC<Props> = ({ onClose }) => {
+  React.useEffect(() => {
+    window.history.pushState({ modal: 'profile' }, '', window.location.href);
+
+    const handlePopState = () => {
+      onClose();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        window.history.back();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
+
+  const handleManualClose = () => {
+    window.history.back();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl"
-      onClick={onClose}
+      onClick={handleManualClose}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -25,7 +51,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
         className="relative w-[95vw] md:w-full max-w-6xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] scale-100 md:scale-90 origin-center"
       >
         <button
-          onClick={onClose}
+          onClick={handleManualClose}
           className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-colors z-20"
         >
           <X size={20} />

@@ -81,7 +81,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                                     <motion.div
                                         layoutId="active-nav-bubble"
                                         className="absolute right-0 w-10 h-10 rounded-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] z-0"
-                                        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                                        transition={{ type: "tween", duration: 0.3, ease: "circOut" }}
                                     />
                                 )}
                             </motion.div>
@@ -90,35 +90,28 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                 </div>
             </div>
 
-            {/* Mobile - Horizontal below header */}
-            <div className="flex md:hidden fixed bottom-6 left-0 right-0 z-[100] justify-center px-4 pointer-events-none">
-                <div className="flex flex-row gap-2 items-center bg-black/60 backdrop-blur-xl border border-white/10 rounded-full py-2.5 px-4 shadow-xl pointer-events-auto">
+            {/* Mobile - Top Navbar */}
+            <div className="flex md:hidden fixed top-0 left-0 right-0 z-[100] justify-center px-4 py-3 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 pointer-events-auto">
+                <div className="flex flex-row gap-8 items-center w-full justify-center">
                     {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const Icon = item.icon;
 
                         return (
-                            <motion.button
+                            <button
                                 key={item.id}
                                 className={`
-                                    relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 z-10
-                                    ${isActive ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}
+                                    relative flex flex-col items-center justify-center gap-1 transition-colors duration-300
+                                    ${isActive ? 'text-indigo-400' : 'text-white/50 hover:text-white/80'}
                                 `}
                                 onClick={() => handleNavClick(item.id)}
                                 aria-label={`Navigate to ${item.label}`}
                             >
-                                <Icon size={20} strokeWidth={isActive ? 2 : 1.5} className="relative z-10" />
-
-                                {/* Active Bubble Background */}
+                                <Icon size={20} className="relative z-10" />
                                 {isActive && (
-                                    <motion.div
-                                        layoutId="mobile-nav-bubble"
-                                        className="absolute inset-0 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)] z-0"
-                                        initial={false}
-                                        transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                                    />
+                                    <div className="absolute -bottom-3 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
                                 )}
-                            </motion.button>
+                            </button>
                         );
                     })}
                 </div>

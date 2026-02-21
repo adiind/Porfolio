@@ -179,6 +179,39 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
   // Computed property for easy access
   const skillExpanded = activeSkillId !== null;
 
+  // History and Escape Key Management
+  React.useEffect(() => {
+    if (activeSkillId !== null) {
+      window.history.pushState({ modal: 'skill' }, '', window.location.href);
+    }
+
+    const handlePopState = () => {
+      setActiveSkillId(null);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeSkillId !== null) {
+        window.history.back();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    if (activeSkillId !== null) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (activeSkillId !== null) {
+        window.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, [activeSkillId]);
+
+  const handleManualClose = () => {
+    window.history.back();
+  };
+
   const handleActiveNodeChange = (nodeId: number | null) => {
     setActiveSkillId(nodeId);
   };
@@ -208,7 +241,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-full w-full pointer-events-none py-12 md:py-16">
+    <div className="relative flex flex-col items-center justify-between h-full w-full pointer-events-none pt-20 pb-12 md:py-16">
 
       {/* HERO TEXT BLOCK - Compact, one thought */}
       <div className={`relative z-50 w-full max-w-[700px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
@@ -228,12 +261,12 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
         </motion.div>
       </div>
 
-      {/* FLOATING GITHUB WIDGET - Left wing on desktop, stacked on mobile */}
+      {/* FLOATING GITHUB WIDGET - Left wing on desktop, hidden on mobile */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-        className="w-full md:w-auto md:absolute md:left-4 lg:left-12 xl:left-24 md:top-1/2 md:-translate-y-1/2 z-40 mt-12 md:mt-0 flex justify-center md:justify-start"
+        className="hidden md:flex md:w-auto absolute left-4 lg:left-12 xl:left-24 top-1/2 -translate-y-1/2 z-40 justify-start scale-90 md:scale-100 origin-top"
       >
         <motion.div
           animate={{ y: [0, -5, 0] }}
@@ -301,7 +334,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           <AnimatePresence>
             <div
               className="fixed inset-0 z-[99999] flex items-start justify-center pt-8 md:pt-16 pointer-events-auto bg-black/80 backdrop-blur-md overflow-y-auto pb-8"
-              onClick={() => setActiveSkillId(null)}
+              onClick={handleManualClose}
             >
               <div
                 className="relative w-[90%] md:w-[700px] max-w-[700px]"
@@ -353,9 +386,11 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                           onClick={(e) => {
                             e.stopPropagation();
                             // Close skill modal and navigate to project
-                            setActiveSkillId(null);
-                            // Dispatch custom event to open project
-                            window.dispatchEvent(new CustomEvent('openProject', { detail: { id: project.id, type: project.type } }));
+                            handleManualClose();
+                            // Dispatch custom event to open project after giving history time to update
+                            setTimeout(() => {
+                              window.dispatchEvent(new CustomEvent('openProject', { detail: { id: project.id, type: project.type } }));
+                            }, 10);
                           }}
                         >
                           {/* Project Image */}
@@ -393,12 +428,12 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setActiveSkillId(null);
+                    handleManualClose();
                   }}
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setActiveSkillId(null);
+                    handleManualClose();
                   }}
                   type="button"
                   aria-label="Close"

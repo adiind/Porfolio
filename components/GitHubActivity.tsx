@@ -154,19 +154,27 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
 
     if (variant === 'compact') {
         return (
-            <div className="flex flex-col gap-3 w-[300px] pointer-events-auto">
-                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl w-fit shadow-xl">
-                    <GitCommit size={18} className="text-emerald-400" />
+            <a
+                href={`https://github.com/${REPO_OWNER}/${REPO_NAME}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col gap-3 w-[300px] pointer-events-auto group/github transition-transform duration-300 hover:-translate-y-1 block"
+            >
+                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 backdrop-blur-md border border-white/10 group-hover/github:border-white/30 rounded-2xl w-fit shadow-xl transition-colors duration-300">
+                    <GitCommit size={18} className="text-emerald-400 group-hover/github:text-emerald-300 transition-colors" />
                     <div className="flex flex-col">
-                        <span className="text-lg font-bold text-white leading-none tracking-tight">{stats.totalCommits}+</span>
+                        <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">{stats.totalCommits}+</span>
                         <span className="text-[9px] text-white/50 uppercase tracking-widest mt-0.5">Total Commits</span>
                     </div>
                 </div>
 
-                <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-xl">
-                    <div className="flex items-center gap-2 mb-3">
-                        <Calendar size={12} className="text-white/60" />
-                        <span className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Activity</span>
+                <div className="bg-black/40 backdrop-blur-md border border-white/10 group-hover/github:border-white/30 rounded-2xl p-4 shadow-xl transition-colors duration-300 relative overflow-hidden">
+                    {/* Hover Glow Effect */}
+                    <div className="absolute inset-0 bg-emerald-500/0 group-hover/github:bg-emerald-500/5 transition-colors duration-300 pointer-events-none" />
+
+                    <div className="flex items-center gap-2 mb-3 relative z-10">
+                        <Calendar size={12} className="text-white/60 group-hover/github:text-white/90 transition-colors" />
+                        <span className="text-[10px] uppercase tracking-widest text-white/60 font-medium group-hover/github:text-white/90 transition-colors">Activity</span>
                     </div>
 
                     <div className="relative w-full overflow-hidden">
@@ -184,7 +192,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         );
     }
 

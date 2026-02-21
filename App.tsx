@@ -16,7 +16,6 @@ import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
 import BlogSection from './components/BlogSection';
-import GitHubActivity from './components/GitHubActivity';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
@@ -128,9 +127,9 @@ const App: React.FC = () => {
       }
 
       // For projects, scroll to the Selected Work section and click the project card
-      // First ensure we're in normal mode so the projects section is visible
+      // First ensure we're in fit mode so the projects section is visible
       if (mode === 'intro') {
-        handleZoom('normal');
+        handleZoom('fit');
       }
 
       // Wait for mode transition and scroll to the project
@@ -608,9 +607,9 @@ const App: React.FC = () => {
     if (section === 'profile') {
       handleZoom('intro');
     } else {
-      // If currently in intro, switch to normal first
+      // If currently in intro, switch to fit mode first
       if (mode === 'intro') {
-        handleZoom('normal');
+        handleZoom('fit');
         // Small delay to allow state to settle before scrolling request
         setTimeout(() => {
           if (section === 'experiences') {
@@ -1086,9 +1085,6 @@ const App: React.FC = () => {
 
           {/* --- WRITINGS SECTION --- */}
           <BlogSection isUnlocked={isWritingsUnlocked} />
-
-          {/* --- GITHUB ACTIVITY SECTION --- */}
-          <GitHubActivity />
 
           <div className="h-32 w-full" />
         </div>

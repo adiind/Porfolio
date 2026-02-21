@@ -56,10 +56,18 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
             onClose();
         };
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                window.history.back();
+            }
+        };
+
         window.addEventListener('popstate', handlePopState);
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('keydown', handleKeyDown);
             // We rely on the user's action to pop the state (by clicking back)
             // Or if we close manually, we pop it ourselves in handleManualClose
         };
@@ -431,6 +439,16 @@ const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: stri
 
 // Feature Card Modal (Detailed View)
 const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accent: string }> = ({ card, onClose, accent }) => {
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
     return (
         <div
             className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
