@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate, LayoutGroup } from 'framer-motion';
-import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS } from './constants';
+import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS, REAL_USER_IMAGE } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
 import TimelineEvent from './components/TimelineEvent';
 import TimelineRail from './components/TimelineRail';
@@ -31,7 +31,7 @@ const App: React.FC = () => {
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [activeSection, setActiveSection] = useState<'profile' | 'experiences' | 'projects' | 'writings'>('profile'); // Added
-
+  const [isWritingsUnlocked, setIsWritingsUnlocked] = useState(false); // Added
 
 
   // Mouse tracking for Spotlight
@@ -177,28 +177,100 @@ const App: React.FC = () => {
     });
   };
 
-  // 2. Scroll Logic - RESTORED BUT MODIFIED
-  // Intro -> Fit is scrollable. Fit -> Intro is MANUAL. Fit -> Normal is MANUAL.
+  // 2. Scroll Snap Logic - Snaps between sections: Profile → Experiences → Projects → Writings
+  const snapCooldownRef = useRef(false);
+  const SNAP_COOLDOWN_MS = 700; // Prevent rapid snapping
+  const SCROLL_THRESHOLD = 25; // Intentional scroll threshold
+
+  // Helper to get section positions
+  const getSectionPositions = useCallback(() => {
+    const projectsEl = document.getElementById('projects');
+    const writingsEl = document.getElementById('writings');
+    return {
+      experiences: 0,
+      projects: projectsEl ? projectsEl.offsetTop - 100 : 0,
+      writings: writingsEl ? writingsEl.offsetTop - 100 : 0,
+    };
+  }, []);
+
+  // Helper to determine current section based on scroll position
+  const getCurrentSection = useCallback((scrollTop: number): 'profile' | 'experiences' | 'projects' | 'writings' => {
+    if (mode === 'intro') return 'profile';
+
+    const positions = getSectionPositions();
+    const viewportBuffer = window.innerHeight * 0.3; // 30% buffer for section detection
+
+    // Check from bottom to top for proper detection
+    if (isWritingsUnlocked && scrollTop >= positions.writings - viewportBuffer) return 'writings';
+    if (scrollTop >= positions.projects - viewportBuffer) return 'projects';
+    return 'experiences';
+  }, [mode, getSectionPositions, isWritingsUnlocked]);
+
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
+      if (snapCooldownRef.current) return;
 
-      // Scroll down from intro → go to fit (collapsed view)
-      // Balanced threshold (deltaY > 15) - prevents accidental triggers but responsive to intentional scrolls
-      if (mode === 'intro' && e.deltaY > 15) {
-        handleZoom('fit');
+      const container = scrollContainerRef.current;
+      const positions = getSectionPositions();
+      const currentScrollTop = container?.scrollTop ?? 0;
+      const currentSection = getCurrentSection(currentScrollTop);
+      const isScrollingDown = e.deltaY > SCROLL_THRESHOLD;
+      const isScrollingUp = e.deltaY < -SCROLL_THRESHOLD;
+
+      // --- SCROLL DOWN ---
+      if (isScrollingDown) {
+        snapCooldownRef.current = true;
+
+        if (mode === 'intro') {
+          // Profile → Experiences
+          handleZoom('fit');
+        } else if (currentSection === 'experiences' && container) {
+          // Experiences → Projects
+          e.preventDefault();
+          smoothScrollTo(container, positions.projects);
+        } else if (currentSection === 'projects' && container) {
+          // Projects → Writings (locked)
+          if (!isWritingsUnlocked) {
+            snapCooldownRef.current = false;
+            return;
+          }
+          // Projects → Writings (unlocked)
+          e.preventDefault();
+          smoothScrollTo(container, positions.writings);
+        } else {
+          // Already at bottom, allow natural scroll
+          snapCooldownRef.current = false;
+          return;
+        }
+
+        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
         return;
       }
 
-      // NO AUTOMATIC TRANSITION TO NORMAL MODE
+      // --- SCROLL UP ---
+      if (isScrollingUp) {
+        snapCooldownRef.current = true;
 
-      // Scroll up from timeline top → go to intro
-      if ((mode === 'fit' || mode === 'normal') && scrollContainerRef.current) {
-        // If at top and scrolling up (negative deltaY)
-        if (scrollContainerRef.current.scrollTop <= 5 && e.deltaY < -20) {
+        if (currentSection === 'writings' && container) {
+          // Writings → Projects
+          e.preventDefault();
+          smoothScrollTo(container, positions.projects);
+        } else if (currentSection === 'projects' && container) {
+          // Projects → Experiences
+          e.preventDefault();
+          smoothScrollTo(container, positions.experiences);
+        } else if (currentSection === 'experiences' && container && currentScrollTop <= 10) {
+          // Experiences (at top) → Profile
           handleZoom('intro');
+        } else {
+          // Not at section boundary, allow natural scroll
+          snapCooldownRef.current = false;
           return;
         }
+
+        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
+        return;
       }
     };
 
@@ -209,26 +281,62 @@ const App: React.FC = () => {
     };
     const handleTouchMove = (e: TouchEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY; // Positive = swiping up (scrolling down), Negative = swiping down
+      if (snapCooldownRef.current) return;
 
-      // Swipe up from intro → go to fit
-      if (mode === 'intro' && deltaY > 30) {
-        handleZoom('fit');
+      const container = scrollContainerRef.current;
+      const positions = getSectionPositions();
+      const currentScrollTop = container?.scrollTop ?? 0;
+      const currentSection = getCurrentSection(currentScrollTop);
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchStartY - touchY; // Positive = swiping up (scrolling down)
+      const TOUCH_THRESHOLD = 50;
+
+      // Swipe up (scroll down)
+      if (deltaY > TOUCH_THRESHOLD) {
+        snapCooldownRef.current = true;
+        touchStartY = touchY; // Reset to prevent multiple triggers
+
+        if (mode === 'intro') {
+          handleZoom('fit');
+        } else if (currentSection === 'experiences' && container) {
+          smoothScrollTo(container, positions.projects);
+        } else if (currentSection === 'projects' && container) {
+          if (!isWritingsUnlocked) {
+            snapCooldownRef.current = false;
+            return;
+          }
+          smoothScrollTo(container, positions.writings);
+        } else {
+          snapCooldownRef.current = false;
+          return;
+        }
+
+        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
         return;
       }
 
-      // Swipe down from timeline top → go to intro
-      if ((mode === 'fit' || mode === 'normal') && scrollContainerRef.current) {
-        // If at top and swiping down (negative deltaY)
-        if (scrollContainerRef.current.scrollTop <= 5 && deltaY < -50) {
+      // Swipe down (scroll up)
+      if (deltaY < -TOUCH_THRESHOLD) {
+        snapCooldownRef.current = true;
+        touchStartY = touchY;
+
+        if (currentSection === 'writings' && container) {
+          smoothScrollTo(container, positions.projects);
+        } else if (currentSection === 'projects' && container) {
+          smoothScrollTo(container, positions.experiences);
+        } else if (currentSection === 'experiences' && container && currentScrollTop <= 10) {
           handleZoom('intro');
+        } else {
+          snapCooldownRef.current = false;
           return;
         }
+
+        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
+        return;
       }
     };
 
-    window.addEventListener('wheel', handleGlobalWheel, { passive: true });
+    window.addEventListener('wheel', handleGlobalWheel, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     return () => {
@@ -236,7 +344,7 @@ const App: React.FC = () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, handleZoom]);
+  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, handleZoom, getSectionPositions, getCurrentSection]);
 
 
   // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
@@ -309,7 +417,7 @@ const App: React.FC = () => {
     let writingsIntersecting = false;
 
     const updateActiveSection = () => {
-      if (writingsIntersecting) {
+      if (writingsIntersecting && isWritingsUnlocked) {
         setActiveSection('writings');
       } else if (projectsIntersecting) {
         setActiveSection('projects');
@@ -512,7 +620,7 @@ const App: React.FC = () => {
             if (projectsEl && scrollContainerRef.current) {
               smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50); // Small buffer
             }
-          } else if (section === 'writings') {
+          } else if (section === 'writings' && isWritingsUnlocked) {
             const writingsEl = document.getElementById('writings');
             if (writingsEl && scrollContainerRef.current) {
               smoothScrollTo(scrollContainerRef.current, writingsEl.offsetTop - 50);
@@ -528,7 +636,7 @@ const App: React.FC = () => {
           if (projectsEl && scrollContainerRef.current) {
             smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50);
           }
-        } else if (section === 'writings') {
+        } else if (section === 'writings' && isWritingsUnlocked) {
           const writingsEl = document.getElementById('writings');
           if (writingsEl && scrollContainerRef.current) {
             smoothScrollTo(scrollContainerRef.current, writingsEl.offsetTop - 50);
@@ -608,17 +716,46 @@ const App: React.FC = () => {
           transition={pageTransition}
           className="relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 pointer-events-auto"
         >
-          <div className="cursor-pointer group" onClick={() => handleZoom('intro')}>
-            <h1 className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors">
-              Adi <span className="font-normal text-white/60 group-hover:text-indigo-300">Agarwal</span>
-            </h1>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mt-0.5 group-hover:text-white/60 transition-colors">
-              Product | Engineering | Data | Design
-            </p>
+          {/* Status Badge Header */}
+          <div
+            className="group flex items-center gap-3 cursor-pointer relative"
+            onClick={() => setIsProfileOpen(true)}
+          >
+            {/* Profile Photo */}
+            <div className="relative w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 transition-colors duration-300">
+              <img
+                src={REAL_USER_IMAGE}
+                alt="Adi Agarwal"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Name and Status */}
+            <div className="flex flex-col">
+              <span className="text-white font-medium text-sm tracking-tight group-hover:text-indigo-300 transition-colors">Adi Agarwal</span>
+
+              {/* Open for Work with Glowing Dot */}
+              <div className="relative flex items-center gap-1.5">
+                {/* Glowing Green Dot */}
+                <div className="relative">
+                  <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full blur-sm opacity-60 group-hover:opacity-100 animate-pulse" />
+                  <div className="relative w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_6px_1px_rgba(52,211,153,0.4)] group-hover:shadow-[0_0_10px_3px_rgba(52,211,153,0.6)] transition-shadow duration-300" />
+                </div>
+                <span className="text-white/50 text-[10px] group-hover:text-white/70 transition-colors duration-300">Open for work</span>
+              </div>
+            </div>
+
+            {/* Hover Tooltip */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-black/95 backdrop-blur-lg border border-white/20 rounded-lg text-xs text-white/90 font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none transform scale-95 group-hover:scale-100 shadow-xl z-50">
+              Internships | June to Aug 2026
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[-8px]">
+                <div className="border-4 border-transparent border-b-black/95"></div>
+              </div>
+            </div>
           </div>
 
-
         </motion.div>
+
       </header>
 
       {/* --- SECTION NAVIGATION RAIL --- */}
@@ -932,23 +1069,37 @@ const App: React.FC = () => {
           </LayoutGroup>
 
           {/* --- PROJECTS SECTION --- */}
-          <ProjectsSection />
+          <ProjectsSection
+            isWritingsUnlocked={isWritingsUnlocked}
+            onUnlockWritings={() => {
+              setIsWritingsUnlocked(true);
+              setTimeout(() => {
+                const writingsEl = document.getElementById('writings');
+                if (writingsEl && scrollContainerRef.current) {
+                  import('./utils').then(({ smoothScrollTo }) => {
+                    smoothScrollTo(scrollContainerRef.current!, writingsEl.offsetTop - 50);
+                  });
+                }
+              }, 150);
+            }}
+          />
 
           {/* --- WRITINGS SECTION --- */}
-          <BlogSection />
+          <BlogSection isUnlocked={isWritingsUnlocked} />
+
+          {/* --- GITHUB ACTIVITY SECTION --- */}
+          <GitHubActivity />
 
           <div className="h-32 w-full" />
         </div>
       </motion.div>
-
-      {/* --- GITHUB ACTIVITY WIDGET (Fixed position) --- */}
-      <GitHubActivity />
 
       {/* --- VERTICAL NAVIGATION --- */}
       <VerticalNavbar
         activeSection={activeSection}
         onNavigate={handleNavigate}
         mode={mode}
+        isWritingsUnlocked={isWritingsUnlocked}
       />
     </div>
   );

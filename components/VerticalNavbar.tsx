@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Grid, BookOpen } from 'lucide-react';
+import { User, Briefcase, Sparkles, BookOpen } from 'lucide-react';
 import { TimelineMode } from '../types';
 
 interface VerticalNavbarProps {
@@ -12,11 +12,11 @@ interface VerticalNavbarProps {
 const navItems = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'experiences', label: 'Experiences', icon: Briefcase },
-    { id: 'projects', label: 'Projects', icon: Grid },
+    { id: 'projects', label: 'Projects', icon: Sparkles },
     { id: 'writings', label: 'Writings', icon: BookOpen },
 ] as const;
 
-const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode }) => {
+const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode, isWritingsUnlocked = false }) => {
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
     const handleNavClick = (id: 'profile' | 'experiences' | 'projects' | 'writings') => {
@@ -33,15 +33,15 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
             {/* Desktop - Vertical on Right Side */}
             <div className="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center">
                 <div className="flex flex-col gap-6 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-6 px-3 shadow-2xl shadow-black/50">
-                    {navItems.map((item) => {
+                    {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const isHovered = hoveredTab === item.id;
                         const Icon = item.icon;
 
                         return (
-                            <div
+                            <motion.div
                                 key={item.id}
-                                className="relative flex items-center justify-end group pointer-events-auto"
+                                className={`relative flex items-center justify-end group pointer-events-auto cursor-pointer`}
                                 onMouseEnter={() => setHoveredTab(item.id)}
                                 onMouseLeave={() => setHoveredTab(null)}
                                 onClick={() => handleNavClick(item.id)}
@@ -84,40 +84,41 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                                         transition={{ type: "spring", stiffness: 350, damping: 25 }}
                                     />
                                 )}
-                            </div>
+                            </motion.div>
                         );
                     })}
                 </div>
             </div>
 
             {/* Mobile - Horizontal below header */}
-            <div className="flex md:hidden fixed top-[72px] left-0 right-0 z-50 justify-center px-4">
-                <div className="flex flex-row gap-1 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-2 px-3 shadow-lg shadow-black/30">
-                    {navItems.map((item) => {
+            <div className="flex md:hidden fixed bottom-6 left-0 right-0 z-[100] justify-center px-4 pointer-events-none">
+                <div className="flex flex-row gap-2 items-center bg-black/60 backdrop-blur-xl border border-white/10 rounded-full py-2.5 px-4 shadow-xl pointer-events-auto">
+                    {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const Icon = item.icon;
 
                         return (
-                            <div
+                            <motion.button
                                 key={item.id}
-                                className="relative flex items-center justify-center pointer-events-auto"
+                                className={`
+                                    relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 z-10
+                                    ${isActive ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}
+                                `}
                                 onClick={() => handleNavClick(item.id)}
-                                role="button"
                                 aria-label={`Navigate to ${item.label}`}
                             >
-                                {/* Icon + Label Container */}
-                                <div
-                                    className={`
-                                        relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300 z-10
-                                        ${isActive ? 'text-white bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.4)]' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}
-                                    `}
-                                >
-                                    <Icon size={14} strokeWidth={isActive ? 2 : 1.5} />
-                                    <span className={`text-[10px] font-medium uppercase tracking-wide ${isActive ? 'text-white' : 'text-white/50'}`}>
-                                        {item.label}
-                                    </span>
-                                </div>
-                            </div>
+                                <Icon size={20} strokeWidth={isActive ? 2 : 1.5} className="relative z-10" />
+
+                                {/* Active Bubble Background */}
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="mobile-nav-bubble"
+                                        className="absolute inset-0 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)] z-0"
+                                        initial={false}
+                                        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                                    />
+                                )}
+                            </motion.button>
                         );
                     })}
                 </div>

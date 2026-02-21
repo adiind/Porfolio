@@ -5,7 +5,12 @@ import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import { PROJECTS } from '../data/projects';
 
-const ProjectsSection: React.FC = () => {
+interface ProjectsSectionProps {
+    isWritingsUnlocked?: boolean;
+    onUnlockWritings?: () => void;
+}
+
+const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = false, onUnlockWritings }) => {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
 
     // Listen for closeAllModals event (e.g., from navbar navigation)
@@ -85,6 +90,22 @@ const ProjectsSection: React.FC = () => {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Hidden Unlock Trigger */}
+                    {!isWritingsUnlocked && onUnlockWritings && (
+                        <div className="mt-24 pt-12 flex justify-center opacity-0 hover:opacity-100 transition-opacity duration-1000">
+                            <button
+                                onClick={onUnlockWritings}
+                                className="group relative flex items-center gap-2 px-5 py-2.5 text-xs font-mono text-white/20 hover:text-white/60 bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 rounded-lg backdrop-blur-sm transition-all duration-500"
+                            >
+                                <span className="opacity-30 group-hover:opacity-100 group-hover:text-indigo-400 transition-colors">{'>_'}</span>
+                                <span className="tracking-widest uppercase ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    <span className="group-hover:hidden">system.log</span>
+                                    <span className="hidden group-hover:inline">cat /var/log/thoughts.md</span>
+                                </span>
+                            </button>
+                        </div>
+                    )}
                 </motion.div>
             </section>
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Zap, PenTool, Bot, Cpu, Layers, Box, Music, Camera, ChevronDown, Trophy, Code } from 'lucide-react';
+import { Project } from '../types/Project';
 
 interface Props {
     project: Project;
@@ -136,8 +137,8 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
         <motion.div
             ref={cardRef}
             layout
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{
                 duration: 0.5,
@@ -185,7 +186,7 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
                             alt={project.hero.title}
                             className="absolute inset-0 w-full h-full object-cover"
                             style={{
-                                opacity: isHovered ? 0.7 : 0.6,
+                                opacity: isHovered ? 0.85 : 0.85,
                                 transform: isHovered ? 'scale(1.05)' : 'scale(1)',
                                 transition: 'opacity 0.5s, transform 0.7s',
                             }}
@@ -193,9 +194,9 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
                         {/* Gradient overlays */}
                         <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-500"
-                            style={{ opacity: isHovered ? 0 : 0.9 }}
+                            style={{ opacity: isHovered ? 0 : 0.5 }}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                         </div>
                         <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-500"

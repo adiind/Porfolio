@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { USER_IMAGE_URL } from '../constants';
 import { Mail, Copy, Check, BarChart3, Code, Palette, Cpu, Printer, X, Zap, Link, ArrowRight } from 'lucide-react';
 import RadialOrbitalTimeline from './ui/radial-orbital-timeline';
+import GitHubActivity from './GitHubActivity';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -226,6 +227,21 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           </p>
         </motion.div>
       </div>
+
+      {/* FLOATING GITHUB WIDGET - Left wing on desktop, stacked on mobile */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+        className="w-full md:w-auto md:absolute md:left-4 lg:left-12 xl:left-24 md:top-1/2 md:-translate-y-1/2 z-40 mt-12 md:mt-0 flex justify-center md:justify-start"
+      >
+        <motion.div
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <GitHubActivity variant="compact" />
+        </motion.div>
+      </motion.div>
 
       {/* VISUAL ELEMENT - Secondary */}
       <div className={`relative w-[360px] h-[360px] md:w-[480px] md:h-[480px] flex items-center justify-center transition-all duration-500 ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>

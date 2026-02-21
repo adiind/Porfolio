@@ -22,7 +22,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-6xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] scale-90 origin-center"
+        className="relative w-[95vw] md:w-full max-w-6xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] scale-100 md:scale-90 origin-center"
       >
         <button
           onClick={onClose}
@@ -91,7 +91,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div >
   );
 };
 
