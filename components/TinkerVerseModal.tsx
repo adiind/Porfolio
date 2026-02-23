@@ -101,11 +101,11 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                     <ProjectsInModal activeProject={activeProject} setActiveProject={setActiveProject} />
 
 
-                    {/* Section 2: The Archive (Marquee Feed) */}
+                    {/* Section 2: Past Project Showcases (Marquee Feed) */}
                     <section className="relative">
                         <div className="flex items-end gap-4 mb-8">
-                            <h3 className="text-3xl font-bold text-white">The Archive</h3>
-                            <p className="hidden md:block text-sm text-gray-500 pb-1.5 font-mono">// Experiments & process notes</p>
+                            <h3 className="text-3xl font-bold text-white">Past Project Showcases</h3>
+                            <p className="hidden md:block text-sm text-gray-500 pb-1.5 font-mono">// Making things, one at a time</p>
                         </div>
 
                         {/* Social Grid (Restored) */}
@@ -141,15 +141,15 @@ const SocialGrid: React.FC<{ posts: SocialPost[] }> = ({ posts }) => {
                         />
 
                         {/* Content */}
-                        <div className="relative z-10 h-full p-2.5 flex flex-col justify-between">
+                        <div className="relative z-10 h-full p-3 flex flex-col justify-between">
                             <div className="flex justify-between items-start">
-                                <span className="text-[8px] font-mono text-white/30">{post.date}</span>
-                                <ExternalLink size={8} className="text-white/20 group-hover:text-white/60 transition-colors" />
+                                <span className="text-[9px] font-mono text-white/30">{post.date}</span>
+                                <ExternalLink size={10} className="text-white/20 group-hover:text-white/60 transition-colors" />
                             </div>
 
                             <div>
-                                <p className="text-[9px] text-gray-400 line-clamp-2 mb-2 group-hover:text-gray-200 transition-colors">
-                                    {post.caption}
+                                <p className="text-[10px] font-semibold text-gray-300 line-clamp-5 mb-2 group-hover:text-white transition-colors leading-snug">
+                                    {post.caption.split('\n')[0].replace(/[✨🚀🔫🌻🔫🌞🐉🪝🚪🌱⚙️🦵🦿🧡🔄💡]/gu, '').replace(/#\S+/g, '').trim() || post.caption.trim()}
                                 </p>
                                 <div className="flex gap-2 text-[9px] font-mono">
                                     <span className={`flex items-center gap-1 ${post.likes > 100 ? 'text-amber-400' : 'text-gray-500'}`}>

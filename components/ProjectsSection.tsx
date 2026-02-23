@@ -93,15 +93,16 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
 
                     {/* Hidden Unlock Trigger */}
                     {!isWritingsUnlocked && onUnlockWritings && (
-                        <div className="mt-24 pt-12 flex justify-center opacity-0 hover:opacity-100 transition-opacity duration-1000">
+                        <div className="mt-24 pt-12 flex justify-center">
                             <button
                                 onClick={onUnlockWritings}
-                                className="group relative flex items-center gap-2 px-5 py-2.5 text-xs font-mono text-white/20 hover:text-white/60 bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 rounded-lg backdrop-blur-sm transition-all duration-500"
+                                className="group relative flex items-center gap-2 px-5 py-2.5 text-xs font-mono bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 rounded-lg transition-all duration-500"
                             >
-                                <span className="opacity-30 group-hover:opacity-100 group-hover:text-indigo-400 transition-colors">{'>_'}</span>
-                                <span className="tracking-widest uppercase ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                                    <span className="group-hover:hidden">system.log</span>
-                                    <span className="hidden group-hover:inline">cat /var/log/thoughts.md</span>
+                                {/* Always faintly visible blinking cursor as a breadcrumb */}
+                                <span className="text-white/20 group-hover:text-indigo-400 transition-all duration-300 animate-pulse">{'>_'}</span>
+                                {/* Label expands on hover */}
+                                <span className="tracking-widest uppercase ml-1 max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 whitespace-nowrap text-white/50 opacity-0 group-hover:opacity-100">
+                                    cat /var/log/thoughts.md
                                 </span>
                             </button>
                         </div>

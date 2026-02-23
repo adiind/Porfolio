@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { GitCommit, Calendar, ExternalLink, Github } from 'lucide-react';
 
 interface GitHubActivityProps {
-    variant?: 'full' | 'compact';
+    variant?: 'full' | 'compact' | 'inline';
 }
 
 interface CommitData {
@@ -152,19 +152,56 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
         return null;
     }
 
+    // Inline: just two tiny stat chips
+    if (variant === 'inline') {
+        const lastCommitDate = stats.recentCommits[0]?.date
+            ? new Date(stats.recentCommits[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : null;
+        return (
+            <div className="flex flex-wrap gap-2">
+                <a
+                    href={`https://github.com/${REPO_OWNER}/${REPO_NAME}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 hover:border-emerald-500/40 rounded-full text-xs text-white/70 hover:text-emerald-300 transition-all"
+                >
+                    <GitCommit size={13} />
+                    <span>{stats.totalCommits}+ commits</span>
+                </a>
+                {lastCommitDate && (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-white/50">
+                        <Calendar size={13} />
+                        <span>Last push {lastCommitDate}</span>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     if (variant === 'compact') {
         return (
             <a
                 href={`https://github.com/${REPO_OWNER}/${REPO_NAME}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col gap-3 w-[300px] pointer-events-auto group/github transition-transform duration-300 hover:-translate-y-1 block"
+                className="flex flex-col gap-3 w-[280px] pointer-events-auto group/github transition-transform duration-300 hover:-translate-y-1 block"
             >
+                {/* Header label */}
+                <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2">
+                        <Github size={12} className="text-white/50" />
+                        <span className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-medium">How I built this site</span>
+                    </div>
+                    <span className="text-[9px] text-white/30 group-hover/github:text-white/50 transition-colors flex items-center gap-1.5">
+                        <img src="/images/antigravity_logo.png" alt="Antigravity" className="w-3 h-3 opacity-40 group-hover/github:opacity-70 transition-opacity" />
+                        <span>Adi × Antigravity</span>
+                    </span>
+                </div>
                 <div className="flex items-center gap-3 px-4 py-3 bg-white/5 backdrop-blur-md border border-white/10 group-hover/github:border-white/30 rounded-2xl w-fit shadow-xl transition-colors duration-300">
                     <GitCommit size={18} className="text-emerald-400 group-hover/github:text-emerald-300 transition-colors" />
                     <div className="flex flex-col">
                         <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">{stats.totalCommits}+</span>
-                        <span className="text-[9px] text-white/50 uppercase tracking-widest mt-0.5">Total Commits</span>
+                        <span className="text-[9px] text-white/50 uppercase tracking-widest mt-0.5">commits to build this site</span>
                     </div>
                 </div>
 
@@ -172,9 +209,12 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                     {/* Hover Glow Effect */}
                     <div className="absolute inset-0 bg-emerald-500/0 group-hover/github:bg-emerald-500/5 transition-colors duration-300 pointer-events-none" />
 
-                    <div className="flex items-center gap-2 mb-3 relative z-10">
-                        <Calendar size={12} className="text-white/60 group-hover/github:text-white/90 transition-colors" />
-                        <span className="text-[10px] uppercase tracking-widest text-white/60 font-medium group-hover/github:text-white/90 transition-colors">Activity</span>
+                    <div className="flex items-center justify-between mb-3 relative z-10">
+                        <div className="flex items-center gap-2">
+                            <Calendar size={12} className="text-white/60 group-hover/github:text-white/90 transition-colors" />
+                            <span className="text-[10px] uppercase tracking-widest text-white/60 font-medium group-hover/github:text-white/90 transition-colors">Build Activity</span>
+                        </div>
+                        <span className="text-[9px] text-white/30 group-hover/github:text-white/50 transition-colors">View source →</span>
                     </div>
 
                     <div className="relative w-full overflow-hidden">

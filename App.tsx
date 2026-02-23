@@ -208,7 +208,10 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
-      if (snapCooldownRef.current) return;
+      if (snapCooldownRef.current) {
+        e.preventDefault();
+        return;
+      }
 
       const container = scrollContainerRef.current;
       const positions = getSectionPositions();
@@ -223,6 +226,7 @@ const App: React.FC = () => {
 
         if (mode === 'intro') {
           // Profile → Experiences
+          e.preventDefault();
           handleZoom('fit');
         } else if (currentSection === 'experiences' && container) {
           // Experiences → Projects
@@ -280,7 +284,10 @@ const App: React.FC = () => {
     };
     const handleTouchMove = (e: TouchEvent) => {
       if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
-      if (snapCooldownRef.current) return;
+      if (snapCooldownRef.current) {
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
 
       const container = scrollContainerRef.current;
       const positions = getSectionPositions();
@@ -292,6 +299,7 @@ const App: React.FC = () => {
 
       // Swipe up (scroll down)
       if (deltaY > TOUCH_THRESHOLD) {
+        if (e.cancelable) e.preventDefault();
         snapCooldownRef.current = true;
         touchStartY = touchY; // Reset to prevent multiple triggers
 
@@ -316,6 +324,7 @@ const App: React.FC = () => {
 
       // Swipe down (scroll up)
       if (deltaY < -TOUCH_THRESHOLD) {
+        if (e.cancelable) e.preventDefault();
         snapCooldownRef.current = true;
         touchStartY = touchY;
 
@@ -337,7 +346,7 @@ const App: React.FC = () => {
 
     window.addEventListener('wheel', handleGlobalWheel, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     return () => {
       window.removeEventListener('wheel', handleGlobalWheel);
       window.removeEventListener('touchstart', handleTouchStart);
