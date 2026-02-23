@@ -47,6 +47,14 @@ export default function RadialOrbitalTimeline({
         x: 0,
         y: 0,
     });
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Sync expandedItems with activeNodeId
     useEffect(() => {
@@ -97,7 +105,7 @@ export default function RadialOrbitalTimeline({
     useEffect(() => {
         let rotationTimer: NodeJS.Timeout;
 
-        if (autoRotate) {
+        if (autoRotate && !isMobile) {
             rotationTimer = setInterval(() => {
                 setRotationAngle((prev) => {
                     const newAngle = (prev + 0.3) % 360;
@@ -111,7 +119,7 @@ export default function RadialOrbitalTimeline({
                 clearInterval(rotationTimer);
             }
         };
-    }, [autoRotate]);
+    }, [autoRotate, isMobile]);
 
     // Removed redundant useEffect for onActiveNodeChange since we call it directly
 
@@ -243,7 +251,7 @@ export default function RadialOrbitalTimeline({
                         >
                             {/* Glow effect - enhanced on hover */}
                             <div
-                                className={`absolute rounded-full transition-all duration-300 ${isPulsing ? "animate-pulse" : ""}`}
+                                className={`absolute rounded-full transition-all duration-300 ${isPulsing && !isMobile ? "animate-pulse" : ""}`}
                                 style={{
                                     background: isHovered
                                         ? `radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(147,51,234,0.2) 50%, rgba(255,255,255,0) 70%)`
@@ -272,7 +280,7 @@ export default function RadialOrbitalTimeline({
                                         : isHovered
                                             ? "border-white shadow-xl shadow-purple-500/40"
                                             : isRelated
-                                                ? "border-white animate-pulse"
+                                                ? `border-white ${!isMobile ? 'animate-pulse' : ''}`
                                                 : "border-white/40 hover:border-white/80"
                                     }
                                     transition-all duration-300 transform

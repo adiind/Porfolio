@@ -164,6 +164,22 @@
       "_original": {
         "status": "Not Started"
       }
+    },
+    {
+      "id": "31049d45-0000-0000-0000-000000000000",
+      "name": "Commit latest portfolio refinements",
+      "status": "In Progress",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [],
+      "url": "",
+      "createdTime": "2026-02-23T10:26:28",
+      "lastModified": "2026-02-23T10:26:28",
+      "_original": {
+        "status": "Not Started"
+      }
     }
   ]
 }

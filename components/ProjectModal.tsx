@@ -38,13 +38,39 @@ const ProjectModal: React.FC<Props> = ({ project, onClose }) => {
     'bg-purple-500/20 text-purple-200 border-purple-500/30',
   ];
 
+  React.useEffect(() => {
+    window.history.pushState({ modal: 'project-modal' }, '', window.location.href);
+
+    const handlePopState = () => {
+      onClose();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        window.history.back();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
+
+  const handleManualClose = () => {
+    window.history.back();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className={`fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 ${theme.overlay}`}
-      onClick={onClose}
+      onClick={handleManualClose}
     >
       {true && (
         // Dark Mode Background Ambience
@@ -62,7 +88,7 @@ const ProjectModal: React.FC<Props> = ({ project, onClose }) => {
         className={`relative z-10 w-full max-w-4xl border rounded-2xl overflow-hidden flex flex-col max-h-[90vh] ${theme.bg} ${theme.glow}`}
       >
         <button
-          onClick={onClose}
+          onClick={handleManualClose}
           className={`absolute top-4 right-4 p-2 rounded-full transition-colors z-20 backdrop-blur-sm ${theme.closeBtn}`}
         >
           <X size={20} />

@@ -608,13 +608,12 @@ const TimelineEvent: React.FC<Props> = ({
           onLaneHover(null);
         }
       }}
-      initial={{ opacity: 0, y: 60, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{
         top: top,
         // Scroll-triggered reveal: fade in when card enters viewport
         opacity: isInView ? (isDimmed ? 0.1 : 1) : 0,
         scale: isInView ? (isDimmed ? 0.98 : isHovered ? 1.02 : 1) : 0.95,
-        y: isInView ? 0 : 60,
         filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
         zIndex: isHovered ? 50 : 10,
       }}

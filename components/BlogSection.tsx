@@ -5,7 +5,11 @@ import BlogCard from './BlogCard';
 import BlogDetail from './BlogDetail';
 import { BLOG_POSTS } from '../data/posts';
 
-const BlogSection: React.FC = () => {
+interface BlogSectionProps {
+    isUnlocked?: boolean;
+}
+
+const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
     const [activePost, setActivePost] = useState<BlogPost | null>(null);
 
     // Listen for closeAllModals event (e.g., from navbar navigation)
@@ -17,6 +21,8 @@ const BlogSection: React.FC = () => {
 
     // Filter to only show public posts
     const visiblePosts = BLOG_POSTS.filter(p => p.visibility === 'public');
+
+    if (!isUnlocked) return null;
 
     return (
         <>

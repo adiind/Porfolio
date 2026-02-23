@@ -5,7 +5,12 @@ import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import { PROJECTS } from '../data/projects';
 
-const ProjectsSection: React.FC = () => {
+interface ProjectsSectionProps {
+    isWritingsUnlocked?: boolean;
+    onUnlockWritings?: () => void;
+}
+
+const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = false, onUnlockWritings }) => {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
 
     // Listen for closeAllModals event (e.g., from navbar navigation)
@@ -85,6 +90,23 @@ const ProjectsSection: React.FC = () => {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Hidden Unlock Trigger */}
+                    {!isWritingsUnlocked && onUnlockWritings && (
+                        <div className="mt-24 pt-12 flex justify-center">
+                            <button
+                                onClick={onUnlockWritings}
+                                className="group relative flex items-center gap-2 px-5 py-2.5 text-xs font-mono bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 rounded-lg transition-all duration-500"
+                            >
+                                {/* Always faintly visible blinking cursor as a breadcrumb */}
+                                <span className="text-white/20 group-hover:text-indigo-400 transition-all duration-300 animate-pulse">{'>_'}</span>
+                                {/* Label expands on hover */}
+                                <span className="tracking-widest uppercase ml-1 max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 whitespace-nowrap text-white/50 opacity-0 group-hover:opacity-100">
+                                    cat /var/log/thoughts.md
+                                </span>
+                            </button>
+                        </div>
+                    )}
                 </motion.div>
             </section>
 

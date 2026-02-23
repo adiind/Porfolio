@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Grid, BookOpen } from 'lucide-react';
+import { User, Briefcase, Sparkles, BookOpen } from 'lucide-react';
 import { TimelineMode } from '../types';
 
 interface VerticalNavbarProps {
@@ -12,11 +12,11 @@ interface VerticalNavbarProps {
 const navItems = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'experiences', label: 'Experiences', icon: Briefcase },
-    { id: 'projects', label: 'Projects', icon: Grid },
+    { id: 'projects', label: 'Projects', icon: Sparkles },
     { id: 'writings', label: 'Writings', icon: BookOpen },
 ] as const;
 
-const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode }) => {
+const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode, isWritingsUnlocked = false }) => {
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
     const handleNavClick = (id: 'profile' | 'experiences' | 'projects' | 'writings') => {
@@ -33,15 +33,15 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
             {/* Desktop - Vertical on Right Side */}
             <div className="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center">
                 <div className="flex flex-col gap-6 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-6 px-3 shadow-2xl shadow-black/50">
-                    {navItems.map((item) => {
+                    {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const isHovered = hoveredTab === item.id;
                         const Icon = item.icon;
 
                         return (
-                            <div
+                            <motion.div
                                 key={item.id}
-                                className="relative flex items-center justify-end group pointer-events-auto"
+                                className={`relative flex items-center justify-end group pointer-events-auto cursor-pointer`}
                                 onMouseEnter={() => setHoveredTab(item.id)}
                                 onMouseLeave={() => setHoveredTab(null)}
                                 onClick={() => handleNavClick(item.id)}
@@ -81,43 +81,37 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                                     <motion.div
                                         layoutId="active-nav-bubble"
                                         className="absolute right-0 w-10 h-10 rounded-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] z-0"
-                                        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                                        transition={{ type: "tween", duration: 0.3, ease: "circOut" }}
                                     />
                                 )}
-                            </div>
+                            </motion.div>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Mobile - Horizontal below header */}
-            <div className="flex md:hidden fixed top-[72px] left-0 right-0 z-50 justify-center px-4">
-                <div className="flex flex-row gap-1 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-2 px-3 shadow-lg shadow-black/30">
-                    {navItems.map((item) => {
+            {/* Mobile - Top Navbar */}
+            <div className="flex md:hidden fixed top-0 left-0 right-0 z-[100] justify-center px-4 py-3 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 pointer-events-auto">
+                <div className="flex flex-row gap-8 items-center w-full justify-center">
+                    {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const Icon = item.icon;
 
                         return (
-                            <div
+                            <button
                                 key={item.id}
-                                className="relative flex items-center justify-center pointer-events-auto"
+                                className={`
+                                    relative flex flex-col items-center justify-center gap-1 transition-colors duration-300
+                                    ${isActive ? 'text-indigo-400' : 'text-white/50 hover:text-white/80'}
+                                `}
                                 onClick={() => handleNavClick(item.id)}
-                                role="button"
                                 aria-label={`Navigate to ${item.label}`}
                             >
-                                {/* Icon + Label Container */}
-                                <div
-                                    className={`
-                                        relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300 z-10
-                                        ${isActive ? 'text-white bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.4)]' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}
-                                    `}
-                                >
-                                    <Icon size={14} strokeWidth={isActive ? 2 : 1.5} />
-                                    <span className={`text-[10px] font-medium uppercase tracking-wide ${isActive ? 'text-white' : 'text-white/50'}`}>
-                                        {item.label}
-                                    </span>
-                                </div>
-                            </div>
+                                <Icon size={20} className="relative z-10" />
+                                {isActive && (
+                                    <div className="absolute -bottom-3 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                                )}
+                            </button>
                         );
                     })}
                 </div>

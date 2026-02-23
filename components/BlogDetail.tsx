@@ -270,8 +270,18 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
             onClose();
         };
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                window.history.back();
+            }
+        };
+
         window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('keydown', handleKeyDown);
+        };
     }, [onClose]);
 
     const handleManualClose = () => {

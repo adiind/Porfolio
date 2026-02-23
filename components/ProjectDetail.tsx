@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
+import GitHubActivity from './GitHubActivity';
 
 interface Props {
     project: Project;
@@ -44,10 +45,18 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             onClose();
         };
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                window.history.back();
+            }
+        };
+
         window.addEventListener('popstate', handlePopState);
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('keydown', handleKeyDown);
         };
     }, [onClose]);
 
@@ -128,6 +137,14 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         {project.heroImage && (
                             <div className="rounded-2xl overflow-hidden shadow-2xl">
                                 <img src={project.heroImage} alt={project.hero.title} className="w-full h-auto object-cover" />
+                            </div>
+                        )}
+
+                        {/* === GITHUB STATS - Inline chips for Portfolio project === */}
+                        {project.id === 'portfolio-website' && (
+                            <div className="mb-6">
+                                <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Build Stats</p>
+                                <GitHubActivity variant="inline" />
                             </div>
                         )}
                     </section>
