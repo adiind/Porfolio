@@ -294,7 +294,7 @@ function setCommand(taskIdPrefix, property, value) {
     }
 
     if (property === 'status') {
-        const validStatuses = ['Not Started', 'In Progress', 'Done'];
+        const validStatuses = ['Not Started', 'In Progress', 'Testing', 'Done'];
         if (!validStatuses.includes(value)) {
             console.log(`❌ Invalid status. Valid values: ${validStatuses.join(', ')}`);
             return;
