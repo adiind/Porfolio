@@ -1,5 +1,5 @@
 {
-  "lastSync": "2026-01-08T07:37:37.188Z",
+  "lastSync": "2026-02-23T16:29:51.353Z",
   "sprintName": "Sprint 1",
   "sprintId": "2e249d45-669f-812b-8063-d55959e2a423",
   "tasks": [
@@ -166,9 +166,9 @@
       }
     },
     {
-      "id": "31049d45-0000-0000-0000-000000000000",
+      "id": "31049d45-669f-8175-979b-c7ec50230d3e",
       "name": "Commit latest portfolio refinements",
-      "status": "In Progress",
+      "status": "Done",
       "priority": null,
       "assignee": null,
       "dueDate": null,
@@ -178,7 +178,7 @@
       "createdTime": "2026-02-23T10:26:28",
       "lastModified": "2026-02-23T10:26:28",
       "_original": {
-        "status": "Not Started"
+        "status": "Done"
       }
     }
   ]

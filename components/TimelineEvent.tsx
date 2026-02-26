@@ -690,9 +690,9 @@ const TimelineEvent: React.FC<Props> = ({
 
             {/* Overlays - extended beyond bounds to cover animation lag */}
             <div
-              className="absolute -inset-8 bg-gradient-to-t from-black via-black/70 to-transparent"
+              className="absolute -inset-8 bg-gradient-to-t from-black via-black/40 to-transparent"
               style={{
-                opacity: (!isFit && isHovered) ? 0 : 0.9,
+                opacity: (!isFit && isHovered) ? 0 : 0.5,
                 transition: 'opacity 0.7s ease-out'
               }}
             />
