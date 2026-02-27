@@ -170,42 +170,32 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             {/* Background Image */}
             {hasImage && (
                 <>
-                    <motion.div
-                        className="absolute overflow-hidden z-0"
-                        animate={{
-                            top: 0,
-                            right: isHovered ? 0 : 'auto',
-                            left: isHovered ? 'auto' : 0,
-                            width: isHovered ? '50%' : '100%',
-                            height: isHovered ? '100%' : '192px',
-                        }}
-                        transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-                    >
-                        <img
+                    <div className="absolute inset-0 overflow-hidden z-0 rounded-xl">
+                        <motion.img
                             src={project.heroImage}
                             alt={project.hero.title}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            style={{
-                                opacity: isHovered ? 0.85 : 0.85,
-                                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                                transition: 'opacity 0.5s, transform 0.7s',
+                            className="absolute inset-0 w-full h-full object-cover origin-center"
+                            initial={{ scale: 1, opacity: 0.85 }}
+                            animate={{
+                                scale: isHovered ? 1.05 : 1,
+                                opacity: isHovered ? 0.6 : 0.85
                             }}
+                            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                         />
                         {/* Gradient overlays */}
                         <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-500"
                             style={{ opacity: isHovered ? 0 : 0.5 }}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/60 to-transparent" />
                         </div>
                         <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-500"
                             style={{ opacity: isHovered ? 1 : 0 }}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+                            <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent translate-y-1/4 group-hover:translate-y-0 transition-transform duration-700 ease-out" />
                         </div>
-                    </motion.div>
+                    </div>
                 </>
             )}
 

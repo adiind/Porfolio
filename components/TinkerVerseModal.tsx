@@ -83,7 +83,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white tracking-tight">TinkerVerse</h2>
-                            <p className="text-xs text-amber-500/80 uppercase tracking-widest font-mono">The Lab & Playground</p>
+                            <p className="text-xs text-amber-500/80 font-mono mt-0.5">A playground to make, test, and showcase products—all the way to video production.</p>
                         </div>
                     </div>
                     <button

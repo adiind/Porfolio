@@ -1,10 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { USER_IMAGE_URL } from '../constants';
 import { Mail, Copy, Check, BarChart3, Code, Palette, Cpu, Printer, X, Zap, Link, ArrowRight } from 'lucide-react';
-import RadialOrbitalTimeline from './ui/radial-orbital-timeline';
 import GitHubActivity from './GitHubActivity';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -173,8 +172,46 @@ const InlineChip: React.FC<{
 const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
   const [activeSkillId, setActiveSkillId] = useState<number | null>(null);
+  const [autoActiveSkillId, setAutoActiveSkillId] = useState<number | null>(null);
   const [hoveredKeyword, setHoveredKeyword] = useState<string | null>(null);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+
+  const marqueeContainerRef = useRef<HTMLDivElement>(null);
+  const autoActiveRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let frameId: number;
+    const updateAutoActive = () => {
+      if (marqueeContainerRef.current && !activeSkillId) {
+        const containerRect = marqueeContainerRef.current.getBoundingClientRect();
+        const containerCenterY = containerRect.top + containerRect.height / 2;
+
+        const pills = marqueeContainerRef.current.querySelectorAll('.skill-pill');
+        let closestId: number | null = null;
+        let minDistance = Infinity;
+
+        pills.forEach((pill) => {
+          const rect = pill.getBoundingClientRect();
+          const pillCenterY = rect.top + rect.height / 2;
+          const distance = Math.abs(pillCenterY - containerCenterY);
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestId = Number(pill.getAttribute('data-skill-id'));
+          }
+        });
+
+        if (closestId !== null && closestId !== autoActiveRef.current && minDistance < 100) {
+          autoActiveRef.current = closestId;
+          setAutoActiveSkillId(closestId);
+        }
+      }
+      frameId = requestAnimationFrame(updateAutoActive);
+    };
+
+    frameId = requestAnimationFrame(updateAutoActive);
+    return () => cancelAnimationFrame(frameId);
+  }, [activeSkillId]);
 
   // Computed property for easy access
   const skillExpanded = activeSkillId !== null;
@@ -276,58 +313,197 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
         </motion.div>
       </motion.div>
 
-      {/* VISUAL ELEMENT - Secondary */}
-      <div className={`relative w-[360px] h-[360px] md:w-[480px] md:h-[480px] flex items-center justify-center transition-all duration-500 ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>
+      {/* HIGHLIGHTED SKILL PROJECTS PREVIEW */}
+      <div
+        className="hidden md:flex flex-col absolute right-[15rem] lg:right-[18rem] xl:right-[22rem] top-1/2 -translate-y-1/2 z-30 h-[280px] lg:h-[400px] w-48 lg:w-56 overflow-hidden pointer-events-none pr-4 justify-center scale-85 md:scale-90 lg:scale-100 origin-right transition-all duration-300"
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+          maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)'
+        }}
+      >
+        <div className="relative w-full flex flex-col justify-center items-end">
+          <AnimatePresence>
+            {autoActiveSkillId && !activeSkillId && (
+              <motion.div
+                key={autoActiveSkillId}
+                initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -30, filter: 'blur(4px)' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="flex flex-col gap-3 items-end absolute w-full"
+              >
+                {skillProjectMapping[autoActiveSkillId]?.projects.slice(0, 3).map((project, idx) => (
+                  <button
+                    key={project.id + idx}
+                    onClick={() => {
+                      if (!activeSkillId) {
+                        window.dispatchEvent(new CustomEvent('openProject', { detail: { id: project.id, type: project.type } }));
+                      }
+                    }}
+                    className="flex items-center gap-3 justify-end opacity-70 hover:opacity-100 transition-opacity cursor-pointer pointer-events-auto group w-full text-right outline-none"
+                  >
+                    <div className="text-right">
+                      <p className="text-xs lg:text-sm text-white font-medium whitespace-nowrap group-hover:text-purple-300 transition-colors">{project.title}</p>
+                    </div>
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg overflow-hidden border border-white/10 shrink-0 shadow-lg bg-neutral-900 group-hover:border-white/30 transition-colors">
+                      <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    </div>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
-        {/* Radial Orbital Timeline with Skills */}
-        <RadialOrbitalTimeline
-          timelineData={skillsTimelineData}
-          activeNodeId={activeSkillId}
-          onActiveNodeChange={handleActiveNodeChange}
-          isExpanded={isAvatarHovered}
+      {/* RIGHT WING - Vertical Skills List Desktop */}
+      <div className="hidden md:flex absolute right-0 lg:right-8 xl:right-16 top-1/2 -translate-y-1/2 z-40 h-[280px] lg:h-[400px] w-60 lg:w-72 scale-85 md:scale-90 lg:scale-100 origin-right">
+
+        <motion.div
+          ref={marqueeContainerRef}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+          className={`relative flex flex-col items-end w-full h-full overflow-hidden pointer-events-none ${skillExpanded ? 'skills-paused' : ''}`}
+          style={{
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+            maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)'
+          }}
         >
-          {/* Avatar - Clear Clickable Affordance */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{
-              scale: [1, 1.02, 1],
-              opacity: 1,
-            }}
-            transition={{
-              scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-              opacity: { duration: 0.6, delay: 0.1 }
-            }}
-            className="group relative z-20 w-[240px] h-[240px] md:w-[320px] md:h-[320px] cursor-pointer pointer-events-auto transition-all duration-300"
-            onClick={onOpenProfile}
-            onMouseEnter={() => setIsAvatarHovered(true)}
-            onMouseLeave={() => setIsAvatarHovered(false)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
+          <style dangerouslySetInnerHTML={{
+            __html: `
+            @keyframes verticalMarquee {
+              0% { transform: translateY(0); }
+              100% { transform: translateY(calc(-50% - 12px)); }
+            }
+            .animate-vertical-marquee {
+              animation: verticalMarquee 30s linear infinite;
+            }
+            .animate-vertical-marquee:hover, .skills-paused .animate-vertical-marquee {
+              animation-play-state: paused;
+            }
+          `}} />
+          <div className="flex flex-col gap-5 lg:gap-6 items-end w-full animate-vertical-marquee pointer-events-auto py-4 pr-8">
+            {[...skillsTimelineData, ...skillsTimelineData].map((skill, index) => {
+              const isActive = activeSkillId === skill.id || (!activeSkillId && autoActiveSkillId === skill.id);
+              return (
+                <motion.div
+                  key={`${skill.id}-${index}`}
+                  className="skill-pill flex"
+                  data-skill-id={skill.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 + (index % 5) * 0.1, duration: 0.5 }}
+                >
+                  <button
+                    onClick={() => handleActiveNodeChange(skill.id)}
+                    className="group flex items-center gap-4 text-right pointer-events-auto"
+                  >
+                    <span className={`text-sm lg:text-base font-medium tracking-wider transition-all duration-300 ${isActive ? "text-white" : "text-white/40 group-hover:text-white/80"}`}>
+                      {skill.title}
+                    </span>
+                    <div className={`relative w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-300 border backdrop-blur-md shadow-xl ${isActive ? "bg-white text-black border-white shadow-white/30 scale-110" : "bg-black/40 text-white/70 border-white/20 hover:border-white/50 hover:bg-black/60 hover:text-white hover:scale-105"}`}>
+                      <skill.icon size={20} className={isActive ? "" : "opacity-70 group-hover:opacity-100"} />
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-full bg-white/20 blur-md pointer-events-none" />
+                      )}
+                    </div>
+                  </button>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* MOBILE SKILLS ROW - Visible only on small screens */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+        className="flex md:hidden flex-wrap justify-center gap-2 w-full px-4 relative z-40 pointer-events-auto mt-4 mb-2"
+      >
+        {skillsTimelineData.map((skill) => (
+          <button
+            key={skill.id}
+            onClick={() => handleActiveNodeChange(skill.id)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-md transition-all duration-300 ${activeSkillId === skill.id ? "bg-white text-black border-white shadow-lg shadow-white/30" : "bg-black/40 text-white/70 border-white/20"}`}
           >
-            {/* Colored gradient glow ring on hover */}
-            <div className="absolute inset-[-6px] rounded-full bg-gradient-to-r from-purple-500/0 via-white/0 to-blue-500/0 group-hover:from-purple-500/40 group-hover:via-white/30 group-hover:to-blue-500/40 transition-all duration-500 blur-md" />
+            <skill.icon size={14} />
+            <span className="text-xs font-medium tracking-wider">{skill.title}</span>
+          </button>
+        ))}
+      </motion.div>
 
-            {/* Subtle outer glow - always visible */}
-            <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-white/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+      {/* VISUAL ELEMENT - Secondary */}
+      <div className={`relative w-[280px] h-[280px] md:w-[360px] md:h-[360px] lg:w-[480px] lg:h-[480px] flex items-center justify-center transition-all duration-500 max-w-[50vw] ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>
 
-            {/* Border ring that appears on hover */}
-            <div className="absolute inset-0 rounded-full border-2 border-white/10 group-hover:border-white/30 transition-all duration-300" />
+        {/* Avatar Orbit Rings */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Orbit ring */}
+          <motion.div
+            className="absolute rounded-full border border-white/10"
+            initial={false}
+            animate={{
+              width: isAvatarHovered ? '95%' : '75%',
+              height: isAvatarHovered ? '95%' : '75%'
+            }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          />
 
-            <img
-              src={USER_IMAGE_URL}
-              alt="Profile"
-              className="w-full h-full object-contain relative z-10 group-hover:brightness-110 transition-all duration-300"
-            />
+          {/* Second orbit ring for depth */}
+          <motion.div
+            className="absolute rounded-full border border-white/5"
+            initial={false}
+            animate={{
+              width: isAvatarHovered ? '100%' : '80%',
+              height: isAvatarHovered ? '100%' : '80%'
+            }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          />
+        </div>
 
-            {/* View Profile CTA - Always visible, enhanced on hover */}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-6 z-20">
-              <div className="bg-black/50 group-hover:bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 group-hover:border-white/40 flex items-center gap-2 transition-all duration-300">
-                <span className="text-xs md:text-sm text-white/80 group-hover:text-white font-medium">View Profile</span>
-                <ArrowRight size={14} className="text-white/60 group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300" />
-              </div>
+        {/* Avatar - Clear Clickable Affordance */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{
+            scale: [1, 1.02, 1],
+            opacity: 1,
+          }}
+          transition={{
+            scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+            opacity: { duration: 0.6, delay: 0.1 }
+          }}
+          className="group relative z-20 w-[60%] h-[60%] cursor-pointer pointer-events-auto transition-all duration-300"
+          onClick={onOpenProfile}
+          onMouseEnter={() => setIsAvatarHovered(true)}
+          onMouseLeave={() => setIsAvatarHovered(false)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          {/* Colored gradient glow ring on hover */}
+          <div className="absolute inset-[-6px] rounded-full bg-gradient-to-r from-purple-500/0 via-white/0 to-blue-500/0 group-hover:from-purple-500/40 group-hover:via-white/30 group-hover:to-blue-500/40 transition-all duration-500 blur-md" />
+
+          {/* Subtle outer glow - always visible */}
+          <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-white/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+
+          {/* Border ring that appears on hover */}
+          <div className="absolute inset-0 rounded-full border-2 border-white/10 group-hover:border-white/30 transition-all duration-300" />
+
+          <img
+            src={USER_IMAGE_URL}
+            alt="Profile"
+            className="w-full h-full object-contain relative z-10 group-hover:brightness-110 transition-all duration-300"
+          />
+
+          {/* View Profile CTA - Always visible, enhanced on hover */}
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-6 z-20">
+            <div className="bg-black/50 group-hover:bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 group-hover:border-white/40 flex items-center gap-2 transition-all duration-300">
+              <span className="text-xs md:text-sm text-white/80 group-hover:text-white font-medium">View Profile</span>
+              <ArrowRight size={14} className="text-white/60 group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300" />
             </div>
-          </motion.div>
-        </RadialOrbitalTimeline>
+          </div>
+        </motion.div>
 
         {/* EXPANDED SKILL CARD - PORTAL FIX */}
         {activeSkillId && typeof document !== 'undefined' && createPortal(
