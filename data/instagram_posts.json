@@ -203,7 +203,7 @@
     "summary": "Not everything needs to be built from the scratch, many of my projects till date were for me to learn the underlying tech.\nHere is where I pivot. 🔄\n\nHere I tried to create the simplest solution that checked all my boxes:\n1. Smart \n2. Small\n3. Simple \n4. Durable\n5. Can handle Ender’s load\n6. Cheap\n7. Manual switches too\n8. And of course pleasant to look at\n\nThe prewired board actually came in cheaper than individual panels, and it saved me a lot of wiring time too.\nThe combined board is also great price for what it does, 600 rupees for the whole board, it uses UART from the ESP-01 to control the relay, I’ve connected it to my home assistant which orchestrates everything.\n#diy #electronics #microcontroller #esp8266 #smarthome",
     "url": "https://www.instagram.com/p/DICISpXvndg/",
     "caption": "Not everything needs to be built from the scratch, many of my projects till date were for me to learn the underlying tech.\nHere is where I pivot. 🔄\n\nHere I tried to create the simplest solution that checked all my boxes:\n1. Smart \n2. Small\n3. Simple \n4. Durable\n5. Can handle Ender’s load\n6. Cheap\n7. Manual switches too\n8. And of course pleasant to look at\n\nThe prewired board actually came in cheaper than individual panels, and it saved me a lot of wiring time too.\nThe combined board is also great price for what it does, 600 rupees for the whole board, it uses UART from the ESP-01 to control the relay, I’ve connected it to my home assistant which orchestrates everything.\n#diy #electronics #microcontroller #esp8266 #smarthome",
-    "likes": 175,
+    "likes": 174,
     "comments": 5
   },
   {
@@ -311,7 +311,7 @@
     "summary": "DIY 2D CNC Plotter is here! ⚙️\nPowered by an Arduino Nano, it uses a special fork of GRBL to run on 28BYJ motors and ULN2003 Motor driver.\nThis took me months to imagine, learn, code, print and tweak.\nYou can find all the parts on my Thinverse (after 24 hours)\nI’ll put further videos detailing how I made this and all the understanding needed to create one of your own.\n\nAsk your doubts in the comments if you’re currently stuck somewhere.\n\n#diy #electronics #microcontroller #tech #cnc #plotter #cncmachine",
     "url": "https://www.instagram.com/p/C_aXpoTvZ9R/",
     "caption": "DIY 2D CNC Plotter is here! ⚙️\nPowered by an Arduino Nano, it uses a special fork of GRBL to run on 28BYJ motors and ULN2003 Motor driver.\nThis took me months to imagine, learn, code, print and tweak.\nYou can find all the parts on my Thinverse (after 24 hours)\nI’ll put further videos detailing how I made this and all the understanding needed to create one of your own.\n\nAsk your doubts in the comments if you’re currently stuck somewhere.\n\n#diy #electronics #microcontroller #tech #cnc #plotter #cncmachine",
-    "likes": 180,
+    "likes": 179,
     "comments": 3
   },
   {
