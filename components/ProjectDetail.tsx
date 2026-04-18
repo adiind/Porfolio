@@ -1,9 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, Check, AlertTriangle, ArrowRight,
-    Lightbulb, Wrench, Scale, Trophy, Sparkles
+    Lightbulb, Wrench, Scale, Trophy, Sparkles,
+    ChevronLeft, ChevronRight, Cpu, Zap, Code2, Globe
 } from 'lucide-react';
 import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
@@ -15,12 +16,12 @@ interface Props {
 }
 
 const colorMap = {
-    'amber': { accentLight: 'bg-amber-500/20', accentText: 'text-amber-400', accentBorder: 'border-amber-500/30' },
-    'teal': { accentLight: 'bg-teal-500/20', accentText: 'text-teal-400', accentBorder: 'border-teal-500/30' },
-    'indigo': { accentLight: 'bg-indigo-500/20', accentText: 'text-indigo-400', accentBorder: 'border-indigo-500/30' },
-    'rose': { accentLight: 'bg-rose-500/20', accentText: 'text-rose-400', accentBorder: 'border-rose-500/30' },
-    'emerald': { accentLight: 'bg-emerald-500/20', accentText: 'text-emerald-400', accentBorder: 'border-emerald-500/30' },
-    'violet': { accentLight: 'bg-violet-500/20', accentText: 'text-violet-400', accentBorder: 'border-violet-500/30' },
+    'amber': { accentLight: 'bg-amber-500/20', accentText: 'text-amber-400', accentBorder: 'border-amber-500/30', glow: 'rgba(245,158,11,0.15)' },
+    'teal': { accentLight: 'bg-teal-500/20', accentText: 'text-teal-400', accentBorder: 'border-teal-500/30', glow: 'rgba(20,184,166,0.15)' },
+    'indigo': { accentLight: 'bg-indigo-500/20', accentText: 'text-indigo-400', accentBorder: 'border-indigo-500/30', glow: 'rgba(99,102,241,0.15)' },
+    'rose': { accentLight: 'bg-rose-500/20', accentText: 'text-rose-400', accentBorder: 'border-rose-500/30', glow: 'rgba(244,63,94,0.15)' },
+    'emerald': { accentLight: 'bg-emerald-500/20', accentText: 'text-emerald-400', accentBorder: 'border-emerald-500/30', glow: 'rgba(16,185,129,0.15)' },
+    'violet': { accentLight: 'bg-violet-500/20', accentText: 'text-violet-400', accentBorder: 'border-violet-500/30', glow: 'rgba(139,92,246,0.15)' },
 };
 
 const splashColors = [
@@ -30,10 +31,147 @@ const splashColors = [
     'bg-emerald-500/10 border-emerald-500/30 text-emerald-200',
 ];
 
+// Feature carousel for Zero's rich feature screenshots
+const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; colors: typeof colorMap[keyof typeof colorMap] }> = ({ features, colors }) => {
+    const [active, setActive] = useState(0);
+    const current = features[active];
+
+    return (
+        <div className="mb-16">
+            <div className="flex items-center gap-3 mb-6">
+                <div className={`p-2 rounded-lg ${colors.accentLight}`}>
+                    <Sparkles size={20} className={colors.accentText} />
+                </div>
+                <h2 className="text-xl font-bold text-white">Feature Walkthrough</h2>
+            </div>
+
+            {/* Main Feature Image */}
+            <motion.div
+                key={active}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-6 relative"
+            >
+                <img
+                    src={current.image}
+                    alt={current.title}
+                    className="w-full h-auto object-cover max-h-[480px] object-top"
+                />
+                {/* Overlay gradient at bottom */}
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent flex items-end p-5">
+                    <div>
+                        <h3 className="text-white font-bold text-lg">{current.title}</h3>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            {current.tags.map((tag, i) => (
+                                <span key={i} className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${splashColors[i % splashColors.length]}`}>
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Description */}
+            <p className="text-white/70 text-sm leading-relaxed mb-6 max-w-3xl">{current.description}</p>
+
+            {/* Thumbnail Nav */}
+            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                {features.map((f, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setActive(i)}
+                        className={`relative flex-shrink-0 rounded-xl overflow-hidden w-32 h-20 border-2 transition-all duration-200 ${
+                            i === active ? `${colors.accentBorder} scale-105 shadow-lg` : 'border-white/10 opacity-50 hover:opacity-80'
+                        }`}
+                    >
+                        <img src={f.image} alt={f.title} className="w-full h-full object-cover object-top" />
+                        {i === active && (
+                            <div className={`absolute inset-0 ${colors.accentLight} opacity-30`} />
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* Arrow controls */}
+            <div className="flex items-center gap-3 mt-4">
+                <button
+                    onClick={() => setActive(a => Math.max(0, a - 1))}
+                    disabled={active === 0}
+                    className="p-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 transition-all"
+                >
+                    <ChevronLeft size={16} />
+                </button>
+                <span className="text-white/40 text-xs font-mono">{active + 1} / {features.length}</span>
+                <button
+                    onClick={() => setActive(a => Math.min(features.length - 1, a + 1))}
+                    disabled={active === features.length - 1}
+                    className="p-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 transition-all"
+                >
+                    <ChevronRight size={16} />
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// Stats grid for Zero
+const StatsGrid: React.FC<{ stats: NonNullable<Project['stats']>; colors: typeof colorMap[keyof typeof colorMap] }> = ({ stats, colors }) => (
+    <div className={`grid grid-cols-3 md:grid-cols-6 gap-3 p-5 rounded-2xl border ${colors.accentBorder} ${colors.accentLight} mb-10`}>
+        {stats.map((stat, i) => (
+            <div key={i} className="text-center">
+                <div className={`text-2xl font-bold ${colors.accentText} font-mono`}>{stat.value}</div>
+                <div className="text-white/50 text-[10px] uppercase tracking-wider mt-0.5">{stat.label}</div>
+            </div>
+        ))}
+    </div>
+);
+
+// Tech Stack grid
+const TechStackSection: React.FC<{ techStack: NonNullable<Project['techStack']>; colors: typeof colorMap[keyof typeof colorMap] }> = ({ techStack, colors }) => {
+    const sections = [
+        { label: 'Backend', items: techStack.backend, icon: <Cpu size={14} /> },
+        { label: 'AI / LLM', items: techStack.ai, icon: <Sparkles size={14} /> },
+        { label: 'Frontend', items: techStack.frontend, icon: <Code2 size={14} /> },
+        { label: 'Integrations', items: techStack.integrations, icon: <Globe size={14} /> },
+    ].filter(s => s.items && s.items.length > 0);
+
+    return (
+        <div className="mb-10">
+            <div className="flex items-center gap-3 mb-5">
+                <div className={`p-2 rounded-lg ${colors.accentLight}`}>
+                    <Cpu size={20} className={colors.accentText} />
+                </div>
+                <h2 className="text-xl font-bold text-white">Technical Stack</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {sections.map((section, i) => (
+                    <div key={i} className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                        <div className={`flex items-center gap-2 ${colors.accentText} text-xs font-bold uppercase tracking-wider mb-3`}>
+                            {section.icon}
+                            {section.label}
+                        </div>
+                        <ul className="space-y-1.5">
+                            {section.items!.map((item, j) => (
+                                <li key={j} className="text-white/60 text-xs leading-snug">{item}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const colors = colorMap[project.themeColor || 'amber'];
     const statusLabels: Record<string, string> = { 'shipped': 'Shipped', 'in-progress': 'In Progress', 'archived': 'Archived', 'concept': 'Concept' };
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const isZero = project.id === 'zero-my-ai';
+    const storyHeading = isZero ? 'Why It Exists' : 'The Story';
+    const buildHeading = isZero ? 'What\'s Inside' : 'What I Built';
+    const decisionsHeading = isZero ? 'Architecture Calls' : 'Key Decisions';
 
     // 1. History Management for Browser Back Button
     React.useEffect(() => {
@@ -105,7 +243,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                 className="relative z-10 h-full overflow-y-auto"
             >
                 <div
-                    className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-24 md:pt-32 pb-16"
+                    className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-14 md:pt-16 pb-16"
                     onClick={(e) => e.stopPropagation()}
                 >
 
@@ -147,7 +285,19 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                                 <GitHubActivity variant="inline" />
                             </div>
                         )}
+
+                        {/* === STATS GRID for Zero === */}
+                        {isZero && project.stats && project.stats.length > 0 && (
+                            <div className="mt-8">
+                                <StatsGrid stats={project.stats} colors={colors} />
+                            </div>
+                        )}
                     </section>
+
+                    {/* ===== FEATURE CAROUSEL (Zero only) ===== */}
+                    {isZero && project.features && project.features.length > 0 && (
+                        <FeatureCarousel features={project.features} colors={colors} />
+                    )}
 
                     {/* ===== STORY + BUILD SECTION ===== */}
                     <section className="mb-16">
@@ -158,7 +308,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                                     <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                         <Lightbulb size={20} className={colors.accentText} />
                                     </div>
-                                    <h2 className="text-xl font-bold text-white">The Story</h2>
+                                    <h2 className="text-xl font-bold text-white">{storyHeading}</h2>
                                 </div>
                                 <p className="text-white/70 text-base leading-relaxed">
                                     {project.context.text}
@@ -171,7 +321,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                                     <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                         <Wrench size={20} className={colors.accentText} />
                                     </div>
-                                    <h2 className="text-xl font-bold text-white">What I Built</h2>
+                                    <h2 className="text-xl font-bold text-white">{buildHeading}</h2>
                                 </div>
                                 <ul className="space-y-2">
                                     {project.build.bullets.map((bullet, i) => (
@@ -192,7 +342,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                                 <div className={`p-2 rounded-lg ${colors.accentLight}`}>
                                     <Scale size={20} className={colors.accentText} />
                                 </div>
-                                <h2 className="text-xl font-bold text-white">Key Decisions</h2>
+                                <h2 className="text-xl font-bold text-white">{decisionsHeading}</h2>
                             </div>
                             <div className="grid md:grid-cols-2 gap-4">
                                 {project.decisions.map((decision, i) => (
@@ -209,6 +359,11 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                             </div>
                         </div>
                     </section>
+
+                    {/* ===== TECH STACK (Zero only) ===== */}
+                    {isZero && project.techStack && (
+                        <TechStackSection techStack={project.techStack} colors={colors} />
+                    )}
 
                     {/* ===== LEARNINGS + OUTCOME SECTION ===== */}
                     <section className="mb-16">

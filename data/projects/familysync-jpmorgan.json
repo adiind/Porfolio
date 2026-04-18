@@ -1,0 +1,82 @@
+{
+    "id": "familysync-jpmorgan",
+    "hero": {
+        "title": "FamilySync – JPMorganChase Service Design Concept",
+        "oneLiner": "An agentic caregiver service designed to reduce family coordination burden while preserving control, trust, and dignity."
+    },
+    "context": {
+        "text": "This Northwestern EDI service design project, developed with JPMorganChase as the partner, started from a broader question than 'where can AI fit in banking?' The opportunity was to explore where agentic systems could take on real coordination work that cuts across family life, money, logistics, and trust. The concept I landed on was FamilySync: a caregiver service that helps families handle messy moments like a sick child, pickup changes, groceries, rides, and shared payments without turning care into a manual operations project. The challenge was to design the service boundary, not just the interface, so that helpful autonomy stayed visible, consent-based, and appropriately constrained."
+    },
+    "build": {
+        "bullets": [
+            "Framed the opportunity around family coordination work rather than a generic banking assistant",
+            "Designed FamilySync as a service actor that coordinates tasks, permissions, stakeholders, and payments across a shared household system",
+            "Mapped the service across the 5 Es structure: learn, set up, use, address problems, and opt out",
+            "Prototype-tested autonomy levels such as Preferences, Autonomous, and Ask-each-time across urgent and non-urgent caregiving scenarios",
+            "Built visible permission and privacy framing inspired by Apple-style permission tiles and first-person explanations",
+            "Modeled backstage logic, handoffs, approvals, and failure states so the concept extended beyond front-end screens",
+            "Used agentic tools in the making process by generating HTML UI components, piping them into Figma through MCP, and creating animated deck assets to explain service flows"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Service actor vs chatbot with personality",
+            "why": "Shifted the design toward coordination, permissions, and system behavior instead of conversational novelty.",
+            "tradeoff": "Made the concept less immediately familiar than a standard assistant interface."
+        },
+        {
+            "decision": "Shared authority vs single-user optimization",
+            "why": "Family actions affect multiple people, so the service needed explicit decision rights and consent logic.",
+            "tradeoff": "Introduced more complexity than designing for one account holder alone."
+        },
+        {
+            "decision": "Configurable autonomy levels vs one default mode",
+            "why": "Allowed people to define where the service can act automatically and where it must pause for approval.",
+            "tradeoff": "Required careful framing so the setup itself did not become overwhelming."
+        },
+        {
+            "decision": "Visible privacy explanations vs invisible data collection",
+            "why": "Made trust a designed interaction rather than a policy hidden in the background.",
+            "tradeoff": "Reduced the amount of silent automation the system could rely on."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Treating agentic AI as service infrastructure made the concept feel materially different from shallow AI feature ideas.",
+            "Scenario-card testing grounded trust conversations in specific action boundaries instead of abstract opinions about AI.",
+            "The combination of service blueprinting, storytelling, and interaction prototypes made the system legible to reviewers."
+        ],
+        "didnt": [
+            "The opportunity space was larger than one quarter, so final scoping still left open questions around segment focus and long-term rollout."
+        ]
+    },
+    "outcome": {
+        "status": "concept",
+        "text": "FamilySync became a strong service design concept for how agentic AI could coordinate caregiving logistics without erasing human judgment. The project moved the conversation from 'AI in finance' toward a more useful frame: AI embedded in service infrastructure, where approvals, privacy, and shared authority are designed with as much care as the interface itself.",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "This project clarified that agentic AI becomes meaningful when it helps carry real coordination load. The value is not talking to an assistant, but preserving trust while reducing the invisible labor around family care."
+    },
+    "themeColor": "emerald",
+    "icon": "box",
+    "skills": [
+        {
+            "label": "Service Design",
+            "description": "Designing the full system, not only the screen-level interaction."
+        },
+        {
+            "label": "Agentic AI",
+            "description": "Shaping how autonomous behavior should act within human guardrails."
+        },
+        {
+            "label": "Permission Design",
+            "description": "Making approvals, visibility, and consent understandable."
+        },
+        {
+            "label": "Scenario Testing",
+            "description": "Using concrete situations to probe trust and autonomy boundaries."
+        }
+    ],
+    "heroImage": "/images/familysync_care.png"
+}

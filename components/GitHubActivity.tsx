@@ -189,32 +189,38 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                 {/* Header label */}
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
-                        <Github size={12} className="text-white/50" />
-                        <span className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-medium">How I built this site</span>
+                        <Github size={12} className="text-white/72" />
+                        <span className="text-[9px] uppercase tracking-[0.2em] text-white/72 font-medium">How I built this site</span>
                     </div>
-                    <span className="text-[9px] text-white/30 group-hover/github:text-white/50 transition-colors flex items-center gap-1.5">
-                        <img src="/images/antigravity_logo.png" alt="Antigravity" className="w-3 h-3 opacity-40 group-hover/github:opacity-70 transition-opacity" />
+                    <span className="text-[9px] text-white/52 group-hover/github:text-white/72 transition-colors flex items-center gap-1.5">
+                        <img src="/images/antigravity_logo.png" alt="Antigravity" className="w-3 h-3 opacity-70 group-hover/github:opacity-95 transition-opacity" />
                         <span>Adi × Antigravity</span>
                     </span>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 backdrop-blur-md border border-white/10 group-hover/github:border-white/30 rounded-2xl w-fit shadow-xl transition-colors duration-300">
+                <div
+                    className="flex items-center gap-3 px-4 py-3 bg-white/12 backdrop-blur-md rounded-2xl w-fit transition-colors duration-300"
+                    style={{ boxShadow: '0 18px 44px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05)' }}
+                >
                     <GitCommit size={18} className="text-emerald-400 group-hover/github:text-emerald-300 transition-colors" />
                     <div className="flex flex-col">
                         <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">{stats.totalCommits}+</span>
-                        <span className="text-[9px] text-white/50 uppercase tracking-widest mt-0.5">commits to build this site</span>
+                        <span className="text-[9px] text-white/72 uppercase tracking-widest mt-0.5">commits to build this site</span>
                     </div>
                 </div>
 
-                <div className="bg-black/40 backdrop-blur-md border border-white/10 group-hover/github:border-white/30 rounded-2xl p-4 shadow-xl transition-colors duration-300 relative overflow-hidden">
+                <div
+                    className="bg-black/58 backdrop-blur-md rounded-2xl p-4 transition-colors duration-300 relative overflow-hidden"
+                    style={{ boxShadow: '0 22px 54px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.045)' }}
+                >
                     {/* Hover Glow Effect */}
-                    <div className="absolute inset-0 bg-emerald-500/0 group-hover/github:bg-emerald-500/5 transition-colors duration-300 pointer-events-none" />
+                    <div className="absolute inset-0 bg-emerald-500/[0.03] group-hover/github:bg-emerald-500/[0.08] transition-colors duration-300 pointer-events-none" />
 
                     <div className="flex items-center justify-between mb-3 relative z-10">
                         <div className="flex items-center gap-2">
-                            <Calendar size={12} className="text-white/60 group-hover/github:text-white/90 transition-colors" />
-                            <span className="text-[10px] uppercase tracking-widest text-white/60 font-medium group-hover/github:text-white/90 transition-colors">Build Activity</span>
+                            <Calendar size={12} className="text-white/78 group-hover/github:text-white transition-colors" />
+                            <span className="text-[10px] uppercase tracking-widest text-white/78 font-medium group-hover/github:text-white transition-colors">Build Activity</span>
                         </div>
-                        <span className="text-[9px] text-white/30 group-hover/github:text-white/50 transition-colors">View source →</span>
+                        <span className="text-[9px] text-white/52 group-hover/github:text-white/72 transition-colors">View source →</span>
                     </div>
 
                     <div className="relative w-full overflow-hidden">
@@ -224,7 +230,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                                     {week.map((day) => (
                                         <div
                                             key={day.date}
-                                            className={`w-2 h-2 rounded-[2px] ${getLevelColor(day.level)} opacity-80`}
+                                            className={`w-2 h-2 rounded-[2px] ${getLevelColor(day.level)} opacity-95`}
                                         />
                                     ))}
                                 </div>

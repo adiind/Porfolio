@@ -127,6 +127,28 @@ const skillProjectMapping: Record<number, {
   },
 };
 
+const matCutMarks = [
+  { top: '29%', left: '18%', width: '12%', rotate: '-9deg', opacity: 0.18 },
+  { top: '39%', left: '62%', width: '10%', rotate: '12deg', opacity: 0.12 },
+  { top: '56%', left: '24%', width: '14%', rotate: '-5deg', opacity: 0.16 },
+  { top: '66%', left: '61%', width: '17%', rotate: '7deg', opacity: 0.14 },
+  { top: '78%', left: '39%', width: '13%', rotate: '-4deg', opacity: 0.11 },
+] as const;
+
+const matDiagonalGuides = [
+  { top: '22%', left: '18%', width: '30%', rotate: '-45deg' },
+  { top: '24%', left: '57%', width: '22%', rotate: '45deg' },
+  { top: '67%', left: '21%', width: '24%', rotate: '45deg' },
+  { top: '69%', left: '56%', width: '24%', rotate: '-45deg' },
+] as const;
+
+const matRegistrationMarks = [
+  { top: '17%', left: '16%' },
+  { top: '17%', left: '84%' },
+  { top: '83%', left: '16%' },
+  { top: '83%', left: '84%' },
+] as const;
+
 interface Props {
   onOpenProfile?: () => void;
 }
@@ -279,9 +301,161 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
 
   return (
     <div className="relative flex flex-col items-center justify-between h-full w-full pointer-events-none pt-20 pb-12 md:py-16">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(92,139,86,0.12),transparent_38%),linear-gradient(180deg,#040504_0%,#050505_38%,#020302_100%)]" />
+
+        <div className="absolute left-1/2 top-[55%] h-[82vh] min-h-[580px] w-[101vw] max-w-[1360px] -translate-x-1/2 -translate-y-1/2">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: [0, -6, 0], rotate: [-0.95, -0.58, -0.95] }}
+            transition={{
+              opacity: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] },
+              scale: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] },
+              y: { duration: 12, repeat: Infinity, ease: 'easeInOut' },
+              rotate: { duration: 12, repeat: Infinity, ease: 'easeInOut' },
+            }}
+            className="relative h-full w-full rounded-[1.85rem] md:rounded-[2.35rem]"
+            style={{
+              background: `
+                linear-gradient(180deg, rgba(28,53,31,0.28) 0%, transparent 12%, transparent 86%, rgba(18,34,21,0.28) 100%),
+                radial-gradient(circle at 18% 16%, rgba(255,255,255,0.13), transparent 22%),
+                radial-gradient(circle at 82% 24%, rgba(255,255,255,0.07), transparent 20%),
+                linear-gradient(146deg, rgba(102,139,93,0.98) 0%, rgba(83,121,76,0.985) 28%, rgba(70,105,66,0.985) 58%, rgba(54,82,52,0.99) 100%)
+              `,
+              boxShadow: '0 42px 140px rgba(0, 0, 0, 0.5), inset 0 -30px 54px rgba(11, 24, 13, 0.34), inset 0 0 0 1px rgba(15, 27, 16, 0.46)',
+            }}
+          >
+            <div
+              className="absolute inset-[10px] md:inset-4 rounded-[1.5rem] md:rounded-[2.05rem] border border-black/16"
+              style={{
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%, transparent 82%, rgba(0,0,0,0.08))',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.015), inset 0 18px 32px rgba(255,255,255,0.015), inset 0 -28px 52px rgba(0,0,0,0.2)',
+              }}
+            />
+
+            <div
+              className="absolute inset-0 opacity-[0.2] mix-blend-screen"
+              style={{
+                backgroundImage: `
+                  radial-gradient(rgba(255,255,255,0.08) 0.7px, transparent 0.7px),
+                  radial-gradient(rgba(0,0,0,0.08) 0.7px, transparent 0.7px),
+                  linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+                  linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px)
+                `,
+                backgroundSize: '6px 6px, 6px 6px, 24px 24px, 24px 24px, 120px 120px, 120px 120px',
+                backgroundPosition: '0 0, 3px 3px, 0 0, 0 0, 0 0, 0 0',
+              }}
+            />
+
+            <div className="absolute inset-x-0 top-0 h-[24%] rounded-t-[1.85rem] md:rounded-t-[2.35rem] bg-gradient-to-b from-black/30 via-black/12 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-[28%] rounded-b-[1.85rem] md:rounded-b-[2.35rem] bg-gradient-to-t from-black/34 via-black/14 to-transparent" />
+            <div className="absolute inset-y-0 left-0 w-[13%] rounded-l-[1.85rem] md:rounded-l-[2.35rem] bg-gradient-to-r from-black/16 via-black/6 to-transparent" />
+            <div className="absolute inset-y-0 right-0 w-[13%] rounded-r-[1.85rem] md:rounded-r-[2.35rem] bg-gradient-to-l from-black/16 via-black/6 to-transparent" />
+            <div className="absolute inset-y-[20%] left-[18%] right-[18%] rounded-full bg-black/10 blur-3xl" />
+
+            <div className="absolute inset-8 md:inset-12 rounded-[1.1rem] md:rounded-[1.55rem] border border-white/6 opacity-40" />
+            <div className="absolute inset-x-8 md:inset-x-12 top-8 md:top-12 h-7 md:h-8 rounded-full border-y border-white/5 bg-gradient-to-b from-black/18 via-black/[0.07] to-transparent" />
+            <div className="absolute inset-x-8 md:inset-x-12 bottom-8 md:bottom-12 h-9 md:h-10 rounded-full border-y border-black/15 bg-gradient-to-t from-black/18 via-black/[0.06] to-transparent" />
+            <div className="absolute inset-y-8 md:inset-y-12 left-8 md:left-12 w-8 md:w-9 rounded-full border-x border-white/5 bg-gradient-to-r from-black/18 via-black/[0.06] to-transparent" />
+            <div className="absolute inset-y-8 md:inset-y-12 right-8 md:right-12 w-8 md:w-9 rounded-full border-x border-black/15 bg-gradient-to-l from-black/18 via-black/[0.06] to-transparent" />
+
+            <div className="absolute left-12 md:left-16 right-12 md:right-16 top-8 md:top-12 flex justify-between opacity-[0.35]">
+              {Array.from({ length: 11 }).map((_, index) => (
+                <div key={`top-${index}`} className="flex flex-col items-center gap-1">
+                  <div className={`w-px bg-white/35 ${index % 5 === 0 ? 'h-3 md:h-4' : 'h-2 md:h-3'}`} />
+                  <span className="text-[7px] md:text-[8px] font-medium tracking-[0.16em] opacity-0">{index}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="absolute left-12 md:left-16 right-12 md:right-16 bottom-6 md:bottom-8 flex justify-between opacity-50">
+              {Array.from({ length: 11 }).map((_, index) => (
+                <div key={`bottom-${index}`} className="flex flex-col items-center gap-1">
+                  <div className={`w-px bg-black/50 ${index % 5 === 0 ? 'h-3 md:h-4' : 'h-2 md:h-3'}`} />
+                  <span className="text-[8px] md:text-[9px] font-medium tracking-[0.16em] text-black/42">{index}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="absolute top-12 md:top-16 bottom-12 md:bottom-16 right-4 md:right-6 flex flex-col justify-between opacity-[0.38]">
+              {Array.from({ length: 7 }).map((_, index) => (
+                <div key={`right-${index}`} className="flex items-center justify-end gap-1.5">
+                  <div className={`bg-black/40 ${index % 3 === 0 ? 'w-3 md:w-4 h-px' : 'w-2.5 md:w-3 h-px'}`} />
+                </div>
+              ))}
+            </div>
+
+            <div className="absolute top-12 md:top-16 bottom-12 md:bottom-16 left-4 md:left-6 flex flex-col justify-between opacity-50">
+              {Array.from({ length: 7 }).map((_, index) => (
+                <div key={index} className="flex items-center gap-1.5">
+                  <div className={`bg-white/26 ${index % 3 === 0 ? 'w-3 md:w-4 h-px' : 'w-2.5 md:w-3 h-px'}`} />
+                  <span className="text-[8px] md:text-[9px] font-medium tracking-[0.12em] text-white/32">{index * 5}</span>
+                </div>
+              ))}
+            </div>
+
+            {matRegistrationMarks.map((mark, index) => (
+              <div
+                key={`registration-${index}`}
+                className="absolute h-4 w-4 md:h-5 md:w-5 -translate-x-1/2 -translate-y-1/2 opacity-[0.45]"
+                style={{ top: mark.top, left: mark.left }}
+              >
+                <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-white/25" />
+                <div className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 bg-white/25" />
+                <div className="absolute inset-[3px] rounded-full border border-white/18" />
+              </div>
+            ))}
+
+            {matDiagonalGuides.map((line, index) => (
+              <div
+                key={`guide-${index}`}
+                className="absolute h-px rounded-full bg-white/18"
+                style={{
+                  top: line.top,
+                  left: line.left,
+                  width: line.width,
+                  transform: `rotate(${line.rotate})`,
+                }}
+              />
+            ))}
+
+            {matCutMarks.map((scratch, index) => (
+              <div
+                key={index}
+                className="absolute h-px rounded-full"
+                style={{
+                  top: scratch.top,
+                  left: scratch.left,
+                  width: scratch.width,
+                  transform: `rotate(${scratch.rotate})`,
+                  background: `rgba(0, 0, 0, ${scratch.opacity})`,
+                  boxShadow: '0 1px 0 rgba(255,255,255,0.05)',
+                }}
+              />
+            ))}
+
+            <div className="absolute left-8 bottom-[3.9rem] hidden max-w-[44%] md:left-12 md:bottom-12 md:block md:max-w-none">
+              <div className="text-[10px] uppercase tracking-[0.32em] text-black/38">
+                Self-Healing Cutting Mat
+              </div>
+              <div className="mt-1 text-[9px] uppercase tracking-[0.24em] text-black/30">
+                A2 Grid · 10 mm · 45° / 60° Guides
+              </div>
+            </div>
+
+            <div className="absolute right-8 top-8 hidden text-[8px] md:block md:right-12 md:top-12 md:text-[9px] uppercase tracking-[0.3em] text-white/22">
+              Shop Surface 01
+            </div>
+          </motion.div>
+        </div>
+      </div>
 
       {/* HERO TEXT BLOCK - Compact, one thought */}
-      <div className={`relative z-50 w-full max-w-[700px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
+      <div className={`relative z-50 w-full max-w-[760px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
+        <div className="absolute inset-x-6 -top-10 h-40 md:h-48 rounded-full bg-black/52 blur-3xl -z-10" />
+        <div className="absolute inset-x-20 -top-4 h-20 md:h-24 rounded-full border border-white/10 bg-white/[0.04] blur-xl -z-10" />
 
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -289,10 +463,16 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="text-center"
         >
-          <h2 className="text-5xl md:text-7xl font-light tracking-tight text-white/95 mb-1">
+          <h2
+            className="text-5xl md:text-7xl font-light tracking-tight text-white mb-1"
+            style={{ textShadow: '0 18px 42px rgba(0,0,0,0.62), 0 3px 10px rgba(0,0,0,0.6)' }}
+          >
             Adi <span className="font-normal">Agarwal</span>
           </h2>
-          <p className="text-[10px] md:text-xs text-white/35 uppercase tracking-[0.25em] font-normal mb-0">
+          <p
+            className="text-[10px] md:text-xs text-white/70 uppercase tracking-[0.25em] font-normal mb-0"
+            style={{ textShadow: '0 6px 18px rgba(0,0,0,0.5)' }}
+          >
             Product · Engineering · Data · Design
           </p>
         </motion.div>
@@ -343,7 +523,12 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                     className="flex items-center gap-3 justify-end opacity-70 hover:opacity-100 transition-opacity cursor-pointer pointer-events-auto group w-full text-right outline-none"
                   >
                     <div className="text-right">
-                      <p className="text-xs lg:text-sm text-white font-medium whitespace-nowrap group-hover:text-purple-300 transition-colors">{project.title}</p>
+                      <p
+                        className="text-xs lg:text-sm text-white font-medium whitespace-nowrap group-hover:text-purple-300 transition-colors"
+                        style={{ textShadow: '0 4px 14px rgba(0,0,0,0.65)' }}
+                      >
+                        {project.title}
+                      </p>
                     </div>
                     <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg overflow-hidden border border-white/10 shrink-0 shadow-lg bg-neutral-900 group-hover:border-white/30 transition-colors">
                       <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -399,7 +584,10 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
                     onClick={() => handleActiveNodeChange(skill.id)}
                     className="group flex items-center gap-4 text-right pointer-events-auto"
                   >
-                    <span className={`text-sm lg:text-base font-medium tracking-wider transition-all duration-300 ${isActive ? "text-white" : "text-white/40 group-hover:text-white/80"}`}>
+                    <span
+                      className={`text-sm lg:text-base font-medium tracking-wider transition-all duration-300 ${isActive ? "text-white" : "text-white/55 group-hover:text-white/85"}`}
+                      style={{ textShadow: '0 4px 14px rgba(0,0,0,0.6)' }}
+                    >
                       {skill.title}
                     </span>
                     <div className={`relative w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-300 border backdrop-blur-md shadow-xl ${isActive ? "bg-white text-black border-white shadow-white/30 scale-110" : "bg-black/40 text-white/70 border-white/20 hover:border-white/50 hover:bg-black/60 hover:text-white hover:scale-105"}`}>
@@ -436,7 +624,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
       </motion.div>
 
       {/* VISUAL ELEMENT - Secondary */}
-      <div className={`relative w-[280px] h-[280px] md:w-[360px] md:h-[360px] lg:w-[480px] lg:h-[480px] flex items-center justify-center transition-all duration-500 max-w-[50vw] ${skillExpanded ? 'opacity-100' : 'opacity-75'}`}>
+      <div className={`relative w-[300px] h-[300px] md:w-[390px] md:h-[390px] lg:w-[520px] lg:h-[520px] flex items-center justify-center transition-all duration-500 max-w-[56vw] ${skillExpanded ? 'opacity-100' : 'opacity-90'}`}>
 
         {/* Avatar Orbit Rings */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -467,25 +655,41 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{
-            scale: [1, 1.02, 1],
-            opacity: 1,
+            scale: [1, 1.028, 1.014, 1],
+            x: [0, 5, 1, -4, 0],
+            y: [0, -12, -7, -14, 0],
+            rotate: [0, 0.9, 0.25, -0.7, 0],
+            opacity: skillExpanded ? 1 : 0.98,
           }}
           transition={{
-            scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+            scale: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
+            x: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
+            y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
+            rotate: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
             opacity: { duration: 0.6, delay: 0.1 }
           }}
-          className="group relative z-20 w-[60%] h-[60%] cursor-pointer pointer-events-auto transition-all duration-300"
+          className="group relative z-20 w-[64%] h-[64%] cursor-pointer pointer-events-auto transition-all duration-300"
           onClick={onOpenProfile}
           onMouseEnter={() => setIsAvatarHovered(true)}
           onMouseLeave={() => setIsAvatarHovered(false)}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.06, y: -8, rotate: 1.2 }}
           whileTap={{ scale: 0.97 }}
         >
+          <motion.div
+            className="absolute left-1/2 top-[72%] h-[15%] w-[44%] -translate-x-1/2 rounded-full bg-black/55 blur-2xl"
+            animate={{
+              scaleX: isAvatarHovered ? 0.88 : 1,
+              scaleY: isAvatarHovered ? 0.76 : 0.94,
+              opacity: isAvatarHovered ? 0.78 : 0.62,
+            }}
+            transition={{ duration: 0.45, ease: "easeInOut" }}
+          />
+          <div className="absolute inset-[-18px] rounded-full bg-black/36 blur-2xl" />
           {/* Colored gradient glow ring on hover */}
           <div className="absolute inset-[-6px] rounded-full bg-gradient-to-r from-purple-500/0 via-white/0 to-blue-500/0 group-hover:from-purple-500/40 group-hover:via-white/30 group-hover:to-blue-500/40 transition-all duration-500 blur-md" />
 
           {/* Subtle outer glow - always visible */}
-          <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-white/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-white/12 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Border ring that appears on hover */}
           <div className="absolute inset-0 rounded-full border-2 border-white/10 group-hover:border-white/30 transition-all duration-300" />
@@ -493,7 +697,8 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
           <img
             src={USER_IMAGE_URL}
             alt="Profile"
-            className="w-full h-full object-contain relative z-10 group-hover:brightness-110 transition-all duration-300"
+            className="w-full h-full object-contain relative z-10 opacity-100 saturate-[1.02] group-hover:brightness-110 transition-all duration-300"
+            style={{ filter: 'drop-shadow(0 28px 36px rgba(0,0,0,0.54))' }}
           />
 
           {/* View Profile CTA - Always visible, enhanced on hover */}
@@ -631,12 +836,19 @@ const Hero: React.FC<Props> = ({ onOpenProfile }) => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.6 }}
       >
-        <h1 className="whitespace-nowrap text-[3vw] sm:text-[3.2vw] md:text-xl lg:text-2xl font-normal text-white/95 leading-snug tracking-tighter md:tracking-tight mb-2">
+        <div className="absolute inset-x-0 top-1/2 h-28 md:h-36 -translate-y-1/2 rounded-full bg-black/38 blur-3xl -z-10" />
+        <h1
+          className="whitespace-nowrap text-[3vw] sm:text-[3.2vw] md:text-xl lg:text-2xl font-normal text-white leading-snug tracking-tighter md:tracking-tight mb-2"
+          style={{ textShadow: '0 10px 26px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.5)' }}
+        >
           A human-centered, data-driven, design-first product innovator.
         </h1>
 
 
-        <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/25 font-normal block mb-6">
+        <span
+          className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/72 font-normal block mb-6"
+          style={{ textShadow: '0 6px 18px rgba(0,0,0,0.5)' }}
+        >
           Open for Summer 2026 Internships
         </span>
       </motion.div>

@@ -1,0 +1,149 @@
+{
+    "id": "zero-my-ai",
+    "hero": {
+        "title": "Zero – Ambient AI Runtime & Voice Assistant",
+        "oneLiner": "Not a chatbot. Zero is a persistent async runtime that learns your preferences, manages your projects, talks back in real-time voice, and controls your home—all while tracking what every AI agent in your stack has built."
+    },
+    "context": {
+        "text": "I built Zero because every AI tool I used treated intelligence as a one-shot exchange. You prompt, it responds, the context dies. Zero is my answer to that: a persistent Python runtime that lives alongside you across sessions. It remembers conversations in a 3-tier memory system, assembles 28k-char context in under 500ms, streams native audio via Gemini Live with ~200ms latency, integrates with Home Assistant for real sensor data and device control, syncs your Canvas assignments and Google Calendar, and renders your entire project graph as a navigable 2D pixel-art world. It also reads what every other AI agent (Claude, Cursor, Kiro) has built and can tell you about it. Zero is a runtime, not a feature."
+    },
+    "build": {
+        "bullets": [
+            "Native Gemini Live voice with push-to-talk, configurable voices, echo cancellation, and interrupt support at ~200ms latency",
+            "Browser voice chat with full-duplex audio, barge-in support, live transcript, and project-scoped context selector",
+            "3-tier memory: FastMemory (<100ms key-value), SQLite (conversations, projects, tasks, people), ChromaDB (768-dim vector embeddings for semantic search)",
+            "Holomat Visual UI: Phaser 3 game world with 8 zones, 6 agent avatars with pathfinding, 25+ tool stations, 3 project view modes (Graph, List, Table)",
+            "Home Assistant integration with entity control, sensor monitoring, threshold alerts, priority entity tracking, and natural language aliases",
+            "Canvas + Google Calendar + Apple PIM integration with automatic assignment import, deadline tracking, and course project sync into Obsidian",
+            "AI Bridge: records all coding activities from Kiro, Claude, Cursor into memory—queryable at any time via voice or text",
+            "Research crew: overnight DuckDuckGo + DeepSeek synthesis + Grok X/Twitter intelligence on saved topics",
+            "Image Lab with Gemini Imagen, style profiles (neumorphic-ui, pixel-art, concept-art), rating feedback loop, and asset manifests",
+            "Extensible tool executor with 40+ integrated capabilities, deferred task queue, IoT command server (ESP32/HA REST), and Langfuse observability"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "3-tier memory over single flat context",
+            "why": "FastMemory handles real-time preferences in <100ms, SQLite handles structured state across sessions, and ChromaDB handles semantic search across thousands of past conversations—each optimized for its access pattern.",
+            "tradeoff": "More infrastructure to maintain and synchronize, but no other single system handles all three access patterns well."
+        },
+        {
+            "decision": "Native audio streaming instead of STT/TTS pipeline",
+            "why": "Gemini Live's native audio gives ~200ms end-to-end latency, natural barge-in support, and configurable voices without the latency cost of recording → STT → LLM → TTS → playback cycles.",
+            "tradeoff": "Tied to a specific model (gemini-2.5-flash-native-audio-latest) and loses fine-grained transcript control during playback."
+        },
+        {
+            "decision": "Phaser 3 game engine for Holomat Visual",
+            "why": "Makes abstract project state navigable—you can literally watch Zero walk to a tool station when it's executing, making the runtime legible as a spatial world rather than a log.",
+            "tradeoff": "Significant asset and engine overhead for what is essentially a project management view."
+        },
+        {
+            "decision": "Deterministic routing before LLM for common intents",
+            "why": "People memory, quick tasks, HA device control, and academic queries have clear patterns. Routing these directly saves latency, token cost, and avoids hallucination on factual lookups.",
+            "tradeoff": "Routing logic must be maintained as a separate layer and can misfire on ambiguous phrasing."
+        }
+    ],
+    "review": {
+        "worked": [
+            "3-tier memory architecture is fast and reliable—FastMemory sub-100ms retrieval makes real-time voice feel snappy.",
+            "Holomat's visual representation of tool execution (avatars walking to stations) makes the runtime legible in a way logs never could.",
+            "Deterministic routing for common intents (HA control, people memory, quick tasks) dramatically reduces latency and LLM cost on daily-use queries.",
+            "The AI Bridge concept (tracking what other agents built) turned out to be genuinely useful—I can ask Zero what Cursor changed yesterday and get a factual answer.",
+            "Voice-first UX with barge-in support feels natural; the ~200ms latency with native audio is tight enough to feel conversational."
+        ],
+        "didnt": [
+            "Holomat world-building is still in progress—authored governance and room composition need curator tooling that isn't fully shipped yet.",
+            "Context assembly at 28k chars can hit the cap on sessions with many loaded projects, requiring smarter truncation heuristics.",
+            "Academic Canvas sync needs more automation to reduce manual setup per quarter."
+        ]
+    },
+    "outcome": {
+        "status": "in-progress",
+        "text": "Zero is my daily-use AI runtime: I run it in the background and talk to it throughout the day. It controls my lights, tracks my assignments, keeps project notes in Obsidian, plays music via Spotify, and tells me what Claude built while I was asleep. The Holomat visual UI has 8 zones, 6 agent avatars, and 25+ tool stations. 331 unit tests, 228 integration tests, 40+ tools, and ~25,000 lines of Python and JavaScript. Still actively shipping: Holomat diorama rehaul, wearable ESP32 support, and Academic Canvas deep integration are all in progress."
+    },
+    "reflection": {
+        "text": "Zero taught me what 'ambient intelligence' actually means in practice: not an always-on API call, but a runtime that earns presence by being fast, contextual, and honest about what it knows. The hardest design problem wasn't the voice or the memory—it was deciding what Zero should do without being asked, and what it should always wait to be asked."
+    },
+    "themeColor": "violet",
+    "icon": "bot",
+    "skills": [
+        {
+            "label": "Async Runtime Architecture",
+            "description": "Python asyncio runtime with multi-process voice, server, and background agents."
+        },
+        {
+            "label": "3-Tier Memory",
+            "description": "FastMemory, SQLite, and ChromaDB each handling different access and retrieval patterns."
+        },
+        {
+            "label": "Gemini Live Voice",
+            "description": "Native audio streaming with barge-in, configurable voices, and AEC."
+        },
+        {
+            "label": "Game Engine UI",
+            "description": "Phaser 3 Holomat world with agent pathfinding, tool stations, and project graph."
+        },
+        {
+            "label": "Home Automation",
+            "description": "Home Assistant integration with entity control, sensor monitoring, and threshold actions."
+        },
+        {
+            "label": "Multi-Agent Coordination",
+            "description": "AI Bridge reads Claude, Kiro, Cursor activity and makes it queryable."
+        }
+    ],
+    "stats": [
+        { "value": "~25k", "label": "Lines of Code" },
+        { "value": "40+", "label": "Integrated Tools" },
+        { "value": "559", "label": "Tests Written" },
+        { "value": "4", "label": "UI Modes" },
+        { "value": "<200ms", "label": "Voice Latency" },
+        { "value": "3-Tier", "label": "Memory Arch." }
+    ],
+    "features": [
+        {
+            "title": "Holomat Visual World",
+            "description": "A Phaser 3 game world with 8 zones, 6 agent avatars with pathfinding, and 25+ tool stations. Avatars walk to stations when tools execute, making the runtime spatially legible. Three project view modes: Graph (force-directed), List (inline edit), Table (sortable). Activity feed shows live spec_created, task_completed, file_modified events.",
+            "image": "/images/zero_holomat.png",
+            "tags": ["Phaser 3", "Pixel Art", "Project Graph", "Agent Avatars"]
+        },
+        {
+            "title": "Browser Voice Chat",
+            "description": "Full-duplex audio with barge-in support and ~200ms latency via Gemini Live. Live transcript with streaming bubbles, tap-to-toggle or hold-to-talk mic, and a project-scoped context selector that loads the relevant project state before each session.",
+            "image": "/images/zero_voice_chat.png",
+            "tags": ["Gemini Live", "WebRTC", "Full-Duplex", "Voice"]
+        },
+        {
+            "title": "Strategy Room (Text Mode)",
+            "description": "Silent focused typing interface with image paste/attach. Dark 'strategy room' aesthetic with a project context sidebar showing threads and todos. Persistent response-style presets (Strategic, Concise, Verbose). Session search with / focus.",
+            "image": "/images/zero_text_mode.png",
+            "tags": ["Text Mode", "Image Analysis", "Presets"]
+        },
+        {
+            "title": "Project Graph & Memory",
+            "description": "Hierarchical projects with threads, todos, questions, and notes visualized as a force-directed graph. Nodes glow by type (violet=project, teal=thread, amber=todo, pink=question). Activity feed shows real-time cross-agent work. Obsidian vault sync keeps notes bidirectional.",
+            "image": "/images/zero_project_graph.png",
+            "tags": ["Graph Visualization", "ChromaDB", "Obsidian Sync"]
+        },
+        {
+            "title": "Home Automation Brain",
+            "description": "Home Assistant integration with natural language entity control, sensor monitoring with threshold alerts, priority entity tracking, and recent change detection in a 5-min window. Zero proactively speaks when monitors trigger.",
+            "image": "/images/zero_home_automation.png",
+            "tags": ["Home Assistant", "Sensor Monitoring", "IoT", "Proactive Voice"]
+        }
+    ],
+    "techStack": {
+        "backend": ["Python 3.11+", "asyncio", "SQLite", "ChromaDB", "FastAPI", "WebSockets"],
+        "ai": ["Gemini Live (native audio)", "Gemini Flash", "Gemini Imagen", "OpenRouter (DeepSeek, Grok)", "Langfuse"],
+        "frontend": ["Vanilla JS", "Phaser 3", "Web Audio API", "MediaPipe"],
+        "integrations": ["Home Assistant", "Canvas (iCal)", "Google Calendar", "Apple PIM", "Spotify", "Obsidian", "Playwright"]
+    },
+    "heroImage": "/images/zero_hero_banner.png",
+    "gallery": [
+        "/images/zero_holomat.png",
+        "/images/zero_voice_chat.png",
+        "/images/zero_text_mode.png",
+        "/images/zero_project_graph.png",
+        "/images/zero_home_automation.png"
+    ]
+}

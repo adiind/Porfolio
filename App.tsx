@@ -68,12 +68,32 @@ const App: React.FC = () => {
   }, [activeProject]);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
+  const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(false);
+
+  // Listen for project detail modal open/close from ProjectsSection
+  useEffect(() => {
+    const onOpen = () => setIsProjectDetailOpen(true);
+    const onClose = () => setIsProjectDetailOpen(false);
+    window.addEventListener('projectDetailOpen', onOpen);
+    window.addEventListener('projectDetailClose', onClose);
+    return () => {
+      window.removeEventListener('projectDetailOpen', onOpen);
+      window.removeEventListener('projectDetailClose', onClose);
+    };
+  }, []);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   const handleCardExpand = useCallback((cardId: string | null) => {
     setExpandedCardId(prev => prev === cardId ? null : cardId);
   }, []);
 
+  const finishModeTransition = useCallback(() => {
+    window.setTimeout(() => {
+      setIsAnimating(false);
+      isAnimatingRef.current = false;
+      // Debug logging removed
+    }, 550);
+  }, []);
 
   // 1. Handle Zoom Transitions - simplified
   const handleZoom = useCallback((targetMode: TimelineMode) => {
@@ -103,14 +123,21 @@ const App: React.FC = () => {
       setPixelsPerMonth(60);
     }
 
-    // Re-enable after animation (500ms)
-    setTimeout(() => {
-      setIsAnimating(false);
-      isAnimatingRef.current = false;
-      // Debug logging removed
+    finishModeTransition();
+  }, [finishModeTransition, mode]);
 
-    }, 550);
-  }, [isAnimating, mode]);
+  const dismissIntroForTouchScroll = useCallback(() => {
+    if (mode !== 'intro' || isAnimatingRef.current) return;
+
+    isAnimatingRef.current = true;
+    setIsAnimating(true);
+    setMode('fit');
+
+    const totalMonths = getMonthDiff(parseDate(CONFIG.startDate), parseDate(CONFIG.endDate));
+    setPixelsPerMonth(Math.max((window.innerHeight - 200) / totalMonths, 2));
+
+    finishModeTransition();
+  }, [finishModeTransition, mode]);
 
   // Listen for openProject events from skill cards in Hero
   useEffect(() => {
@@ -206,8 +233,10 @@ const App: React.FC = () => {
   }, [mode, getSectionPositions, isWritingsUnlocked]);
 
   useEffect(() => {
+    const isTouchViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+
     const handleGlobalWheel = (e: WheelEvent) => {
-      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
+      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen || isProjectDetailOpen) return;
       if (snapCooldownRef.current) {
         e.preventDefault();
         return;
@@ -277,82 +306,16 @@ const App: React.FC = () => {
       }
     };
 
-    // Touch support for mobile
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen) return;
-      if (snapCooldownRef.current) {
-        if (e.cancelable) e.preventDefault();
-        return;
-      }
+    if (!isTouchViewport) {
+      window.addEventListener('wheel', handleGlobalWheel, { passive: false });
+    }
 
-      const container = scrollContainerRef.current;
-      const positions = getSectionPositions();
-      const currentScrollTop = container?.scrollTop ?? 0;
-      const currentSection = getCurrentSection(currentScrollTop);
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY; // Positive = swiping up (scrolling down)
-      const TOUCH_THRESHOLD = 50;
-
-      // Swipe up (scroll down)
-      if (deltaY > TOUCH_THRESHOLD) {
-        if (e.cancelable) e.preventDefault();
-        snapCooldownRef.current = true;
-        touchStartY = touchY; // Reset to prevent multiple triggers
-
-        if (mode === 'intro') {
-          handleZoom('fit');
-        } else if (currentSection === 'experiences' && container) {
-          smoothScrollTo(container, positions.projects);
-        } else if (currentSection === 'projects' && container) {
-          if (!isWritingsUnlocked) {
-            snapCooldownRef.current = false;
-            return;
-          }
-          smoothScrollTo(container, positions.writings);
-        } else {
-          snapCooldownRef.current = false;
-          return;
-        }
-
-        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
-        return;
-      }
-
-      // Swipe down (scroll up)
-      if (deltaY < -TOUCH_THRESHOLD) {
-        if (e.cancelable) e.preventDefault();
-        snapCooldownRef.current = true;
-        touchStartY = touchY;
-
-        if (currentSection === 'writings' && container) {
-          smoothScrollTo(container, positions.projects);
-        } else if (currentSection === 'projects' && container) {
-          smoothScrollTo(container, positions.experiences);
-        } else if (currentSection === 'experiences' && container && currentScrollTop <= 10) {
-          handleZoom('intro');
-        } else {
-          snapCooldownRef.current = false;
-          return;
-        }
-
-        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
-        return;
-      }
-    };
-
-    window.addEventListener('wheel', handleGlobalWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     return () => {
-      window.removeEventListener('wheel', handleGlobalWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
+      if (!isTouchViewport) {
+        window.removeEventListener('wheel', handleGlobalWheel);
+      }
     };
-  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, handleZoom, getSectionPositions, getCurrentSection]);
+  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, isProjectDetailOpen, handleZoom, getSectionPositions, getCurrentSection]);
 
 
   // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
@@ -400,8 +363,16 @@ const App: React.FC = () => {
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    setScrollTop(e.currentTarget.scrollTop);
-  }, []);
+    const nextScrollTop = e.currentTarget.scrollTop;
+    setScrollTop(nextScrollTop);
+
+    // On touch devices, let a deliberate scroll dismiss the intro hero
+    // without snapping the user back to the top of the timeline.
+    const isTouchViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+    if (isTouchViewport && mode === 'intro' && nextScrollTop > SCROLL_THRESHOLD) {
+      dismissIntroForTouchScroll();
+    }
+  }, [dismissIntroForTouchScroll, mode]);
 
   // Sync activeSection with mode
   useEffect(() => {
@@ -656,9 +627,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative z-10">
-
-      {/* Background removed for performance - keeping it clean and minimal */}
-
       {/* Spotlight Overlay */}
       <motion.div
         className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300"
@@ -791,9 +759,12 @@ const App: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="absolute bottom-8 left-0 right-0 flex justify-center text-white/30 pointer-events-none"
+              className="absolute bottom-8 left-0 right-0 flex justify-center text-white/60 pointer-events-none"
             >
-              <div className="flex flex-col items-center gap-2 animate-bounce">
+              <div
+                className="flex flex-col items-center gap-2 animate-bounce"
+                style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
+              >
                 <MousePointer2 size={16} />
                 <span className="text-[10px] uppercase tracking-widest">Scroll to Explore</span>
               </div>

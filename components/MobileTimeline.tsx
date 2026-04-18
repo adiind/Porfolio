@@ -128,11 +128,16 @@ const MobileTimeline: React.FC<Props> = ({
                             <h3 className="font-bold text-white text-lg leading-tight">{item.title}</h3>
                             {/* Logo */}
                             {item.logoUrl && (
-                                <img
-                                    src={item.logoUrl}
-                                    alt="Logo"
-                                    className={`w-8 h-8 object-contain rounded bg-white/5 p-0.5 ${item.id === 'ms-edi' ? 'filter brightness-0 invert opacity-80' : 'opacity-90'}`}
-                                />
+                                <div className={`shrink-0 flex items-center justify-center ${item.id === 'ms-edi' ? 'min-w-[56px] pl-2' : 'w-8 h-8 rounded bg-white/5 p-0.5'}`}>
+                                    <img
+                                        src={item.logoUrl}
+                                        alt={`${item.company} logo`}
+                                        className={item.id === 'ms-edi'
+                                            ? 'h-5 w-auto max-w-[56px] object-contain opacity-70 filter brightness-0 invert'
+                                            : 'w-full h-full object-contain opacity-90'
+                                        }
+                                    />
+                                </div>
                             )}
                         </div>
 
@@ -309,5 +314,4 @@ const MobileTimeline: React.FC<Props> = ({
 };
 
 export default MobileTimeline;
-
 
