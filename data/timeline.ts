@@ -37,15 +37,16 @@ export const TIMELINE_DATA: TimelineItem[] = [
     type: "education",
     subtype: 'role',
     start: "2025-08-01",
-    end: "2025-12-31",
-    summary: "Learning to decide what is worth building, and how to make it real.",
+    end: "2026-03-31",
+    summary: "Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work.",
     bullets: [
       "Graduate program centered on human-centered design, systems thinking, and real-world problem solving",
       "Studio-led work in ambiguous problem spaces with an emphasis on framing the right problem before building",
       "Strong focus on user research, synthesis, and translating insight into concrete decisions",
       "Regular exposure to trade-offs between technical feasibility, user needs, and execution constraints",
       "Hands-on prototyping across physical and digital artifacts to validate ideas early",
-      "Collaborative, critique-driven environment that prioritizes clarity of thinking and intent"
+      "Collaborative, critique-driven environment that prioritizes clarity of thinking and intent",
+      "Winter Quarter partner work pushed the practice into interaction design with McDonald's and agentic AI service design with JPMorganChase"
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Northwestern_Wildcats_logo.svg/1200px-Northwestern_Wildcats_logo.svg.png",
     imageUrl: "/images/northwestern_ford.png",
@@ -108,6 +109,58 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "User Research", description: "Ethnographic research and behavior analysis." },
           { label: "Rapid Prototyping", description: "Iterative testing of physical and digital concepts." },
           { label: "Design for Manufacturing", description: "Designing within real-world production constraints." }
+        ]
+      },
+      {
+        title: "McDonald's Interaction Design",
+        subtitle: "Interaction Design · Ordering Systems",
+        summary: "Explored how fast ordering could feel clearer and lower-friction in real decision moments.",
+        expandedSummary: "A Winter Quarter interaction design project exploring how McDonald's ordering could reduce friction without removing choice. The work focused on the behavior of the interface itself: how the system guides the next action, reveals complexity only when needed, and helps people recover quickly when they are moving fast.",
+        imageUrl: "/images/pg-design-project.jpg",
+        pills: [
+          { label: "Interaction Design", description: "Designing how the experience behaves moment to moment." },
+          { label: "Cognitive Load", description: "Reducing how much people need to process under time pressure." },
+          { label: "Progressive Disclosure", description: "Revealing options in layers instead of all at once." },
+          { label: "Decision Flow", description: "Clarifying what to do next without overwhelming the user." }
+        ],
+        details: [
+          "Mapped the order journey to find where speed and clarity break down",
+          "Designed flows for browsing, customization, review, and confirmation",
+          "Tested how simplified next actions changed confidence under time pressure",
+          "Explored how promotions could support the flow without dominating it",
+          "Used placeholder assets to focus critique on interaction logic before final polish"
+        ],
+        skills: [
+          { label: "Interaction Design", description: "Designing behavior, not only visual styling." },
+          { label: "Prototype Testing", description: "Using flows to evaluate clarity and recovery." },
+          { label: "Information Hierarchy", description: "Making the next action easy to find." },
+          { label: "UX Strategy", description: "Balancing speed, choice, and business constraints." }
+        ]
+      },
+      {
+        title: "FamilySync for JPMorganChase",
+        subtitle: "Service Design · Agentic AI",
+        summary: "Designed an agentic caregiver service that coordinates family tasks, approvals, and payments without removing human control.",
+        expandedSummary: "This Northwestern EDI service design project with JPMorganChase explored agentic AI as service infrastructure rather than a banking chatbot. The concept, FamilySync, focused on messy coordination moments like pickups, sick days, groceries, rides, and shared payments. The core design challenge was defining what the service should do automatically, what it should ask permission for, and how to keep the system legible across a multi-person household.",
+        imageUrl: "/images/portfolio_hero.png",
+        pills: [
+          { label: "Agentic AI", description: "Designing autonomous behavior inside clear guardrails." },
+          { label: "Shared Authority", description: "Accounting for multiple stakeholders in one service action." },
+          { label: "Permissions", description: "Making approvals, privacy, and access visible." },
+          { label: "5 Es", description: "Designing the service across learn, set up, use, address problems, and opt out." }
+        ],
+        details: [
+          "Defined the concept around family coordination burden rather than generic AI assistance",
+          "Tested autonomy levels like Preferences, Autonomous, and Ask-each-time in scenario-based sessions",
+          "Designed visible permission framing with first-person explanations for sensitive actions",
+          "Mapped backstage logic, handoffs, failure states, and opt-out paths across the service",
+          "Used agentic tooling in the process itself by generating HTML UI, piping it into Figma, and creating animated service-flow assets"
+        ],
+        skills: [
+          { label: "Service Design", description: "Designing the full operating system around the experience." },
+          { label: "Scenario Testing", description: "Grounding trust questions in concrete moments." },
+          { label: "Permission Design", description: "Defining what the system can see, do, and ask." },
+          { label: "Systems Thinking", description: "Connecting actors, policies, and service handoffs." }
         ]
       }
     ]
@@ -628,15 +681,27 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     lane: 2,
     title: "Founder & Creator",
     company: "Tinker Verse",
-    headline: "A sandbox for physical computing and creative tech.",
+    headline: "A sandbox for physical computing, agentic software, and creative tech.",
     type: "personal",
     subtype: 'role',
     start: "2024-02-01",
-    end: "2025-12-31",
-    summary: "Personal lab for physical computing, generative art, and expressive hardware.",
-    bullets: ["Voice-controlled home assistant.", "Generative drawing plotter."],
+    end: "2026-03-31",
+    summary: "Personal lab for physical computing, agentic software, and expressive prototypes.",
+    bullets: [
+      "Voice-controlled home assistant.",
+      "Generative drawing plotter.",
+      "Agentic AI workspace for structuring context, outputs, and delegation."
+    ],
     logoUrl: TINKERVERSE_LOGO,
     projects: [
+      {
+        id: "zero-my-ai",
+        title: "Zero",
+        description: "Ambient AI runtime with native voice, 3-tier memory, Holomat visual world, Home Assistant integration, and 40+ tools. A persistent companion that learns alongside you.",
+        imageUrl: "/images/zero_hero_banner.png",
+        tags: ["Gemini Live", "Python", "Phaser 3", "Home Assistant"],
+        link: "#"
+      },
       {
         id: "jarvis",
         title: "Jarvis Home Assistant",

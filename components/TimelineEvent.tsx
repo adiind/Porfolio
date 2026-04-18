@@ -5,7 +5,7 @@ import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
 import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight, mapTimelineItemToProject } from '../utils';
-import { PROJECTS } from '../data/projects';
+import { getProjectsByIds } from '../data/projects';
 import { Briefcase, GraduationCap, User, Sparkles, Heart, MessageCircle, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
 
 interface Props {
@@ -1021,8 +1021,11 @@ const TinkerVerseGrid: React.FC<{
 
   const rowHeight = pixelsPerMonth;
 
-  // Memoize projects for the thumbnail grid
-  const projectsToShow = useMemo(() => PROJECTS.slice(0, 3), []);
+  const tinkerverseProjects = useMemo(
+    () => getProjectsByIds((item.projects ?? []).map((project) => project.id)),
+    [item.projects]
+  );
+  const projectsToShow = tinkerverseProjects.slice(0, 3);
 
   if (isFit) {
     return (
@@ -1054,7 +1057,7 @@ const TinkerVerseGrid: React.FC<{
         <div className="mt-auto relative z-10 pt-2">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className="text-[8px] font-mono text-amber-400/80 uppercase tracking-wider">
-              {PROJECTS.length} Projects
+              {tinkerverseProjects.length} Projects
             </span>
           </div>
           <h3 className={`font-bold text-[10px] leading-tight ${styles.text}`}>{item.title}</h3>

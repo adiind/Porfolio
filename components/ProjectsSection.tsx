@@ -20,6 +20,11 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
         return () => window.removeEventListener('closeAllModals', handleCloseAll);
     }, []);
 
+    // Notify App.tsx when this modal opens/closes so global scroll-snap is blocked
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent(activeProject ? 'projectDetailOpen' : 'projectDetailClose'));
+    }, [activeProject]);
+
     return (
         <>
             <section id="projects" className="relative w-full max-w-6xl mx-auto px-6 py-12 md:py-24 border-t border-white/5 mt-6 md:mt-20">

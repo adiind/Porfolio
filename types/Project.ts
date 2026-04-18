@@ -37,6 +37,25 @@ export interface ProjectReflection {
     text: string;
 }
 
+export interface ProjectStat {
+    value: string;
+    label: string;
+}
+
+export interface ProjectFeature {
+    title: string;
+    description: string;
+    image: string;
+    tags: string[];
+}
+
+export interface ProjectTechStack {
+    backend?: string[];
+    ai?: string[];
+    frontend?: string[];
+    integrations?: string[];
+}
+
 export interface Project {
     id: string;
     hero: ProjectHero;
@@ -55,4 +74,8 @@ export interface Project {
     heroImage?: string;
     heroVideo?: string;
     gallery?: string[];
+    // Rich project details (optional, for detailed projects like Zero)
+    stats?: ProjectStat[];
+    features?: ProjectFeature[];
+    techStack?: ProjectTechStack;
 }

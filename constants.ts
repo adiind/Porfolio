@@ -25,7 +25,7 @@ export const PROFILE_SKILLS = [
 // Visual Configuration
 export const CONFIG: TimelineConfig = {
   startDate: '2016-01-01',
-  endDate: '2025-12-31'
+  endDate: '2026-03-31'
 };
 
 export const SOCIAL_POSTS: SocialPost[] = (RAW_INSTAGRAM_POSTS as any[]).map((post: any) => {

@@ -4,7 +4,7 @@ import { X, ExternalLink, PlayCircle, Heart, MessageCircle, Github, ArrowUpRight
 import { TimelineItem, SocialPost, TinkerProject } from '../types';
 import { TINKERVERSE_LOGO } from '../constants';
 import { formatDate } from '../utils';
-import { PROJECTS } from '../data/projects';
+import { getProjectsByIds } from '../data/projects';
 import { Project } from '../types/Project';
 import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
@@ -19,9 +19,10 @@ interface Props {
 
 // Projects section component for TinkerVerse modal
 const ProjectsInModal: React.FC<{
+    projects: Project[];
     activeProject: Project | null;
     setActiveProject: (project: Project | null) => void;
-}> = ({ activeProject, setActiveProject }) => {
+}> = ({ projects, activeProject, setActiveProject }) => {
     return (
         <section>
             <div className="flex items-end gap-4 mb-8">
@@ -30,7 +31,7 @@ const ProjectsInModal: React.FC<{
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {PROJECTS.map((project, index) => (
+                {projects.map((project, index) => (
                     <ProjectCard
                         key={project.id}
                         project={project}
@@ -55,6 +56,7 @@ const ProjectsInModal: React.FC<{
 
 const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
+    const projects = getProjectsByIds((item.projects ?? []).map((project) => project.id));
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
             {/* Backdrop */}
@@ -98,7 +100,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                 <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 space-y-16 custom-scrollbar">
 
                     {/* Section 1: Projects */}
-                    <ProjectsInModal activeProject={activeProject} setActiveProject={setActiveProject} />
+                    <ProjectsInModal projects={projects} activeProject={activeProject} setActiveProject={setActiveProject} />
 
 
                     {/* Section 2: Past Project Showcases (Marquee Feed) */}

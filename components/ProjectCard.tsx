@@ -122,6 +122,13 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
         y.set(0);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+        }
+    };
+
     const Icon = iconMap[project.icon || 'zap'];
     const colors = colorMap[project.themeColor || 'amber'];
     const hasImage = !!project.heroImage;
@@ -155,12 +162,19 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={handleMouseLeave}
+            onFocus={() => setIsHovered(true)}
+            onBlur={handleMouseLeave}
             onClick={onClick}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label={`Open project ${project.hero.title}`}
             className={`
                 group relative cursor-pointer overflow-hidden
                 border ${isHovered ? colors.borderHover : colors.border}
                 rounded-xl
-                transition-all duration-500
+                transition-all duration-500 touch-manipulation
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]
                 ${isHovered ? `shadow-[0_0_40px_rgba(255,255,255,0.1)] ${colors.glow}` : 'shadow-lg'}
             `}
         >
@@ -230,16 +244,18 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             {/* Content Container */}
             <motion.div
                 layout
-                className="relative z-10 flex flex-col p-4"
+                initial={false}
+                className="relative z-10 flex flex-col p-4 min-h-[192px]"
                 animate={{
-                    minHeight: isHovered ? '280px' : '192px',
+                    minHeight: isHovered ? 280 : 192,
                 }}
                 transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
             >
                 {/* Spacer to push content down when collapsed, align top when expanded */}
                 <motion.div
-                    className="flex-1"
-                    animate={{ minHeight: isHovered ? '0px' : '100px' }}
+                    initial={false}
+                    className="flex-1 min-h-[100px]"
+                    animate={{ minHeight: isHovered ? 0 : 100 }}
                     transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
                 />
 

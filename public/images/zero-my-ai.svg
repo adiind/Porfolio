@@ -1,0 +1,119 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="160" y1="80" x2="1440" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#131A3D" />
+      <stop offset="0.48" stop-color="#090D1F" />
+      <stop offset="1" stop-color="#04060F" />
+    </linearGradient>
+    <linearGradient id="panelStroke" x1="356" y1="132" x2="1305" y2="766" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C5CFF" stop-opacity="0.45" />
+      <stop offset="0.58" stop-color="#2E4DCC" stop-opacity="0.28" />
+      <stop offset="1" stop-color="#19B8B0" stop-opacity="0.2" />
+    </linearGradient>
+    <linearGradient id="heroGlow" x1="526" y1="162" x2="1068" y2="490" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7A5CFF" stop-opacity="0.18" />
+      <stop offset="1" stop-color="#17BEBB" stop-opacity="0.1" />
+    </linearGradient>
+    <filter id="blurA" x="-122" y="-42" width="684" height="684" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="70" />
+    </filter>
+    <filter id="blurB" x="1015" y="330" width="632" height="632" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="80" />
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)" />
+
+  <g filter="url(#blurA)">
+    <circle cx="220" cy="300" r="132" fill="#7A5CFF" fill-opacity="0.28" />
+  </g>
+  <g filter="url(#blurB)">
+    <circle cx="1331" cy="646" r="116" fill="#16C7C0" fill-opacity="0.22" />
+  </g>
+
+  <rect x="74" y="74" width="1452" height="752" rx="34" fill="#070A16" fill-opacity="0.86" stroke="url(#panelStroke)" />
+  <rect x="98" y="98" width="86" height="704" rx="24" fill="#0C1227" fill-opacity="0.96" stroke="#202A4E" />
+
+  <rect x="118" y="124" width="46" height="46" rx="14" fill="#7B61FF" fill-opacity="0.18" stroke="#8A74FF" />
+  <path d="M132 146C132 137.163 139.163 130 148 130V130C156.837 130 164 137.163 164 146V146C164 154.837 156.837 162 148 162V162C139.163 162 132 154.837 132 146V146Z" fill="#8A74FF" fill-opacity="0.24"/>
+  <path d="M148 138L153.657 143.657L148 149.314L142.343 143.657L148 138Z" fill="#BFB2FF"/>
+
+  <rect x="118" y="214" width="46" height="46" rx="14" fill="#101831" stroke="#202A4E" />
+  <rect x="118" y="278" width="46" height="46" rx="14" fill="#101831" stroke="#202A4E" />
+  <rect x="118" y="342" width="46" height="46" rx="14" fill="#101831" stroke="#202A4E" />
+  <rect x="118" y="406" width="46" height="46" rx="14" fill="#101831" stroke="#202A4E" />
+  <circle cx="141" cy="237" r="7" fill="#5F78FF" fill-opacity="0.75" />
+  <rect x="136" y="294" width="18" height="12" rx="3" fill="#14C8C0" fill-opacity="0.78" />
+  <path d="M133 364H149M149 364H160M149 364V351M149 364V377" stroke="#7B61FF" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="135" y="420" width="26" height="18" rx="5" fill="#FFCF5C" fill-opacity="0.8" />
+
+  <text x="224" y="154" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="18" font-weight="600" letter-spacing="0.18em">ZEROMYAI</text>
+  <text x="224" y="186" fill="#91A0CF" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.14em">CONTROL PLANE FOR AGENTIC WORK</text>
+
+  <rect x="224" y="228" width="1260" height="2" fill="#10172D" />
+
+  <rect x="224" y="256" width="744" height="224" rx="28" fill="#0B1020" stroke="#242F5D" />
+  <rect x="248" y="280" width="696" height="176" rx="22" fill="url(#heroGlow)" stroke="#253056" />
+
+  <text x="278" y="326" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="42" font-weight="700">Make AI work feel governed, resumable,</text>
+  <text x="278" y="378" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="42" font-weight="700">and actually reusable.</text>
+  <text x="278" y="426" fill="#A2AFDA" font-family="system-ui, sans-serif" font-size="20">Mission setup, autonomy control, checkpoint review, prompt orchestration,</text>
+  <text x="278" y="454" fill="#A2AFDA" font-family="system-ui, sans-serif" font-size="20">artifact workflows, and execution history inside one stateful workspace.</text>
+
+  <rect x="1020" y="256" width="464" height="224" rx="28" fill="#0B1020" stroke="#242F5D" />
+  <text x="1054" y="306" fill="#A8B5E8" font-family="system-ui, sans-serif" font-size="14" font-weight="600" letter-spacing="0.14em">REVIEW GATES</text>
+  <rect x="1054" y="332" width="396" height="44" rx="16" fill="#111835" stroke="#29345E" />
+  <text x="1078" y="359" fill="#F3F4FF" font-family="system-ui, sans-serif" font-size="18" font-weight="600">Scope Locked</text>
+  <text x="1348" y="359" fill="#7FE4D8" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Approved</text>
+  <rect x="1054" y="388" width="396" height="44" rx="16" fill="#111835" stroke="#29345E" />
+  <text x="1078" y="415" fill="#F3F4FF" font-family="system-ui, sans-serif" font-size="18" font-weight="600">Draft Bundle Review</text>
+  <text x="1318" y="415" fill="#FFD36A" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Needs Input</text>
+  <rect x="1054" y="444" width="396" height="12" rx="6" fill="#141C38" />
+  <rect x="1054" y="444" width="255" height="12" rx="6" fill="#7B61FF" fill-opacity="0.65" />
+
+  <rect x="224" y="516" width="432" height="258" rx="28" fill="#0B1020" stroke="#242F5D" />
+  <text x="258" y="558" fill="#A8B5E8" font-family="system-ui, sans-serif" font-size="14" font-weight="600" letter-spacing="0.14em">MISSION SETUP</text>
+  <rect x="258" y="584" width="364" height="36" rx="14" fill="#101831" stroke="#27345C" />
+  <text x="278" y="607" fill="#EEF0FF" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Deliverable</text>
+  <text x="460" y="607" fill="#B4C1E9" font-family="system-ui, sans-serif" font-size="15">PRD + launch brief + task list</text>
+  <rect x="258" y="632" width="172" height="36" rx="14" fill="#101831" stroke="#27345C" />
+  <text x="278" y="655" fill="#EEF0FF" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Audience</text>
+  <text x="362" y="655" fill="#B4C1E9" font-family="system-ui, sans-serif" font-size="15">Product + eng</text>
+  <rect x="450" y="632" width="172" height="36" rx="14" fill="#101831" stroke="#27345C" />
+  <text x="470" y="655" fill="#EEF0FF" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Autonomy</text>
+  <text x="554" y="655" fill="#7FE4D8" font-family="system-ui, sans-serif" font-size="15">Assist</text>
+  <rect x="258" y="684" width="111" height="30" rx="15" fill="#7B61FF" fill-opacity="0.18" stroke="#7B61FF" />
+  <text x="284" y="704" fill="#C8BCFF" font-family="system-ui, sans-serif" font-size="13" font-weight="600">Context stack</text>
+  <rect x="379" y="684" width="122" height="30" rx="15" fill="#14C8C0" fill-opacity="0.14" stroke="#14C8C0" />
+  <text x="407" y="704" fill="#A2F0E6" font-family="system-ui, sans-serif" font-size="13" font-weight="600">Review points</text>
+  <rect x="511" y="684" width="111" height="30" rx="15" fill="#FFC85B" fill-opacity="0.14" stroke="#FFC85B" />
+  <text x="539" y="704" fill="#FFE09A" font-family="system-ui, sans-serif" font-size="13" font-weight="600">Flow templates</text>
+
+  <rect x="688" y="516" width="432" height="258" rx="28" fill="#0B1020" stroke="#242F5D" />
+  <text x="722" y="558" fill="#A8B5E8" font-family="system-ui, sans-serif" font-size="14" font-weight="600" letter-spacing="0.14em">AGENT RUNS</text>
+  <rect x="722" y="586" width="118" height="62" rx="18" fill="#111835" stroke="#28355F" />
+  <text x="744" y="613" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Scope</text>
+  <text x="744" y="634" fill="#97A7D9" font-family="system-ui, sans-serif" font-size="13">lock inputs</text>
+  <rect x="862" y="586" width="118" height="62" rx="18" fill="#111835" stroke="#28355F" />
+  <text x="884" y="613" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Route</text>
+  <text x="884" y="634" fill="#97A7D9" font-family="system-ui, sans-serif" font-size="13">pick flow</text>
+  <rect x="1002" y="586" width="84" height="62" rx="18" fill="#111835" stroke="#28355F" />
+  <text x="1024" y="613" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Run</text>
+  <text x="1024" y="634" fill="#97A7D9" font-family="system-ui, sans-serif" font-size="13">execute</text>
+  <path d="M840 617H862M980 617H1002" stroke="#7B61FF" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="780" cy="706" r="7" fill="#14C8C0" />
+  <circle cx="860" cy="706" r="7" fill="#7B61FF" />
+  <circle cx="940" cy="706" r="7" fill="#FFC85B" />
+  <circle cx="1020" cy="706" r="7" fill="#14C8C0" />
+  <path d="M780 706H860H940H1020" stroke="#29345E" stroke-width="3" stroke-linecap="round"/>
+  <text x="722" y="742" fill="#B0BCE5" font-family="system-ui, sans-serif" font-size="15">Execution history keeps every run inspectable and reversible.</text>
+
+  <rect x="1152" y="516" width="332" height="258" rx="28" fill="#0B1020" stroke="#242F5D" />
+  <text x="1186" y="558" fill="#A8B5E8" font-family="system-ui, sans-serif" font-size="14" font-weight="600" letter-spacing="0.14em">OUTPUT PACKETS</text>
+  <rect x="1186" y="586" width="264" height="42" rx="14" fill="#111835" stroke="#28355F" />
+  <text x="1210" y="612" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="17" font-weight="600">PRD</text>
+  <rect x="1186" y="640" width="264" height="42" rx="14" fill="#111835" stroke="#28355F" />
+  <text x="1210" y="666" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="17" font-weight="600">Task breakdown</text>
+  <rect x="1186" y="694" width="264" height="42" rx="14" fill="#111835" stroke="#28355F" />
+  <text x="1210" y="720" fill="#F4F4FF" font-family="system-ui, sans-serif" font-size="17" font-weight="600">Review notes</text>
+</svg>
