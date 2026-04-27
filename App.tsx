@@ -69,6 +69,7 @@ const App: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
   const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(false);
+  const hasBlockingOverlay = isProfileOpen || activeCaseStudy !== null || activeProject !== null || isTinkerVerseOpen || isProjectDetailOpen;
 
   // Listen for project detail modal open/close from ProjectsSection
   useEffect(() => {
@@ -138,6 +139,150 @@ const App: React.FC = () => {
 
     finishModeTransition();
   }, [finishModeTransition, mode]);
+
+  const scrollTimelineBy = useCallback((deltaY: number, baseScrollTop?: number) => {
+    const container = scrollContainerRef.current;
+    if (!container || deltaY === 0) return 0;
+
+    const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+    const startScrollTop = baseScrollTop ?? container.scrollTop;
+    const nextScrollTop = Math.min(maxScrollTop, Math.max(0, startScrollTop + deltaY));
+    container.scrollTop = nextScrollTop;
+    return nextScrollTop - startScrollTop;
+  }, []);
+
+  const introTouchRef = useRef<{
+    startX: number;
+    startY: number;
+    scrollTop: number;
+    dismissedIntro: boolean;
+  } | null>(null);
+  const timelinePointerRef = useRef<{
+    startY: number;
+    scrollTop: number;
+    hasDragged: boolean;
+  } | null>(null);
+  const introPointerRef = useRef<{
+    startX: number;
+    startY: number;
+    scrollTop: number;
+    dismissedIntro: boolean;
+  } | null>(null);
+
+  const handleIntroTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (mode !== 'intro' || isAnimatingRef.current || hasBlockingOverlay) {
+      introTouchRef.current = null;
+      return;
+    }
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    introTouchRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
+      dismissedIntro: false,
+    };
+  }, [hasBlockingOverlay, mode]);
+
+  const handleIntroTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const gesture = introTouchRef.current;
+    if (!gesture || mode !== 'intro' || hasBlockingOverlay) return;
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const deltaY = gesture.startY - touch.clientY;
+    const deltaX = Math.abs(touch.clientX - gesture.startX);
+    const isIntentionalVerticalSwipe = deltaY > SCROLL_THRESHOLD && deltaY > deltaX * 1.1;
+    if (!isIntentionalVerticalSwipe) return;
+
+    if (!gesture.dismissedIntro) {
+      gesture.dismissedIntro = true;
+      dismissIntroForTouchScroll();
+    }
+
+    scrollTimelineBy(deltaY, gesture.scrollTop);
+  }, [dismissIntroForTouchScroll, scrollTimelineBy, hasBlockingOverlay, mode]);
+
+
+  const handleIntroTouchEnd = useCallback(() => {
+    introTouchRef.current = null;
+  }, []);
+
+  const handleIntroPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse' || mode !== 'intro' || isAnimatingRef.current || hasBlockingOverlay) {
+      introPointerRef.current = null;
+      return;
+    }
+
+    introPointerRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
+      dismissedIntro: false,
+    };
+  }, [hasBlockingOverlay, mode]);
+
+  const handleIntroPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const gesture = introPointerRef.current;
+    if (!gesture || mode !== 'intro' || hasBlockingOverlay) return;
+
+    const deltaY = gesture.startY - e.clientY;
+    const deltaX = Math.abs(e.clientX - gesture.startX);
+    const isIntentionalVerticalDrag = deltaY > SCROLL_THRESHOLD && deltaY > deltaX * 1.1;
+    if (!isIntentionalVerticalDrag) return;
+
+    e.preventDefault();
+
+    if (!gesture.dismissedIntro) {
+      gesture.dismissedIntro = true;
+      dismissIntroForTouchScroll();
+    }
+
+    scrollTimelineBy(deltaY, gesture.scrollTop);
+  }, [dismissIntroForTouchScroll, scrollTimelineBy, hasBlockingOverlay, mode]);
+
+  const handleIntroPointerEnd = useCallback(() => {
+    introPointerRef.current = null;
+  }, []);
+
+  const handleTimelinePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const isMobileScrollViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+    if (!isMobileScrollViewport || e.pointerType !== 'mouse' || mode === 'intro' || hasBlockingOverlay || isAnimatingRef.current) {
+      timelinePointerRef.current = null;
+      return;
+    }
+
+    timelinePointerRef.current = {
+      startY: e.clientY,
+      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
+      hasDragged: false,
+    };
+  }, [hasBlockingOverlay, mode]);
+
+  const handleTimelinePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const gesture = timelinePointerRef.current;
+    if (!gesture || mode === 'intro' || hasBlockingOverlay) return;
+
+    const deltaY = gesture.startY - e.clientY;
+    if (Math.abs(deltaY) <= SCROLL_THRESHOLD && !gesture.hasDragged) return;
+
+    e.preventDefault();
+    gesture.hasDragged = true;
+
+    if (deltaY < -SCROLL_THRESHOLD && gesture.scrollTop <= 10) {
+      handleZoom('intro');
+      return;
+    }
+
+    scrollTimelineBy(deltaY, gesture.scrollTop);
+  }, [handleZoom, hasBlockingOverlay, mode, scrollTimelineBy]);
+
+  const handleTimelinePointerEnd = useCallback(() => {
+    timelinePointerRef.current = null;
+  }, []);
 
   // Listen for openProject events from skill cards in Hero
   useEffect(() => {
@@ -236,7 +381,7 @@ const App: React.FC = () => {
     const isTouchViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
 
     const handleGlobalWheel = (e: WheelEvent) => {
-      if (isAnimatingRef.current || isProfileOpen || activeCaseStudy || activeProject || isTinkerVerseOpen || isProjectDetailOpen) return;
+      if (isAnimatingRef.current || hasBlockingOverlay) return;
       if (snapCooldownRef.current) {
         e.preventDefault();
         return;
@@ -248,6 +393,26 @@ const App: React.FC = () => {
       const currentSection = getCurrentSection(currentScrollTop);
       const isScrollingDown = e.deltaY > SCROLL_THRESHOLD;
       const isScrollingUp = e.deltaY < -SCROLL_THRESHOLD;
+
+      if (isTouchViewport) {
+        if (mode === 'intro' && isScrollingDown) {
+          e.preventDefault();
+          snapCooldownRef.current = true;
+          dismissIntroForTouchScroll();
+          scrollTimelineBy(Math.min(window.innerHeight * 0.45, Math.max(SCROLL_THRESHOLD + 1, e.deltaY)));
+          setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
+        } else if (mode !== 'intro' && container && (isScrollingDown || isScrollingUp)) {
+          e.preventDefault();
+
+          if (isScrollingUp && currentScrollTop <= 10) {
+            handleZoom('intro');
+            return;
+          }
+
+          scrollTimelineBy(e.deltaY);
+        }
+        return;
+      }
 
       // --- SCROLL DOWN ---
       if (isScrollingDown) {
@@ -306,16 +471,12 @@ const App: React.FC = () => {
       }
     };
 
-    if (!isTouchViewport) {
-      window.addEventListener('wheel', handleGlobalWheel, { passive: false });
-    }
+    window.addEventListener('wheel', handleGlobalWheel, { passive: false });
 
     return () => {
-      if (!isTouchViewport) {
-        window.removeEventListener('wheel', handleGlobalWheel);
-      }
+      window.removeEventListener('wheel', handleGlobalWheel);
     };
-  }, [mode, isAnimating, isProfileOpen, activeCaseStudy, activeProject, isTinkerVerseOpen, isProjectDetailOpen, handleZoom, getSectionPositions, getCurrentSection]);
+  }, [mode, isAnimating, hasBlockingOverlay, handleZoom, dismissIntroForTouchScroll, scrollTimelineBy, getSectionPositions, getCurrentSection]);
 
 
   // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
@@ -676,7 +837,7 @@ const App: React.FC = () => {
       </AnimatePresence>
 
       {/* --- HEADER --- */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 pointer-events-none">
+      <header className="hidden md:block fixed top-0 left-0 right-0 z-50 px-6 py-4 pointer-events-none">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: mode === 'intro' ? 0 : 1 }}
@@ -741,6 +902,15 @@ const App: React.FC = () => {
       <motion.div
         id="profile"
         className="absolute inset-0 z-40 will-change-transform"
+        onTouchStart={handleIntroTouchStart}
+        onTouchMove={handleIntroTouchMove}
+        onTouchEnd={handleIntroTouchEnd}
+        onTouchCancel={handleIntroTouchEnd}
+        onPointerDown={handleIntroPointerDown}
+        onPointerMove={handleIntroPointerMove}
+        onPointerUp={handleIntroPointerEnd}
+        onPointerCancel={handleIntroPointerEnd}
+        style={{ touchAction: mode === 'intro' ? 'pan-y' : 'auto' }}
         animate={{
           opacity: mode === 'intro' ? 1 : 0,
           y: mode === 'intro' ? 0 : -150,
@@ -823,7 +993,12 @@ const App: React.FC = () => {
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
+          onPointerDown={handleTimelinePointerDown}
+          onPointerMove={handleTimelinePointerMove}
+          onPointerUp={handleTimelinePointerEnd}
+          onPointerCancel={handleTimelinePointerEnd}
           className="h-full overflow-y-auto overflow-x-hidden relative no-scrollbar"
+          style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorY: 'contain', touchAction: 'pan-y' }}
         >
           {/* Mobile Layout - Stacked Sections */}
           <div className="block md:hidden mt-[150px] pb-6">
@@ -1076,6 +1251,7 @@ const App: React.FC = () => {
         onNavigate={handleNavigate}
         mode={mode}
         isWritingsUnlocked={isWritingsUnlocked}
+        isHidden={hasBlockingOverlay}
       />
     </div>
   );

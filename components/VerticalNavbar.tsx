@@ -7,6 +7,8 @@ interface VerticalNavbarProps {
     activeSection: 'profile' | 'experiences' | 'projects' | 'writings';
     onNavigate: (section: 'profile' | 'experiences' | 'projects' | 'writings') => void;
     mode: TimelineMode;
+    isWritingsUnlocked?: boolean;
+    isHidden?: boolean;
 }
 
 const navItems = [
@@ -16,7 +18,7 @@ const navItems = [
     { id: 'writings', label: 'Writings', icon: BookOpen },
 ] as const;
 
-const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode, isWritingsUnlocked = false }) => {
+const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode, isWritingsUnlocked = false, isHidden = false }) => {
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
     const handleNavClick = (id: 'profile' | 'experiences' | 'projects' | 'writings') => {
@@ -29,7 +31,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
     };
 
     return (
-        <>
+        <div className={isHidden ? 'hidden' : undefined}>
             {/* Desktop - Vertical on Right Side */}
             <div className="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center">
                 <div className="flex flex-col gap-6 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-6 px-3 shadow-2xl shadow-black/50">
@@ -91,7 +93,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
             </div>
 
             {/* Mobile - Top Navbar */}
-            <div className="flex md:hidden fixed top-0 left-0 right-0 z-[100] justify-center px-4 py-3 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 pointer-events-auto">
+            <div className="flex md:hidden fixed top-0 left-0 right-0 z-[60] justify-center px-4 py-3 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 pointer-events-auto">
                 <div className="flex flex-row gap-8 items-center w-full justify-center">
                     {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
@@ -116,7 +118,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                     })}
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
