@@ -63,6 +63,13 @@ const BlogCard: React.FC<Props> = ({ post, index, onClick }) => {
         y.set(0);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+        }
+    };
+
     const colors = colorMap[post.status === 'Draft' ? 'draft' : 'published'];
     const hasImage = !!post.imageUrl;
 
@@ -93,12 +100,19 @@ const BlogCard: React.FC<Props> = ({ post, index, onClick }) => {
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={handleMouseLeave}
+            onFocus={() => setIsHovered(true)}
+            onBlur={handleMouseLeave}
             onClick={onClick}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label={`Open writing ${post.title}`}
             className={`
                 group relative cursor-pointer overflow-hidden
                 border ${isHovered ? colors.borderHover : colors.border}
                 rounded-xl
-                transition-all duration-500
+                transition-all duration-500 touch-manipulation
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]
                 ${isHovered ? `shadow-[0_0_40px_rgba(255,255,255,0.1)] ${colors.glow}` : 'shadow-lg'}
             `}
         >

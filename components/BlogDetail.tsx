@@ -296,6 +296,7 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
             transition={{ duration: 0.15 }}
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden"
             onClick={handleManualClose}
+            onWheel={(e) => e.stopPropagation()}
         >
             {/* Background Ambience */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -307,6 +308,7 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
             {ReactDOM.createPortal(
                 <button
                     onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
+                    onWheel={(e) => e.stopPropagation()}
                     className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 shadow-2xl"
                 >
                     <X size={20} strokeWidth={2.5} />
@@ -316,7 +318,7 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
             )}
 
             {/* Main Content */}
-            <div className="relative z-10 h-full overflow-y-auto">
+            <div className="relative z-10 h-full overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
                 <article
                     className="max-w-3xl mx-auto px-6 md:px-12 pt-24 md:pt-32 pb-16"
                     onClick={(e) => e.stopPropagation()}

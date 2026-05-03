@@ -4,6 +4,7 @@ import { BlogPost } from '../types/BlogPost';
 import BlogCard from './BlogCard';
 import BlogDetail from './BlogDetail';
 import { BLOG_POSTS } from '../data/posts';
+import { trackEvent } from '../lib/analytics';
 
 interface BlogSectionProps {
     isUnlocked?: boolean;
@@ -12,12 +13,27 @@ interface BlogSectionProps {
 const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
     const [activePost, setActivePost] = useState<BlogPost | null>(null);
 
+    const openPost = (post: BlogPost) => {
+        trackEvent('blog_opened', {
+            id: post.id,
+            title: post.title,
+            tags: post.tags.join(','),
+            source: 'writings',
+        });
+        setActivePost(post);
+    };
+
     // Listen for closeAllModals event (e.g., from navbar navigation)
     useEffect(() => {
         const handleCloseAll = () => setActivePost(null);
         window.addEventListener('closeAllModals', handleCloseAll);
         return () => window.removeEventListener('closeAllModals', handleCloseAll);
     }, []);
+
+    // Notify App.tsx when this modal opens/closes so global scroll-snap is blocked
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent(activePost ? 'blogDetailOpen' : 'blogDetailClose'));
+    }, [activePost]);
 
     // Filter to only show public posts
     const visiblePosts = BLOG_POSTS.filter(p => p.visibility === 'public');
@@ -62,7 +78,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
                                 <BlogCard
                                     post={post}
                                     index={index}
-                                    onClick={() => setActivePost(post)}
+                                    onClick={() => openPost(post)}
                                 />
                             </div>
                         ))}

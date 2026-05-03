@@ -4,6 +4,7 @@ import { TimelineItem, CaseStudy } from '../types';
 import { Briefcase, GraduationCap, Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
 import { formatDate } from '../utils';
 import { TINKERVERSE_LOGO, SOCIAL_POSTS } from '../constants';
+import { trackEvent } from '../lib/analytics';
 
 interface Props {
     items: TimelineItem[];
@@ -66,8 +67,18 @@ const MobileTimeline: React.FC<Props> = ({
     const handleCardTap = (item: TimelineItem) => {
         // Toggle expansion
         if (expandedId === item.id) {
+            trackEvent('mobile_timeline_card_collapsed', {
+                id: item.id,
+                title: item.title,
+                type: item.type,
+            });
             setExpandedId(null);
         } else {
+            trackEvent('mobile_timeline_card_expanded', {
+                id: item.id,
+                title: item.title,
+                type: item.type,
+            });
             setExpandedId(item.id);
         }
     };
@@ -133,7 +144,7 @@ const MobileTimeline: React.FC<Props> = ({
                                         src={item.logoUrl}
                                         alt={`${item.company} logo`}
                                         className={item.id === 'ms-edi'
-                                            ? 'h-5 w-auto max-w-[56px] object-contain opacity-70 filter brightness-0 invert'
+                                            ? 'h-5 w-auto max-w-[56px] object-contain opacity-90'
                                             : 'w-full h-full object-contain opacity-90'
                                         }
                                     />
@@ -205,6 +216,10 @@ const MobileTimeline: React.FC<Props> = ({
                                                             className={`p-3 rounded-xl border transition-all ${isFeatureExpanded ? 'bg-indigo-500/20 border-indigo-500/40 shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                trackEvent(isFeatureExpanded ? 'mobile_feature_card_collapsed' : 'mobile_feature_card_expanded', {
+                                                                    parent_id: item.id,
+                                                                    title: card.title,
+                                                                });
                                                                 setExpandedFeatureId(isFeatureExpanded ? null : featureKey);
                                                             }}
                                                         >
@@ -314,4 +329,3 @@ const MobileTimeline: React.FC<Props> = ({
 };
 
 export default MobileTimeline;
-

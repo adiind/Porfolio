@@ -53,11 +53,15 @@ const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; co
                 transition={{ duration: 0.3 }}
                 className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-6 relative"
             >
-                <img
-                    src={current.image}
-                    alt={current.title}
-                    className="w-full h-auto object-cover max-h-[480px] object-top"
-                />
+                {current.image ? (
+                    <img
+                        src={current.image}
+                        alt={current.title}
+                        className="w-full h-auto object-cover max-h-[480px] object-top"
+                    />
+                ) : (
+                    <div className="min-h-[260px] bg-white/[0.03]" />
+                )}
                 {/* Overlay gradient at bottom */}
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent flex items-end p-5">
                     <div>
@@ -86,7 +90,13 @@ const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; co
                             i === active ? `${colors.accentBorder} scale-105 shadow-lg` : 'border-white/10 opacity-50 hover:opacity-80'
                         }`}
                     >
-                        <img src={f.image} alt={f.title} className="w-full h-full object-cover object-top" />
+                        {f.image ? (
+                            <img src={f.image} alt={f.title} className="w-full h-full object-cover object-top" />
+                        ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-white/[0.03] px-2 text-center text-[10px] text-white/50">
+                                {f.title}
+                            </div>
+                        )}
                         {i === active && (
                             <div className={`absolute inset-0 ${colors.accentLight} opacity-30`} />
                         )}
@@ -120,9 +130,14 @@ const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; co
 const StatsGrid: React.FC<{ stats: NonNullable<Project['stats']>; colors: typeof colorMap[keyof typeof colorMap] }> = ({ stats, colors }) => (
     <div className={`grid grid-cols-3 md:grid-cols-6 gap-3 p-5 rounded-2xl border ${colors.accentBorder} ${colors.accentLight} mb-10`}>
         {stats.map((stat, i) => (
-            <div key={i} className="text-center">
+            <div key={i} className="group relative text-center" title={stat.description}>
                 <div className={`text-2xl font-bold ${colors.accentText} font-mono`}>{stat.value}</div>
                 <div className="text-white/50 text-[10px] uppercase tracking-wider mt-0.5">{stat.label}</div>
+                {stat.description && (
+                    <div className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 w-44 -translate-x-1/2 rounded-lg border border-white/10 bg-black/95 px-3 py-2 text-left text-[11px] leading-snug text-white/70 opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
+                        {stat.description}
+                    </div>
+                )}
             </div>
         ))}
     </div>
@@ -265,7 +280,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         {project.skills && project.skills.length > 0 && (
                             <div className="flex flex-wrap gap-2 mb-8">
                                 {project.skills.slice(0, 6).map((skill, i) => (
-                                    <span key={i} className={`px-3 py-1.5 text-xs font-medium rounded-full border ${splashColors[i % splashColors.length]}`}>
+                                    <span key={i} title={skill.description} className={`px-3 py-1.5 text-xs font-medium rounded-full border ${splashColors[i % splashColors.length]}`}>
                                         {skill.label}
                                     </span>
                                 ))}

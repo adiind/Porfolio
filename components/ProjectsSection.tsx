@@ -4,6 +4,7 @@ import { Project } from '../types/Project';
 import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import { PROJECTS } from '../data/projects';
+import { trackEvent } from '../lib/analytics';
 
 interface ProjectsSectionProps {
     isWritingsUnlocked?: boolean;
@@ -12,6 +13,16 @@ interface ProjectsSectionProps {
 
 const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = false, onUnlockWritings }) => {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
+
+    const openProject = (project: Project) => {
+        trackEvent('project_opened', {
+            id: project.id,
+            title: project.hero.title,
+            status: project.outcome.status,
+            source: 'selected_work',
+        });
+        setActiveProject(project);
+    };
 
     // Listen for closeAllModals event (e.g., from navbar navigation)
     useEffect(() => {
@@ -63,7 +74,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
                                 <ProjectCard
                                     project={project}
                                     index={index}
-                                    onClick={() => setActiveProject(project)}
+                                    onClick={() => openProject(project)}
                                 />
                             </div>
                         ))}
@@ -100,7 +111,10 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
                     {!isWritingsUnlocked && onUnlockWritings && (
                         <div className="mt-24 pt-12 flex justify-center">
                             <button
-                                onClick={onUnlockWritings}
+                                onClick={() => {
+                                    trackEvent('writings_unlock_clicked', { source: 'selected_work' });
+                                    onUnlockWritings();
+                                }}
                                 className="group relative flex items-center gap-2 px-5 py-2.5 text-xs font-mono bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 rounded-lg transition-all duration-500"
                             >
                                 {/* Always faintly visible blinking cursor as a breadcrumb */}

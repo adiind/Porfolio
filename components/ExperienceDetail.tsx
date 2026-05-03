@@ -24,10 +24,6 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
         }
     };
 
-    // Carousel manual scroll (for navigation buttons)
-    // Infinite scroll is handled by CSS animation with hover-to-pause
-    const [isMarqueePaused, setIsMarqueePaused] = useState(false);
-
     // State for Feature Card Modal
     const [selectedFeatureCard, setSelectedFeatureCard] = useState<FeatureCard | null>(null);
 
@@ -156,7 +152,7 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                                             <img
                                                 src={item.logoUrl}
                                                 alt={item.company}
-                                                className={`w-8 h-8 object-contain ${item.id === 'ms-edi' ? 'invert' : ''}`}
+                                                className="w-8 h-8 object-contain"
                                             />
                                         )}
                                         <div className="flex items-center gap-2 text-white/60 text-sm">
@@ -223,41 +219,25 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                                         </div>
                                     </div>
 
-                                    {/* Infinite Scroll Marquee - Pauses on hover */}
+                                    {/* Horizontal project list */}
                                     <div
-                                        className="overflow-hidden"
-                                        onMouseEnter={() => setIsMarqueePaused(true)}
-                                        onMouseLeave={() => setIsMarqueePaused(false)}
+                                        className="overflow-x-auto overflow-y-hidden pb-2 no-scrollbar"
                                     >
                                         <div
                                             ref={carouselRef}
-                                            className="flex gap-3"
-                                            style={{
-                                                animation: `marquee ${item.featureCards.length * 5}s linear infinite`,
-                                                animationPlayState: isMarqueePaused ? 'paused' : 'running',
-                                            }}
+                                            className="flex gap-3 snap-x snap-mandatory"
                                         >
-                                            {/* Duplicate cards for seamless loop */}
-                                            {[...item.featureCards, ...item.featureCards].map((card, i) => (
+                                            {item.featureCards.map((card, i) => (
                                                 <FeatureCardItem
                                                     key={i}
                                                     card={card}
-                                                    index={i % item.featureCards.length}
+                                                    index={i}
                                                     accent={accent}
-                                                    onClick={() => {
-                                                        setSelectedFeatureCard(card);
-                                                        setIsMarqueePaused(true); // Pause when clicking
-                                                    }}
+                                                    onClick={() => setSelectedFeatureCard(card)}
                                                 />
                                             ))}
                                         </div>
                                     </div>
-                                    <style>{`
-                                        @keyframes marquee {
-                                            0% { transform: translateX(0); }
-                                            100% { transform: translateX(-50%); }
-                                        }
-                                    `}</style>
                                 </div>
                             )}
 
@@ -382,7 +362,7 @@ const SkillPill: React.FC<{ label: string; description?: string }> = ({ label, d
 const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: string; onClick: () => void }> = ({ card, index, accent, onClick }) => {
     return (
         <div
-            className="group w-[300px] flex-shrink-0 snap-start rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer hover:bg-white/[0.08] hover:scale-[1.02]"
+            className="group w-[260px] max-w-[calc(100vw-3rem)] flex-shrink-0 snap-start rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer hover:bg-white/[0.08] hover:scale-[1.02]"
             onClick={onClick}
         >
             {/* Card Header with gradient or image */}
