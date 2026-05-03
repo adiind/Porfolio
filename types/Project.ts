@@ -40,12 +40,13 @@ export interface ProjectReflection {
 export interface ProjectStat {
     value: string;
     label: string;
+    description?: string;
 }
 
 export interface ProjectFeature {
     title: string;
     description: string;
-    image: string;
+    image?: string;
     tags: string[];
 }
 

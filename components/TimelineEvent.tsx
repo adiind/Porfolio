@@ -223,7 +223,7 @@ const TimelineEvent: React.FC<Props> = ({
           {item.logoUrl && (
             <img
               src={item.logoUrl}
-              className={`absolute top-3 left-3 w-6 h-6 object-contain opacity-70 ${item.id === 'ms-edi' ? 'brightness-0 invert' : ''}`}
+              className="absolute top-3 left-3 w-6 h-6 object-contain opacity-80"
               alt="Logo"
             />
           )}
@@ -731,8 +731,7 @@ const TimelineEvent: React.FC<Props> = ({
                 src={item.logoUrl}
                 alt="Logo"
                 className={`absolute top-3 left-3 object-contain transition-all duration-500 ${isHovered && !isFit ? 'w-10 h-10 md:w-16 md:h-16' : 'w-6 h-6 md:w-8 md:h-8'
-                  } ${item.id === 'ms-edi' ? 'opacity-80 filter brightness-0 invert' : 'opacity-80'
-                  }`}
+                  } opacity-80`}
               />
             )}
 

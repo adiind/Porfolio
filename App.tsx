@@ -23,6 +23,7 @@ import { Project } from './types/Project';
 import { PROJECTS } from './data/projects';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
+import { trackEvent } from './lib/analytics';
 
 
 const App: React.FC = () => {
@@ -69,7 +70,8 @@ const App: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
   const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(false);
-  const hasBlockingOverlay = isProfileOpen || activeCaseStudy !== null || activeProject !== null || isTinkerVerseOpen || isProjectDetailOpen;
+  const [isBlogDetailOpen, setIsBlogDetailOpen] = useState(false);
+  const hasBlockingOverlay = isProfileOpen || activeCaseStudy !== null || activeProject !== null || isTinkerVerseOpen || isProjectDetailOpen || isBlogDetailOpen;
 
   // Listen for project detail modal open/close from ProjectsSection
   useEffect(() => {
@@ -82,10 +84,54 @@ const App: React.FC = () => {
       window.removeEventListener('projectDetailClose', onClose);
     };
   }, []);
+
+  // Listen for future blog detail modal open/close from BlogSection
+  useEffect(() => {
+    const onOpen = () => setIsBlogDetailOpen(true);
+    const onClose = () => setIsBlogDetailOpen(false);
+    window.addEventListener('blogDetailOpen', onOpen);
+    window.addEventListener('blogDetailClose', onClose);
+    return () => {
+      window.removeEventListener('blogDetailOpen', onOpen);
+      window.removeEventListener('blogDetailClose', onClose);
+    };
+  }, []);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   const handleCardExpand = useCallback((cardId: string | null) => {
     setExpandedCardId(prev => prev === cardId ? null : cardId);
+  }, []);
+
+  const handleOpenProfile = useCallback((source: string) => {
+    trackEvent('profile_opened', { source });
+    setIsProfileOpen(true);
+  }, []);
+
+  const handleOpenCaseStudy = useCallback((caseStudy: CaseStudy) => {
+    trackEvent('case_study_opened', {
+      title: caseStudy.title,
+      theme: caseStudy.themeColor ?? 'none',
+    });
+    setActiveCaseStudy(caseStudy);
+  }, []);
+
+  const handleOpenTimelineProject = useCallback((item: TimelineItem, source = 'timeline') => {
+    trackEvent('timeline_item_opened', {
+      id: item.id,
+      title: item.title,
+      company: item.company,
+      type: item.type,
+      source,
+    });
+    setActiveProject(item);
+  }, []);
+
+  const handleOpenTinkerVerse = useCallback((source = 'timeline') => {
+    trackEvent('tinkerverse_opened', {
+      source,
+      posts: SOCIAL_POSTS.length,
+    });
+    setIsTinkerVerseOpen(true);
   }, []);
 
   const finishModeTransition = useCallback(() => {
@@ -97,8 +143,14 @@ const App: React.FC = () => {
   }, []);
 
   // 1. Handle Zoom Transitions - simplified
-  const handleZoom = useCallback((targetMode: TimelineMode) => {
+  const handleZoom = useCallback((targetMode: TimelineMode, source = 'control') => {
     if (isAnimatingRef.current || mode === targetMode) return;
+
+    trackEvent('timeline_mode_changed', {
+      from: mode,
+      to: targetMode,
+      source,
+    });
 
     isAnimatingRef.current = true;
     setIsAnimating(true);
@@ -127,8 +179,14 @@ const App: React.FC = () => {
     finishModeTransition();
   }, [finishModeTransition, mode]);
 
-  const dismissIntroForTouchScroll = useCallback(() => {
+  const dismissIntroForTouchScroll = useCallback((source = 'touch_scroll') => {
     if (mode !== 'intro' || isAnimatingRef.current) return;
+
+    trackEvent('timeline_mode_changed', {
+      from: 'intro',
+      to: 'fit',
+      source,
+    });
 
     isAnimatingRef.current = true;
     setIsAnimating(true);
@@ -200,7 +258,7 @@ const App: React.FC = () => {
 
     if (!gesture.dismissedIntro) {
       gesture.dismissedIntro = true;
-      dismissIntroForTouchScroll();
+      dismissIntroForTouchScroll('touch_swipe');
     }
 
     scrollTimelineBy(deltaY, gesture.scrollTop);
@@ -238,7 +296,7 @@ const App: React.FC = () => {
 
     if (!gesture.dismissedIntro) {
       gesture.dismissedIntro = true;
-      dismissIntroForTouchScroll();
+      dismissIntroForTouchScroll('pointer_drag');
     }
 
     scrollTimelineBy(deltaY, gesture.scrollTop);
@@ -273,7 +331,7 @@ const App: React.FC = () => {
     gesture.hasDragged = true;
 
     if (deltaY < -SCROLL_THRESHOLD && gesture.scrollTop <= 10) {
-      handleZoom('intro');
+      handleZoom('intro', 'mobile_pointer_drag');
       return;
     }
 
@@ -288,12 +346,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleOpenProject = (e: CustomEvent<{ id: string; type: 'project' | 'experience' }>) => {
       const { id, type } = e.detail;
+      trackEvent('hero_project_link_clicked', { id, type });
 
       // For experiences, open the timeline modal directly
       if (type === 'experience') {
         const timelineItem = TIMELINE_DATA.find(item => item.id === id);
         if (timelineItem) {
-          setActiveProject(timelineItem);
+          handleOpenTimelineProject(timelineItem, 'hero_related_project');
         }
         return;
       }
@@ -301,7 +360,7 @@ const App: React.FC = () => {
       // For projects, scroll to the Selected Work section and click the project card
       // First ensure we're in fit mode so the projects section is visible
       if (mode === 'intro') {
-        handleZoom('fit');
+        handleZoom('fit', 'hero_project_link');
       }
 
       // Wait for mode transition and scroll to the project
@@ -337,9 +396,14 @@ const App: React.FC = () => {
 
     window.addEventListener('openProject', handleOpenProject as EventListener);
     return () => window.removeEventListener('openProject', handleOpenProject as EventListener);
-  }, [handleZoom, mode]);
+  }, [handleOpenTimelineProject, handleZoom, mode]);
 
   const handleManualZoom = (direction: 'in' | 'out') => {
+    trackEvent('timeline_zoom_clicked', {
+      direction,
+      mode,
+      pixels_per_month: pixelsPerMonth,
+    });
     setMode('normal'); // Switch to normal mode on manual zoom
     setPixelsPerMonth(prev => {
       const step = 5;
@@ -398,14 +462,14 @@ const App: React.FC = () => {
         if (mode === 'intro' && isScrollingDown) {
           e.preventDefault();
           snapCooldownRef.current = true;
-          dismissIntroForTouchScroll();
+          dismissIntroForTouchScroll('mobile_wheel');
           scrollTimelineBy(Math.min(window.innerHeight * 0.45, Math.max(SCROLL_THRESHOLD + 1, e.deltaY)));
           setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
         } else if (mode !== 'intro' && container && (isScrollingDown || isScrollingUp)) {
           e.preventDefault();
 
           if (isScrollingUp && currentScrollTop <= 10) {
-            handleZoom('intro');
+            handleZoom('intro', 'mobile_wheel');
             return;
           }
 
@@ -421,7 +485,7 @@ const App: React.FC = () => {
         if (mode === 'intro') {
           // Profile → Experiences
           e.preventDefault();
-          handleZoom('fit');
+          handleZoom('fit', 'scroll_snap');
         } else if (currentSection === 'experiences' && container) {
           // Experiences → Projects
           e.preventDefault();
@@ -459,7 +523,7 @@ const App: React.FC = () => {
           smoothScrollTo(container, positions.experiences);
         } else if (currentSection === 'experiences' && container && currentScrollTop <= 10) {
           // Experiences (at top) → Profile
-          handleZoom('intro');
+          handleZoom('intro', 'scroll_snap');
         } else {
           // Not at section boundary, allow natural scroll
           snapCooldownRef.current = false;
@@ -476,7 +540,7 @@ const App: React.FC = () => {
     return () => {
       window.removeEventListener('wheel', handleGlobalWheel);
     };
-  }, [mode, isAnimating, hasBlockingOverlay, handleZoom, dismissIntroForTouchScroll, scrollTimelineBy, getSectionPositions, getCurrentSection]);
+  }, [mode, isAnimating, hasBlockingOverlay, handleZoom, dismissIntroForTouchScroll, scrollTimelineBy, getSectionPositions, getCurrentSection, isWritingsUnlocked]);
 
 
   // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
@@ -522,18 +586,38 @@ const App: React.FC = () => {
 
 
 
+  const scrollMilestonesRef = useRef<Set<number>>(new Set());
+
+  const trackScrollDepth = useCallback((container: HTMLDivElement, nextScrollTop: number) => {
+    const maxScrollable = container.scrollHeight - container.clientHeight;
+    if (maxScrollable <= 0) return;
+
+    const depth = Math.min(100, Math.round((nextScrollTop / maxScrollable) * 100));
+    [25, 50, 75, 100].forEach((milestone) => {
+      if (depth < milestone || scrollMilestonesRef.current.has(milestone)) return;
+
+      scrollMilestonesRef.current.add(milestone);
+      trackEvent('scroll_depth_reached', {
+        depth: milestone,
+        section: getCurrentSection(nextScrollTop),
+        mode,
+      });
+    });
+  }, [getCurrentSection, mode]);
+
   // Throttled scroll handler for better performance
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const nextScrollTop = e.currentTarget.scrollTop;
     setScrollTop(nextScrollTop);
+    trackScrollDepth(e.currentTarget, nextScrollTop);
 
     // On touch devices, let a deliberate scroll dismiss the intro hero
     // without snapping the user back to the top of the timeline.
     const isTouchViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
     if (isTouchViewport && mode === 'intro' && nextScrollTop > SCROLL_THRESHOLD) {
-      dismissIntroForTouchScroll();
+      dismissIntroForTouchScroll('touch_scroll');
     }
-  }, [dismissIntroForTouchScroll, mode]);
+  }, [dismissIntroForTouchScroll, mode, trackScrollDepth]);
 
   // Sync activeSection with mode
   useEffect(() => {
@@ -745,12 +829,18 @@ const App: React.FC = () => {
   };
 
   const handleNavigate = (section: 'profile' | 'experiences' | 'projects' | 'writings') => {
+    trackEvent('section_nav_clicked', {
+      section,
+      from: activeSection,
+      mode,
+    });
+
     if (section === 'profile') {
-      handleZoom('intro');
+      handleZoom('intro', 'section_nav');
     } else {
       // If currently in intro, switch to fit mode first
       if (mode === 'intro') {
-        handleZoom('fit');
+        handleZoom('fit', 'section_nav');
         // Small delay to allow state to settle before scrolling request
         setTimeout(() => {
           if (section === 'experiences') {
@@ -813,7 +903,7 @@ const App: React.FC = () => {
           <ExperienceDetail
             item={richProject ? { ...activeProject, ...richProject } as TimelineItem : activeProject}
             onClose={() => setActiveProject(null)}
-            onOpenCaseStudy={setActiveCaseStudy}
+            onOpenCaseStudy={handleOpenCaseStudy}
           />
         )}
       </AnimatePresence>
@@ -842,7 +932,7 @@ const App: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: mode === 'intro' ? 0 : 1 }}
           transition={{ duration: 0.8 }}
-          className="absolute inset-0 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 pointer-events-auto"
+          className={`absolute inset-0 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         />
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -851,12 +941,12 @@ const App: React.FC = () => {
             y: mode === 'intro' ? -20 : 0
           }}
           transition={pageTransition}
-          className="relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 pointer-events-auto"
+          className={`relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         >
           {/* Status Badge Header */}
           <div
             className="group flex items-center gap-3 cursor-pointer relative"
-            onClick={() => setIsProfileOpen(true)}
+            onClick={() => handleOpenProfile('header_badge')}
           >
             {/* Profile Photo */}
             <div className="relative w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 transition-colors duration-300">
@@ -910,6 +1000,8 @@ const App: React.FC = () => {
         onPointerMove={handleIntroPointerMove}
         onPointerUp={handleIntroPointerEnd}
         onPointerCancel={handleIntroPointerEnd}
+        aria-hidden={mode !== 'intro'}
+        inert={mode !== 'intro' ? true : undefined}
         style={{ touchAction: mode === 'intro' ? 'pan-y' : 'auto' }}
         animate={{
           opacity: mode === 'intro' ? 1 : 0,
@@ -920,7 +1012,7 @@ const App: React.FC = () => {
         }}
         transition={pageTransition}
       >
-        <Hero onOpenProfile={() => setIsProfileOpen(true)} />
+        <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} />
 
         <AnimatePresence>
           {mode === 'intro' && (
@@ -973,7 +1065,7 @@ const App: React.FC = () => {
           <div className="w-full h-[1px] bg-white/10 my-1" />
           {mode !== 'fit' ? (
             <button
-              onClick={() => handleZoom('fit')}
+              onClick={() => handleZoom('fit', 'zoom_control')}
               className={`p-2 rounded-full border transition-all bg-indigo-500/20 text-indigo-200 border-indigo-500/50 hover:bg-indigo-500/40`}
               title="Fit to Screen"
             >
@@ -981,7 +1073,7 @@ const App: React.FC = () => {
             </button>
           ) : (
             <button
-              onClick={() => handleZoom('normal')}
+              onClick={() => handleZoom('normal', 'zoom_control')}
               className={`p-2 rounded-full border transition-all bg-indigo-500 text-white border-indigo-500`}
               title="Reset Zoom"
             >
@@ -1004,9 +1096,9 @@ const App: React.FC = () => {
           <div className="block md:hidden mt-[150px] pb-6">
             <MobileTimeline
               items={TIMELINE_DATA}
-              onOpenCaseStudy={setActiveCaseStudy}
-              onOpenProject={setActiveProject}
-              onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+              onOpenCaseStudy={handleOpenCaseStudy}
+              onOpenProject={(item) => handleOpenTimelineProject(item, 'mobile_timeline')}
+              onOpenTinkerVerse={() => handleOpenTinkerVerse('mobile_timeline')}
             />
 
             {/* Mobile-only Back to Home Button */}
@@ -1016,7 +1108,7 @@ const App: React.FC = () => {
                   if (scrollContainerRef.current) {
                     scrollContainerRef.current.scrollTop = 0;
                   }
-                  handleZoom('intro');
+                  handleZoom('intro', 'mobile_home');
                 }}
                 className="p-3 rounded-full bg-indigo-500/80 text-white shadow-lg shadow-indigo-500/30 active:scale-95 transition-transform"
               >
@@ -1061,9 +1153,9 @@ const App: React.FC = () => {
                             pixelsPerMonth={pixelsPerMonth}
                             totalHeight={totalContainerHeight}
                             mode={mode}
-                            onOpenCaseStudy={setActiveCaseStudy}
-                            onOpenProject={setActiveProject}
-                            onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                            onOpenCaseStudy={handleOpenCaseStudy}
+                            onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_grid')}
+                            onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_grid')}
                             isScrolling={false}
                             layoutMode="grid"
                             isExpanded={expandedCardId === item.id}
@@ -1093,9 +1185,9 @@ const App: React.FC = () => {
                             pixelsPerMonth={pixelsPerMonth}
                             totalHeight={totalContainerHeight}
                             mode={mode}
-                            onOpenCaseStudy={setActiveCaseStudy}
-                            onOpenProject={setActiveProject}
-                            onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                            onOpenCaseStudy={handleOpenCaseStudy}
+                            onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_grid')}
+                            onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_grid')}
                             isScrolling={false}
                             layoutMode="grid"
                             isExpanded={expandedCardId === item.id}
@@ -1123,9 +1215,9 @@ const App: React.FC = () => {
                             pixelsPerMonth={pixelsPerMonth}
                             totalHeight={totalContainerHeight}
                             mode={mode}
-                            onOpenCaseStudy={setActiveCaseStudy}
-                            onOpenProject={setActiveProject}
-                            onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                            onOpenCaseStudy={handleOpenCaseStudy}
+                            onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_grid')}
+                            onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_grid')}
                             isScrolling={false}
                             layoutMode="grid"
                             isExpanded={expandedCardId === item.id}
@@ -1209,9 +1301,9 @@ const App: React.FC = () => {
                         pixelsPerMonth={pixelsPerMonth}
                         totalHeight={totalContainerHeight}
                         mode={mode}
-                        onOpenCaseStudy={setActiveCaseStudy}
-                        onOpenProject={setActiveProject}
-                        onOpenTinkerVerse={() => setIsTinkerVerseOpen(true)}
+                        onOpenCaseStudy={handleOpenCaseStudy}
+                        onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_rail')}
+                        onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_rail')}
                         isScrolling={!canHover}
                       // layoutMode defaults to absolute
                       />
@@ -1226,6 +1318,7 @@ const App: React.FC = () => {
           <ProjectsSection
             isWritingsUnlocked={isWritingsUnlocked}
             onUnlockWritings={() => {
+              trackEvent('writings_unlocked', { source: 'hidden_projects_trigger' });
               setIsWritingsUnlocked(true);
               setTimeout(() => {
                 const writingsEl = document.getElementById('writings');

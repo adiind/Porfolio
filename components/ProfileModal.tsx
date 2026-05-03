@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Linkedin, FileText, ExternalLink } from 'lucide-react';
 import { REAL_USER_IMAGE, PROFILE_BIO, PROFILE_SKILLS, SOCIAL_LINKS } from '../constants';
+import { trackEvent } from '../lib/analytics';
 
 interface Props {
   onClose: () => void;
@@ -99,6 +100,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
               href={SOCIAL_LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent('linkedin_clicked', { source: 'profile_modal' })}
               className="flex items-center gap-2 px-5 py-2.5 bg-[#0077b5] hover:bg-[#006396] text-white rounded-lg transition-all shadow-lg hover:shadow-blue-500/20 font-medium text-sm"
             >
               <Linkedin size={16} />
@@ -108,6 +110,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
               href={SOCIAL_LINKS.resume}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent('resume_viewed', { source: 'profile_modal' })}
               className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/10 font-medium text-sm group"
             >
               <FileText size={16} className="text-rose-400 group-hover:text-rose-300" />

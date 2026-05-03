@@ -46,9 +46,9 @@ export const TIMELINE_DATA: TimelineItem[] = [
       "Regular exposure to trade-offs between technical feasibility, user needs, and execution constraints",
       "Hands-on prototyping across physical and digital artifacts to validate ideas early",
       "Collaborative, critique-driven environment that prioritizes clarity of thinking and intent",
-      "Winter Quarter partner work pushed the practice into interaction design with McDonald's and agentic AI service design with JPMorganChase"
+      "Winter Quarter partner work pushed the practice into interaction design with McDonald's and agentic AI service design with JPMorgan Chase"
     ],
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Northwestern_Wildcats_logo.svg/1200px-Northwestern_Wildcats_logo.svg.png",
+    logoUrl: "/images/northwestern_wildcats_logo.svg",
     imageUrl: "/images/northwestern_ford.png",
     skills: [
       { label: "User Research", description: "Qualitative and quantitative methods to uncover user needs." },
@@ -116,7 +116,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
         subtitle: "Interaction Design · Ordering Systems",
         summary: "Explored how fast ordering could feel clearer and lower-friction in real decision moments.",
         expandedSummary: "A Winter Quarter interaction design project exploring how McDonald's ordering could reduce friction without removing choice. The work focused on the behavior of the interface itself: how the system guides the next action, reveals complexity only when needed, and helps people recover quickly when they are moving fast.",
-        imageUrl: "/images/pg-design-project.jpg",
+        imageUrl: "/images/mcdonalds_order.png",
         pills: [
           { label: "Interaction Design", description: "Designing how the experience behaves moment to moment." },
           { label: "Cognitive Load", description: "Reducing how much people need to process under time pressure." },
@@ -138,11 +138,11 @@ export const TIMELINE_DATA: TimelineItem[] = [
         ]
       },
       {
-        title: "FamilySync for JPMorganChase",
+        title: "FamilySync for JPMorgan Chase",
         subtitle: "Service Design · Agentic AI",
         summary: "Designed an agentic caregiver service that coordinates family tasks, approvals, and payments without removing human control.",
-        expandedSummary: "This Northwestern EDI service design project with JPMorganChase explored agentic AI as service infrastructure rather than a banking chatbot. The concept, FamilySync, focused on messy coordination moments like pickups, sick days, groceries, rides, and shared payments. The core design challenge was defining what the service should do automatically, what it should ask permission for, and how to keep the system legible across a multi-person household.",
-        imageUrl: "/images/portfolio_hero.png",
+        expandedSummary: "This Northwestern EDI service design project with JPMorgan Chase explored agentic AI as service infrastructure rather than a banking chatbot. The concept, FamilySync, focused on messy coordination moments like pickups, sick days, groceries, rides, and shared payments. The core design challenge was defining what the service should do automatically, what it should ask permission for, and how to keep the system legible across a multi-person household.",
+        imageUrl: "/images/familysync_jpmorgan_chase.png",
         pills: [
           { label: "Agentic AI", description: "Designing autonomous behavior inside clear guardrails." },
           { label: "Shared Authority", description: "Accounting for multiple stakeholders in one service action." },
@@ -697,9 +697,9 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
       {
         id: "zero-my-ai",
         title: "Zero",
-        description: "Ambient AI runtime with native voice, 3-tier memory, Holomat visual world, Home Assistant integration, and 40+ tools. A persistent companion that learns alongside you.",
+        description: "Part Jarvis, part second brain: a human-centered AI assistant experiment with voice, chat, image generation, four-layer memory, Codex coding support, smart-home context, and bug/feature loops.",
         imageUrl: "/images/zero_hero_banner.png",
-        tags: ["Gemini Live", "Python", "Phaser 3", "Home Assistant"],
+        tags: ["Second Brain", "Voice + Chat", "Codex", "4-Layer Memory"],
         link: "#"
       },
       {

@@ -74,6 +74,9 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="tinkerverse-modal-title"
                 className="relative w-full max-w-7xl h-full max-h-[90vh] bg-[#050505] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
             >
                 {/* Header */}
@@ -84,12 +87,14 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                             <img src={TINKERVERSE_LOGO} alt="TV" className="relative w-10 h-10 rounded-lg bg-black object-cover border border-white/10" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-white tracking-tight">TinkerVerse</h2>
+                            <h2 id="tinkerverse-modal-title" className="text-2xl font-bold text-white tracking-tight">TinkerVerse</h2>
                             <p className="text-xs text-amber-500/80 font-mono mt-0.5">A playground to make, test, and showcase products—all the way to video production.</p>
                         </div>
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
+                        aria-label="Close TinkerVerse modal"
                         className="p-3 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors border border-transparent hover:border-white/10"
                     >
                         <X size={20} />

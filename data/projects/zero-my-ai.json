@@ -1,149 +1,135 @@
 {
     "id": "zero-my-ai",
     "hero": {
-        "title": "Zero – Ambient AI Runtime & Voice Assistant",
-        "oneLiner": "Not a chatbot. Zero is a persistent async runtime that learns your preferences, manages your projects, talks back in real-time voice, and controls your home—all while tracking what every AI agent in your stack has built."
+        "title": "Zero - Second Brain AI Assistant",
+        "oneLiner": "Part Jarvis, part second brain, part slightly over-caffeinated project partner. Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop."
     },
     "context": {
-        "text": "I built Zero because every AI tool I used treated intelligence as a one-shot exchange. You prompt, it responds, the context dies. Zero is my answer to that: a persistent Python runtime that lives alongside you across sessions. It remembers conversations in a 3-tier memory system, assembles 28k-char context in under 500ms, streams native audio via Gemini Live with ~200ms latency, integrates with Home Assistant for real sensor data and device control, syncs your Canvas assignments and Google Calendar, and renders your entire project graph as a navigable 2D pixel-art world. It also reads what every other AI agent (Claude, Cursor, Kiro) has built and can tell you about it. Zero is a runtime, not a feature."
+        "text": "Zero started as a question: what would a second brain feel like if it could also talk back? It grew out of my earlier Jarvis home-assistant experiments, but this version is less about shouting commands at devices and more about living with my context. I built it as an experiment, not a packaged product. It combines voice, chat, image generation, personal memory, coding support, home automation, and project tracking into one assistant. The important part is not that it has a lot of tools; it is that it knows when to use them, when to ask, and when to stay out of the way. It remembers people and projects, knows which devices exist in my space, and keeps a SQL-backed trail of tasks, bugs, feature requests, and decisions so the system improves through real use."
     },
     "build": {
         "bullets": [
-            "Native Gemini Live voice with push-to-talk, configurable voices, echo cancellation, and interrupt support at ~200ms latency",
-            "Browser voice chat with full-duplex audio, barge-in support, live transcript, and project-scoped context selector",
-            "3-tier memory: FastMemory (<100ms key-value), SQLite (conversations, projects, tasks, people), ChromaDB (768-dim vector embeddings for semantic search)",
-            "Holomat Visual UI: Phaser 3 game world with 8 zones, 6 agent avatars with pathfinding, 25+ tool stations, 3 project view modes (Graph, List, Table)",
-            "Home Assistant integration with entity control, sensor monitoring, threshold alerts, priority entity tracking, and natural language aliases",
-            "Canvas + Google Calendar + Apple PIM integration with automatic assignment import, deadline tracking, and course project sync into Obsidian",
-            "AI Bridge: records all coding activities from Kiro, Claude, Cursor into memory—queryable at any time via voice or text",
-            "Research crew: overnight DuckDuckGo + DeepSeek synthesis + Grok X/Twitter intelligence on saved topics",
-            "Image Lab with Gemini Imagen, style profiles (neumorphic-ui, pixel-art, concept-art), rating feedback loop, and asset manifests",
-            "Extensible tool executor with 40+ integrated capabilities, deferred task queue, IoT command server (ESP32/HA REST), and Langfuse observability"
+            "Designed voice and chat as two equal ways to interact: talk when my hands are busy, type when I need precision.",
+            "Built four layers of memory: quick preferences, SQL records, semantic search, and active session context.",
+            "Stored people, projects, todos, devices, conversations, bugs, and feature ideas in structured records instead of loose chat history.",
+            "Built a custom router that decides whether a request is conversation, home control, project lookup, image generation, bug capture, feature planning, or research before it reaches a model.",
+            "Added prompt-injection checks and tool permissions around sensitive actions like home devices, calendars, files, and project memory.",
+            "Connected Home Assistant so Zero can work with actual rooms, lights, sensors, aliases, and device state.",
+            "Created an image generation lab with reusable prompt styles, generated assets, feedback notes, and lightweight versioning.",
+            "Built a live coding workspace where Zero can talk to Codex, surface bugs, suggest next features, summarize changes, and bring in a small council of perspectives when a decision needs more than one brain."
         ]
     },
     "decisions": [
         {
-            "decision": "3-tier memory over single flat context",
-            "why": "FastMemory handles real-time preferences in <100ms, SQLite handles structured state across sessions, and ChromaDB handles semantic search across thousands of past conversations—each optimized for its access pattern.",
-            "tradeoff": "More infrastructure to maintain and synchronize, but no other single system handles all three access patterns well."
+            "decision": "Assistant experiment over product demo",
+            "why": "Zero is strongest when it shows how I think through ambiguous AI interaction: what should be automated, what should be confirmed, and what should stay visible to the user.",
+            "tradeoff": "The scope is intentionally uneven in places, but every part teaches something about designing useful AI systems."
         },
         {
-            "decision": "Native audio streaming instead of STT/TTS pipeline",
-            "why": "Gemini Live's native audio gives ~200ms end-to-end latency, natural barge-in support, and configurable voices without the latency cost of recording → STT → LLM → TTS → playback cycles.",
-            "tradeoff": "Tied to a specific model (gemini-2.5-flash-native-audio-latest) and loses fine-grained transcript control during playback."
+            "decision": "Custom router before model calls",
+            "why": "Many requests have a clear shape: turn on a light, find a project note, log a bug, create an image, or answer normally. Routing first makes the assistant faster, cheaper, and easier to trust.",
+            "tradeoff": "Router logic needs maintenance, especially when a request is ambiguous or combines multiple intents."
         },
         {
-            "decision": "Phaser 3 game engine for Holomat Visual",
-            "why": "Makes abstract project state navigable—you can literally watch Zero walk to a tool station when it's executing, making the runtime legible as a spatial world rather than a log.",
-            "tradeoff": "Significant asset and engine overhead for what is essentially a project management view."
+            "decision": "Four-layer memory instead of one giant chat log",
+            "why": "Quick memory stores preferences, SQL keeps hard facts auditable, semantic memory finds related old context, and session memory tracks what is happening right now.",
+            "tradeoff": "More plumbing to maintain, but each memory layer has a clear job instead of everything becoming one messy prompt."
         },
         {
-            "decision": "Deterministic routing before LLM for common intents",
-            "why": "People memory, quick tasks, HA device control, and academic queries have clear patterns. Routing these directly saves latency, token cost, and avoids hallucination on factual lookups.",
-            "tradeoff": "Routing logic must be maintained as a separate layer and can misfire on ambiguous phrasing."
+            "decision": "Guardrails around tools",
+            "why": "An assistant that can touch home devices, files, calendars, and project records needs permission boundaries and prompt-injection defenses, not just better prompts.",
+            "tradeoff": "Guardrails add friction, but that friction is part of making the system usable by a real person."
         }
     ],
     "review": {
         "worked": [
-            "3-tier memory architecture is fast and reliable—FastMemory sub-100ms retrieval makes real-time voice feel snappy.",
-            "Holomat's visual representation of tool execution (avatars walking to stations) makes the runtime legible in a way logs never could.",
-            "Deterministic routing for common intents (HA control, people memory, quick tasks) dramatically reduces latency and LLM cost on daily-use queries.",
-            "The AI Bridge concept (tracking what other agents built) turned out to be genuinely useful—I can ask Zero what Cursor changed yesterday and get a factual answer.",
-            "Voice-first UX with barge-in support feels natural; the ~200ms latency with native audio is tight enough to feel conversational."
+            "Framing Zero as an experiment made the project easier to explain: it is about designing context-aware assistance, not claiming to ship a universal assistant.",
+            "Voice and chat together made the assistant feel more human-centered because each mode fits a different kind of moment.",
+            "The Jarvis lineage makes the home-control part feel grounded, but Zero is much more of a second brain than a remote control.",
+            "The SQL-backed bug and feature loop turned personal tinkering into a product-minded iteration system.",
+            "The live coding workspace makes the project feel useful to me as a developer, not just impressive as an AI demo.",
+            "The router made the assistant feel less random because common actions followed predictable paths."
         ],
         "didnt": [
-            "Holomat world-building is still in progress—authored governance and room composition need curator tooling that isn't fully shipped yet.",
-            "Context assembly at 28k chars can hit the cap on sessions with many loaded projects, requiring smarter truncation heuristics.",
-            "Academic Canvas sync needs more automation to reduce manual setup per quarter."
+            "The project can easily look like a pile of AI features if the story is not tightly edited.",
+            "Memory needs clearer user-facing controls so people can see what Zero knows, forget things, and correct records.",
+            "Prompt-injection testing has to keep evolving as more tools become available.",
+            "Some flows still need better onboarding so a first-time viewer understands what Zero can safely do."
         ]
     },
     "outcome": {
         "status": "in-progress",
-        "text": "Zero is my daily-use AI runtime: I run it in the background and talk to it throughout the day. It controls my lights, tracks my assignments, keeps project notes in Obsidian, plays music via Spotify, and tells me what Claude built while I was asleep. The Holomat visual UI has 8 zones, 6 agent avatars, and 25+ tool stations. 331 unit tests, 228 integration tests, 40+ tools, and ~25,000 lines of Python and JavaScript. Still actively shipping: Holomat diorama rehaul, wearable ESP32 support, and Academic Canvas deep integration are all in progress."
+        "text": "Zero is now my daily second-brain assistant experiment. It talks, chats, generates images, remembers people and projects, helps me code with Codex, controls parts of my home, and keeps a structured loop of bugs, feature ideas, and project decisions. The recruiter signal is not only that I can wire AI tools together; it is that I can turn a messy technical possibility into a human-centered system with memory, permissions, iteration, and visible tradeoffs."
     },
     "reflection": {
-        "text": "Zero taught me what 'ambient intelligence' actually means in practice: not an always-on API call, but a runtime that earns presence by being fast, contextual, and honest about what it knows. The hardest design problem wasn't the voice or the memory—it was deciding what Zero should do without being asked, and what it should always wait to be asked."
+        "text": "Zero taught me that the hard part of AI product work is not adding another model call. The hard part is shaping context, trust, timing, and feedback so the assistant feels helpful without feeling chaotic. It pushed me to think like a designer, developer, and product owner at the same time."
     },
     "themeColor": "violet",
     "icon": "bot",
     "skills": [
         {
-            "label": "Async Runtime Architecture",
-            "description": "Python asyncio runtime with multi-process voice, server, and background agents."
+            "label": "Human-Centered AI",
+            "description": "Designing assistant behavior around trust, timing, and user control."
         },
         {
-            "label": "3-Tier Memory",
-            "description": "FastMemory, SQLite, and ChromaDB each handling different access and retrieval patterns."
+            "label": "Voice + Chat UX",
+            "description": "Supporting both conversational voice and precise text workflows."
         },
         {
-            "label": "Gemini Live Voice",
-            "description": "Native audio streaming with barge-in, configurable voices, and AEC."
+            "label": "4-Layer Memory",
+            "description": "Preferences, SQL records, semantic memory, and live session context."
         },
         {
-            "label": "Game Engine UI",
-            "description": "Phaser 3 Holomat world with agent pathfinding, tool stations, and project graph."
+            "label": "Tool Routing",
+            "description": "Classifying intents before model calls so actions stay predictable."
         },
         {
             "label": "Home Automation",
-            "description": "Home Assistant integration with entity control, sensor monitoring, and threshold actions."
+            "description": "Connecting assistant behavior to real rooms, sensors, and devices."
         },
         {
-            "label": "Multi-Agent Coordination",
-            "description": "AI Bridge reads Claude, Kiro, Cursor activity and makes it queryable."
+            "label": "Coding Loops",
+            "description": "Using Codex, bug logs, feature queues, and council-style review to keep building."
         }
     ],
     "stats": [
-        { "value": "~25k", "label": "Lines of Code" },
-        { "value": "40+", "label": "Integrated Tools" },
-        { "value": "559", "label": "Tests Written" },
-        { "value": "4", "label": "UI Modes" },
-        { "value": "<200ms", "label": "Voice Latency" },
-        { "value": "3-Tier", "label": "Memory Arch." }
+        { "value": "Voice", "label": "Talks Back", "description": "Use it hands-free, interrupt it, or switch back to text when precision matters." },
+        { "value": "Chat", "label": "Second Brain", "description": "Project notes, people, questions, and decisions live in one assistant instead of scattered tabs." },
+        { "value": "Images", "label": "Gen Lab", "description": "Reusable prompt styles, generated assets, and feedback notes for visual experiments." },
+        { "value": "4 Layers", "label": "Memory", "description": "Quick preferences, SQL facts, semantic search, and active session context." },
+        { "value": "Codex", "label": "Coding Aid", "description": "A live coding workspace that can talk to Codex, track bugs, and suggest features." },
+        { "value": "Devices", "label": "Smart Home", "description": "Real rooms, lights, sensors, and aliases through Home Assistant." }
     ],
     "features": [
         {
-            "title": "Holomat Visual World",
-            "description": "A Phaser 3 game world with 8 zones, 6 agent avatars with pathfinding, and 25+ tool stations. Avatars walk to stations when tools execute, making the runtime spatially legible. Three project view modes: Graph (force-directed), List (inline edit), Table (sortable). Activity feed shows live spec_created, task_completed, file_modified events.",
-            "image": "/images/zero_holomat.png",
-            "tags": ["Phaser 3", "Pixel Art", "Project Graph", "Agent Avatars"]
-        },
-        {
-            "title": "Browser Voice Chat",
-            "description": "Full-duplex audio with barge-in support and ~200ms latency via Gemini Live. Live transcript with streaming bubbles, tap-to-toggle or hold-to-talk mic, and a project-scoped context selector that loads the relevant project state before each session.",
+            "title": "Voice + Chat Assistant",
+            "description": "Zero supports spoken conversation for quick, ambient moments and text chat for more deliberate work. The goal was not to make a louder chatbot, but to choose the interface that fits the task.",
             "image": "/images/zero_voice_chat.png",
-            "tags": ["Gemini Live", "WebRTC", "Full-Duplex", "Voice"]
+            "tags": ["Voice", "Chat", "Context"]
         },
         {
-            "title": "Strategy Room (Text Mode)",
-            "description": "Silent focused typing interface with image paste/attach. Dark 'strategy room' aesthetic with a project context sidebar showing threads and todos. Persistent response-style presets (Strategic, Concise, Verbose). Session search with / focus.",
-            "image": "/images/zero_text_mode.png",
-            "tags": ["Text Mode", "Image Analysis", "Presets"]
-        },
-        {
-            "title": "Project Graph & Memory",
-            "description": "Hierarchical projects with threads, todos, questions, and notes visualized as a force-directed graph. Nodes glow by type (violet=project, teal=thread, amber=todo, pink=question). Activity feed shows real-time cross-agent work. Obsidian vault sync keeps notes bidirectional.",
+            "title": "People + Project Memory",
+            "description": "Zero keeps four layers of memory: quick preferences, SQL records for facts, semantic search for related old context, and live session context for what is happening right now. That means it can remember people, projects, notes, bugs, and decisions without pretending a giant chat log is a brain.",
             "image": "/images/zero_project_graph.png",
-            "tags": ["Graph Visualization", "ChromaDB", "Obsidian Sync"]
+            "tags": ["4-Layer Memory", "SQL Facts", "Semantic Search"]
         },
         {
-            "title": "Home Automation Brain",
-            "description": "Home Assistant integration with natural language entity control, sensor monitoring with threshold alerts, priority entity tracking, and recent change detection in a 5-min window. Zero proactively speaks when monitors trigger.",
-            "image": "/images/zero_home_automation.png",
-            "tags": ["Home Assistant", "Sensor Monitoring", "IoT", "Proactive Voice"]
+            "title": "Live Coding Workspace + Council",
+            "description": "This is the focused workspace where Zero helps me code. It can talk to Codex, keep track of bugs, turn rough feature ideas into next steps, and call in a small council of perspectives like engineer, designer, critic, and product brain when a decision needs more than one angle.",
+            "image": "/images/zero_text_mode.png",
+            "tags": ["Codex", "Bug Loop", "Council"]
         }
     ],
     "techStack": {
-        "backend": ["Python 3.11+", "asyncio", "SQLite", "ChromaDB", "FastAPI", "WebSockets"],
-        "ai": ["Gemini Live (native audio)", "Gemini Flash", "Gemini Imagen", "OpenRouter (DeepSeek, Grok)", "Langfuse"],
-        "frontend": ["Vanilla JS", "Phaser 3", "Web Audio API", "MediaPipe"],
-        "integrations": ["Home Assistant", "Canvas (iCal)", "Google Calendar", "Apple PIM", "Spotify", "Obsidian", "Playwright"]
+        "backend": ["Python", "SQLite", "Semantic Memory", "WebSockets"],
+        "ai": ["Gemini Live", "Image Generation", "Custom Router", "Prompt Guardrails"],
+        "frontend": ["Voice UI", "Chat UI", "Coding Workspace", "Memory Views"],
+        "integrations": ["Codex", "Home Assistant", "Google Calendar", "Canvas", "Obsidian", "Spotify"]
     },
     "heroImage": "/images/zero_hero_banner.png",
     "gallery": [
-        "/images/zero_holomat.png",
         "/images/zero_voice_chat.png",
         "/images/zero_text_mode.png",
-        "/images/zero_project_graph.png",
-        "/images/zero_home_automation.png"
+        "/images/zero_project_graph.png"
     ]
 }

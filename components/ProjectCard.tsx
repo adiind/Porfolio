@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Zap, PenTool, Bot, Cpu, Layers, Box, Music, Camera, ChevronDown, Trophy, Code } from 'lucide-react';
+import { ChevronDown, Trophy } from 'lucide-react';
 import { Project } from '../types/Project';
 
 interface Props {
@@ -8,18 +8,6 @@ interface Props {
     index: number;
     onClick: () => void;
 }
-
-const iconMap = {
-    'zap': Zap,
-    'pen-tool': PenTool,
-    'bot': Bot,
-    'code': Code,
-    'cpu': Cpu,
-    'layers': Layers,
-    'box': Box,
-    'music': Music,
-    'camera': Camera,
-};
 
 const colorMap = {
     'amber': {
@@ -129,7 +117,6 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
         }
     };
 
-    const Icon = iconMap[project.icon || 'zap'];
     const colors = colorMap[project.themeColor || 'amber'];
     const hasImage = !!project.heroImage;
 
@@ -227,18 +214,6 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
                     <Trophy size={10} />
                     {statusLabels[project.outcome.status]}
                 </motion.span>
-            </div>
-
-            {/* Icon Badge (Top Left) */}
-            <div className="absolute top-3 left-3 z-20">
-                <motion.div
-                    layout
-                    className={`p-2 rounded-lg ${colors.icon} backdrop-blur-sm`}
-                    animate={{ scale: isHovered ? 1.1 : 1, rotate: isHovered ? 5 : 0 }}
-                    transition={{ type: 'spring', stiffness: 400 }}
-                >
-                    <Icon size={isHovered ? 20 : 18} />
-                </motion.div>
             </div>
 
             {/* Content Container */}

@@ -1,11 +1,11 @@
 {
     "id": "familysync-jpmorgan",
     "hero": {
-        "title": "FamilySync – JPMorganChase Service Design Concept",
+        "title": "FamilySync – JPMorgan Chase Service Design Concept",
         "oneLiner": "An agentic caregiver service designed to reduce family coordination burden while preserving control, trust, and dignity."
     },
     "context": {
-        "text": "This Northwestern EDI service design project, developed with JPMorganChase as the partner, started from a broader question than 'where can AI fit in banking?' The opportunity was to explore where agentic systems could take on real coordination work that cuts across family life, money, logistics, and trust. The concept I landed on was FamilySync: a caregiver service that helps families handle messy moments like a sick child, pickup changes, groceries, rides, and shared payments without turning care into a manual operations project. The challenge was to design the service boundary, not just the interface, so that helpful autonomy stayed visible, consent-based, and appropriately constrained."
+        "text": "This Northwestern EDI service design project, developed with JPMorgan Chase as the partner, started from a broader question than 'where can AI fit in banking?' The opportunity was to explore where agentic systems could take on real coordination work that cuts across family life, money, logistics, and trust. The concept I landed on was FamilySync: a caregiver service that helps families handle messy moments like a sick child, pickup changes, groceries, rides, and shared payments without turning care into a manual operations project. The challenge was to design the service boundary, not just the interface, so that helpful autonomy stayed visible, consent-based, and appropriately constrained."
     },
     "build": {
         "bullets": [
@@ -78,5 +78,5 @@
             "description": "Using concrete situations to probe trust and autonomy boundaries."
         }
     ],
-    "heroImage": "/images/familysync_care.png"
+    "heroImage": "/images/familysync_jpmorgan_chase.png"
 }
