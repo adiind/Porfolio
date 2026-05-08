@@ -17,9 +17,10 @@ import plotterData from './projects/plotter.json';
 import portfolioWebsiteData from './projects/portfolio-website.json';
 
 // Projects shown in Selected Work section
-// FamilySync and McDonald's are excluded from this grid (available via getProjectsByIds)
 export const PROJECTS: Project[] = [
     zeroMyAIData as Project,
+    familySyncData as Project,
+    mcdonaldsInteractionData as Project,
     suryaData as Project,
     solopumpData as Project,
     heliosData as Project,

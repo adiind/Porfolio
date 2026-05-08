@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, Check, AlertTriangle, ArrowRight,
     Lightbulb, Wrench, Scale, Trophy, Sparkles,
-    ChevronLeft, ChevronRight, Cpu, Zap, Code2, Globe
+    ChevronLeft, ChevronRight, Cpu, Zap, Code2, Globe, ExternalLink
 } from 'lucide-react';
 import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
@@ -285,6 +285,19 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                                     </span>
                                 ))}
                             </div>
+                        )}
+
+                        {project.sourceUrl && (
+                            <a
+                                href={project.sourceUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className={`mb-8 inline-flex w-fit items-center gap-2 rounded-full border ${colors.accentBorder} ${colors.accentLight} px-4 py-2 text-sm font-semibold ${colors.accentText} transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/40`}
+                            >
+                                <ExternalLink size={16} />
+                                {project.sourceLabel ?? 'View source'}
+                            </a>
                         )}
 
                         {project.heroImage && (
