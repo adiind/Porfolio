@@ -75,6 +75,8 @@ export interface Project {
     heroImage?: string;
     heroVideo?: string;
     gallery?: string[];
+    sourceUrl?: string;
+    sourceLabel?: string;
     // Rich project details (optional, for detailed projects like Zero)
     stats?: ProjectStat[];
     features?: ProjectFeature[];
