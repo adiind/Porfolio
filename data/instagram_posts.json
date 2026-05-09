@@ -5,7 +5,7 @@
     "summary": "[Maker Entry] Bambu Lab X1C | Patchwork\n\n#livingallery\n\nPatchwork is a custom maker wall built across various X1Cs in the CornerMakery at the Segal Design Institute.\n\nMy problem was that I make too much and always want my tools at hand but they’re always on my desk then, so i took top 10 of my tools and combined it with a dashboard to get something uniquely gallery worthy!\n\nEverything on the wall was designed around the actual objects I use every day: thin markers, broad markers, and markers for dangerously large ideas, a support removal cutter, wire cutters, a full screwdriver set, calipers, a multimeter, magnetic tape measure, post-it notes, and a magnetic e-ink display connected to Home Assistant for dashboards and live data.\n\nInstead of forcing tools into generic organizers, every holder was custom designed around the object itself, turning the workspace into something functional, colorful, and personal.\n\nSwipe to see the tedious effort behind the result!\n\n#livingallery",
     "url": "https://www.instagram.com/p/DX-pMT_jHmO/",
     "caption": "[Maker Entry] Bambu Lab X1C | Patchwork\n\n#livingallery\n\nPatchwork is a custom maker wall built across various X1Cs in the CornerMakery at the Segal Design Institute.\n\nMy problem was that I make too much and always want my tools at hand but they’re always on my desk then, so i took top 10 of my tools and combined it with a dashboard to get something uniquely gallery worthy!\n\nEverything on the wall was designed around the actual objects I use every day: thin markers, broad markers, and markers for dangerously large ideas, a support removal cutter, wire cutters, a full screwdriver set, calipers, a multimeter, magnetic tape measure, post-it notes, and a magnetic e-ink display connected to Home Assistant for dashboards and live data.\n\nInstead of forcing tools into generic organizers, every holder was custom designed around the object itself, turning the workspace into something functional, colorful, and personal.\n\nSwipe to see the tedious effort behind the result!\n\n#livingallery",
-    "likes": 49,
+    "likes": 70,
     "comments": 4
   },
   {
@@ -34,24 +34,6 @@
     "caption": "It’s time you met Zer0",
     "likes": 15,
     "comments": 1
-  },
-  {
-    "id": "https://www.instagram.com/p/DWGLWo-Dgyx/",
-    "date": "2026-03-20",
-    "summary": "Yes Claude Cowork created the thumbnail #Claude #ai",
-    "url": "https://www.instagram.com/p/DWGLWo-Dgyx/",
-    "caption": "Yes Claude Cowork created the thumbnail #Claude #ai",
-    "likes": 6,
-    "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/DWFBWCfAnNp/",
-    "date": "2026-03-19",
-    "summary": "Welcome back to one day prints?",
-    "url": "https://www.instagram.com/p/DWFBWCfAnNp/",
-    "caption": "Welcome back to one day prints?",
-    "likes": 14,
-    "comments": 0
   },
   {
     "id": "https://www.instagram.com/p/DUwF03Ygb2j/",
@@ -898,5 +880,23 @@
     "caption": "The white filament had a lot of adhesion issues which mostly I was able to solve but after this failed attempt I did realise the hilt needed to be black. While downloading and 3D print I’m ready made files has its own hassles, the real game begins now, how do I paint it to look realistic.",
     "likes": 44,
     "comments": 0
+  },
+  {
+    "id": "https://www.instagram.com/p/C7mG9AvMQvr/",
+    "date": "2024-05-30",
+    "summary": "🚀 Using stepper motors to create a linear rail! Here’s why stepper motors are essential:\n\n- **Precise Control:** Allows for exact positioning.\n- **High Torque:** Great for demanding applications.\n- **Reliability:** Consistent performance over time.\n\n**Types of Motors:**\n- **DC Motor:** Simple, variable speed, but less precise.\n- **Servo Motor:** Offers high precision with feedback control.\n- **Stepper Motor:** Combines precision and control, perfect for projects requiring exact movement.\n\nStay tuned to see the results! 🔧✨ #TechInnovation #StepperMotor #DIYProjects #MakersGonnaMake",
+    "url": "https://www.instagram.com/p/C7mG9AvMQvr/",
+    "caption": "🚀 Using stepper motors to create a linear rail! Here’s why stepper motors are essential:\n\n- **Precise Control:** Allows for exact positioning.\n- **High Torque:** Great for demanding applications.\n- **Reliability:** Consistent performance over time.\n\n**Types of Motors:**\n- **DC Motor:** Simple, variable speed, but less precise.\n- **Servo Motor:** Offers high precision with feedback control.\n- **Stepper Motor:** Combines precision and control, perfect for projects requiring exact movement.\n\nStay tuned to see the results! 🔧✨ #TechInnovation #StepperMotor #DIYProjects #MakersGonnaMake",
+    "likes": 14,
+    "comments": 2
+  },
+  {
+    "id": "https://www.instagram.com/p/C7hzlDXsht_/",
+    "date": "2024-05-28",
+    "summary": "OLED displays with SPI are perfect for creating interactive and dynamic projects! \n\nThis 128x64 pixel module offers high contrast, low power consumption, and fast updates, making it ideal for animations, real-time feedback, and sleek UI elements in your DIY electronics.\n\nWatch as a simple button press triggers a responsive animation on the OLED screen! 🎥🔄\n\n#OLED #SPI #Electronics #DIY #Tech #Microcontroller #ESP8266",
+    "url": "https://www.instagram.com/p/C7hzlDXsht_/",
+    "caption": "OLED displays with SPI are perfect for creating interactive and dynamic projects! \n\nThis 128x64 pixel module offers high contrast, low power consumption, and fast updates, making it ideal for animations, real-time feedback, and sleek UI elements in your DIY electronics.\n\nWatch as a simple button press triggers a responsive animation on the OLED screen! 🎥🔄\n\n#OLED #SPI #Electronics #DIY #Tech #Microcontroller #ESP8266",
+    "likes": 3,
+    "comments": 1
   }
 ]
