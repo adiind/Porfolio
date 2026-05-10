@@ -1,11 +1,20 @@
 [
   {
+    "id": "https://www.instagram.com/p/DYGyfZWDe0p/",
+    "date": "2026-05-09",
+    "summary": "Some better renders for Patchwork!\n\nMade for @bambulab_official #livingallery challenge in just 3 days, 11 units, each uniquely designed, magnetic E-Ink display and pegboard/ magnetic insert backplate!",
+    "url": "https://www.instagram.com/p/DYGyfZWDe0p/",
+    "caption": "Some better renders for Patchwork!\n\nMade for @bambulab_official #livingallery challenge in just 3 days, 11 units, each uniquely designed, magnetic E-Ink display and pegboard/ magnetic insert backplate!",
+    "likes": 16,
+    "comments": 1
+  },
+  {
     "id": "https://www.instagram.com/p/DX-pMT_jHmO/",
     "date": "2026-05-06",
     "summary": "[Maker Entry] Bambu Lab X1C | Patchwork\n\n#livingallery\n\nPatchwork is a custom maker wall built across various X1Cs in the CornerMakery at the Segal Design Institute.\n\nMy problem was that I make too much and always want my tools at hand but they’re always on my desk then, so i took top 10 of my tools and combined it with a dashboard to get something uniquely gallery worthy!\n\nEverything on the wall was designed around the actual objects I use every day: thin markers, broad markers, and markers for dangerously large ideas, a support removal cutter, wire cutters, a full screwdriver set, calipers, a multimeter, magnetic tape measure, post-it notes, and a magnetic e-ink display connected to Home Assistant for dashboards and live data.\n\nInstead of forcing tools into generic organizers, every holder was custom designed around the object itself, turning the workspace into something functional, colorful, and personal.\n\nSwipe to see the tedious effort behind the result!\n\n#livingallery",
     "url": "https://www.instagram.com/p/DX-pMT_jHmO/",
     "caption": "[Maker Entry] Bambu Lab X1C | Patchwork\n\n#livingallery\n\nPatchwork is a custom maker wall built across various X1Cs in the CornerMakery at the Segal Design Institute.\n\nMy problem was that I make too much and always want my tools at hand but they’re always on my desk then, so i took top 10 of my tools and combined it with a dashboard to get something uniquely gallery worthy!\n\nEverything on the wall was designed around the actual objects I use every day: thin markers, broad markers, and markers for dangerously large ideas, a support removal cutter, wire cutters, a full screwdriver set, calipers, a multimeter, magnetic tape measure, post-it notes, and a magnetic e-ink display connected to Home Assistant for dashboards and live data.\n\nInstead of forcing tools into generic organizers, every holder was custom designed around the object itself, turning the workspace into something functional, colorful, and personal.\n\nSwipe to see the tedious effort behind the result!\n\n#livingallery",
-    "likes": 70,
+    "likes": 72,
     "comments": 4
   },
   {
@@ -889,14 +898,5 @@
     "caption": "🚀 Using stepper motors to create a linear rail! Here’s why stepper motors are essential:\n\n- **Precise Control:** Allows for exact positioning.\n- **High Torque:** Great for demanding applications.\n- **Reliability:** Consistent performance over time.\n\n**Types of Motors:**\n- **DC Motor:** Simple, variable speed, but less precise.\n- **Servo Motor:** Offers high precision with feedback control.\n- **Stepper Motor:** Combines precision and control, perfect for projects requiring exact movement.\n\nStay tuned to see the results! 🔧✨ #TechInnovation #StepperMotor #DIYProjects #MakersGonnaMake",
     "likes": 14,
     "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C7hzlDXsht_/",
-    "date": "2024-05-28",
-    "summary": "OLED displays with SPI are perfect for creating interactive and dynamic projects! \n\nThis 128x64 pixel module offers high contrast, low power consumption, and fast updates, making it ideal for animations, real-time feedback, and sleek UI elements in your DIY electronics.\n\nWatch as a simple button press triggers a responsive animation on the OLED screen! 🎥🔄\n\n#OLED #SPI #Electronics #DIY #Tech #Microcontroller #ESP8266",
-    "url": "https://www.instagram.com/p/C7hzlDXsht_/",
-    "caption": "OLED displays with SPI are perfect for creating interactive and dynamic projects! \n\nThis 128x64 pixel module offers high contrast, low power consumption, and fast updates, making it ideal for animations, real-time feedback, and sleek UI elements in your DIY electronics.\n\nWatch as a simple button press triggers a responsive animation on the OLED screen! 🎥🔄\n\n#OLED #SPI #Electronics #DIY #Tech #Microcontroller #ESP8266",
-    "likes": 3,
-    "comments": 1
   }
 ]
