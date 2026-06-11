@@ -1,94 +1,66 @@
-<div align="center">
-  <h1 align="center">Adi Agarwal - Portfolio</h1>
-  <p align="center">
-    A personal portfolio website showcasing projects, experience, and skills.
-    <br />
-    <br />
-    <a href="https://adiagarwal.com">View Demo</a>
-    ·
-    <a href="https://github.com/adiind/Porfolio/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/adiind/Porfolio/issues">Request Feature</a>
-  </p>
-</div>
+# Adi Agarwal - Portfolio
 
-## About The Project
+This is the source for my personal portfolio: [adiagarwal.com](https://adiagarwal.com).
 
-This is a comprehensive portfolio website designed to showcase my professional experience, projects, and technical skills. It features a modern, responsive design with smooth animations and a dynamic timeline.
+I designed and built this site to show my technical range across product analytics, frontend engineering, AI systems, interaction design, service design, embedded systems, and physical prototyping. It is not a starter template or a generic project README. The portfolio itself is part of the work: a live, interactive proof of how I think, build, test, and explain complex systems.
 
-### Built With
+## What This Portfolio Shows
 
-*   ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-*   ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
-*   ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-*   ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-*   ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
+- Product analytics and experimentation across growth, revenue, supply-chain, marketplace, and consumer-product contexts.
+- Frontend engineering through a responsive React and TypeScript interface with animated timelines, layered modals, custom scroll behavior, reusable UI primitives, and polished interaction states.
+- AI and agentic systems through Zero, a second-brain assistant with voice/chat UX, structured memory, tool routing, Home Assistant integration, image generation, coding loops, and prompt-injection guardrails.
+- Service and interaction design through Northwestern EDI work, including FamilySync for JPMorgan Chase and a McDonald's group-ordering concept.
+- Hardware and making through embedded systems, ESP32/Arduino, MQTT, CAD, 3D printing, kinetic mechanisms, local voice recognition, and physical prototypes.
+- Human-AI development workflow through agent-assisted coding, browser verification, content iteration, and asset generation.
 
-## Getting Started
+## Featured Work
 
-To get a local copy up and running, follow these simple steps.
+| Area | Work | What it demonstrates |
+| --- | --- | --- |
+| AI systems | Zero - Second Brain AI Assistant | Voice/chat UX, memory design, tool routing, Home Assistant integration, image generation, and guarded agent behavior. |
+| Service design | FamilySync - JPMorgan Chase | Agentic caregiver service design, permissions, privacy framing, shared authority, and scenario testing. |
+| Interaction design | McDonald's Group Ordering | Shared cart ownership, invite flows, review readiness, split-oriented checkout, and coordination UX. |
+| Embedded AI + IoT | Jarvis | Local voice recognition, MQTT, embedded C++, Home Assistant automation, and physical feedback design. |
+| Physical computing | Surya, Helios, SoloPump, Plotter | CAD, 3D printing, mechanical systems, electronics, calibration logic, and kinetic product prototyping. |
+| Portfolio build | This site | React, TypeScript, Vite, Framer Motion, Tailwind utility styling, analytics instrumentation, and agentic build workflows. |
 
-### Prerequisites
+## Technical Stack
 
-*   Node.js (Latest LTS version recommended)
-*   npm
+- Frontend: React 19, TypeScript, Vite, Framer Motion, Radix UI primitives, lucide-react, class-variance-authority, Tailwind CDN utilities, and custom component patterns.
+- Interaction systems: Responsive timeline layouts, project detail modals, writing modals, keyboard-accessible cards, hover previews, scroll-state hooks, and mobile gesture handling.
+- Content model: JSON-driven project, timeline, writing, and Instagram data that keeps case studies structured and easy to update.
+- Analytics: A vendor-neutral tracking wrapper for Zaraz, PostHog, Plausible, and Umami.
+- Workflow tooling: Notion sync scripts, Vite build/preview commands, local browser checks, and an agent-maintained session log in `AGENTS.md`.
 
-### Installation
+## Repository Map
 
-1.  Clone the repo
-    ```sh
-    git clone https://github.com/adiind/Porfolio.git
-    ```
-2.  Install NPM packages
-    ```sh
-    npm install
-    ```
-3.  Set up environment variables
-    *   Create a `.env` file based on `.env.example` (if available) or ensure required keys are present.
+- `App.tsx` - Main application shell, section state, intro flow, and global modal coordination.
+- `components/` - Portfolio UI, including hero, timeline, project cards, project details, writings, profile, navigation, and shared UI primitives.
+- `data/` - Structured portfolio content for timeline items, selected work, posts, project case studies, and synced external data.
+- `writing/posts/` - Long-form writing shown in the Writings section.
+- `lib/analytics.ts` - Custom analytics event helper.
+- `scripts/notion-sync.cjs` - Notion task/content sync workflow used during development.
+- `public/images/` - Portfolio imagery, case-study assets, screenshots, and prototype visuals.
 
-### Running Locally
-
-Start the development server:
+## Running Locally
 
 ```sh
+npm install
 npm run dev
 ```
 
-This will also pull the latest Notion data before starting the server.
+`npm run dev` pulls fresh Notion data first, then starts the Vite dev server on `localhost:3000`.
 
-## Scripts & Notion Workflow
+Useful commands:
 
-This project uses a custom script to sync tasks and content from Notion.
-
-### Notion Sync Commands
-
-*   `npm run sync:pull`: Pull fresh tasks/data from Notion.
-*   `npm run sync:push`: Push local task changes to Notion.
-*   `npm run sync:list`: List cached tasks (faster, no API call).
-*   `npm run sync:status`: Check for pending local changes.
-*   `npm run sprint:issues`: Query Notion for sprint issues.
-
-### Daily Workflow
-
-1.  **Start of session**: `npm run sync:pull`
-2.  **View tasks**: `npm run sync:list`
-3.  **Work on tasks**: Update status via scripts (see `node scripts/notion-sync.cjs --help` for more details).
-4.  **End of session**: `npm run sync:push`
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+- `npm run build` - Create a production build.
+- `npm run preview` - Preview the production build locally.
+- `npm run sync:pull` - Pull fresh Notion data.
+- `npm run sync:push` - Push local task changes back to Notion.
+- `npm run sync:list` - List cached Notion tasks.
+- `npm run sync:status` - Check pending Notion sync state.
 
 ## Contact
 
-Adi Agarwal - [LinkedIn](https://linkedin.com/in/adiagarwal) - [Website](https://adiagarwal.com)
+- Website: [adiagarwal.com](https://adiagarwal.com)
+- LinkedIn: [linkedin.com/in/adiagarwal](https://linkedin.com/in/adiagarwal)
