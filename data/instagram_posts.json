@@ -1,11 +1,29 @@
 [
   {
+    "id": "https://www.instagram.com/p/DaWvadSMIsF/",
+    "date": "2026-07-04",
+    "summary": "Its time I introduce you guys to Vader!\n\nPatchwork, my modular wall art + storage solution just won the #livingallery contest and I won a Bambu X2D!!!\n\nReally appreciate @bambulab_official for dropping such a challenge and to give a small creator like me a chance to get hands on to something like this!\n\nX2D is truly the best printer I’ve ever interacted with and it has changed 3D printers for me forever!",
+    "url": "https://www.instagram.com/p/DaWvadSMIsF/",
+    "caption": "Its time I introduce you guys to Vader!\n\nPatchwork, my modular wall art + storage solution just won the #livingallery contest and I won a Bambu X2D!!!\n\nReally appreciate @bambulab_official for dropping such a challenge and to give a small creator like me a chance to get hands on to something like this!\n\nX2D is truly the best printer I’ve ever interacted with and it has changed 3D printers for me forever!",
+    "likes": 1,
+    "comments": 0
+  },
+  {
+    "id": "https://www.instagram.com/p/DaWXmZ6C24w/",
+    "date": "2026-07-03",
+    "summary": "Merging all my interests here, home control and automation in AR with some extra magic!",
+    "url": "https://www.instagram.com/p/DaWXmZ6C24w/",
+    "caption": "Merging all my interests here, home control and automation in AR with some extra magic!",
+    "likes": 3,
+    "comments": 0
+  },
+  {
     "id": "https://www.instagram.com/p/DaCPDMMgMGG/",
     "date": "2026-06-26",
     "summary": "Live with @formlabs!",
     "url": "https://www.instagram.com/p/DaCPDMMgMGG/",
     "caption": "Live with @formlabs!",
-    "likes": 1530,
+    "likes": 1579,
     "comments": 21
   },
   {
@@ -14,7 +32,7 @@
     "summary": "Industrial automation!",
     "url": "https://www.instagram.com/p/DaCOtOeAUJb/",
     "caption": "Industrial automation!",
-    "likes": 189,
+    "likes": 192,
     "comments": 6
   },
   {
@@ -878,24 +896,6 @@
     "summary": "Here I’ve explored GPT-4o and TTS model from @openai \nThe 4o has some interesting vision capabilities that we will eventually get to, for now I wanted to create an ai assistant that can talk to me.\nThe basic code can be used to create fun small games for events where each voice can be given a different personality and instruction set. Creating a murder mystery game with interactive AI bots can be one of my next projects too!",
     "url": "https://www.instagram.com/p/C8U9ogrMBsX/",
     "caption": "Here I’ve explored GPT-4o and TTS model from @openai \nThe 4o has some interesting vision capabilities that we will eventually get to, for now I wanted to create an ai assistant that can talk to me.\nThe basic code can be used to create fun small games for events where each voice can be given a different personality and instruction set. Creating a murder mystery game with interactive AI bots can be one of my next projects too!",
-    "likes": 5,
-    "comments": 0
-  },
-  {
-    "id": "https://www.instagram.com/p/C8OtsUUsKpl/",
-    "date": "2024-06-15",
-    "summary": "Smart Curtain Bot #2\nWe’ve successfully created a roller for the curtain rod, while one of the roller will be moved by the stepper motor, the other one needs to move freely and I’ll need a lot more experience to be able to 3D print an axle with proper tolerances. \nThankfully I had an extra ball bearing that now I’m thinking of attaching to the other roller and now both the rollers can be joined by the stepper motor holder that and ball bearing connector.",
-    "url": "https://www.instagram.com/p/C8OtsUUsKpl/",
-    "caption": "Smart Curtain Bot #2\nWe’ve successfully created a roller for the curtain rod, while one of the roller will be moved by the stepper motor, the other one needs to move freely and I’ll need a lot more experience to be able to 3D print an axle with proper tolerances. \nThankfully I had an extra ball bearing that now I’m thinking of attaching to the other roller and now both the rollers can be joined by the stepper motor holder that and ball bearing connector.",
-    "likes": 7,
-    "comments": 2
-  },
-  {
-    "id": "https://www.instagram.com/p/C8BxAFHsykZ/",
-    "date": "2024-06-10",
-    "summary": "Might have lost a few night’s sleep and the parts still don’t fit perfectly",
-    "url": "https://www.instagram.com/p/C8BxAFHsykZ/",
-    "caption": "Might have lost a few night’s sleep and the parts still don’t fit perfectly",
     "likes": 5,
     "comments": 0
   }
