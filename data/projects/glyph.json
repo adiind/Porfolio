@@ -1,0 +1,80 @@
+{
+    "id": "glyph",
+    "hero": {
+        "title": "Glyph – Open Wearable Platform",
+        "oneLiner": "An open, modular wearable-gauntlet concept explored through a separate looks-like model and works-like interaction prototype."
+    },
+    "context": {
+        "text": "Today's smartwatches make the wrist useful while keeping their sensors and hardware closed. Glyph explores an intentional-wear gauntlet as an open, programmable interface for controlling computers, environments, and agentic systems."
+    },
+    "build": {
+        "bullets": [
+            "Built two separate models: a looks-like appearance prototype and a works-like interaction prototype.",
+            "The looks-like model uses a transparent thermoformed PETG shell, PETG-GF structure, a curated black acrylic layer, and three diagonal white LED filaments.",
+            "The works-like model uses a Waveshare ESP32-S3 Touch LCD 1.83-inch development board and a XIAO nRF52840 Sense Plus secondary module.",
+            "Implemented IMU input, BLE-HID paths, dashboard telemetry, Wi-Fi/BLE bridges, and mapped Home Assistant control.",
+            "Kept the appearance and functional models visibly separate instead of implying one fully integrated product."
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Split the prototype into looks-like and works-like models",
+            "why": "Each artifact could answer one question honestly: what the product should feel like and whether the interaction loop can work.",
+            "tradeoff": "The case study must clearly explain that the finished appearance model and working electronics are separate."
+        },
+        {
+            "decision": "Use transparent PETG over a curated black visual layer",
+            "why": "The clear shell communicates the visual direction without pretending the visible composition is the literal working circuit.",
+            "tradeoff": "Smoked tint remains a future CMF direction, not the submitted prototype state."
+        },
+        {
+            "decision": "Keep the module side-mounted",
+            "why": "The side attachment supports the gauntlet silhouette and the verified build direction.",
+            "tradeoff": "Earlier rear-cartridge studies are historical explorations, not the current product architecture."
+        },
+        {
+            "decision": "Scope the built light system to three white filaments",
+            "why": "It delivered the light language within the prototype window without claiming a fabricated dense matrix.",
+            "tradeoff": "The dense white matrix remains production intent only."
+        }
+    ],
+    "review": {
+        "worked": [
+            "The two-model strategy separated form and interaction questions without hiding prototype boundaries.",
+            "The current firmware demonstrates a teachable lift, point, adjust, and confirm interaction loop.",
+            "The open-platform thesis connects industrial design, embedded systems, and environmental control in one product direction."
+        ],
+        "didnt": [
+            "Authentic looks-like and works-like photographs are still missing from the portfolio package.",
+            "Haptics, EMG, the dense matrix, a custom PCB, smoked PETG, and the full module ecosystem were not integrated into the built prototype.",
+            "Role, collaborators, public links, and the final outcome still need Adi's confirmation before publication."
+        ]
+    },
+    "outcome": {
+        "status": "in-progress",
+        "text": "The evidence currently supports a separate appearance model plus a working interaction stack. The case study remains a draft until authentic build photography, demo proof, credits, and a confirmed outcome are supplied."
+    },
+    "reflection": {
+        "text": "The next iteration must integrate the physical and functional models while keeping the boundary between built evidence and production intent explicit."
+    },
+    "themeColor": "rose",
+    "icon": "cpu",
+    "skills": [
+        {
+            "label": "Industrial Design",
+            "description": "Gauntlet form, transparent-shell CMF, and wearable visual language."
+        },
+        {
+            "label": "Embedded Prototyping",
+            "description": "ESP32-S3 and nRF52840 interaction paths with IMU, Wi-Fi, and BLE."
+        },
+        {
+            "label": "Interaction Design",
+            "description": "Gesture calibration, target selection, adjustment, and confirmation loops."
+        },
+        {
+            "label": "Fabrication",
+            "description": "PETG thermoforming, PETG-GF printing, acrylic layers, and sleeve construction."
+        }
+    ]
+}

@@ -93,8 +93,17 @@ const MobileTimeline: React.FC<Props> = ({
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`w-full rounded-2xl border ${getCardStyle(item.type)} shadow-lg cursor-pointer active:scale-[0.99] transition-all relative overflow-hidden group mb-4`}
+                className={`w-full rounded-2xl border ${getCardStyle(item.type)} shadow-lg cursor-pointer active:scale-[0.99] transition-all relative overflow-hidden group mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
                 onClick={() => handleCardTap(item)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCardTap(item);
+                    }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Open ${item.title}`}
             >
                 {/* 1. Image Header (Always Visible if exists) */}
                 {item.imageUrl && (
@@ -202,7 +211,7 @@ const MobileTimeline: React.FC<Props> = ({
                                         <div className="mt-5 pt-3 border-t border-white/10">
                                             <div className="flex items-center gap-2 mb-3">
                                                 <div className="h-px flex-1 bg-white/10"></div>
-                                                <div className="text-[10px] uppercase tracking-widest font-bold text-white/40">Key Projects</div>
+                                                <div className="text-[10px] uppercase tracking-widest font-bold text-white/55">Key Projects</div>
                                                 <div className="h-px flex-1 bg-white/10"></div>
                                             </div>
 
@@ -213,7 +222,7 @@ const MobileTimeline: React.FC<Props> = ({
                                                     return (
                                                         <div
                                                             key={idx}
-                                                            className={`p-3 rounded-xl border transition-all ${isFeatureExpanded ? 'bg-indigo-500/20 border-indigo-500/40 shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
+                                                            className={`p-3 rounded-xl border transition-all ${isFeatureExpanded ? 'bg-indigo-500/20 border-indigo-500/40 shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/10'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 trackEvent(isFeatureExpanded ? 'mobile_feature_card_collapsed' : 'mobile_feature_card_expanded', {
@@ -222,13 +231,28 @@ const MobileTimeline: React.FC<Props> = ({
                                                                 });
                                                                 setExpandedFeatureId(isFeatureExpanded ? null : featureKey);
                                                             }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                                    e.stopPropagation();
+                                                                    e.preventDefault();
+                                                                    trackEvent(isFeatureExpanded ? 'mobile_feature_card_collapsed' : 'mobile_feature_card_expanded', {
+                                                                        parent_id: item.id,
+                                                                        title: card.title,
+                                                                    });
+                                                                    setExpandedFeatureId(isFeatureExpanded ? null : featureKey);
+                                                                }
+                                                            }}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            aria-expanded={isFeatureExpanded}
+                                                            aria-label={card.title}
                                                         >
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <div className="flex-1">
                                                                     <div className={`text-xs font-bold ${isFeatureExpanded ? 'text-indigo-200' : 'text-white/80'}`}>{card.title}</div>
                                                                     {!isFeatureExpanded && <div className="text-[10px] text-white/50 mt-0.5">{card.subtitle}</div>}
                                                                 </div>
-                                                                <div className={`p-1 rounded-full ${isFeatureExpanded ? 'bg-indigo-500/20 text-indigo-300' : 'bg-transparent text-white/30'}`}>
+                                                                <div className={`p-1 rounded-full ${isFeatureExpanded ? 'bg-indigo-500/20 text-indigo-300' : 'bg-transparent text-white/55'}`}>
                                                                     {isFeatureExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                                                                 </div>
                                                             </div>
@@ -264,7 +288,7 @@ const MobileTimeline: React.FC<Props> = ({
 
                                     <div className="mt-4 pt-4 border-t border-white/5 flex justify-center">
                                         <button
-                                            className="text-[10px] uppercase tracking-wider text-white/30 flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+                                            className="text-[10px] uppercase tracking-wider text-white/55 flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setExpandedId(null);
@@ -302,8 +326,17 @@ const MobileTimeline: React.FC<Props> = ({
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="w-full p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-pointer active:scale-[0.98] transition-transform backdrop-blur-sm shadow-amber-900/10 shadow-lg"
+                    className="w-full p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-pointer active:scale-[0.98] transition-transform backdrop-blur-sm shadow-amber-900/10 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
                     onClick={onOpenTinkerVerse}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onOpenTinkerVerse();
+                        }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Open TinkerVerse"
                 >
                     <div className="flex items-center gap-4 mb-3">
                         <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="w-10 h-10 rounded-lg bg-white p-0.5 object-cover" />

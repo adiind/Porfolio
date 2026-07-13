@@ -36,9 +36,10 @@ export const formatDate = (dateStr: string): string => {
  * Smooth scrolls a container to a specific position
  */
 export const smoothScrollTo = (container: HTMLElement, top: number) => {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   container.scrollTo({
     top,
-    behavior: 'smooth'
+    behavior: prefersReducedMotion ? 'auto' : 'smooth'
   });
 };
 

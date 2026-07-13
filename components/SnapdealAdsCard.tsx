@@ -22,6 +22,17 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                 e.stopPropagation(); // Prevent parent click handlers
                 onToggle();
             }}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onToggle();
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-expanded={isExpanded}
+            aria-label={data.title}
             className={`
         mt-4 relative rounded-xl overflow-hidden cursor-pointer group
         border border-yellow-500/30
@@ -30,6 +41,7 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
         hover:shadow-[0_0_30px_rgba(234,179,8,0.2)]
         hover:border-yellow-500/60
         transition-all duration-500
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80
       `}
         >
             {/* Background ambient glow */}
@@ -47,7 +59,7 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                         <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-yellow-500/10 text-yellow-500 mb-2 border border-yellow-500/20 shadow-[0_0_10px_rgba(234,179,8,0.1)]">
                             {data.subtitle}
                         </span>
-                        <span className={`text-[10px] uppercase font-bold tracking-widest text-gray-500 transition-opacity ${isExpanded ? 'opacity-0' : 'opacity-100'}`}>
+                        <span className={`text-[10px] uppercase font-bold tracking-widest text-white/60 transition-opacity ${isExpanded ? 'opacity-0' : 'opacity-100'}`}>
                             Click to Expand
                         </span>
                     </div>
@@ -67,7 +79,7 @@ const SnapdealAdsCard: React.FC<Props> = ({ data, isExpanded, onToggle }) => {
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                            <p className="text-xs text-white/55 leading-relaxed mb-4">
                                 {data.summary}
                             </p>
 

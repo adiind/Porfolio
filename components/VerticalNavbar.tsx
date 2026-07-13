@@ -34,21 +34,22 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
         <div className={isHidden ? 'hidden' : undefined}>
             {/* Desktop - Vertical on Right Side */}
             <div className="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center">
-                <div className="flex flex-col gap-6 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-6 px-3 shadow-2xl shadow-black/50">
+                <nav aria-label="Sections" className="flex flex-col gap-6 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-6 px-3 shadow-2xl shadow-black/50">
                     {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const isHovered = hoveredTab === item.id;
                         const Icon = item.icon;
 
                         return (
-                            <motion.div
+                            <motion.button
                                 key={item.id}
-                                className={`relative flex items-center justify-end group pointer-events-auto cursor-pointer`}
+                                type="button"
+                                className={`relative flex items-center justify-end group pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
                                 onMouseEnter={() => setHoveredTab(item.id)}
                                 onMouseLeave={() => setHoveredTab(null)}
                                 onClick={() => handleNavClick(item.id)}
-                                role="button"
                                 aria-label={`Navigate to ${item.label}`}
+                                aria-current={isActive ? 'true' : undefined}
                             >
                                 {/* Label (Tooltip) */}
                                 <AnimatePresence>
@@ -72,7 +73,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                                     className={`
                     relative flex items-center justify-center 
                     w-10 h-10 rounded-full transition-all duration-300 z-10
-                    ${isActive ? 'text-white scale-110' : 'text-white/40 hover:text-white/80 hover:scale-105'}
+                    ${isActive ? 'text-white scale-110' : 'text-white/55 hover:text-white/80 hover:scale-105'}
                   `}
                                 >
                                     <Icon size={18} strokeWidth={isActive ? 2 : 1.5} />
@@ -86,15 +87,15 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                                         transition={{ type: "tween", duration: 0.3, ease: "circOut" }}
                                     />
                                 )}
-                            </motion.div>
+                            </motion.button>
                         );
                     })}
-                </div>
+                </nav>
             </div>
 
             {/* Mobile - Top Navbar */}
             <div className="flex md:hidden fixed top-0 left-0 right-0 z-[60] justify-center px-4 py-3 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 pointer-events-auto">
-                <div className="flex flex-row gap-8 items-center w-full justify-center">
+                <nav aria-label="Sections" className="flex flex-row gap-8 items-center w-full justify-center">
                     {navItems.filter(item => item.id !== 'writings' || isWritingsUnlocked).map((item) => {
                         const isActive = activeSection === item.id;
                         const Icon = item.icon;
@@ -103,11 +104,12 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                             <button
                                 key={item.id}
                                 className={`
-                                    relative flex flex-col items-center justify-center gap-1 transition-colors duration-300
+                                    relative flex flex-col items-center justify-center gap-1 min-w-11 min-h-11 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80
                                     ${isActive ? 'text-indigo-400' : 'text-white/50 hover:text-white/80'}
                                 `}
                                 onClick={() => handleNavClick(item.id)}
                                 aria-label={`Navigate to ${item.label}`}
+                                aria-current={isActive ? 'true' : undefined}
                             >
                                 <Icon size={20} className="relative z-10" />
                                 {isActive && (
@@ -116,7 +118,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                             </button>
                         );
                     })}
-                </div>
+                </nav>
             </div>
         </div>
     );

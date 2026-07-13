@@ -17,8 +17,8 @@ const PostCard = ({ post }: { post: SocialPost }) => (
         className="block p-5 rounded-xl border border-white/10 bg-white/5 hover:border-amber-500/30 hover:bg-white/10 transition-all duration-300 group"
     >
         <div className="flex justify-between items-start mb-3">
-            <span className="text-[10px] font-mono text-white/40">{post.date}</span>
-            <ExternalLink size={12} className="text-white/20 group-hover:text-amber-400 transition-colors" />
+            <span className="text-[10px] font-mono text-white/60">{post.date}</span>
+            <ExternalLink size={12} className="text-white/55 group-hover:text-amber-400 transition-colors" />
         </div>
 
         <p className="text-sm text-gray-300 font-light leading-relaxed line-clamp-4 group-hover:text-white transition-colors">
@@ -26,11 +26,11 @@ const PostCard = ({ post }: { post: SocialPost }) => (
         </p>
 
         <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/5">
-            <div className="flex items-center gap-1.5 text-xs text-white/40 group-hover:text-amber-200/70">
+            <div className="flex items-center gap-1.5 text-xs text-white/55 group-hover:text-amber-200/70">
                 <Heart size={12} />
                 <span>{post.likes}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-white/40 group-hover:text-blue-200/70">
+            <div className="flex items-center gap-1.5 text-xs text-white/55 group-hover:text-blue-200/70">
                 <MessageCircle size={12} />
                 <span>{post.comments}</span>
             </div>
@@ -50,8 +50,12 @@ const MarqueeColumn = ({ posts, duration = 40, className }: { posts: SocialPost[
           .animate-scroll-vertical {
             animation: scroll-vertical var(--duration) linear infinite;
           }
-          .group\\/column:hover .animate-scroll-vertical {
+          .group\\/column:hover .animate-scroll-vertical,
+          .group\\/column:focus-within .animate-scroll-vertical {
             animation-play-state: paused;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .animate-scroll-vertical { animation: none; }
           }
         `}
             </style>

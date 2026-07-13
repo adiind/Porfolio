@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { GitCommit, Calendar, ExternalLink, Github } from 'lucide-react';
+import { GitCommit, Calendar, ExternalLink, Github, SquareTerminal, Asterisk } from 'lucide-react';
 
 interface GitHubActivityProps {
     variant?: 'full' | 'compact' | 'inline';
@@ -148,7 +148,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
         weeks.push(stats.contributions.slice(i, i + 7));
     }
 
-    if (stats.loading || stats.error) {
+    if ((stats.loading || stats.error) && variant !== 'compact') {
         return null;
     }
 
@@ -192,10 +192,24 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                         <Github size={12} className="text-white/72" />
                         <span className="text-[9px] uppercase tracking-[0.2em] text-white/72 font-medium">How I built this site</span>
                     </div>
-                    <span className="text-[9px] text-white/52 group-hover/github:text-white/72 transition-colors flex items-center gap-1.5">
-                        <img src="/images/antigravity_logo.png" alt="Antigravity" className="w-3 h-3 opacity-70 group-hover/github:opacity-95 transition-opacity" />
-                        <span>Adi × Antigravity</span>
-                    </span>
+                    <span className="text-[8px] uppercase tracking-[0.16em] text-white/52 group-hover/github:text-white/72 transition-colors">AI build crew</span>
+                </div>
+                <div
+                    className="grid grid-cols-3 gap-1.5"
+                    aria-label="AI collaborators: Google Antigravity, OpenAI Codex, and Anthropic Claude"
+                >
+                    <div className="flex min-w-0 items-center gap-1.5 rounded-lg border border-white/10 bg-black/45 px-2 py-1.5" title="Google Antigravity">
+                        <img src="/images/antigravity_mark.png" alt="" className="h-3.5 w-3.5 shrink-0 object-contain" />
+                        <span className="truncate text-[8px] font-medium text-white/68">Antigravity</span>
+                    </div>
+                    <div className="flex min-w-0 items-center gap-1.5 rounded-lg border border-white/10 bg-black/45 px-2 py-1.5" title="OpenAI Codex">
+                        <SquareTerminal size={14} aria-hidden="true" className="shrink-0 text-white/85" />
+                        <span className="truncate text-[8px] font-medium text-white/68">Codex</span>
+                    </div>
+                    <div className="flex min-w-0 items-center gap-1.5 rounded-lg border border-[#d97757]/25 bg-[#d97757]/10 px-2 py-1.5" title="Anthropic Claude">
+                        <Asterisk size={14} aria-hidden="true" className="shrink-0 text-[#e89574]" />
+                        <span className="truncate text-[8px] font-medium text-[#efb198]">Claude</span>
+                    </div>
                 </div>
                 <div
                     className="flex items-center gap-3 px-4 py-3 bg-white/12 backdrop-blur-md rounded-2xl w-fit transition-colors duration-300"
@@ -203,8 +217,12 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                 >
                     <GitCommit size={18} className="text-emerald-400 group-hover/github:text-emerald-300 transition-colors" />
                     <div className="flex flex-col">
-                        <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">{stats.totalCommits}+</span>
-                        <span className="text-[9px] text-white/72 uppercase tracking-widest mt-0.5">commits to build this site</span>
+                        <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">
+                            {stats.loading ? 'Syncing' : stats.error ? 'Source' : `${stats.totalCommits}+`}
+                        </span>
+                        <span className="text-[9px] text-white/72 uppercase tracking-widest mt-0.5">
+                            {stats.loading ? 'loading build history' : stats.error ? 'view the build repository' : 'commits to build this site'}
+                        </span>
                     </div>
                 </div>
 
@@ -224,15 +242,17 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                     </div>
 
                     <div className="relative w-full overflow-hidden">
-                        <div className="flex gap-[2px] justify-end">
-                            {weeks.slice(-20).map((week, weekIndex) => (
+                        <div className="flex min-h-5 gap-[2px] justify-end">
+                            {(weeks.length ? weeks.slice(-20) : Array.from({ length: 20 }, () => [])).map((week, weekIndex) => (
                                 <div key={weekIndex} className="flex flex-col gap-[2px]">
-                                    {week.map((day) => (
-                                        <div
-                                            key={day.date}
-                                            className={`w-2 h-2 rounded-[2px] ${getLevelColor(day.level)} opacity-95`}
-                                        />
-                                    ))}
+                                    {week.length
+                                        ? week.map((day) => (
+                                            <div
+                                                key={day.date}
+                                                className={`w-2 h-2 rounded-[2px] ${getLevelColor(day.level)} opacity-95`}
+                                            />
+                                        ))
+                                        : Array.from({ length: 2 }, (_, dayIndex) => <div key={dayIndex} className="h-2 w-2 rounded-[2px] bg-white/5" />)}
                                 </div>
                             ))}
                         </div>
@@ -284,7 +304,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                             <GitCommit size={24} className="text-emerald-400" />
                             <div className="flex flex-col">
                                 <span className="text-3xl font-bold text-white leading-none">{stats.totalCommits}+</span>
-                                <span className="text-sm text-white/40 uppercase tracking-wider mt-1">Total Commits</span>
+                                <span className="text-sm text-white/55 uppercase tracking-wider mt-1">Total Commits</span>
                             </div>
                         </div>
                     </motion.div>
@@ -299,7 +319,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                                 <span className="text-sm uppercase tracking-wider text-white/60 font-medium">Contribution History</span>
                             </div>
                             {/* Legend */}
-                            <div className="hidden sm:flex items-center gap-2 text-xs text-white/40">
+                            <div className="hidden sm:flex items-center gap-2 text-xs text-white/55">
                                 <span>Less</span>
                                 {[0, 1, 2, 3, 4].map((level) => (
                                     <div
@@ -335,7 +355,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                         </div>
                         {/* Mobile active day info */}
                         <div className="mt-4 sm:hidden flex justify-between items-center text-xs">
-                            <div className="flex items-center gap-1.5 text-white/40">
+                            <div className="flex items-center gap-1.5 text-white/55">
                                 <span>Less</span>
                                 {[0, 1, 2, 3, 4].map((level) => (
                                     <div
@@ -377,7 +397,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                                                 <code className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded">
                                                     {commit.sha}
                                                 </code>
-                                                <span className="text-xs text-white/30 whitespace-nowrap">
+                                                <span className="text-xs text-white/55 whitespace-nowrap">
                                                     {formatDate(commit.date)}
                                                 </span>
                                             </div>

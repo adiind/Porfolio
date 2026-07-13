@@ -99,7 +99,7 @@ const ProjectModal: React.FC<Props> = ({ project, onClose }) => {
           {videoId ? (
             <div className="w-full aspect-video bg-black relative shadow-2xl">
               <iframe
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1`}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&rel=0&modestbranding=1`}
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

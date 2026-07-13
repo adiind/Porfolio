@@ -5,12 +5,12 @@ import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
 import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
 import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight, mapTimelineItemToProject } from '../utils';
-import { getProjectsByIds } from '../data/projects';
+import { useProjects } from '../context/ProjectsContext';
 import { Briefcase, GraduationCap, User, Sparkles, Heart, MessageCircle, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
 
 interface Props {
   item: TimelineItem;
-  hoveredId: string | null;
+  isHovered: boolean;
   onHover: (id: string | null) => void;
   onLaneHover: (lane: number | null) => void;
   isDimmed: boolean;
@@ -29,7 +29,7 @@ interface Props {
 
 const TimelineEvent: React.FC<Props> = ({
   item,
-  hoveredId,
+  isHovered,
   onHover,
   onLaneHover,
   isDimmed,
@@ -45,9 +45,6 @@ const TimelineEvent: React.FC<Props> = ({
   isExpanded = false,
   onExpand
 }) => {
-  // Once hoveredId is set, show it regardless of isScrolling (isScrolling check only prevents setting hover, not showing it)
-  const isHovered = hoveredId === item.id;
-
   // Track if mouse is currently over this card
   const isMouseOverRef = useRef(false);
   const prevIsScrollingRef = useRef(isScrolling);
@@ -97,11 +94,11 @@ const TimelineEvent: React.FC<Props> = ({
     prevIsScrollingRef.current = isScrolling;
 
     // Scrolling just stopped and mouse is over this card
-    if (wasScrolling && !isScrolling && isMouseOverRef.current && hoveredId !== item.id) {
+    if (wasScrolling && !isScrolling && isMouseOverRef.current && !isHovered) {
       onHover(item.id);
       onLaneHover(item.lane);
     }
-  }, [isScrolling, hoveredId, item.id, item.lane, onHover, onLaneHover]);
+  }, [isScrolling, isHovered, item.id, item.lane, onHover, onLaneHover]);
 
 
   const isFit = mode === 'fit' || mode === 'intro';
@@ -156,8 +153,17 @@ const TimelineEvent: React.FC<Props> = ({
             ease: 'easeOut',
             layout: { duration: 0.3, ease: 'easeOut' }
           }}
-          className="relative w-full h-96 md:h-[600px] rounded-xl overflow-hidden cursor-pointer border border-amber-500/20 bg-amber-500/10 hover:border-amber-400/40 transition-colors duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] group"
+          className="relative w-full h-96 md:h-[600px] rounded-xl overflow-hidden cursor-pointer border border-amber-500/20 bg-amber-500/10 hover:border-amber-400/40 transition-colors duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
           onClick={handleGridClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleGridClick();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label={`Open ${item.title}`}
         >
           <TinkerVerseGrid
             item={item}
@@ -183,8 +189,17 @@ const TimelineEvent: React.FC<Props> = ({
           ease: 'easeOut',
           layout: { duration: 0.3, ease: 'easeOut' }
         }}
-        className={`relative w-full ${getHeightClass()} rounded-xl overflow-hidden cursor-pointer border border-white/5 bg-white/5 hover:border-white/20 transition-colors duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] group`}
+        className={`relative w-full ${getHeightClass()} rounded-xl overflow-hidden cursor-pointer border border-white/5 bg-white/5 hover:border-white/20 transition-colors duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
         onClick={handleGridClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleGridClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`Open ${item.title}`}
       >
         {/* Background Image */}
         {item.imageUrl && (
@@ -192,7 +207,7 @@ const TimelineEvent: React.FC<Props> = ({
             <img
               src={item.imageUrl}
               alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-105 group-focus-within:opacity-40 group-focus-within:scale-105"
               style={{ transition: 'opacity 0.3s, transform 0.5s' }}
             />
             <div
@@ -224,11 +239,11 @@ const TimelineEvent: React.FC<Props> = ({
             <img
               src={item.logoUrl}
               className="absolute top-3 left-3 w-6 h-6 object-contain opacity-80"
-              alt="Logo"
+              alt={`${item.company ?? item.title} logo`}
             />
           )}
           <h3
-            className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 transition-colors"
+            className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 group-focus-within:text-indigo-200 transition-colors"
           >
             {item.title}
           </h3>
@@ -351,7 +366,7 @@ const TimelineEvent: React.FC<Props> = ({
         headerBg: 'bg-purple-900/30 border-purple-500/20',
         headerText: 'text-purple-200',
         subText: 'text-purple-300',
-        badgeText: 'National Winner',
+        badgeText: 'ASEAN Top 10',
         accent: 'text-purple-400',
         bulletDot: 'bg-purple-500'
       }
@@ -370,19 +385,19 @@ const TimelineEvent: React.FC<Props> = ({
     return (
       <motion.div
         ref={cardRef}
-        layout
-        initial={{ opacity: 0, x: -50 }}
+        initial={{ opacity: 0, x: -50, y: top }}
         animate={{
-          top: top,
+          y: top,
           opacity: isInView ? 1 : 0,
           x: isInView ? 0 : -50,
-          zIndex: isHovered ? 60 : 10
         }}
         style={{
           position: 'absolute',
+          top: 0,
           left: '-5.5rem',
           width: '5rem',
           height: Math.max(height, 60),
+          zIndex: isHovered ? 60 : 10,
         }}
         onMouseEnter={() => {
           isMouseOverRef.current = true;
@@ -392,7 +407,7 @@ const TimelineEvent: React.FC<Props> = ({
           }
         }}
         onMouseMove={() => {
-          if (!isScrolling && hoveredId !== item.id) {
+          if (!isScrolling && !isHovered) {
             onHover(item.id);
             onLaneHover(null);
           }
@@ -402,14 +417,26 @@ const TimelineEvent: React.FC<Props> = ({
           onHover(null);
           onLaneHover(null);
         }}
-        className="group flex flex-col items-end"
+        onFocus={() => {
+          if (!isScrolling) {
+            onHover(item.id);
+            onLaneHover(null);
+          }
+        }}
+        onBlur={() => {
+          onHover(null);
+          onLaneHover(null);
+        }}
+        tabIndex={0}
+        aria-label={`Open ${item.title}`}
+        className="group flex flex-col items-end focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
       >
         {/* The Bookmark Tab */}
         <div className={`
           w-full h-full rounded-l-md bg-gradient-to-r ${theme.grad}
           border-y border-l
           flex flex-col items-center justify-center gap-2 p-1 cursor-pointer
-          transition-all duration-300 ${!isScrolling ? 'group-hover:w-[5.5rem] group-hover:brightness-125' : ''}
+          transition-all duration-300 ${!isScrolling ? 'group-hover:w-[5.5rem] group-hover:brightness-125 group-focus-within:w-[5.5rem] group-focus-within:brightness-125' : ''}
         `}>
           {theme.icon}
           {!isFit && (
@@ -426,8 +453,17 @@ const TimelineEvent: React.FC<Props> = ({
               initial={{ opacity: 0, scale: 0.9, x: -10 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className={`absolute left-[110%] top-0 w-[400px] max-w-[80vw] rounded-xl shadow-2xl overflow-hidden z-50 flex flex-col cursor-pointer transition-colors border ${theme.popoverBg}`}
+              className={`absolute left-[110%] top-0 w-[400px] max-w-[80vw] rounded-xl shadow-2xl overflow-hidden z-50 flex flex-col cursor-pointer transition-colors border ${theme.popoverBg} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
               onClick={() => onOpenProject && onOpenProject(item)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onOpenProject && onOpenProject(item);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${item.title}`}
             >
               {/* Header */}
               <div className={`p-3 border-b flex items-center justify-between ${theme.headerBg}`}>
@@ -435,7 +471,7 @@ const TimelineEvent: React.FC<Props> = ({
                   {isCompetition ? <Trophy size={14} className={theme.accent} /> : <Flower size={14} className={theme.accent} />}
                   <span className={`text-xs font-bold uppercase tracking-wider ${theme.headerText}`}>{item.type}</span>
                 </div>
-                <span className="text-[10px] text-white/40">{formatDate(item.start)}</span>
+                <span className="text-[10px] text-white/60">{formatDate(item.start)}</span>
               </div>
 
               {/* Content */}
@@ -462,7 +498,7 @@ const TimelineEvent: React.FC<Props> = ({
                   <div className="relative aspect-video rounded-lg overflow-hidden border border-white/10 group/vid">
                     <img
                       src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                      alt="Thumbnail"
+                      alt={item.title}
                       className="w-full h-full object-cover opacity-80 group-hover/vid:opacity-100 transition-opacity"
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover/vid:bg-black/20 transition-colors">
@@ -476,7 +512,7 @@ const TimelineEvent: React.FC<Props> = ({
                   <div className="relative aspect-video rounded-lg overflow-hidden border border-white/10 group/img">
                     <img
                       src={imageUrl}
-                      alt="Project"
+                      alt={item.title}
                       className="w-full h-full object-cover opacity-90 group-hover/img:opacity-100 transition-opacity"
                     />
                   </div>
@@ -490,7 +526,7 @@ const TimelineEvent: React.FC<Props> = ({
                 {/* Bullets */}
                 <ul className="mt-4 space-y-2">
                   {item.bullets?.slice(0, 2).map((b, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[10px] text-gray-400">
+                    <li key={i} className="flex items-start gap-2 text-[10px] text-white/55">
                       <span className={`w-1 h-1 rounded-full mt-1.5 shrink-0 ${theme.bulletDot}`} />
                       {b}
                     </li>
@@ -520,7 +556,6 @@ const TimelineEvent: React.FC<Props> = ({
           // Auto height to fit grid content + padding
           height: isFit ? height : 'auto',
           minHeight: height,
-          filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
           zIndex: isHovered ? 50 : 10,
           perspective: 1000,
           rotateX: isHovered && !isScrolling ? rotateX : 0,
@@ -546,7 +581,7 @@ const TimelineEvent: React.FC<Props> = ({
           }
         }}
         onMouseMove={(e) => {
-          if (!isScrolling && hoveredId !== item.id) {
+          if (!isScrolling && !isHovered) {
             onHover(item.id);
             onLaneHover(item.lane);
           }
@@ -581,6 +616,15 @@ const TimelineEvent: React.FC<Props> = ({
       ref={cardRef}
       data-item-id={item.id}
       onClick={() => onOpenProject && onOpenProject(item)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpenProject && onOpenProject(item);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${item.title}`}
       onMouseEnter={(e) => {
         isMouseOverRef.current = true;
         if (!isActuallyScrolling()) {
@@ -592,7 +636,7 @@ const TimelineEvent: React.FC<Props> = ({
       onMouseMove={(e) => {
         // Also trigger on mouse move - handles case where card scrolls under cursor
         if (!isActuallyScrolling()) {
-          if (hoveredId !== item.id) {
+          if (!isHovered) {
             onHover(item.id);
             onLaneHover(item.lane);
           }
@@ -608,14 +652,24 @@ const TimelineEvent: React.FC<Props> = ({
           onLaneHover(null);
         }
       }}
-      initial={{ opacity: 0, scale: 0.95 }}
+      onFocus={() => {
+        onHover(item.id);
+        onLaneHover(item.lane);
+      }}
+      onBlur={() => {
+        onHover(null);
+        onLaneHover(null);
+      }}
+      initial={{ opacity: 0, scale: 0.95, y: top }}
       animate={{
-        top: top,
+        // Animate position as a transform (compositor-only) instead of CSS `top`,
+        // which forces layout on every frame during zoom transitions.
+        y: top,
         // Scroll-triggered reveal: fade in when card enters viewport
+        // Dimming is opacity/scale only — animating blur/grayscale filters on
+        // every non-hovered card at once caused mass repaints.
         opacity: isInView ? (isDimmed ? 0.1 : 1) : 0,
         scale: isInView ? (isDimmed ? 0.98 : isHovered ? 1.02 : 1) : 0.95,
-        filter: isDimmed ? 'grayscale(100%) blur(2px)' : 'grayscale(0%) blur(0px)',
-        zIndex: isHovered ? 50 : 10,
       }}
       transition={{
         type: 'tween',
@@ -625,6 +679,8 @@ const TimelineEvent: React.FC<Props> = ({
       }}
       style={{
         position: 'absolute',
+        top: 0, // vertical position applied via the animated `y` transform
+        zIndex: isHovered ? 50 : 10,
         ...laneStyle,
         ...(isHovered && !isFit ? {
           height: 'auto',
@@ -632,27 +688,23 @@ const TimelineEvent: React.FC<Props> = ({
           width: '700px',
           maxWidth: '90vw',
           minHeight: `${height}px`,
-          zIndex: 50, // Ensure z-index is high when hovered
           perspective: 1000, // Add perspective for 3D effect
           rotateX: !isScrolling ? rotateX : 0, // Apply tilt only when not scrolling
           rotateY: !isScrolling ? rotateY : 0,
           // Lane-aware positioning:
           // Lane 0 (left): anchor left edge, expand right
-          // Lane 1 (middle): center expansion using calc() instead of transform to avoid flicker
+          // Lane 1 (middle): center expansion using calc()
           // Lane 2 (right): anchor right edge, expand left
           ...(item.lane === 0 ? {
             left: laneStyle.left,
             right: 'auto',
-            transform: 'none'
           } : item.lane === 1 ? {
             left: 'calc(50% - 350px)', // Strictly center 700px width
             right: 'auto',
             minWidth: '30%', // Ensure we don't shrink smaller than the lane
-            transform: 'none'
           } : {
             left: 'auto',
             right: '0%',
-            transform: 'none'
           })
         } : {
           height: `${height}px`,
@@ -663,6 +715,7 @@ const TimelineEvent: React.FC<Props> = ({
         rounded-lg md:rounded-xl cursor-pointer overflow-hidden group
         transition-colors duration-500 border border-transparent
         flex flex-col
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80
         ${s.glass} ${!isFit && s.hoverGlass}
       `}
     >
@@ -729,7 +782,7 @@ const TimelineEvent: React.FC<Props> = ({
             {item.logoUrl && (
               <img
                 src={item.logoUrl}
-                alt="Logo"
+                alt={`${item.company ?? item.title} logo`}
                 className={`absolute top-3 left-3 object-contain transition-all duration-500 ${isHovered && !isFit ? 'w-10 h-10 md:w-16 md:h-16' : 'w-6 h-6 md:w-8 md:h-8'
                   } opacity-80`}
               />
@@ -741,7 +794,7 @@ const TimelineEvent: React.FC<Props> = ({
 
         {/* Spacer: In Grid mode, NO margin (center). In Expanded, margin below image. */}
         <div className={`transition-all duration-500 flex flex-col justify-end ${(!isFit && isHovered) ? 'mt-32' : 'mt-0'}`}>
-          <h3 className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 transition-colors">
+          <h3 className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 group-focus-within:text-indigo-200 transition-colors">
             {item.title}
           </h3>
           <p className="text-[10px] text-white/60 font-medium uppercase tracking-wide truncate">
@@ -759,11 +812,11 @@ const TimelineEvent: React.FC<Props> = ({
           {(isHovered && !isFit) && (
             <motion.div
               layout
-              initial={{ opacity: 0, maxHeight: 0 }}
-              animate={{ opacity: 1, maxHeight: 2000 }}
-              exit={{ opacity: 0, maxHeight: 0 }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{
-                maxHeight: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+                height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
                 opacity: { duration: 0.3 }
               }}
               style={{ overflow: 'hidden' }}
@@ -838,7 +891,7 @@ const TimelineEvent: React.FC<Props> = ({
                     >
                       <div className={`absolute top-0 left-0 w-full h-1 ${item.lane === 0 ? 'bg-gradient-to-r from-rose-600 to-rose-300' : 'bg-gradient-to-r from-gray-500 to-gray-300'
                         }`} />
-                      <div className={`text-[9px] uppercase font-bold mb-1.5 tracking-wider ${item.lane === 0 ? 'text-rose-400' : 'text-gray-400'
+                      <div className={`text-[9px] uppercase font-bold mb-1.5 tracking-wider ${item.lane === 0 ? 'text-rose-400' : 'text-white/60'
                         }`}>
                         {hoveredToolkitSkill}
                       </div>
@@ -861,9 +914,9 @@ const TimelineEvent: React.FC<Props> = ({
                       <Trophy size={20} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] uppercase font-bold tracking-widest text-amber-700 mb-0.5">Achievement</div>
+                      <div className="text-[10px] uppercase font-bold tracking-widest text-amber-800 mb-0.5">Achievement</div>
                       <h4 className="text-xs font-bold leading-tight truncate">{item.award.title}</h4>
-                      <p className="text-[10px] text-amber-800/80 mt-1 line-clamp-2">{item.award.summary}</p>
+                      <p className="text-[10px] text-amber-900 mt-1 line-clamp-2">{item.award.summary}</p>
                     </div>
                   </div>
                   {/* Decoration */}
@@ -942,7 +995,7 @@ const TimelineEvent: React.FC<Props> = ({
                       <h4 className="text-xs font-bold leading-tight truncate">{item.publication.title}</h4>
                       <p className="text-[10px] text-blue-800/80 mt-1 line-clamp-2">{item.publication.summary}</p>
                       {item.publication.journal && (
-                        <p className="text-[9px] text-blue-900/60 mt-0.5 italic">{item.publication.journal}</p>
+                        <p className="text-[9px] text-blue-900 mt-0.5 italic">{item.publication.journal}</p>
                       )}
                     </div>
                   </div>
@@ -961,23 +1014,33 @@ const TimelineEvent: React.FC<Props> = ({
                     e.stopPropagation();
                     onOpenCaseStudy(item.caseStudy!);
                   }}
-                  className="mt-4 bg-gray-100 rounded-lg p-3 text-gray-900 shadow-lg transform translate-y-0 relative overflow-hidden group/cs hover:bg-white transition-colors cursor-pointer"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      onOpenCaseStudy(item.caseStudy!);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open case study ${item.caseStudy.title}`}
+                  className="mt-4 bg-gray-100 rounded-lg p-3 text-gray-900 shadow-lg transform translate-y-0 relative overflow-hidden group/cs hover:bg-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
                 >
                   <div className="flex gap-3 items-center relative z-10">
                     {item.caseStudy.thumbnailUrl && (
                       <img
                         src={item.caseStudy.thumbnailUrl}
-                        alt="Thumbnail"
+                        alt={item.caseStudy.title}
                         className="w-10 h-10 rounded bg-gray-200 object-cover flex-shrink-0"
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className={`text-[10px] uppercase font-bold tracking-widest mb-0.5 ${item.caseStudy.themeColor === 'orange' ? 'text-orange-600' : 'text-indigo-600'}`}>Case Study</div>
+                      <div className={`text-[10px] uppercase font-bold tracking-widest mb-0.5 ${item.caseStudy.themeColor === 'orange' ? 'text-orange-700' : 'text-indigo-600'}`}>Case Study</div>
                       <h4 className="text-xs font-bold leading-tight truncate">{item.caseStudy.title}</h4>
                       <p className="text-[10px] text-gray-600 mt-1 line-clamp-2">{item.caseStudy.summary}</p>
                     </div>
                     <div className="bg-gray-200 p-1.5 rounded-full group-hover/cs:bg-indigo-100 transition-colors">
-                      <ArrowUpRight size={14} className="text-gray-400 group-hover/cs:text-indigo-600 transition-colors" />
+                      <ArrowUpRight size={14} className="text-gray-600 group-hover/cs:text-indigo-600 transition-colors" />
                     </div>
                   </div>
                 </motion.div>
@@ -999,6 +1062,7 @@ const TinkerVerseGrid: React.FC<{
   isFit: boolean,
   onClick?: () => void
 }> = ({ item, posts, height, pixelsPerMonth, styles, isFit, onClick }) => {
+  const { getProjectsByIds } = useProjects();
   const startDate = parseDate(item.start);
   const endDate = parseDate(item.end);
   const [hoveredPost, setHoveredPost] = useState<SocialPost | null>(null);
@@ -1028,7 +1092,19 @@ const TinkerVerseGrid: React.FC<{
 
   if (isFit) {
     return (
-      <div className="w-full h-full flex flex-col p-2 overflow-hidden relative" onClick={onClick}>
+      <div
+        className="w-full h-full flex flex-col p-2 overflow-hidden relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+        onClick={onClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick && onClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Open TinkerVerse"
+      >
         {/* Project thumbnails grid */}
         <div className="flex-1 grid grid-cols-2 gap-1.5 overflow-hidden">
           {projectsToShow.map((project, i) => (
@@ -1069,11 +1145,20 @@ const TinkerVerseGrid: React.FC<{
   return (
     <div
       onClick={onClick}
-      className="relative w-full p-2 pb-4 flex flex-col items-center pointer-events-auto cursor-pointer"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick && onClick();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Open TinkerVerse"
+      className="relative w-full p-2 pb-4 flex flex-col items-center pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
     >
       <div className="flex flex-col w-full px-2 mb-2 sticky top-0 z-10">
         <div className="flex items-center gap-2 opacity-80">
-          <img src={TINKERVERSE_LOGO} alt="TV" className="w-4 h-4 rounded-sm bg-white p-[1px] object-cover" />
+          <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="w-4 h-4 rounded-sm bg-white p-[1px] object-cover" />
           <span className={`text-xs font-bold uppercase tracking-widest ${styles.text}`}>TinkerVerse</span>
         </div>
         {item.headline && (
@@ -1090,7 +1175,7 @@ const TinkerVerseGrid: React.FC<{
             style={{ height: `${rowHeight}px`, minHeight: '24px' }}
           >
             {rowHeight > 20 && (
-              <div className="hidden md:block w-8 text-[9px] font-mono text-amber-200/40 text-right shrink-0">
+              <div className="hidden md:block w-8 text-[9px] font-mono text-amber-200/60 text-right shrink-0">
                 {row.date.toLocaleDateString('en-US', { month: 'short' })}
               </div>
             )}
@@ -1114,10 +1199,20 @@ const TinkerVerseGrid: React.FC<{
                         window.open(post.url, '_blank');
                       }
                     }}
+                    onKeyDown={(e) => {
+                      if (hasPost && (e.key === 'Enter' || e.key === ' ')) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        window.open(post.url, '_blank');
+                      }
+                    }}
+                    role={hasPost ? 'button' : undefined}
+                    tabIndex={hasPost ? 0 : undefined}
+                    aria-label={hasPost ? `View post from ${formatDate(post.date)}` : undefined}
                     className={`
                          w-3 h-3 md:w-4 md:h-4 rounded-[3px] transition-all duration-300 relative
                          ${hasPost
-                        ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)] cursor-pointer hover:scale-125 hover:z-[200] hover:bg-amber-200'
+                        ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)] cursor-pointer hover:scale-125 hover:z-[200] hover:bg-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80'
                         : 'bg-amber-900/20'
                       }
                        `}
@@ -1134,9 +1229,9 @@ const TinkerVerseGrid: React.FC<{
                           <div className="absolute inset-0 bg-amber-500/5 pointer-events-none" />
                           <div className="relative z-10">
                             <div className="flex items-center gap-2 mb-2">
-                              <img src={TINKERVERSE_LOGO} className="w-6 h-6 rounded-full bg-white p-0.5 object-cover" alt="TV" />
+                              <img src={TINKERVERSE_LOGO} className="w-6 h-6 rounded-full bg-white p-0.5 object-cover" alt="TinkerVerse" />
                               <span className="text-[10px] font-bold text-amber-100">tinker_verse</span>
-                              <span className="text-[9px] text-white/40 ml-auto">{formatDate(post.date)}</span>
+                              <span className="text-[9px] text-white/60 ml-auto">{formatDate(post.date)}</span>
                             </div>
                             <p className="text-[10px] text-white/80 line-clamp-3 mb-2 leading-relaxed">{post.caption}</p>
                             <div className="flex items-center gap-3 text-white/50 text-[10px] border-t border-white/10 pt-2">
@@ -1159,4 +1254,6 @@ const TinkerVerseGrid: React.FC<{
   );
 };
 
-export default TimelineEvent;
+// Memoized so app-level re-renders (scroll tracking, hover elsewhere) only
+// re-render the cards whose props actually changed.
+export default React.memo(TimelineEvent);
