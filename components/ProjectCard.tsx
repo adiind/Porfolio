@@ -82,6 +82,37 @@ const splashColors = [
     'bg-purple-500/10 border-purple-500/30 text-purple-200',
 ];
 
+const GlyphCardArtwork: React.FC = () => (
+    <div
+        className="absolute inset-0 overflow-hidden bg-[#090909]"
+        style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+        }}
+        aria-hidden="true"
+    >
+        <div className="absolute left-4 top-4 font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-white/45">01 + 02 / Evidence first</div>
+        <div className="absolute bottom-10 left-4 text-[50px] font-black uppercase leading-none tracking-[-0.09em] text-white/10">Glyph</div>
+        <svg viewBox="0 0 330 210" className="absolute inset-0 h-full w-full text-white">
+            <g fill="none" stroke="currentColor" strokeWidth="1">
+                <path d="M43 72C43 52 57 40 78 40H165C188 40 203 55 203 76V152C203 173 188 187 166 187H78C56 187 43 173 43 153Z" opacity=".7" />
+                <path d="M66 85C66 72 76 64 90 64H142C157 64 167 74 167 89V138C167 153 157 163 142 163H89C75 163 66 153 66 139Z" opacity=".22" />
+                <path d="M95 145L130 81M83 116H160" opacity=".25" />
+                <path d="M219 111H244" strokeDasharray="3 5" opacity=".55" />
+                <rect x="252" y="68" width="52" height="86" rx="4" opacity=".75" />
+                <rect x="260" y="78" width="36" height="43" rx="2" opacity=".25" />
+                <path d="M260 134H296M260 142H282" opacity=".25" />
+            </g>
+            <g fill="#ff3b30">
+                <circle cx="186" cy="83" r="3" />
+                <circle cx="186" cy="97" r="3" />
+                <circle cx="186" cy="111" r="3" />
+            </g>
+        </svg>
+        <div className="absolute bottom-4 right-4 border border-[#ff3b30]/60 bg-[#ff3b30]/10 px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#ff6b62]">Prototype study</div>
+    </div>
+);
+
 const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
@@ -119,6 +150,7 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
 
     const colors = colorMap[project.themeColor || 'amber'];
     const hasImage = !!project.heroImage;
+    const isGlyph = project.id === 'glyph';
 
     const statusLabels: Record<string, string> = {
         'shipped': 'Shipped',
@@ -169,12 +201,15 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             {isHovered && <div className="absolute inset-0 bg-[#0a0a0a] z-0" />}
 
             {/* Background Image */}
+            {isGlyph && <GlyphCardArtwork />}
             {hasImage && (
                 <>
                     <div className="absolute inset-0 overflow-hidden z-0 rounded-xl">
                         <motion.img
                             src={project.heroImage}
                             alt={project.hero.title}
+                            loading="lazy"
+                            decoding="async"
                             className="absolute inset-0 w-full h-full object-cover origin-center"
                             initial={{ scale: 1, opacity: 0.85 }}
                             animate={{
@@ -201,7 +236,7 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             )}
 
             {/* Fallback gradient background for cards without images */}
-            {!hasImage && (
+            {!hasImage && !isGlyph && (
                 <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} via-black to-black opacity-80`} />
             )}
 

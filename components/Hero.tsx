@@ -898,6 +898,8 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
             <img
               src={USER_IMAGE_URL}
               alt="Adi Agarwal"
+              fetchPriority="high"
+              decoding="async"
               className="w-full h-full object-contain relative z-10 opacity-100 saturate-[1.02] group-hover:brightness-110 transition-all duration-300"
               style={{ filter: 'drop-shadow(0 28px 36px rgba(0,0,0,0.54))' }}
             />

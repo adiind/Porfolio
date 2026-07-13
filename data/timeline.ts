@@ -15,7 +15,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     end: "Present",
     summary: "Building a portfolio using advanced agentic coding workflows to explore the future of human-AI collaboration.",
     bullets: [
-      "Leveraged Google Deepmind's Antigravity agent to architect and implement the site.",
+      "Coordinated Antigravity, Codex, and Claude across implementation, critique, and verification.",
       "Moved beyond 'vibe coding' to structured, verifiable agentic development.",
       "Showcasing the potential of AI as a pair programmer and system architect."
     ],
@@ -23,7 +23,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     imageUrl: "/images/portfolio_projects.png",
     skills: [
       { label: "Agentic AI", description: "Collaborating with autonomous agents." },
-      { label: "Next.js", description: "Modern React framework." },
+      { label: "React + Vite", description: "The actual frontend runtime and build system." },
       { label: "Tailwind", description: "Utility-first styling." }
     ]
   },
@@ -290,16 +290,16 @@ export const TIMELINE_DATA: TimelineItem[] = [
     id: "jarvis-competition",
     lane: 2,
     title: "Jarvis Assistant",
-    company: "Top 10 Finalist · ASEAN Edge AI & IoT Challenge",
+    company: "Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge",
     companyUrl: "https://circuitdigest.com/tags/iot-and-edge-ai-electronics-design-contest-2024",
     headline: "Voice-controlled AI home assistant built from scratch.",
     type: "competition",
     subtype: 'role',
     start: "2024-11-01",
     end: "2024-11-30",
-    summary: "Award-winning DIY Voice Recognition Home Assistant built with Maixduino & MQTT.",
+    summary: "Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT.",
     bullets: [
-      "Selected as a Top 10 finalist in CircuitDigest and DigiKey's ASEAN Edge AI & IoT Challenge.",
+      "Selected among the Top 10 projects in an Edge AI & IoT challenge open across ASEAN countries, hosted by Circuit Digest and DigiKey.",
       "Integrated Voice Recognition, Motion Detection, and Home Assistant via MQTT.",
       "Designed custom 3D-printed enclosure and open-sourced the library."
     ],
@@ -318,7 +318,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       { label: "GitHub", url: "https://github.com/adiind/diy-jarvis" },
       { label: "Circuit Digest", url: "https://circuitdigest.com/microcontroller-projects/voice-controlled-smart-home-assistant" }
     ],
-    extendedDescription: `Jarvis is an open-source, voice-controlled smart home assistant that integrates IoT and AI technologies to deliver a seamless and interactive smart home experience. Developed for the ASEAN-level Edge AI & IoT Challenge hosted by Circuit Digest and DigiKey, the project earned Top 10 award and received special praise for its innovative approach and detailed video demonstration.
+    extendedDescription: `Jarvis is an open-source, voice-controlled smart home assistant that integrates IoT and AI technologies to deliver a seamless and interactive smart home experience. Developed for an Edge AI & IoT Challenge open across ASEAN countries and hosted by Circuit Digest and DigiKey, the project was selected as one of the challenge's Top 10 finalists and received praise for its innovative approach and detailed video demonstration.
 
 The assistant leverages voice recognition, motion detection, and MQTT communication to interact with Home Assistant, allowing precise control of smart devices. With dynamic visual feedback, advanced voice commands, and a modular design, Jarvis bridges the gap between smart home technology and user accessibility. Its open-source nature invites experimentation and customization, empowering smart home enthusiasts to tailor it to their specific needs. Balancing affordability with advanced functionality, Jarvis exemplifies a scalable and adaptable solution in the smart home space.
 

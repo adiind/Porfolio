@@ -10,6 +10,7 @@ import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
 import GitHubActivity from './GitHubActivity';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import GlyphProjectDetail from './GlyphProjectDetail';
 
 interface Props {
     project: Project;
@@ -183,7 +184,7 @@ const TechStackSection: React.FC<{ techStack: NonNullable<Project['techStack']>;
     );
 };
 
-const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
+const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const colors = colorMap[project.themeColor || 'amber'];
     const statusLabels: Record<string, string> = { 'shipped': 'Shipped', 'in-progress': 'In Progress', 'archived': 'Archived', 'concept': 'Concept' };
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -447,5 +448,11 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
         </motion.div>
     );
 };
+
+const ProjectDetail: React.FC<Props> = (props) => (
+    props.project.id === 'glyph'
+        ? <GlyphProjectDetail {...props} />
+        : <DefaultProjectDetail {...props} />
+);
 
 export default ProjectDetail;

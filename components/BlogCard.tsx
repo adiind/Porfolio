@@ -126,6 +126,8 @@ const BlogCard: React.FC<Props> = ({ post, index, onClick }) => {
                         <motion.img
                             src={post.imageUrl}
                             alt={post.title}
+                            loading="lazy"
+                            decoding="async"
                             className="absolute inset-0 w-full h-full object-cover origin-center"
                             initial={{ scale: 1, opacity: 0.6 }}
                             animate={{

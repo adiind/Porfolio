@@ -148,7 +148,7 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
         weeks.push(stats.contributions.slice(i, i + 7));
     }
 
-    if (stats.loading || stats.error) {
+    if ((stats.loading || stats.error) && variant !== 'compact') {
         return null;
     }
 
@@ -217,8 +217,12 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                 >
                     <GitCommit size={18} className="text-emerald-400 group-hover/github:text-emerald-300 transition-colors" />
                     <div className="flex flex-col">
-                        <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">{stats.totalCommits}+</span>
-                        <span className="text-[9px] text-white/72 uppercase tracking-widest mt-0.5">commits to build this site</span>
+                        <span className="text-lg font-bold text-white leading-none tracking-tight group-hover/github:text-emerald-300 transition-colors">
+                            {stats.loading ? 'Syncing' : stats.error ? 'Source' : `${stats.totalCommits}+`}
+                        </span>
+                        <span className="text-[9px] text-white/72 uppercase tracking-widest mt-0.5">
+                            {stats.loading ? 'loading build history' : stats.error ? 'view the build repository' : 'commits to build this site'}
+                        </span>
                     </div>
                 </div>
 
@@ -238,15 +242,17 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                     </div>
 
                     <div className="relative w-full overflow-hidden">
-                        <div className="flex gap-[2px] justify-end">
-                            {weeks.slice(-20).map((week, weekIndex) => (
+                        <div className="flex min-h-5 gap-[2px] justify-end">
+                            {(weeks.length ? weeks.slice(-20) : Array.from({ length: 20 }, () => [])).map((week, weekIndex) => (
                                 <div key={weekIndex} className="flex flex-col gap-[2px]">
-                                    {week.map((day) => (
-                                        <div
-                                            key={day.date}
-                                            className={`w-2 h-2 rounded-[2px] ${getLevelColor(day.level)} opacity-95`}
-                                        />
-                                    ))}
+                                    {week.length
+                                        ? week.map((day) => (
+                                            <div
+                                                key={day.date}
+                                                className={`w-2 h-2 rounded-[2px] ${getLevelColor(day.level)} opacity-95`}
+                                            />
+                                        ))
+                                        : Array.from({ length: 2 }, (_, dayIndex) => <div key={dayIndex} className="h-2 w-2 rounded-[2px] bg-white/5" />)}
                                 </div>
                             ))}
                         </div>
