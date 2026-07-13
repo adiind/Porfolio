@@ -1,0 +1,135 @@
+{
+    "id": "glyph",
+    "hero": {
+        "title": "Glyph – Open Wearable Gauntlet",
+        "oneLiner": "A modular wearable gauntlet that treats the wrist as an open, programmable interface. Transparent shell over curated internals, exposed sensors and pogo ports, IMU gesture input, and directional haptics for the age of agentic AI."
+    },
+    "context": {
+        "text": "Today's smartwatches made the wrist useful but closed. Strip away the fitness band and you are left with an alarm and a timer, sensors locked behind sealed firmware. No product calls itself a smartwatch yet exposes its sensors and pinouts so the wearer can interact with their environment, computer, and gadgets. Glyph is my answer: a body-worn platform framed in the Nothing design language that exposes its GPIO, sensors, and modular pogo ports as an accessible wearable testing playground. It is not a fitness band and not an Apple Watch clone; it is a new category of wrist device for makers who want to program, repurpose, and hack what they wear. Built for a Northwestern Product Practicum, Glyph is intentionally worn in sessions rather than always on: you put it on to engage an AI, run a task, or control a device, then take it off. That reframing drove every decision about form, power, and interaction."
+    },
+    "build": {
+        "bullets": [
+            "Delivered two distinct physical models: a looks-like appearance model that sells the form, CMF, and light language, and a works-like functional model that proves the interactions.",
+            "Thermoformed a fully transparent PETG shell over a curated black acrylic internal layer, so the transparency reveals a designed composition instead of messy wiring.",
+            "Designed a sculpted gauntlet body (~104 x 54 x 15 mm) that reads as a wrist platform, not a scaled-up watch, with a side-attaching module rather than a rear cartridge.",
+            "Brought up embedded electronics on a Waveshare ESP32-S3 Touch LCD 1.83 (240x284 AMOLED-class display, QMI8658 6-axis IMU, mic, speaker, Wi-Fi, BLE 5), breaking out extra pinouts for the demo.",
+            "Wrote works-like firmware for real interactions: IMU gesture input, BLE-HID presentation clicker and air-mouse paths, and controllable demo states.",
+            "Built a browser dashboard and a Mac bridge to prove IMU gesture control and a Home Assistant smart-light toggle end to end.",
+            "Sewed a custom multi-layer breathable sleeve (neoprene scuba, 3D spacer mesh, webbing and elastic) with a low-profile magnetic closure.",
+            "Printed structural parts in glass-filled PETG on a Bambu Lab X1C, laser-cut the acrylic internal layer and diffusers, and assembled with heat-set inserts."
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Build two models instead of one integrated unit",
+            "why": "A convincing looks-like model and a separate works-like model let each do one job well: one communicates the product direction and CMF, the other proves the interactions actually work.",
+            "tradeoff": "The demo has to explain that these are two artifacts, and the working electronics look nothing like the finished appearance model."
+        },
+        {
+            "decision": "Transparent shell over a curated black internal layer",
+            "why": "Transparent should not mean exposing the real mess. A designed black acrylic layer hides the actual electronics while creating the visible technical composition of light bars, labels, and contacts.",
+            "tradeoff": "Adds a fabrication step and means the beautiful internals are partly staged rather than the literal working board."
+        },
+        {
+            "decision": "Open hardware and exposed sensors as the core differentiator",
+            "why": "The closest analog, Titan Gauntlets, proves demand for the form but ships closed. Glyph's wedge is the same gauntlet, opened up: schematics, firmware, CAD, and exposed GPIO for makers to fork and extend.",
+            "tradeoff": "Openness is a positioning bet, not a feature you can photograph, so it has to be argued as clearly as it is shown."
+        },
+        {
+            "decision": "Directional haptics as an agency interface for AI",
+            "why": "Agentic AI creates a new attention problem: it asks, waits, acts, and completes. Two actuators using the funneling illusion make intent felt without looking: inbound pulses toward the hand, outbound away, completion as a settle pulse.",
+            "tradeoff": "The two-actuator 1-D haptic display is production intent; the works-like model deprioritized the haptic driver, so this was demonstrated conceptually rather than fully built."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Framing Glyph as a category rather than a better watch made the whole project easier to pitch: not a smartwatch replacement, a new kind of wrist device.",
+            "Splitting looks-like and works-like kept both honest and let the physical model reach a premium finish without waiting on electronics.",
+            "The transparent-shell-over-curated-internals approach delivered the Nothing aesthetic while keeping the real build practical.",
+            "The agentic-AI haptic framing (inbound, outbound, notification lanes) gave the interaction story a clear reason to exist right now.",
+            "User testing surfaced concrete wins: demand for a secondary module, the value of pogo pins and haptics, and the need for a proper display."
+        ],
+        "didnt": [
+            "Several hero features are production intent, not built: the dense white LED matrix, the custom integrated PCB, the two-actuator haptic display, and the EMG wristband.",
+            "The prototype ships only three diagonal white LED filaments instead of the full Glyph matrix.",
+            "Session-based wear needs clearer onboarding so a first-time viewer understands it is deliberately not always-on.",
+            "Keeping production intent and Wizard-of-Oz boundaries legible in the deck takes constant editing to avoid overclaiming."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "Glyph was completed and demoed live as a two-model prototype: a transparent looks-like appearance model and a works-like functional model. In-class the live sequence ran a two-wrist setup, arming Glyph with a quiet double-flip to switch the display from IDLE to CONTROL with a haptic pulse, then driving slides and cues from a detachable nRF52840 Sense pod over a BLE bridge. The recruiter signal is not that I wired AI tools together; it is that I can take a fuzzy 'what if the wrist were open again' thesis and turn it into a category, a form, working electronics, and an honest demo with visible tradeoffs.",
+        "proof": "Two physical models built; live BLE-HID + IMU class demo, June 2026"
+    },
+    "reflection": {
+        "text": "Glyph taught me that hardware product work is mostly about editing scope honestly. The hard part was not adding another sensor; it was deciding what to build for real, what to stage, and how to keep those boundaries visible so the story stayed credible. It pushed me to work as industrial designer, embedded developer, and product owner at once, and to defend a point of view about who a device is for."
+    },
+    "themeColor": "indigo",
+    "icon": "cpu",
+    "skills": [
+        {
+            "label": "Industrial Design",
+            "description": "Sculpted gauntlet form and Nothing-language CMF translated into a wearable."
+        },
+        {
+            "label": "CAD & Fabrication",
+            "description": "Fusion 360, FDM in glass-filled PETG, PETG thermoforming, and laser-cut acrylic."
+        },
+        {
+            "label": "Embedded Systems",
+            "description": "ESP32-S3 and nRF52840 bring-up, IMU input, and BLE-HID firmware."
+        },
+        {
+            "label": "Interaction Design",
+            "description": "Eyes-free gesture-in, haptic-out loops and directional haptic lanes for AI."
+        },
+        {
+            "label": "Product Strategy",
+            "description": "Positioning an open, hackable wrist platform against closed smartwatches."
+        },
+        {
+            "label": "Prototyping Honesty",
+            "description": "Separating built, production-intent, and Wizard-of-Oz to keep the demo credible."
+        }
+    ],
+    "heroImage": "/images/glyph_hero.png",
+    "gallery": [
+        "/images/glyph_sleeve.png",
+        "/images/glyph_body_angled.png",
+        "/images/glyph_side_module.png"
+    ],
+    "stats": [
+        { "value": "2", "label": "Models Built", "description": "A looks-like appearance model and a works-like functional model, each proving a different thing." },
+        { "value": "Open", "label": "Hardware", "description": "Exposed GPIO, sensors, and pogo ports so makers can fork the CAD, firmware, and modules." },
+        { "value": "IMU", "label": "Gesture Input", "description": "Wrist flick, tilt, and rotate read by a 6-axis IMU for eyes-free control." },
+        { "value": "1-D", "label": "Haptic Display", "description": "Two actuators create apparent motion along the forearm to signal AI intent and direction." },
+        { "value": "PETG", "label": "Transparent Shell", "description": "Thermoformed clear shell over a curated black acrylic internal layer." },
+        { "value": "BLE", "label": "Live Demo", "description": "BLE-HID clicker and air-mouse plus a Home Assistant smart-light bridge." }
+    ],
+    "features": [
+        {
+            "title": "Looks-Like Model on the Sleeve",
+            "description": "The appearance model communicates the product direction: a transparent gauntlet body with a side-attaching module worn over a custom breathable sleeve. Transparency reveals a designed black internal layer, light filaments, and pogo contacts rather than raw wiring.",
+            "image": "/images/glyph_sleeve.png",
+            "tags": ["Industrial Design", "CMF", "Side Module"]
+        },
+        {
+            "title": "Curated Transparent Internals",
+            "description": "A thermoformed clear PETG shell sits over a laser-cut black acrylic layer, diagonal white LED filaments, and gold pogo details. The composition is designed so the see-through body reads as premium consumer electronics, not an exposed dev board.",
+            "image": "/images/glyph_body_angled.png",
+            "tags": ["Thermoforming", "Acrylic Optics", "Nothing Language"]
+        },
+        {
+            "title": "Modular, Sensor-Exposed Platform",
+            "description": "A side module snaps on magnetically over pogo contacts and can host different brains, an nRF52840 or an ESP32-S3 Sense, turning Glyph into a camera, sensor, or beacon pod. Exposed pinouts let a maker attach sensors and reprogram it as a body-worn microcontroller.",
+            "image": "/images/glyph_side_module.png",
+            "tags": ["Modularity", "Pogo Ports", "Open Hardware"]
+        }
+    ],
+    "techStack": {
+        "backend": ["ESP32-S3 (Waveshare 1.83)", "nRF52840 Sense", "QMI8658 IMU", "Hand-soldered proto-board", "Node bridge"],
+        "ai": ["Agentic AI status channel", "Directional haptic lanes", "Voice-to-AI (staged)"],
+        "frontend": ["Touch LCD UI states", "Browser demo dashboard", "LED light zones"],
+        "integrations": ["BLE-HID", "Home Assistant", "IMU air-mouse", "ESP-NOW / Wi-Fi modules"]
+    }
+}

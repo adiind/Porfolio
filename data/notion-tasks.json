@@ -1,12 +1,12 @@
 {
-  "lastSync": "2026-02-23T16:29:51.353Z",
+  "lastSync": "2026-06-11T06:58:25.550Z",
   "sprintName": "Sprint 1",
   "sprintId": "2e249d45-669f-812b-8063-d55959e2a423",
   "tasks": [
     {
       "id": "2e249d45-669f-8002-b4d6-d4d111b978de",
       "name": "Replace floating intro bubble with primary identity headline",
-      "status": "In Progress",
+      "status": "Done",
       "priority": null,
       "assignee": null,
       "dueDate": null,
@@ -33,9 +33,9 @@
           "text": ""
         }
       ],
-      "url": "https://www.notion.so/Replace-floating-intro-bubble-with-primary-identity-headline-2e249d45669f8002b4d6d4d111b978de",
+      "url": "https://app.notion.com/p/Replace-floating-intro-bubble-with-primary-identity-headline-2e249d45669f8002b4d6d4d111b978de",
       "createdTime": "2026-01-08T05:59:00.000Z",
-      "lastModified": "2026-01-08T07:17:00.000Z",
+      "lastModified": "2026-01-08T07:37:00.000Z",
       "_original": {
         "status": "Done"
       }
@@ -54,7 +54,7 @@
           "text": "[image]"
         }
       ],
-      "url": "https://www.notion.so/Vertical-nav-bar-not-updating-2e249d45669f8056af04c81faa929d95",
+      "url": "https://app.notion.com/p/Vertical-nav-bar-not-updating-2e249d45669f8056af04c81faa929d95",
       "createdTime": "2026-01-08T05:42:00.000Z",
       "lastModified": "2026-01-08T06:08:00.000Z",
       "_original": {
@@ -95,7 +95,7 @@
           "text": "Created .agent/workflows/notion-sync.md for workflow documentation"
         }
       ],
-      "url": "https://www.notion.so/Implement-local-Notion-tasks-cache-system-2e249d45669f81108b0cec8fbc16acee",
+      "url": "https://app.notion.com/p/Implement-local-Notion-tasks-cache-system-2e249d45669f81108b0cec8fbc16acee",
       "createdTime": "2026-01-08T07:10:00.000Z",
       "lastModified": "2026-01-08T07:15:00.000Z",
       "_original": {
@@ -116,7 +116,7 @@
           "text": ""
         }
       ],
-      "url": "https://www.notion.so/Add-Images-to-experiences-2e249d45669f804ebd79da5f948224bd",
+      "url": "https://app.notion.com/p/Add-Images-to-experiences-2e249d45669f804ebd79da5f948224bd",
       "createdTime": "2026-01-08T07:21:00.000Z",
       "lastModified": "2026-01-08T07:21:00.000Z",
       "_original": {
@@ -137,7 +137,7 @@
           "text": ""
         }
       ],
-      "url": "https://www.notion.so/Add-Images-to-projects-2e249d45669f80d4a72fcadaf2d3c8dd",
+      "url": "https://app.notion.com/p/Add-Images-to-projects-2e249d45669f80d4a72fcadaf2d3c8dd",
       "createdTime": "2026-01-08T07:21:00.000Z",
       "lastModified": "2026-01-08T07:21:00.000Z",
       "_original": {
@@ -146,7 +146,7 @@
     },
     {
       "id": "2e249d45-669f-8009-aa2e-d63d65cb9031",
-      "name": "Show",
+      "name": "Show collapsed timeline view on first scroll",
       "status": "Not Started",
       "priority": null,
       "assignee": null,
@@ -158,27 +158,48 @@
           "text": ""
         }
       ],
-      "url": "https://www.notion.so/Show-2e249d45669f8009aa2ed63d65cb9031",
+      "url": "https://app.notion.com/p/Show-collapsed-timeline-view-on-first-scroll-2e249d45669f8009aa2ed63d65cb9031",
       "createdTime": "2026-01-08T07:22:00.000Z",
-      "lastModified": "2026-01-08T07:22:00.000Z",
+      "lastModified": "2026-01-08T07:24:00.000Z",
       "_original": {
         "status": "Not Started"
       }
     },
     {
-      "id": "31049d45-669f-8175-979b-c7ec50230d3e",
-      "name": "Commit latest portfolio refinements",
-      "status": "Done",
+      "id": "2e249d45-669f-80d5-9935-f0d9e2408834",
+      "name": "Show floating project section bottom button",
+      "status": "Not Started",
+      "priority": null,
+      "assignee": null,
+      "dueDate": null,
+      "tags": [],
+      "content": [
+        {
+          "type": "paragraph",
+          "text": ""
+        }
+      ],
+      "url": "https://app.notion.com/p/Show-floating-project-section-bottom-button-2e249d45669f80d59935f0d9e2408834",
+      "createdTime": "2026-01-08T07:27:00.000Z",
+      "lastModified": "2026-01-08T07:28:00.000Z",
+      "_original": {
+        "status": "Not Started"
+      }
+    },
+    {
+      "id": "37c49d45-669f-814b-84c8-d27f84be1352",
+      "name": "Setup 7.5 Inch Monochrome eInk Display Support",
+      "status": "In Progress",
       "priority": null,
       "assignee": null,
       "dueDate": null,
       "tags": [],
       "content": [],
-      "url": "",
-      "createdTime": "2026-02-23T10:26:28",
-      "lastModified": "2026-02-23T10:26:28",
+      "url": "https://app.notion.com/p/Setup-7-5-Inch-Monochrome-eInk-Display-Support-37c49d45669f814b84c8d27f84be1352",
+      "createdTime": "2026-06-11T06:57:00.000Z",
+      "lastModified": "2026-06-11T06:57:00.000Z",
       "_original": {
-        "status": "Done"
+        "status": "In Progress"
       }
     }
   ]

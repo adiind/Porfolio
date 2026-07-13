@@ -125,6 +125,19 @@
     .backdrop-blur-xl {
       backdrop-filter: blur(24px);
     }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .animate-pulse,
+      .animate-ping {
+        animation: none !important;
+      }
+
+      html,
+      body {
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 

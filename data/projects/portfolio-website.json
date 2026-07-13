@@ -2,65 +2,65 @@
     "id": "portfolio-website",
     "hero": {
         "title": "Portfolio Website",
-        "oneLiner": "A personal portfolio built with agentic AI, showcasing the future of software development."
+        "oneLiner": "An evolving portfolio designed, implemented, audited, and refined through a multi-agent AI workflow."
     },
     "context": {
-        "text": "This website is more than just a showcase of my work; it's a demonstration of a new way of building. Created using advanced agentic coding workflows, this project moves beyond simple 'vibe coding' to a structured, iterative, and AI-partnered development process. It represents a shift where the developer acts as a high-level architect while AI agents handle implementation, verification, and asset generation."
+        "text": "This website is both a portfolio and an ongoing experiment in AI-mediated making. I set the product direction, visual language, content, and acceptance criteria, then work across Antigravity, Codex, and Claude to plan changes, implement them, critique the result, and verify the live experience. The interesting part is not that AI writes code; it is how a human keeps intent, taste, factual accuracy, and quality control coherent across many agent-assisted iterations."
     },
     "build": {
         "bullets": [
-            "Next.js 14 (App Router) for performance and SEO",
-            "Tailwind CSS for rapid, cohesive styling",
-            "Framer Motion for smooth, premium interactions",
-            "Agentic AI workflow (Deepmind Antigravity)",
-            "Automated screenshot generation and verification"
+            "React 19 and TypeScript on Vite for a fast, component-driven single-page application",
+            "Framer Motion and a custom timeline system for the portfolio's zoom, scroll, and modal interactions",
+            "Structured JSON content for project case studies, career history, and writing",
+            "A multi-agent workflow spanning Google Antigravity, OpenAI Codex, and Anthropic Claude",
+            "Production builds, browser screenshots, keyboard checks, accessibility audits, and performance verification after meaningful changes"
         ]
     },
     "decisions": [
         {
-            "decision": "Agentic Coding vs Traditional Hand-Coding",
-            "why": "To explore the capabilities of modern AI in complex project management and code generation.",
-            "tradeoff": "Requires managing agent context and reviewing plans rather than just writing code."
+            "decision": "Multi-agent collaboration vs one AI assistant",
+            "why": "Different agents are useful for different modes of work: implementation, critique, research, browser verification, and long-running refactors.",
+            "tradeoff": "The human has to preserve context, reconcile conflicting suggestions, and remain accountable for the final result."
         },
         {
-            "decision": "Vanilla CSS/Tailwind vs Component Libraries",
-            "why": "Maintained complete control over the 'premium' aesthetic without fighting library defaults.",
-            "tradeoff": "More initial CSS setup, but greater long-term flexibility."
+            "decision": "Custom interaction system vs a conventional portfolio template",
+            "why": "The timeline, cutting-mat hero, and layered project stories make the portfolio itself evidence of product and interaction thinking.",
+            "tradeoff": "A distinctive interface demands more testing, performance work, and accessibility care than a standard scrolling site."
         }
     ],
     "review": {
         "worked": [
             "Rapid iteration on design and content.",
-            "Seamless integration of new features via AI planning.",
-            "Automated tasks (like screenshots) saved manual effort."
+            "Using multiple agents made critique and verification part of the build loop instead of an afterthought.",
+            "Automated builds, screenshots, and browser checks made ambitious interaction changes safer to ship."
         ],
         "didnt": [
-            "Occasional context limits required re-explaining project structure."
+            "Agent output still drifts without clear product intent, source-of-truth content, and explicit verification."
         ]
     },
     "outcome": {
         "status": "shipped",
-        "text": "The result is a responsive, high-performance portfolio that not only houses my work but serves as a case study in itself. It demonstrates that AI can be a partner in creativity, not just a tool for automation.",
+        "text": "The result is a responsive portfolio that serves as a living case study in human-agent collaboration. It shows how AI can expand the amount of design, engineering, auditing, and iteration one person can coordinate while keeping authorship grounded in intent and judgment.",
         "proof": null,
         "blocker": ""
     },
     "reflection": {
-        "text": "Building this portfolio with AI reinforced that the future of coding is collaborative. The 'magic' isn't in generating code, but in orchestrating intent."
+        "text": "Building this portfolio reinforced that the scarce skill in an AI-mediated workflow is not typing code. It is translating intent into constraints, recognizing when the output is wrong, and carrying a coherent point of view through many rounds of implementation and critique."
     },
     "themeColor": "indigo",
     "icon": "code",
     "skills": [
         {
-            "label": "Agentic AI Workflows",
-            "description": "Prompt engineering and context management."
+            "label": "Multi-Agent Workflows",
+            "description": "Coordinating Antigravity, Codex, and Claude across planning, implementation, critique, and verification."
         },
         {
-            "label": "Next.js",
-            "description": "App directory and React Server Components."
+            "label": "React + TypeScript",
+            "description": "A typed component system for complex interactive portfolio states."
         },
         {
-            "label": "Tailwind CSS",
-            "description": "Utility-first styling."
+            "label": "Vite + Framer Motion",
+            "description": "Fast builds and motion-driven interaction design."
         }
     ],
     "heroImage": "/images/portfolio_hero.png"

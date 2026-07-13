@@ -246,7 +246,7 @@ const BlogCard: React.FC<Props> = ({ post, index, onClick }) => {
                                     </span>
                                 ))}
                                 {post.tags.length > 4 && (
-                                    <span className="px-2 py-1 text-[10px] font-medium rounded-full border border-white/20 text-white/40">
+                                    <span className="px-2 py-1 text-[10px] font-medium rounded-full border border-white/20 text-white/60">
                                         +{post.tags.length - 4}
                                     </span>
                                 )}
@@ -258,7 +258,7 @@ const BlogCard: React.FC<Props> = ({ post, index, onClick }) => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.15, duration: 0.2 }}
-                            className="mt-4 flex items-center gap-2 text-white/30"
+                            className="mt-4 flex items-center gap-2 text-white/55"
                         >
                             <ChevronDown size={14} className="animate-bounce" />
                             <span className="text-[10px] uppercase tracking-widest">Click to read</span>

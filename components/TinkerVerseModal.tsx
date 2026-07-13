@@ -4,10 +4,11 @@ import { X, ExternalLink, PlayCircle, Heart, MessageCircle, Github, ArrowUpRight
 import { TimelineItem, SocialPost, TinkerProject } from '../types';
 import { TINKERVERSE_LOGO } from '../constants';
 import { formatDate } from '../utils';
-import { getProjectsByIds } from '../data/projects';
 import { Project } from '../types/Project';
 import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
+import { useProjects } from '../context/ProjectsContext';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 
 
 
@@ -27,7 +28,7 @@ const ProjectsInModal: React.FC<{
         <section>
             <div className="flex items-end gap-4 mb-8">
                 <h3 className="text-3xl font-bold text-white">Projects</h3>
-                <p className="hidden md:block text-sm text-gray-500 pb-1.5 font-mono">// Systems and experiments</p>
+                <p className="hidden md:block text-sm text-white/55 pb-1.5 font-mono">// Systems and experiments</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,7 +57,9 @@ const ProjectsInModal: React.FC<{
 
 const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
+    const { getProjectsByIds } = useProjects();
     const projects = getProjectsByIds((item.projects ?? []).map((project) => project.id));
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'tinkerverse' });
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
             {/* Backdrop */}
@@ -65,11 +68,13 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={onClose}
-                className="absolute inset-0 bg-black/95 backdrop-blur-xl"
+                className="absolute inset-0 bg-black/95"
             />
 
             {/* Modal Content */}
             <motion.div
+                ref={dialogRef}
+                tabIndex={-1}
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -77,14 +82,14 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="tinkerverse-modal-title"
-                className="relative w-full max-w-7xl h-full max-h-[90vh] bg-[#050505] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+                className="relative w-full max-w-7xl h-full max-h-[90vh] bg-[#050505] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col focus:outline-none"
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#050505] z-10 shrink-0">
                     <div className="flex items-center gap-4">
                         <div className="relative">
                             <div className="absolute inset-0 bg-amber-500/20 blur-lg rounded-full" />
-                            <img src={TINKERVERSE_LOGO} alt="TV" className="relative w-10 h-10 rounded-lg bg-black object-cover border border-white/10" />
+                            <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="relative w-10 h-10 rounded-lg bg-black object-cover border border-white/10" />
                         </div>
                         <div>
                             <h2 id="tinkerverse-modal-title" className="text-2xl font-bold text-white tracking-tight">TinkerVerse</h2>
@@ -112,7 +117,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, posts, onClose }) => {
                     <section className="relative">
                         <div className="flex items-end gap-4 mb-8">
                             <h3 className="text-3xl font-bold text-white">Past Project Showcases</h3>
-                            <p className="hidden md:block text-sm text-gray-500 pb-1.5 font-mono">// Making things, one at a time</p>
+                            <p className="hidden md:block text-sm text-white/55 pb-1.5 font-mono">// Making things, one at a time</p>
                         </div>
 
                         {/* Social Grid (Restored) */}
@@ -150,8 +155,8 @@ const SocialGrid: React.FC<{ posts: SocialPost[] }> = ({ posts }) => {
                         {/* Content */}
                         <div className="relative z-10 h-full p-3 flex flex-col justify-between">
                             <div className="flex justify-between items-start">
-                                <span className="text-[9px] font-mono text-white/30">{post.date}</span>
-                                <ExternalLink size={10} className="text-white/20 group-hover:text-white/60 transition-colors" />
+                                <span className="text-[9px] font-mono text-white/60">{post.date}</span>
+                                <ExternalLink size={10} className="text-white/60 group-hover:text-white/60 transition-colors" />
                             </div>
 
                             <div>
@@ -159,10 +164,10 @@ const SocialGrid: React.FC<{ posts: SocialPost[] }> = ({ posts }) => {
                                     {post.caption.split('\n')[0].replace(/[✨🚀🔫🌻🔫🌞🐉🪝🚪🌱⚙️🦵🦿🧡🔄💡]/gu, '').replace(/#\S+/g, '').trim() || post.caption.trim()}
                                 </p>
                                 <div className="flex gap-2 text-[9px] font-mono">
-                                    <span className={`flex items-center gap-1 ${post.likes > 100 ? 'text-amber-400' : 'text-gray-500'}`}>
+                                    <span className={`flex items-center gap-1 ${post.likes > 100 ? 'text-amber-400' : 'text-white/55'}`}>
                                         <Heart size={9} /> {post.likes}
                                     </span>
-                                    <span className="flex items-center gap-1 text-gray-600">
+                                    <span className="flex items-center gap-1 text-white/55">
                                         <MessageCircle size={9} /> {post.comments}
                                     </span>
                                 </div>

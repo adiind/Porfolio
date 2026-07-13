@@ -9,6 +9,7 @@ import {
 import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
 import GitHubActivity from './GitHubActivity';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 
 interface Props {
     project: Project;
@@ -86,6 +87,7 @@ const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; co
                     <button
                         key={i}
                         onClick={() => setActive(i)}
+                        aria-label={`View image ${i + 1}`}
                         className={`relative flex-shrink-0 rounded-xl overflow-hidden w-32 h-20 border-2 transition-all duration-200 ${
                             i === active ? `${colors.accentBorder} scale-105 shadow-lg` : 'border-white/10 opacity-50 hover:opacity-80'
                         }`}
@@ -109,14 +111,16 @@ const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; co
                 <button
                     onClick={() => setActive(a => Math.max(0, a - 1))}
                     disabled={active === 0}
+                    aria-label="Previous image"
                     className="p-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 transition-all"
                 >
                     <ChevronLeft size={16} />
                 </button>
-                <span className="text-white/40 text-xs font-mono">{active + 1} / {features.length}</span>
+                <span className="text-white/55 text-xs font-mono">{active + 1} / {features.length}</span>
                 <button
                     onClick={() => setActive(a => Math.min(features.length - 1, a + 1))}
                     disabled={active === features.length - 1}
+                    aria-label="Next image"
                     className="p-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 transition-all"
                 >
                     <ChevronRight size={16} />
@@ -184,47 +188,30 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const statusLabels: Record<string, string> = { 'shipped': 'Shipped', 'in-progress': 'In Progress', 'archived': 'Archived', 'concept': 'Concept' };
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isZero = project.id === 'zero-my-ai';
+    // Render rich sections (stats / features / tech stack) for any project that provides that data.
+    const hasRichSections = isZero || project.id === 'glyph';
     const storyHeading = isZero ? 'Why It Exists' : 'The Story';
     const buildHeading = isZero ? 'What\'s Inside' : 'What I Built';
     const decisionsHeading = isZero ? 'Architecture Calls' : 'Key Decisions';
 
-    // 1. History Management for Browser Back Button
-    React.useEffect(() => {
-        // Push a new state when the modal opens
-        window.history.pushState({ modal: 'project' }, '', window.location.href);
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'project' });
 
-        const handlePopState = (event: PopStateEvent) => {
-            // When user clicks back, close the modal
-            onClose();
-        };
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                window.history.back();
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [onClose]);
-
-    // 2. Manual Close Handler
     const handleManualClose = () => {
-        window.history.back();
+        onClose();
     };
 
     return (
         <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-detail-title"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden"
+            className="fixed inset-0 z-[100] bg-black/95 overflow-hidden focus:outline-none"
             onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}
@@ -237,6 +224,7 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             {ReactDOM.createPortal(
                 <button
                     onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
+                    aria-label="Close project"
                     className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 shadow-2xl"
                 >
                     <X size={20} strokeWidth={2.5} />
@@ -269,9 +257,9 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                             {statusLabels[project.outcome.status]}
                         </span>
 
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight leading-tight">
+                        <h2 id="project-detail-title" className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight leading-tight">
                             {project.hero.title}
-                        </h1>
+                        </h2>
 
                         <p className="text-lg md:text-xl text-white/60 max-w-3xl leading-relaxed mb-6">
                             {project.hero.oneLiner}
@@ -309,21 +297,21 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         {/* === GITHUB STATS - Inline chips for Portfolio project === */}
                         {project.id === 'portfolio-website' && (
                             <div className="mb-6">
-                                <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Build Stats</p>
+                                <p className="text-xs text-white/55 uppercase tracking-widest mb-2">Build Stats</p>
                                 <GitHubActivity variant="inline" />
                             </div>
                         )}
 
-                        {/* === STATS GRID for Zero === */}
-                        {isZero && project.stats && project.stats.length > 0 && (
+                        {/* === STATS GRID === */}
+                        {hasRichSections && project.stats && project.stats.length > 0 && (
                             <div className="mt-8">
                                 <StatsGrid stats={project.stats} colors={colors} />
                             </div>
                         )}
                     </section>
 
-                    {/* ===== FEATURE CAROUSEL (Zero only) ===== */}
-                    {isZero && project.features && project.features.length > 0 && (
+                    {/* ===== FEATURE CAROUSEL ===== */}
+                    {hasRichSections && project.features && project.features.length > 0 && (
                         <FeatureCarousel features={project.features} colors={colors} />
                     )}
 
@@ -388,8 +376,8 @@ const ProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         </div>
                     </section>
 
-                    {/* ===== TECH STACK (Zero only) ===== */}
-                    {isZero && project.techStack && (
+                    {/* ===== TECH STACK ===== */}
+                    {hasRichSections && project.techStack && (
                         <TechStackSection techStack={project.techStack} colors={colors} />
                     )}
 

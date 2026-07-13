@@ -1,7 +1,7 @@
 
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useMotionValue, useMotionTemplate, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, LayoutGroup } from 'framer-motion';
 import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS, REAL_USER_IMAGE } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
 import TimelineEvent from './components/TimelineEvent';
@@ -20,13 +20,13 @@ import VerticalNavbar from './components/VerticalNavbar'; // Added
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 import { Project } from './types/Project';
-import { PROJECTS } from './data/projects';
+import { ProjectsProvider, useProjects } from './context/ProjectsContext';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
 import { trackEvent } from './lib/analytics';
 
 
-const App: React.FC = () => {
+const PortfolioApp: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
@@ -37,6 +37,10 @@ const App: React.FC = () => {
   // Mouse tracking for Spotlight
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  // Center a fixed-size gradient on the cursor via transform (compositor-only)
+  // instead of repainting a full-screen background gradient on every mousemove.
+  const spotlightX = useTransform(mouseX, (v) => v - 600);
+  const spotlightY = useTransform(mouseY, (v) => v - 600);
 
 
   // Timeline Logic
@@ -63,10 +67,11 @@ const App: React.FC = () => {
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
   const [activeProject, setActiveProject] = useState<TimelineItem | null>(null);
+  const { projects } = useProjects();
 
   const richProject = useMemo(() => {
-    return activeProject ? PROJECTS.find(p => p.id === activeProject.id) : null;
-  }, [activeProject]);
+    return activeProject ? projects.find(p => p.id === activeProject.id) : null;
+  }, [activeProject, projects]);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
   const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(false);
@@ -134,6 +139,25 @@ const App: React.FC = () => {
     setIsTinkerVerseOpen(true);
   }, []);
 
+  // Stable per-source variants so memoized TimelineEvent cards don't re-render
+  // when the app re-renders (inline lambdas would break React.memo).
+  const openTimelineProjectFromGrid = useCallback(
+    (item: TimelineItem) => handleOpenTimelineProject(item, 'timeline_grid'),
+    [handleOpenTimelineProject]
+  );
+  const openTimelineProjectFromRail = useCallback(
+    (item: TimelineItem) => handleOpenTimelineProject(item, 'timeline_rail'),
+    [handleOpenTimelineProject]
+  );
+  const openTinkerVerseFromGrid = useCallback(
+    () => handleOpenTinkerVerse('timeline_grid'),
+    [handleOpenTinkerVerse]
+  );
+  const openTinkerVerseFromRail = useCallback(
+    () => handleOpenTinkerVerse('timeline_rail'),
+    [handleOpenTinkerVerse]
+  );
+
   const finishModeTransition = useCallback(() => {
     window.setTimeout(() => {
       setIsAnimating(false);
@@ -197,6 +221,23 @@ const App: React.FC = () => {
 
     finishModeTransition();
   }, [finishModeTransition, mode]);
+
+  useEffect(() => {
+    const handleIntroKeyDown = (e: KeyboardEvent) => {
+      if (mode !== 'intro' || hasBlockingOverlay) return;
+
+      const target = e.target as HTMLElement | null;
+      const isFormField = target && ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'].includes(target.tagName);
+      if (isFormField) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        dismissIntroForTouchScroll('keyboard');
+      }
+    };
+    window.addEventListener('keydown', handleIntroKeyDown);
+    return () => window.removeEventListener('keydown', handleIntroKeyDown);
+  }, [mode, hasBlockingOverlay, dismissIntroForTouchScroll]);
 
   const scrollTimelineBy = useCallback((deltaY: number, baseScrollTop?: number) => {
     const container = scrollContainerRef.current;
@@ -606,9 +647,22 @@ const App: React.FC = () => {
   }, [getCurrentSection, mode]);
 
   // Throttled scroll handler for better performance
+  const scrollRafRef = useRef<number | null>(null);
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const nextScrollTop = e.currentTarget.scrollTop;
-    setScrollTop(nextScrollTop);
+    // scrollTop state only feeds TimelineRail's year highlighting, which renders
+    // in normal/detail mode. Skipping the state update otherwise avoids
+    // re-rendering the whole tree on every scroll frame; rAF coalesces updates.
+    if (mode === 'normal' || mode === 'detail') {
+      if (scrollRafRef.current === null) {
+        scrollRafRef.current = requestAnimationFrame(() => {
+          scrollRafRef.current = null;
+          if (scrollContainerRef.current) {
+            setScrollTop(scrollContainerRef.current.scrollTop);
+          }
+        });
+      }
+    }
     trackScrollDepth(e.currentTarget, nextScrollTop);
 
     // On touch devices, let a deliberate scroll dismiss the intro hero
@@ -618,6 +672,17 @@ const App: React.FC = () => {
       dismissIntroForTouchScroll('touch_scroll');
     }
   }, [dismissIntroForTouchScroll, mode, trackScrollDepth]);
+
+  useEffect(() => () => {
+    if (scrollRafRef.current !== null) cancelAnimationFrame(scrollRafRef.current);
+  }, []);
+
+  // Sync rail highlight when entering a rail mode (scroll updates are skipped elsewhere)
+  useEffect(() => {
+    if ((mode === 'normal' || mode === 'detail') && scrollContainerRef.current) {
+      setScrollTop(scrollContainerRef.current.scrollTop);
+    }
+  }, [mode]);
 
   // Sync activeSection with mode
   useEffect(() => {
@@ -680,26 +745,20 @@ const App: React.FC = () => {
     };
   }, [mode]);
 
-  // Simple hover handlers - block during animation, intro, or scrolling
+  // Simple hover handlers - block during animation, intro, or scrolling.
+  // Read gating state from refs so these callbacks stay referentially stable
+  // and don't invalidate memoized TimelineEvent cards on every scroll/hover.
   const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
 
   const handleHover = useCallback((id: string | null) => {
-    // Debug logging removed
-
-    if (mode === 'intro' || isAnimating || isScrolling) {
-      // Debug logging removed
-
-      return;
-    }
-    // Debug logging removed
-
+    if (modeRef.current === 'intro' || isAnimatingRef.current || isScrollingRef.current) return;
     setHoveredId(id);
-  }, [mode, isAnimating, isScrolling, hoveredId]);
+  }, []);
 
   const handleLaneHover = useCallback((lane: number | null) => {
-    if (mode === 'intro' || isAnimating || isScrolling) return;
+    if (modeRef.current === 'intro' || isAnimatingRef.current || isScrollingRef.current) return;
     setHoveredLane(lane);
-  }, [mode, isAnimating, isScrolling]);
+  }, []);
 
   // Track mouse position for hover detection after scroll (tracked globally)
   const mousePositionRef = useRef<{ x: number; y: number } | null>(null);
@@ -878,13 +937,19 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative z-10">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black focus:font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400">Skip to content</a>
       {/* Spotlight Overlay */}
-      <motion.div
-        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300"
-        style={{
-          background: useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(99, 102, 241, 0.07), transparent 80%)`,
-        }}
-      />
+      <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
+        <motion.div
+          className="absolute top-0 left-0 w-[1200px] h-[1200px] rounded-full"
+          style={{
+            x: spotlightX,
+            y: spotlightY,
+            background: 'radial-gradient(circle closest-side, rgba(99, 102, 241, 0.07), transparent 80%)',
+            willChange: 'transform',
+          }}
+        />
+      </div>
 
 
       {/* --- CASE STUDY MODAL --- */}
@@ -944,9 +1009,11 @@ const App: React.FC = () => {
           className={`relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         >
           {/* Status Badge Header */}
-          <div
-            className="group flex items-center gap-3 cursor-pointer relative"
+          <button
+            type="button"
+            className="group flex items-center gap-3 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
             onClick={() => handleOpenProfile('header_badge')}
+            aria-label="View profile"
           >
             {/* Profile Photo */}
             <div className="relative w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 transition-colors duration-300">
@@ -957,29 +1024,28 @@ const App: React.FC = () => {
               />
             </div>
 
-            {/* Name and Status */}
+            {/* Name and profile signal */}
             <div className="flex flex-col">
               <span className="text-white font-medium text-sm tracking-tight group-hover:text-indigo-300 transition-colors">Adi Agarwal</span>
 
-              {/* Open for Work with Glowing Dot */}
+              {/* Practice tag */}
               <div className="relative flex items-center gap-1.5">
-                {/* Glowing Green Dot */}
                 <div className="relative">
-                  <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full blur-sm opacity-60 group-hover:opacity-100 animate-pulse" />
-                  <div className="relative w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_6px_1px_rgba(52,211,153,0.4)] group-hover:shadow-[0_0_10px_3px_rgba(52,211,153,0.6)] transition-shadow duration-300" />
+                  <div className="absolute inset-0 w-2 h-2 bg-indigo-300 rounded-full blur-sm opacity-50 group-hover:opacity-80" />
+                  <div className="relative w-2 h-2 bg-indigo-300 rounded-full shadow-[0_0_6px_1px_rgba(165,180,252,0.35)] group-hover:shadow-[0_0_10px_3px_rgba(165,180,252,0.45)] transition-shadow duration-300" />
                 </div>
-                <span className="text-white/50 text-[10px] group-hover:text-white/70 transition-colors duration-300">Open for work</span>
+                <span className="text-white/50 text-[10px] group-hover:text-white/70 transition-colors duration-300">Tangible AI + product systems</span>
               </div>
             </div>
 
             {/* Hover Tooltip */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-black/95 backdrop-blur-lg border border-white/20 rounded-lg text-xs text-white/90 font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none transform scale-95 group-hover:scale-100 shadow-xl z-50">
-              Internships | June to Aug 2026
+              View profile
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[-8px]">
                 <div className="border-4 border-transparent border-b-black/95"></div>
               </div>
             </div>
-          </div>
+          </button>
 
         </motion.div>
 
@@ -1012,7 +1078,7 @@ const App: React.FC = () => {
         }}
         transition={pageTransition}
       >
-        <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} />
+        <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} active={mode === 'intro'} />
 
         <AnimatePresence>
           {mode === 'intro' && (
@@ -1023,13 +1089,16 @@ const App: React.FC = () => {
               transition={{ duration: 0.5 }}
               className="absolute bottom-8 left-0 right-0 flex justify-center text-white/60 pointer-events-none"
             >
-              <div
-                className="flex flex-col items-center gap-2 animate-bounce"
+              <button
+                type="button"
+                onClick={() => dismissIntroForTouchScroll('keyboard')}
+                className="flex flex-col items-center gap-2 animate-bounce pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
                 style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
+                aria-label="Explore timeline"
               >
                 <MousePointer2 size={16} />
                 <span className="text-[10px] uppercase tracking-widest">Scroll to Explore</span>
-              </div>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -1052,6 +1121,7 @@ const App: React.FC = () => {
             onClick={() => handleManualZoom('in')}
             className="p-2 rounded-full border transition-all bg-black/40 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
             title="Zoom In"
+            aria-label="Zoom In"
           >
             <Plus size={16} />
           </button>
@@ -1059,6 +1129,7 @@ const App: React.FC = () => {
             onClick={() => handleManualZoom('out')}
             className="p-2 rounded-full border transition-all bg-black/40 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
             title="Zoom Out"
+            aria-label="Zoom Out"
           >
             <Minus size={16} />
           </button>
@@ -1068,6 +1139,7 @@ const App: React.FC = () => {
               onClick={() => handleZoom('fit', 'zoom_control')}
               className={`p-2 rounded-full border transition-all bg-indigo-500/20 text-indigo-200 border-indigo-500/50 hover:bg-indigo-500/40`}
               title="Fit to Screen"
+              aria-label="Fit to Screen"
             >
               <Minimize size={16} />
             </button>
@@ -1076,6 +1148,7 @@ const App: React.FC = () => {
               onClick={() => handleZoom('normal', 'zoom_control')}
               className={`p-2 rounded-full border transition-all bg-indigo-500 text-white border-indigo-500`}
               title="Reset Zoom"
+              aria-label="Reset Zoom"
             >
               <Maximize size={16} />
             </button>
@@ -1084,6 +1157,9 @@ const App: React.FC = () => {
 
         <div
           ref={scrollContainerRef}
+          id="main-content"
+          role="main"
+          tabIndex={-1}
           onScroll={handleScroll}
           onPointerDown={handleTimelinePointerDown}
           onPointerMove={handleTimelinePointerMove}
@@ -1110,7 +1186,8 @@ const App: React.FC = () => {
                   }
                   handleZoom('intro', 'mobile_home');
                 }}
-                className="p-3 rounded-full bg-indigo-500/80 text-white shadow-lg shadow-indigo-500/30 active:scale-95 transition-transform"
+                className="p-3 rounded-full bg-indigo-500/80 text-white shadow-lg shadow-indigo-500/30 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+                aria-label="Back to top"
               >
                 <Home size={20} />
               </button>
@@ -1146,7 +1223,7 @@ const App: React.FC = () => {
                           <TimelineEvent
                             key={item.id}
                             item={item}
-                            hoveredId={hoveredId}
+                            isHovered={hoveredId === item.id}
                             onHover={handleHover}
                             onLaneHover={handleLaneHover}
                             isDimmed={hoveredId !== null && hoveredId !== item.id}
@@ -1154,8 +1231,8 @@ const App: React.FC = () => {
                             totalHeight={totalContainerHeight}
                             mode={mode}
                             onOpenCaseStudy={handleOpenCaseStudy}
-                            onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_grid')}
-                            onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_grid')}
+                            onOpenProject={openTimelineProjectFromGrid}
+                            onOpenTinkerVerse={openTinkerVerseFromGrid}
                             isScrolling={false}
                             layoutMode="grid"
                             isExpanded={expandedCardId === item.id}
@@ -1178,7 +1255,7 @@ const App: React.FC = () => {
                           <TimelineEvent
                             key={item.id}
                             item={item}
-                            hoveredId={hoveredId}
+                            isHovered={hoveredId === item.id}
                             onHover={handleHover}
                             onLaneHover={handleLaneHover}
                             isDimmed={hoveredId !== null && hoveredId !== item.id}
@@ -1186,8 +1263,8 @@ const App: React.FC = () => {
                             totalHeight={totalContainerHeight}
                             mode={mode}
                             onOpenCaseStudy={handleOpenCaseStudy}
-                            onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_grid')}
-                            onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_grid')}
+                            onOpenProject={openTimelineProjectFromGrid}
+                            onOpenTinkerVerse={openTinkerVerseFromGrid}
                             isScrolling={false}
                             layoutMode="grid"
                             isExpanded={expandedCardId === item.id}
@@ -1208,7 +1285,7 @@ const App: React.FC = () => {
                           <TimelineEvent
                             key={item.id}
                             item={item}
-                            hoveredId={hoveredId}
+                            isHovered={hoveredId === item.id}
                             onHover={handleHover}
                             onLaneHover={handleLaneHover}
                             isDimmed={hoveredId !== null && hoveredId !== item.id}
@@ -1216,8 +1293,8 @@ const App: React.FC = () => {
                             totalHeight={totalContainerHeight}
                             mode={mode}
                             onOpenCaseStudy={handleOpenCaseStudy}
-                            onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_grid')}
-                            onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_grid')}
+                            onOpenProject={openTimelineProjectFromGrid}
+                            onOpenTinkerVerse={openTinkerVerseFromGrid}
                             isScrolling={false}
                             layoutMode="grid"
                             isExpanded={expandedCardId === item.id}
@@ -1294,7 +1371,7 @@ const App: React.FC = () => {
                       <TimelineEvent
                         key={item.id}
                         item={item}
-                        hoveredId={hoveredId}
+                        isHovered={hoveredId === item.id}
                         onHover={handleHover}
                         onLaneHover={handleLaneHover}
                         isDimmed={hoveredId !== null && hoveredId !== item.id}
@@ -1302,8 +1379,8 @@ const App: React.FC = () => {
                         totalHeight={totalContainerHeight}
                         mode={mode}
                         onOpenCaseStudy={handleOpenCaseStudy}
-                        onOpenProject={(timelineItem) => handleOpenTimelineProject(timelineItem, 'timeline_rail')}
-                        onOpenTinkerVerse={() => handleOpenTinkerVerse('timeline_rail')}
+                        onOpenProject={openTimelineProjectFromRail}
+                        onOpenTinkerVerse={openTinkerVerseFromRail}
                         isScrolling={!canHover}
                       // layoutMode defaults to absolute
                       />
@@ -1349,5 +1426,11 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <ProjectsProvider>
+    <PortfolioApp />
+  </ProjectsProvider>
+);
 
 export default App;

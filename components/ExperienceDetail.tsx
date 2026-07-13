@@ -1,9 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, ScrollText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TimelineItem, CaseStudy, FeatureCard } from '../types';
 import { formatDate } from '../utils';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 
 interface Props {
     item: TimelineItem;
@@ -42,45 +43,23 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
     };
     const accent = getAccentColor();
 
-    // 1. History Management for Browser Back Button
-    useEffect(() => {
-        // Push a new state when the modal opens
-        window.history.pushState({ modal: 'experience' }, '', window.location.href);
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'experience' });
 
-        const handlePopState = (event: PopStateEvent) => {
-            // When user clicks back, close the modal
-            onClose();
-        };
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                window.history.back();
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-            window.removeEventListener('keydown', handleKeyDown);
-            // We rely on the user's action to pop the state (by clicking back)
-            // Or if we close manually, we pop it ourselves in handleManualClose
-        };
-    }, [onClose]);
-
-    // 2. Manual Close Handler (Close Button or Backdrop)
     const handleManualClose = () => {
-        window.history.back();
-        // The popstate listener will trigger onClose
+        onClose();
     };
 
     return (
         <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="experience-detail-title"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[45] bg-black/95 backdrop-blur-xl overflow-hidden"
+            className="fixed inset-0 z-[45] bg-black/95 overflow-hidden focus:outline-none"
             onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}
@@ -157,15 +136,15 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                                         )}
                                         <div className="flex items-center gap-2 text-white/60 text-sm">
                                             <span className="font-medium">{item.company}</span>
-                                            <span className="text-white/30">•</span>
+                                            <span className="text-white/55">•</span>
                                             <span className="font-mono text-xs">
                                                 {formatDate(item.start)} — {formatDate(item.end)}
                                             </span>
                                         </div>
                                     </div>
-                                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 tracking-tight">
+                                    <h2 id="experience-detail-title" className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 tracking-tight">
                                         {item.title}
-                                    </h1>
+                                    </h2>
                                     {item.headline && (
                                         <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mb-4">
                                             {item.headline}
@@ -206,12 +185,14 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                                         <div className="flex gap-1">
                                             <button
                                                 onClick={() => scrollCarousel('left')}
+                                                aria-label="Previous image"
                                                 className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                                             >
                                                 <ChevronLeft size={16} className="text-white/70" />
                                             </button>
                                             <button
                                                 onClick={() => scrollCarousel('right')}
+                                                aria-label="Next image"
                                                 className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                                             >
                                                 <ChevronRight size={16} className="text-white/70" />
@@ -406,7 +387,7 @@ const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: stri
                             </span>
                         ))}
                         {card.pills.length > 2 && (
-                            <span className="px-1.5 py-0.5 text-[9px] text-white/30">
+                            <span className="px-1.5 py-0.5 text-[9px] text-white/60">
                                 +{card.pills.length - 2}
                             </span>
                         )}
@@ -419,19 +400,16 @@ const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: stri
 
 // Feature Card Modal (Detailed View)
 const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accent: string }> = ({ card, onClose, accent }) => {
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onClose();
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'feature' });
 
     return (
         <div
-            className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            ref={dialogRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="feature-card-modal-title"
+            className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md focus:outline-none"
             onClick={(e) => {
                 e.stopPropagation();
                 onClose();
@@ -446,6 +424,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
             >
                 <button
                     onClick={onClose}
+                    aria-label="Close"
                     className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white/70 hover:text-white transition-colors backdrop-blur-sm z-50"
                 >
                     <X size={20} />
@@ -472,7 +451,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                         <div className="relative z-10 w-full">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg">{card.title}</h2>
+                                    <h2 id="feature-card-modal-title" className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg">{card.title}</h2>
                                     <p className={`text-${accent}-300 font-medium text-sm md:text-base drop-shadow-md`}>{card.subtitle}</p>
                                 </div>
                                 {!card.imageUrl && (
@@ -494,7 +473,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                         {/* Pills */}
                         {card.pills && card.pills.length > 0 && (
                             <div className="mb-8">
-                                <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Technologies & Skills</h4>
+                                <h4 className="text-xs font-bold text-white/55 uppercase tracking-widest mb-3">Technologies & Skills</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {card.pills.map((pill, i) => (
                                         <SkillPill key={i} label={pill.label} description={pill.description} />
@@ -506,7 +485,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                         {/* Key Details / Bullets */}
                         {card.details && card.details.length > 0 && (
                             <div>
-                                <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Key Responsibilities & Impact</h4>
+                                <h4 className="text-xs font-bold text-white/55 uppercase tracking-widest mb-4">Key Responsibilities & Impact</h4>
                                 <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
                                     {card.details.map((detail, i) => (
                                         <div key={i} className="p-4 border-b border-white/5 last:border-0 flex items-start gap-3 hover:bg-white/[0.02] transition-colors">
@@ -521,7 +500,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                         {/* Project Links */}
                         {card.projectLinks && card.projectLinks.length > 0 && (
                             <div className="mt-8 pt-8 border-t border-white/10">
-                                <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Project Links</h4>
+                                <h4 className="text-xs font-bold text-white/55 uppercase tracking-widest mb-4">Project Links</h4>
                                 <div className="flex flex-col gap-3">
                                     {card.projectLinks.map((link, i) => (
                                         <a
@@ -534,7 +513,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                                             <span className="text-sm font-medium text-white/80 group-hover/link:text-white transition-colors">
                                                 {link.label}
                                             </span>
-                                            <ExternalLink size={16} className={`text-white/40 group-hover/link:text-${accent}-400 transition-colors`} />
+                                            <ExternalLink size={16} className={`text-white/55 group-hover/link:text-${accent}-400 transition-colors`} />
                                         </a>
                                     ))}
                                 </div>

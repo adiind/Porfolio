@@ -3,44 +3,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Linkedin, FileText, ExternalLink } from 'lucide-react';
 import { REAL_USER_IMAGE, PROFILE_BIO, PROFILE_SKILLS, SOCIAL_LINKS } from '../constants';
 import { trackEvent } from '../lib/analytics';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 
 interface Props {
   onClose: () => void;
 }
 
 const ProfileModal: React.FC<Props> = ({ onClose }) => {
-  React.useEffect(() => {
-    window.history.pushState({ modal: 'profile' }, '', window.location.href);
-
-    const handlePopState = () => {
-      onClose();
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        window.history.back();
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [onClose]);
+  const dialogRef = useDialogA11y(onClose, { historyTag: 'profile' });
 
   const handleManualClose = () => {
-    window.history.back();
+    onClose();
   };
 
   return (
     <motion.div
+      ref={dialogRef}
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="profile-modal-title"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl focus:outline-none"
       onClick={handleManualClose}
     >
       <motion.div
@@ -53,6 +39,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
       >
         <button
           onClick={handleManualClose}
+          aria-label="Close profile"
           className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-colors z-20"
         >
           <X size={20} />
@@ -71,8 +58,8 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
         {/* Right Column: Content */}
         <div className="flex-1 p-6 md:p-8 flex flex-col overflow-y-auto custom-scrollbar">
           <div className="mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Hello, I'm Adi.</h2>
-            <p className="text-rose-400 font-medium tracking-wide uppercase text-sm">Design Engineer & Product Thinker</p>
+            <h2 id="profile-modal-title" className="text-2xl md:text-3xl font-bold text-white mb-2">Hello, I'm Adi.</h2>
+            <p className="text-rose-400 font-medium tracking-wide uppercase text-sm">Tangible AI · Product Design · Creative Technology</p>
           </div>
 
           <div className="space-y-4 text-gray-300 text-sm leading-relaxed mb-6 font-light">
@@ -82,7 +69,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Core Toolkit</h3>
+            <h3 className="text-xs font-bold text-white/55 uppercase tracking-widest mb-3">Core Toolkit</h3>
             <div className="flex flex-wrap gap-2">
               {PROFILE_SKILLS.map((skill, i) => (
                 <span

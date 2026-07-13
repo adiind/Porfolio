@@ -188,10 +188,11 @@ const ScrollTracker: React.FC<ScrollTrackerProps> = ({
             const containerRect = container.getBoundingClientRect();
             const elementRect = element.getBoundingClientRect();
             const offset = elementRect.top - containerRect.top + container.scrollTop - 80;
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             container.scrollTo({
                 top: offset,
-                behavior: 'smooth'
+                behavior: prefersReducedMotion ? 'auto' : 'smooth'
             });
         }
     };
@@ -224,13 +225,16 @@ const ScrollTracker: React.FC<ScrollTrackerProps> = ({
                         const isPast = index < activeSection;
 
                         return (
-                            <motion.div
+                            <motion.button
                                 key={section.id}
-                                className="flex items-center gap-3 cursor-pointer group"
+                                type="button"
+                                className="flex items-center gap-3 cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 rounded"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     scrollToSection(section.id);
                                 }}
+                                aria-label={`Go to ${section.label}`}
+                                aria-current={isActive ? 'true' : undefined}
                                 whileHover={{ x: 2 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                             >
@@ -269,7 +273,7 @@ const ScrollTracker: React.FC<ScrollTrackerProps> = ({
                                 <div className="flex items-center gap-2">
                                     {section.icon && (
                                         <span className={`transition-colors duration-200
-                                            ${isActive ? colors.text : isPast ? colors.textMuted : 'text-white/40 group-hover:text-white/60'}`}
+                                            ${isActive ? colors.text : isPast ? colors.textMuted : 'text-white/55 group-hover:text-white/60'}`}
                                         >
                                             {section.icon}
                                         </span>
@@ -279,7 +283,7 @@ const ScrollTracker: React.FC<ScrollTrackerProps> = ({
                                             ? `${colors.text}`
                                             : isPast
                                                 ? 'text-white/60'
-                                                : 'text-white/35 group-hover:text-white/55'
+                                                : 'text-white/55 group-hover:text-white/60'
                                         }`}
                                     >
                                         {section.label}
@@ -294,7 +298,7 @@ const ScrollTracker: React.FC<ScrollTrackerProps> = ({
                                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                     />
                                 )}
-                            </motion.div>
+                            </motion.button>
                         );
                     })}
                 </div>

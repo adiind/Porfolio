@@ -205,7 +205,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Discount-Depth", description: "How steep pricing must go before conversion lifts." }
         ],
         details: [
-          "Reduced food wastage pan-India by ~60%",
+          "Reduced food wastage pan-India by ~50%",
           "Generated pure incremental revenue from previously lost orders"
         ],
         skills: [
@@ -290,7 +290,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     id: "jarvis-competition",
     lane: 2,
     title: "Jarvis Assistant",
-    company: "IOT and Edge AI Electronics Design Contest Top 10 Winner",
+    company: "Top 10 Finalist · ASEAN Edge AI & IoT Challenge",
     companyUrl: "https://circuitdigest.com/tags/iot-and-edge-ai-electronics-design-contest-2024",
     headline: "Voice-controlled AI home assistant built from scratch.",
     type: "competition",
@@ -299,7 +299,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     end: "2024-11-30",
     summary: "Award-winning DIY Voice Recognition Home Assistant built with Maixduino & MQTT.",
     bullets: [
-      "Top 10 National Award Winner @ Circuit Digest & DigiKey Challenge.",
+      "Selected as a Top 10 finalist in CircuitDigest and DigiKey's ASEAN Edge AI & IoT Challenge.",
       "Integrated Voice Recognition, Motion Detection, and Home Assistant via MQTT.",
       "Designed custom 3D-printed enclosure and open-sourced the library."
     ],

@@ -104,8 +104,8 @@ const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
                                 "
                             >
                                 <div className="text-center">
-                                    <p className="text-white/30 text-sm font-medium mb-1">More Thoughts</p>
-                                    <p className="text-white/20 text-xs">Coming Soon</p>
+                                    <p className="text-white/55 text-sm font-medium mb-1">More Thoughts</p>
+                                    <p className="text-white/55 text-xs">Coming Soon</p>
                                 </div>
                             </motion.div>
                         ))}

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
 import { X, Calendar, BookOpen, ArrowLeft } from 'lucide-react';
 import { BlogPost } from '../types/BlogPost';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 
 interface Props {
     post: BlogPost;
@@ -88,7 +89,7 @@ const renderMarkdown = (content: string) => {
             elements.push(
                 <pre key={i} className="my-6 rounded-xl bg-black/50 border border-white/10 overflow-x-auto">
                     <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-white/5">
-                        <span className="text-xs font-mono text-white/40 uppercase">{language}</span>
+                        <span className="text-xs font-mono text-white/55 uppercase">{language}</span>
                     </div>
                     <code className="block p-4 text-sm font-mono text-emerald-300/90 leading-relaxed whitespace-pre">
                         {codeLines.join('\n')}
@@ -262,39 +263,24 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
         return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     };
 
-    // History Management for Browser Back Button
-    React.useEffect(() => {
-        window.history.pushState({ modal: 'blog' }, '', window.location.href);
-
-        const handlePopState = () => {
-            onClose();
-        };
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                window.history.back();
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [onClose]);
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'writing' });
 
     const handleManualClose = () => {
-        window.history.back();
+        onClose();
     };
 
     return (
         <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="blog-detail-title"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden focus:outline-none"
             onClick={handleManualClose}
             onWheel={(e) => e.stopPropagation()}
         >
@@ -309,6 +295,7 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
                 <button
                     onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
                     onWheel={(e) => e.stopPropagation()}
+                    aria-label="Close article"
                     className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 shadow-2xl"
                 >
                     <X size={20} strokeWidth={2.5} />
@@ -326,7 +313,7 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
                     {/* Back Link */}
                     <button
                         onClick={handleManualClose}
-                        className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors mb-8 text-sm"
+                        className="flex items-center gap-2 text-white/55 hover:text-white/70 transition-colors mb-8 text-sm"
                     >
                         <ArrowLeft size={16} />
                         Back to Writings
@@ -341,9 +328,9 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
                         </span>
 
                         {/* Title */}
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">
+                        <h2 id="blog-detail-title" className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">
                             {post.title}
-                        </h1>
+                        </h2>
 
                         {/* Meta */}
                         <div className="flex items-center gap-4 text-white/50 text-sm mb-6">
