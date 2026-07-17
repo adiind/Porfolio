@@ -23,7 +23,7 @@
     "summary": "Live with @formlabs!",
     "url": "https://www.instagram.com/p/DaCPDMMgMGG/",
     "caption": "Live with @formlabs!",
-    "likes": 1783,
+    "likes": 1786,
     "comments": 27
   },
   {
@@ -32,7 +32,7 @@
     "summary": "Industrial automation!",
     "url": "https://www.instagram.com/p/DaCOtOeAUJb/",
     "caption": "Industrial automation!",
-    "likes": 216,
+    "likes": 218,
     "comments": 7
   },
   {
@@ -311,7 +311,7 @@
     "summary": "End of Air Mouse ( Air Gun) experiment v5 🔫\nWe’ve added some tactile buttons along with some nice fillets for a great grip, the overall ergonomics has been greatly improved!",
     "url": "https://www.instagram.com/p/DMDR2I8vupq/",
     "caption": "End of Air Mouse ( Air Gun) experiment v5 🔫\nWe’ve added some tactile buttons along with some nice fillets for a great grip, the overall ergonomics has been greatly improved!",
-    "likes": 17,
+    "likes": 16,
     "comments": 1
   },
   {
@@ -383,7 +383,7 @@
     "summary": "Ability to create everything and here I create hooks!🪝 \n\nTook me a long time to make this video especially because I wanted to document it properly, ended up skipping the speaker mount modelling process altogether. \nI know you’re curious about the LED strips and how I made them, try finding a video named WLED and then Hyperion in my profile to understand how I created that.\n\n#diy #tech #electronics #desksetup #homedecor",
     "url": "https://www.instagram.com/p/DEU02DBP5N_/",
     "caption": "Ability to create everything and here I create hooks!🪝 \n\nTook me a long time to make this video especially because I wanted to document it properly, ended up skipping the speaker mount modelling process altogether. \nI know you’re curious about the LED strips and how I made them, try finding a video named WLED and then Hyperion in my profile to understand how I created that.\n\n#diy #tech #electronics #desksetup #homedecor",
-    "likes": 802,
+    "likes": 801,
     "comments": 13
   },
   {
@@ -410,7 +410,7 @@
     "summary": "Let’s see Air Gun in action, I think I’ve maximised the software optimisations that I could get from this old, less accurate MPU6050. Airgun seems complete, except maybe a few modifications… let’s focus on the UX and design next!\n#electronics #arduino #tech",
     "url": "https://www.instagram.com/p/DDYn_KUTIPx/",
     "caption": "Let’s see Air Gun in action, I think I’ve maximised the software optimisations that I could get from this old, less accurate MPU6050. Airgun seems complete, except maybe a few modifications… let’s focus on the UX and design next!\n#electronics #arduino #tech",
-    "likes": 334,
+    "likes": 333,
     "comments": 6
   },
   {
@@ -446,7 +446,7 @@
     "summary": "I’ve updated my light to run on ESPHome, with that I was able to add special reverse integrations to control other lights in my home with the buttons on this light.\n\nESPHome creates custom firmware for ESP devices, making smart home automation easy. Here’s why I prefer it with Home Assistant:\n\n1. **Custom Firmware**: ESPHome builds firmware specifically for your ESP devices, tailored to your needs and fitting budget.\n \n2. **Easy Integration**: Once set up, devices are automatically detected and managed by Home Assistant, allowing for real-time control. You can even update it OTA.\n\n3. **No Coding Needed**: Instead of writing complex code, you just use simple YAML files to configure your devices. ESPHome does the rest. Almost no code, it’s similar to JSON editing.\n\n4. **Quick Setup**: Adding new sensors or devices is as easy as updating a file and reloading. Home Assistant picks them up right away. I legit started and ended this in a week, including video production and learning.\n\n#diy #electronics #tech #microcontroller #esp8266 #esp \n#homeautomation #homeassistant #esphome",
     "url": "https://www.instagram.com/p/C_2yQi2vBh7/",
     "caption": "I’ve updated my light to run on ESPHome, with that I was able to add special reverse integrations to control other lights in my home with the buttons on this light.\n\nESPHome creates custom firmware for ESP devices, making smart home automation easy. Here’s why I prefer it with Home Assistant:\n\n1. **Custom Firmware**: ESPHome builds firmware specifically for your ESP devices, tailored to your needs and fitting budget.\n \n2. **Easy Integration**: Once set up, devices are automatically detected and managed by Home Assistant, allowing for real-time control. You can even update it OTA.\n\n3. **No Coding Needed**: Instead of writing complex code, you just use simple YAML files to configure your devices. ESPHome does the rest. Almost no code, it’s similar to JSON editing.\n\n4. **Quick Setup**: Adding new sensors or devices is as easy as updating a file and reloading. Home Assistant picks them up right away. I legit started and ended this in a week, including video production and learning.\n\n#diy #electronics #tech #microcontroller #esp8266 #esp \n#homeautomation #homeassistant #esphome",
-    "likes": 98,
+    "likes": 97,
     "comments": 5
   },
   {
@@ -455,7 +455,7 @@
     "summary": "This project isn’t about my singular goal to create the smart curtain bot, it’s about reaching the ability to make a project like this. Not just this project, but projects in general.\nIt’s about my understanding of materials and sourcing them properly in right prices.\nIt’s about my CAD and 3D printing skills that repeatedly hone themselves with every iteration.\nIt’s about learning to embrace the iterative development process, knowing that I started at the bottom rung of it.\n\nIt’s all about the failures along the way, and what they’ve taught me. \n \n#diy #electronics #smarthome #microcontroller #tech #3dprinting",
     "url": "https://www.instagram.com/p/C_vYMGvPMXY/",
     "caption": "This project isn’t about my singular goal to create the smart curtain bot, it’s about reaching the ability to make a project like this. Not just this project, but projects in general.\nIt’s about my understanding of materials and sourcing them properly in right prices.\nIt’s about my CAD and 3D printing skills that repeatedly hone themselves with every iteration.\nIt’s about learning to embrace the iterative development process, knowing that I started at the bottom rung of it.\n\nIt’s all about the failures along the way, and what they’ve taught me. \n \n#diy #electronics #smarthome #microcontroller #tech #3dprinting",
-    "likes": 126,
+    "likes": 125,
     "comments": 9
   },
   {
@@ -473,7 +473,7 @@
     "summary": "DIY 2D CNC Plotter is here! ⚙️\nPowered by an Arduino Nano, it uses a special fork of GRBL to run on 28BYJ motors and ULN2003 Motor driver.\nThis took me months to imagine, learn, code, print and tweak.\nYou can find all the parts on my Thinverse (after 24 hours)\nI’ll put further videos detailing how I made this and all the understanding needed to create one of your own.\n\nAsk your doubts in the comments if you’re currently stuck somewhere.\n\n#diy #electronics #microcontroller #tech #cnc #plotter #cncmachine",
     "url": "https://www.instagram.com/p/C_aXpoTvZ9R/",
     "caption": "DIY 2D CNC Plotter is here! ⚙️\nPowered by an Arduino Nano, it uses a special fork of GRBL to run on 28BYJ motors and ULN2003 Motor driver.\nThis took me months to imagine, learn, code, print and tweak.\nYou can find all the parts on my Thinverse (after 24 hours)\nI’ll put further videos detailing how I made this and all the understanding needed to create one of your own.\n\nAsk your doubts in the comments if you’re currently stuck somewhere.\n\n#diy #electronics #microcontroller #tech #cnc #plotter #cncmachine",
-    "likes": 179,
+    "likes": 178,
     "comments": 3
   },
   {
@@ -518,7 +518,7 @@
     "summary": "Air Gun v3 is here! 🔫\nAlso known as air mouse, this is the third iteration of it and it is getting better and better!\nI’ve added all necessary mouse functions including the extra two back and forward buttons found in productivity mouses.\nI was able to integrate a joystick which currently is only mapped to scrolling.\nAs a Easter egg I’ve put in the new switch, it essentially should allow me to switch between a keyboard mapped joystick to a scroll mapped joystick.\nAlso clicking the joystick is middle click obviously.\nAll previous movement functions have been retained.\n\n#diy #electronics #esp32 #microcontroller #techinnovation #tech",
     "url": "https://www.instagram.com/p/C-2wIcFvZ07/",
     "caption": "Air Gun v3 is here! 🔫\nAlso known as air mouse, this is the third iteration of it and it is getting better and better!\nI’ve added all necessary mouse functions including the extra two back and forward buttons found in productivity mouses.\nI was able to integrate a joystick which currently is only mapped to scrolling.\nAs a Easter egg I’ve put in the new switch, it essentially should allow me to switch between a keyboard mapped joystick to a scroll mapped joystick.\nAlso clicking the joystick is middle click obviously.\nAll previous movement functions have been retained.\n\n#diy #electronics #esp32 #microcontroller #techinnovation #tech",
-    "likes": 35,
+    "likes": 34,
     "comments": 0
   },
   {
