@@ -632,7 +632,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
             Adi <span className="font-normal">Agarwal</span>
           </h1>
           <p
-            className="text-[10px] md:text-xs text-white/70 uppercase tracking-[0.25em] font-normal mb-0"
+            className="whitespace-nowrap text-[8px] uppercase tracking-[0.15em] text-white/70 sm:text-[10px] sm:tracking-[0.2em] md:text-xs md:tracking-[0.25em] font-normal mb-0"
             style={{ textShadow: '0 6px 18px rgba(0,0,0,0.5)' }}
           >
             Tangible AI · Product Design · Creative Technology
