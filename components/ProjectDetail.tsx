@@ -53,13 +53,13 @@ const FeatureCarousel: React.FC<{ features: NonNullable<Project['features']>; co
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-6 relative"
+                className="aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 bg-[#0b0b0b] shadow-2xl mb-6 relative"
             >
                 {current.image ? (
                     <img
                         src={current.image}
                         alt={current.title}
-                        className="w-full h-auto object-cover max-h-[480px] object-top"
+                        className="h-full w-full object-cover object-center"
                     />
                 ) : (
                     <div className="min-h-[260px] bg-white/[0.03]" />
@@ -190,7 +190,7 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isZero = project.id === 'zero-my-ai';
     // Render rich sections (stats / features / tech stack) for any project that provides that data.
-    const hasRichSections = isZero || project.id === 'glyph';
+    const hasRichSections = isZero;
     const storyHeading = isZero ? 'Why It Exists' : 'The Story';
     const buildHeading = isZero ? 'What\'s Inside' : 'What I Built';
     const decisionsHeading = isZero ? 'Architecture Calls' : 'Key Decisions';
@@ -290,8 +290,8 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         )}
 
                         {project.heroImage && (
-                            <div className="rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={project.heroImage} alt={project.hero.title} className="w-full h-auto object-cover" />
+                            <div className="aspect-[16/10] overflow-hidden rounded-2xl bg-[#0b0b0b] shadow-2xl">
+                                <img src={project.heroImage} alt={project.hero.title} className="h-full w-full object-cover object-center" />
                             </div>
                         )}
 

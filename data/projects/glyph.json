@@ -1,80 +1,93 @@
 {
     "id": "glyph",
     "hero": {
-        "title": "Glyph – Open Wearable Platform",
-        "oneLiner": "An open, modular wearable-gauntlet concept explored through a separate looks-like model and works-like interaction prototype."
+        "title": "Glyph: A Body for AI",
+        "oneLiner": "I built a wearable test bed to see what happens when AI leaves the chat window and becomes something you can wear, move, and build on."
     },
     "context": {
-        "text": "Today's smartwatches make the wrist useful while keeping their sensors and hardware closed. Glyph explores an intentional-wear gauntlet as an open, programmable interface for controlling computers, environments, and agentic systems."
+        "text": "Glyph started in Northwestern's Spring 2026 Product Practicum. My first idea was a wearable test bed for tinkerers. I spoke with people who build things about attachment, feedback, and adding new parts. At the same time, I kept thinking about how AI was getting better while we were still talking to it through a chat box. Glyph brought those two ideas together."
     },
     "build": {
         "bullets": [
-            "Built two separate models: a looks-like appearance prototype and a works-like interaction prototype.",
-            "The looks-like model uses a transparent thermoformed PETG shell, PETG-GF structure, a curated black acrylic layer, and three diagonal white LED filaments.",
-            "The works-like model uses a Waveshare ESP32-S3 Touch LCD 1.83-inch development board and a XIAO nRF52840 Sense Plus secondary module.",
-            "Implemented IMU input, BLE-HID paths, dashboard telemetry, Wi-Fi/BLE bridges, and mapped Home Assistant control.",
-            "Kept the appearance and functional models visibly separate instead of implying one fully integrated product."
+            "I built one model to work out the shape, materials, lights, sleeve, and side module.",
+            "The clear model uses thermoformed PETG, PETG-GF parts, a black acrylic layer, and three white light filaments.",
+            "I built the working demo separately with a Waveshare ESP32-S3 Touch LCD 1.83-inch board and a XIAO nRF52840 Sense Plus.",
+            "I got IMU gestures, BLE-HID, air mouse control, telemetry, Wi-Fi and BLE bridges, and Home Assistant lighting control working.",
+            "The demo let me point, select, change brightness and color, and confirm with a snap or tap."
         ]
     },
     "decisions": [
         {
-            "decision": "Split the prototype into looks-like and works-like models",
-            "why": "Each artifact could answer one question honestly: what the product should feel like and whether the interaction loop can work.",
-            "tradeoff": "The case study must clearly explain that the finished appearance model and working electronics are separate."
+            "decision": "Start with tinkerers",
+            "why": "Talking to people who build wearables gave me clear needs: easy attachment, room for new parts, and feedback that makes sense quickly.",
+            "tradeoff": "I could not build the full system in one quarter."
         },
         {
-            "decision": "Use transparent PETG over a curated black visual layer",
-            "why": "The clear shell communicates the visual direction without pretending the visible composition is the literal working circuit.",
-            "tradeoff": "Smoked tint remains a future CMF direction, not the submitted prototype state."
+            "decision": "Use Nothing, the company, as the class reference",
+            "why": "I liked the clear shells, black and white hardware, useful lights, and the way the products show how they are put together.",
+            "tradeoff": "This was my class project. Nothing was only used as a reference and was not involved."
         },
         {
-            "decision": "Keep the module side-mounted",
-            "why": "The side attachment supports the gauntlet silhouette and the verified build direction.",
-            "tradeoff": "Earlier rear-cartridge studies are historical explorations, not the current product architecture."
-        },
-        {
-            "decision": "Scope the built light system to three white filaments",
-            "why": "It delivered the light language within the prototype window without claiming a fabricated dense matrix.",
-            "tradeoff": "The dense white matrix remains production intent only."
+            "decision": "Build the form and the working demo separately",
+            "why": "One model let me make the wearable look right. The other let me test whether the gestures and controls worked.",
+            "tradeoff": "The polished shell and the working electronics were not one device."
         }
     ],
     "review": {
         "worked": [
-            "The two-model strategy separated form and interaction questions without hiding prototype boundaries.",
-            "The current firmware demonstrates a teachable lift, point, adjust, and confirm interaction loop.",
-            "The open-platform thesis connects industrial design, embedded systems, and environmental control in one product direction."
+            "The conversations with tinkerers made the module and connection ideas much clearer.",
+            "Picking Nothing helped me make consistent choices about the shell, lights, and visible parts.",
+            "The two models let me show both the physical idea and the working controls."
         ],
         "didnt": [
-            "Authentic looks-like and works-like photographs are still missing from the portfolio package.",
-            "Haptics, EMG, the dense matrix, a custom PCB, smoked PETG, and the full module ecosystem were not integrated into the built prototype.",
-            "Role, collaborators, public links, and the final outcome still need Adi's confirmation before publication."
+            "The polished model and the working electronics were not combined.",
+            "Haptics, EMG, a dense light matrix, a custom PCB, and the full set of modules were not built.",
+            "The size and sleeve still need longer wear testing."
         ]
     },
     "outcome": {
-        "status": "in-progress",
-        "text": "The evidence currently supports a separate appearance model plus a working interaction stack. The case study remains a draft until authentic build photography, demo proof, credits, and a confirmed outcome are supplied."
+        "status": "concept",
+        "text": "For the final, I brought in the polished wearable model and the separate electronics demo. I kept them separate because that was the honest state of the project.",
+        "proof": "Two physical models and a live gesture-to-room demo, Spring 2026"
     },
     "reflection": {
-        "text": "The next iteration must integrate the physical and functional models while keeping the boundary between built evidence and production intent explicit."
+        "text": "AI has enough brains. I wanted to see what happens when you give it a body."
     },
-    "themeColor": "rose",
+    "themeColor": "indigo",
     "icon": "cpu",
     "skills": [
         {
-            "label": "Industrial Design",
-            "description": "Gauntlet form, transparent-shell CMF, and wearable visual language."
+            "label": "Human-Centered Design",
+            "description": "I spoke with tinkerers about attaching parts, reading feedback, and changing wearable devices."
         },
         {
-            "label": "Embedded Prototyping",
-            "description": "ESP32-S3 and nRF52840 interaction paths with IMU, Wi-Fi, and BLE."
+            "label": "Industrial Design",
+            "description": "I designed the gauntlet shape, clear shell, sleeve, lights, and side module."
+        },
+        {
+            "label": "Physical Prototyping",
+            "description": "I used separate models for the finished form and the working controls."
+        },
+        {
+            "label": "Embedded Systems",
+            "description": "I worked with ESP32-S3 and nRF52840 hardware, IMU input, Wi-Fi, BLE, telemetry, and room controls."
         },
         {
             "label": "Interaction Design",
-            "description": "Gesture calibration, target selection, adjustment, and confirmation loops."
+            "description": "I built the gesture flow for selecting, changing, and confirming an action."
         },
         {
-            "label": "Fabrication",
-            "description": "PETG thermoforming, PETG-GF printing, acrylic layers, and sleeve construction."
+            "label": "Brand Study",
+            "description": "Nothing, the company, was used as the class reference for the clear shell, useful lights, and black and white hardware."
         }
+    ],
+    "heroImage": "/images/glyph/hero-wrist.webp",
+    "gallery": [
+        "/images/glyph/hero-wrist.webp",
+        "/images/glyph/on-wrist-01.webp",
+        "/images/glyph/on-wrist-02.webp",
+        "/images/glyph/detail-angled.webp",
+        "/images/glyph/detail-side.webp",
+        "/images/glyph/side-module.webp"
     ]
 }

@@ -16,27 +16,36 @@ type ProjectIntent = 'all' | 'tangible-ai' | 'product-thinking' | 'physical-craf
 const PROJECT_INTENTS: Array<{
     id: ProjectIntent;
     label: string;
+    shortLabel: string;
     cue: string;
     projectIds?: string[];
 }> = [
-    { id: 'all', label: 'All work', cue: 'See the full range' },
+    {
+        id: 'all',
+        label: 'Works across disciplines',
+        shortLabel: 'Range',
+        cue: 'One person connecting research, interfaces, code, hardware, and physical craft.',
+    },
     {
         id: 'tangible-ai',
-        label: 'AI systems',
-        cue: 'Make intelligence legible',
+        label: 'Makes AI tangible',
+        shortLabel: 'AI',
+        cue: 'Turning invisible intelligence into interactions people can see, understand, and control.',
         projectIds: ['glyph', 'zero-my-ai', 'jarvis', 'portfolio-website'],
     },
     {
         id: 'product-thinking',
-        label: 'Product thinking',
-        cue: 'Frame, test, and decide',
-        projectIds: ['glyph', 'zero-my-ai', 'familysync-jpmorgan', 'mcdonalds-interaction-design', 'portfolio-website'],
+        label: 'Shapes the product',
+        shortLabel: 'Product',
+        cue: 'Finding the right problem, mapping the system, and making clear product decisions.',
+        projectIds: ['familysync-jpmorgan', 'mcdonalds-interaction-design', 'zero-my-ai', 'glyph', 'portfolio-website'],
     },
     {
         id: 'physical-craft',
-        label: 'Physical craft',
-        cue: 'Build what you can touch',
-        projectIds: ['glyph', 'surya', 'solopump', 'helios', 'jarvis', 'plotter'],
+        label: 'Builds the system',
+        shortLabel: 'Build',
+        cue: 'Carrying ideas into software, electronics, mechanics, and working prototypes.',
+        projectIds: ['glyph', 'surya', 'plotter', 'jarvis', 'helios', 'solopump'],
     },
 ];
 
@@ -44,12 +53,14 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
     const [activeProject, setActiveProject] = useState<Project | null>(null);
     const [activeIntent, setActiveIntent] = useState<ProjectIntent>('all');
     const { projects } = useProjects();
+    const activeIntentConfig = PROJECT_INTENTS.find((intent) => intent.id === activeIntent) ?? PROJECT_INTENTS[0];
     const visibleProjects = useMemo(() => {
-        const selectedIntent = PROJECT_INTENTS.find((intent) => intent.id === activeIntent);
-        if (!selectedIntent?.projectIds) return projects;
-        const projectIds = new Set(selectedIntent.projectIds);
-        return projects.filter((project) => projectIds.has(project.id));
-    }, [activeIntent, projects]);
+        if (!activeIntentConfig.projectIds) return projects;
+        const projectsById = new Map(projects.map((project) => [project.id, project] as const));
+        return activeIntentConfig.projectIds
+            .map((projectId) => projectsById.get(projectId))
+            .filter((project): project is Project => Boolean(project));
+    }, [activeIntentConfig, projects]);
 
     const selectIntent = (intent: ProjectIntent) => {
         setActiveIntent(intent);
@@ -105,35 +116,59 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
                             transition={{ duration: 0.5, delay: 0.1 }}
                             className="text-white/50 text-lg md:text-xl max-w-xl"
                         >
-                            Choose the signal you are looking for. The strongest work often lives between categories.
+                            Start with the capability you need to see.
                         </motion.p>
                     </div>
 
-                    <div className="mb-9 border-y border-white/10 bg-white/[0.015] py-3 md:mb-12 md:py-4">
-                        <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d8ff4e]/75">
-                            What are you here to evaluate?
-                        </p>
-                        <div className="grid grid-cols-2 gap-2 md:grid-cols-4" role="group" aria-label="Filter selected work by visitor intent">
-                            {PROJECT_INTENTS.map((intent, index) => {
-                                const isActive = activeIntent === intent.id;
-                                return (
-                                    <button
-                                        key={intent.id}
-                                        type="button"
-                                        aria-pressed={isActive}
-                                        aria-controls="selected-work-grid"
-                                        onClick={() => selectIntent(intent.id)}
-                                        className={`group relative min-h-[72px] overflow-hidden border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8ff4e] ${isActive
-                                            ? 'border-[#d8ff4e]/70 bg-[#d8ff4e]/10 text-white'
-                                            : 'border-white/10 bg-black/30 text-white/60 hover:border-white/25 hover:bg-white/[0.04] hover:text-white'
-                                            }`}
-                                    >
-                                        <span className={`absolute right-2 top-1 font-mono text-[9px] ${isActive ? 'text-[#d8ff4e]/75' : 'text-white/20'}`}>0{index + 1}</span>
-                                        <span className="block text-sm font-semibold tracking-tight">{intent.label}</span>
-                                        <span className={`mt-1 block text-[10px] leading-tight ${isActive ? 'text-[#d8ff4e]/75' : 'text-white/45 group-hover:text-white/60'}`}>{intent.cue}</span>
-                                    </button>
-                                );
-                            })}
+                    <div className="mb-10 md:mb-12">
+                        <p className="mb-2 ml-2 text-xs text-white/45">I want to see how Adi…</p>
+                        <div className="inline-flex w-full rounded-full border border-white/5 bg-white/[0.08] p-1 shadow-2xl shadow-black/40 backdrop-blur-md sm:w-auto">
+                            <div className="flex w-full items-center gap-1" role="group" aria-label="Choose what you want to evaluate">
+                                {PROJECT_INTENTS.map((intent) => {
+                                    const isActive = activeIntent === intent.id;
+                                    return (
+                                        <button
+                                            key={intent.id}
+                                            type="button"
+                                            aria-label={intent.label}
+                                            aria-pressed={isActive}
+                                            aria-controls="selected-work-grid"
+                                            onClick={() => selectIntent(intent.id)}
+                                            className={`group relative flex min-h-10 min-w-0 flex-1 items-center justify-center rounded-full px-2.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 sm:flex-none sm:px-4 ${isActive ? 'text-white' : 'text-white/55 hover:text-white/85'}`}
+                                        >
+                                            {isActive && (
+                                                <motion.span
+                                                    layoutId="selected-work-intent-marker"
+                                                    className="absolute inset-0 rounded-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.45)]"
+                                                    transition={{ type: 'tween', duration: 0.25, ease: 'circOut' }}
+                                                />
+                                            )}
+                                            <span className="relative z-10 truncate text-[11px] font-medium transition-colors sm:text-sm">
+                                                <span className="sm:hidden">{intent.shortLabel}</span>
+                                                <span className="hidden sm:inline">{intent.label}</span>
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="mt-3 flex min-h-7 items-start justify-between gap-4 px-2 md:items-center">
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.p
+                                    key={activeIntentConfig.id}
+                                    initial={{ opacity: 0, y: 4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -3 }}
+                                    transition={{ duration: 0.18 }}
+                                    className="max-w-2xl text-xs leading-relaxed text-white/50 md:text-sm"
+                                >
+                                    {activeIntentConfig.cue}
+                                </motion.p>
+                            </AnimatePresence>
+                            <span className="hidden shrink-0 text-xs text-white/45 sm:block" aria-live="polite">
+                                {visibleProjects.length} {visibleProjects.length === 1 ? 'project' : 'projects'}
+                            </span>
                         </div>
                     </div>
 
