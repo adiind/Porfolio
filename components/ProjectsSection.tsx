@@ -5,11 +5,7 @@ import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import { trackEvent } from '../lib/analytics';
 import { useProjects } from '../context/ProjectsContext';
-
-interface ProjectsSectionProps {
-    isWritingsUnlocked?: boolean;
-    onUnlockWritings?: () => void;
-}
+import { INITIAL_WORK_PROJECT_ID } from '../lib/workRoutes';
 
 type ProjectIntent = 'all' | 'tangible-ai' | 'product-thinking' | 'physical-craft';
 
@@ -49,10 +45,14 @@ const PROJECT_INTENTS: Array<{
     },
 ];
 
-const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = false, onUnlockWritings }) => {
-    const [activeProject, setActiveProject] = useState<Project | null>(null);
-    const [activeIntent, setActiveIntent] = useState<ProjectIntent>('all');
+const ProjectsSection: React.FC = () => {
     const { projects } = useProjects();
+    // Deep link (/work/<id>): mount with the matching detail already open so a
+    // fresh page load of e.g. /work/glyph goes straight to the case study.
+    const [activeProject, setActiveProject] = useState<Project | null>(
+        () => (INITIAL_WORK_PROJECT_ID ? projects.find((p) => p.id === INITIAL_WORK_PROJECT_ID) ?? null : null)
+    );
+    const [activeIntent, setActiveIntent] = useState<ProjectIntent>('all');
     const activeIntentConfig = PROJECT_INTENTS.find((intent) => intent.id === activeIntent) ?? PROJECT_INTENTS[0];
     const visibleProjects = useMemo(() => {
         if (!activeIntentConfig.projectIds) return projects;
@@ -61,6 +61,15 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
             .map((projectId) => projectsById.get(projectId))
             .filter((project): project is Project => Boolean(project));
     }, [activeIntentConfig, projects]);
+
+    // Balance the grid for filtered result counts so the last row never strands
+    // a single orphan card (e.g. 4 results become a 2x2 grid instead of 3+1).
+    const gridColumnsClass = useMemo(() => {
+        const count = visibleProjects.length;
+        if (count === 1) return 'grid-cols-1 md:max-w-xl';
+        if (count === 2 || count === 4) return 'grid-cols-1 md:grid-cols-2';
+        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+    }, [visibleProjects.length]);
 
     const selectIntent = (intent: ProjectIntent) => {
         setActiveIntent(intent);
@@ -76,6 +85,19 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
         });
         setActiveProject(project);
     };
+
+    // Deep-link opens bypass openProject(), so track them once on mount.
+    useEffect(() => {
+        if (!INITIAL_WORK_PROJECT_ID) return;
+        const project = projects.find((p) => p.id === INITIAL_WORK_PROJECT_ID);
+        if (!project) return;
+        trackEvent('project_opened', {
+            id: project.id,
+            title: project.hero.title,
+            status: project.outcome.status,
+            source: 'deep_link',
+        });
+    }, []);
 
     // Listen for closeAllModals event (e.g., from navbar navigation)
     useEffect(() => {
@@ -173,7 +195,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
                     </div>
 
                     {/* Projects Grid */}
-                    <div id="selected-work-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite">
+                    <div id="selected-work-grid" className={`grid ${gridColumnsClass} gap-6`} aria-live="polite">
                         <AnimatePresence mode="popLayout" initial={false}>
                             {visibleProjects.map((project, index) => (
                                 <motion.div
@@ -195,38 +217,18 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isWritingsUnlocked = 
                         </AnimatePresence>
                     </div>
 
-                    {/* Hidden Unlock Trigger */}
-                    {!isWritingsUnlocked && onUnlockWritings && (
-                        <div className="mt-24 pt-12 flex justify-center">
-                            <button
-                                onClick={() => {
-                                    trackEvent('writings_unlock_clicked', { source: 'selected_work' });
-                                    onUnlockWritings();
-                                }}
-                                aria-label="Read my writings"
-                                className="group relative flex items-center gap-2 px-5 py-2.5 text-xs font-mono bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 rounded-lg transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
-                            >
-                                {/* Always faintly visible blinking cursor as a breadcrumb */}
-                                <span className="text-white/20 group-hover:text-indigo-400 transition-all duration-300 animate-pulse">{'>_'}</span>
-                                {/* Label expands on hover */}
-                                <span className="tracking-widest uppercase ml-1 max-w-0 overflow-hidden group-hover:max-w-[200px] group-focus:max-w-[200px] group-focus-within:max-w-[200px] transition-[max-width,opacity] duration-500 whitespace-nowrap text-white/50 opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-focus-within:opacity-100">
-                                    cat /var/log/thoughts.md
-                                </span>
-                            </button>
-                        </div>
-                    )}
                 </motion.div>
             </section>
 
-            {/* Project Detail Modal */}
-            <AnimatePresence>
-                {activeProject && (
-                    <ProjectDetail
-                        project={activeProject}
-                        onClose={() => setActiveProject(null)}
-                    />
-                )}
-            </AnimatePresence>
+            {/* Project Detail Modal — plain conditional: an AnimatePresence exit
+                would keep the closed dialog as an invisible click-eating layer
+                whenever frames are throttled (see App.tsx overlay note). */}
+            {activeProject && (
+                <ProjectDetail
+                    project={activeProject}
+                    onClose={() => setActiveProject(null)}
+                />
+            )}
         </>
     );
 };

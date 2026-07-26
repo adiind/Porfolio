@@ -10,6 +10,7 @@ import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
 import GitHubActivity from './GitHubActivity';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { projectPath } from '../lib/workRoutes';
 import GlyphProjectDetail from './GlyphProjectDetail';
 
 interface Props {
@@ -195,7 +196,7 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const buildHeading = isZero ? 'What\'s Inside' : 'What I Built';
     const decisionsHeading = isZero ? 'Architecture Calls' : 'Key Decisions';
 
-    const dialogRef = useDialogA11y(onClose, { historyTag: 'project' });
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'project', historyPath: projectPath(project.id) });
 
     const handleManualClose = () => {
         onClose();
@@ -212,7 +213,7 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[100] bg-black/95 overflow-hidden focus:outline-none"
+            className="fixed inset-0 z-[100] bg-[#050505] overflow-hidden focus:outline-none"
             onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}

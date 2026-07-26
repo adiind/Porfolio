@@ -1,14 +1,12 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { USER_IMAGE_URL } from '../constants';
-import { Mail, Copy, Check, BarChart3, Code, Palette, Cpu, Printer, X, Zap, Link, ArrowRight } from 'lucide-react';
+import { USER_IMAGE_URL, SOCIAL_LINKS } from '../constants';
+import { BarChart3, Code, Palette, Cpu, Printer, X, ArrowRight, FileText, Linkedin } from 'lucide-react';
 import GitHubActivity from './GitHubActivity';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { trackEvent } from '../lib/analytics';
 
 const skillsTimelineData = [
   {
@@ -129,34 +127,63 @@ const skillProjectMapping: Record<number, {
 };
 
 // Palette and layout are adapted from the Classic preset at cutting-mat-generator.vercel.app.
-const matBounds = {
-  x: 58,
-  y: 58,
-  width: 984,
-  height: 644,
-  unitX: 984 / 50,
-  unitY: 644 / 35,
-} as const;
-
-const matHorizontalUnits = Array.from({ length: 51 }, (_, index) => index);
-const matVerticalUnits = Array.from({ length: 36 }, (_, index) => index);
-const matMajorXUnits = matHorizontalUnits.filter(unit => unit % 5 === 0);
-const matMajorYUnits = matVerticalUnits.filter(unit => unit % 5 === 0);
+// The mat draws in measured pixel space (ResizeObserver + matching viewBox): the old
+// fixed 1100x760 viewBox with preserveAspectRatio="none" stretched with the container,
+// turning grid squares into wide rectangles and smearing every label on the mat.
 const matAngles = [15, 30, 45, 60] as const;
 const matRadii = [180, 320, 500] as const;
+// Decorative cut scratches, as fractions of the ruled area.
 const matCutMarks = [
-  { x1: 210, y1: 290, x2: 356, y2: 266 },
-  { x1: 690, y1: 314, x2: 845, y2: 338 },
-  { x1: 250, y1: 456, x2: 416, y2: 430 },
-  { x1: 652, y1: 542, x2: 835, y2: 528 },
+  { x1: 0.155, y1: 0.36, x2: 0.303, y2: 0.323 },
+  { x1: 0.642, y1: 0.398, x2: 0.8, y2: 0.435 },
+  { x1: 0.195, y1: 0.618, x2: 0.364, y2: 0.578 },
+  { x1: 0.604, y1: 0.752, x2: 0.79, y2: 0.73 },
 ] as const;
 
 const CuttingMatSurface: React.FC<{ active?: boolean }> = ({ active = true }) => {
-  const originX = matBounds.x;
-  const originY = matBounds.y + matBounds.height;
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 1100, h: 760 });
+
+  useEffect(() => {
+    const el = surfaceRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setDims(prev => (Math.abs(prev.w - width) < 1 && Math.abs(prev.h - height) < 1)
+          ? prev
+          : { w: Math.round(width), h: Math.round(height) });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const geo = useMemo(() => {
+    const { w, h } = dims;
+    const compact = w < 640;
+    const unit = compact ? 16 : 22;      // square grid cell, px
+    const margin = compact ? 38 : 58;    // ruler band around the ruled area
+    const cols = Math.max(10, Math.floor((w - margin * 2) / unit));
+    const rows = Math.max(10, Math.floor((h - margin * 2) / unit));
+    const x0 = Math.round((w - cols * unit) / 2);
+    const y0 = Math.round((h - rows * unit) / 2);
+    return {
+      w, h, unit, cols, rows, x0, y0,
+      x1: x0 + cols * unit,
+      y1: y0 + rows * unit,
+      xUnits: Array.from({ length: cols + 1 }, (_, i) => i),
+      yUnits: Array.from({ length: rows + 1 }, (_, i) => i),
+    };
+  }, [dims]);
+
+  const originX = geo.x0;
+  const originY = geo.y1;
+  const guideLength = Math.min(geo.x1 - geo.x0, geo.y1 - geo.y0) * 0.95;
 
   return (
     <motion.div
+      ref={surfaceRef}
       initial={{ opacity: 0, scale: 0.96, y: 24 }}
       animate={active
         ? { opacity: 1, scale: 1, y: [0, -6, 0], rotate: [-0.72, -0.38, -0.72] }
@@ -175,8 +202,7 @@ const CuttingMatSurface: React.FC<{ active?: boolean }> = ({ active = true }) =>
     >
       <svg
         className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1100 760"
-        preserveAspectRatio="none"
+        viewBox={`0 0 ${geo.w} ${geo.h}`}
         role="presentation"
         aria-hidden="true"
       >
@@ -193,97 +219,94 @@ const CuttingMatSurface: React.FC<{ active?: boolean }> = ({ active = true }) =>
           </radialGradient>
         </defs>
 
-        <rect width="1100" height="760" rx="34" fill="url(#matFill)" />
-        <rect width="1100" height="760" rx="34" fill="url(#matLight)" />
-        <rect x="22" y="22" width="1056" height="716" rx="27" fill="none" stroke="rgba(229,229,90,0.34)" strokeWidth="1.15" vectorEffect="non-scaling-stroke" />
-        <rect x="38" y="38" width="1024" height="684" rx="19" fill="none" stroke="rgba(229,229,90,0.18)" strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
+        <rect width={geo.w} height={geo.h} rx="34" fill="url(#matFill)" />
+        <rect width={geo.w} height={geo.h} rx="34" fill="url(#matLight)" />
+        <rect x="22" y="22" width={geo.w - 44} height={geo.h - 44} rx="27" fill="none" stroke="rgba(229,229,90,0.34)" strokeWidth="1.15" />
+        <rect x="38" y="38" width={geo.w - 76} height={geo.h - 76} rx="19" fill="none" stroke="rgba(229,229,90,0.18)" strokeWidth="0.8" />
 
         <g>
-          {matHorizontalUnits.map((unit) => {
-            const x = matBounds.x + unit * matBounds.unitX;
+          {geo.xUnits.map((unit) => {
+            const x = geo.x0 + unit * geo.unit;
             const isMajor = unit % 5 === 0;
             return (
               <line
                 key={`mat-v-${unit}`}
                 x1={x}
-                y1={matBounds.y}
+                y1={geo.y0}
                 x2={x}
-                y2={matBounds.y + matBounds.height}
+                y2={geo.y1}
                 stroke={isMajor ? 'rgba(229,229,90,0.46)' : 'rgba(229,229,90,0.16)'}
                 strokeWidth={isMajor ? 1 : 0.55}
-                vectorEffect="non-scaling-stroke"
               />
             );
           })}
 
-          {matVerticalUnits.map((unit) => {
-            const y = matBounds.y + unit * matBounds.unitY;
+          {geo.yUnits.map((unit) => {
+            const y = geo.y0 + unit * geo.unit;
             const isMajor = unit % 5 === 0;
             return (
               <line
                 key={`mat-h-${unit}`}
-                x1={matBounds.x}
+                x1={geo.x0}
                 y1={y}
-                x2={matBounds.x + matBounds.width}
+                x2={geo.x1}
                 y2={y}
                 stroke={isMajor ? 'rgba(229,229,90,0.46)' : 'rgba(229,229,90,0.16)'}
                 strokeWidth={isMajor ? 1 : 0.55}
-                vectorEffect="non-scaling-stroke"
               />
             );
           })}
         </g>
 
-        <g stroke="rgba(229,229,90,0.38)" strokeLinecap="round" vectorEffect="non-scaling-stroke">
-          {matHorizontalUnits.map((unit) => {
-            const x = matBounds.x + unit * matBounds.unitX;
+        <g stroke="rgba(229,229,90,0.38)" strokeLinecap="round">
+          {geo.xUnits.map((unit) => {
+            const x = geo.x0 + unit * geo.unit;
             const tick = unit % 5 === 0 ? 13 : 8;
             return (
               <React.Fragment key={`mat-x-tick-${unit}`}>
-                <line x1={x} y1="36" x2={x} y2={36 + tick} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
-                <line x1={x} y1="724" x2={x} y2={724 - tick} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
+                <line x1={x} y1={geo.y0 - 22} x2={x} y2={geo.y0 - 22 + tick} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
+                <line x1={x} y1={geo.y1 + 22} x2={x} y2={geo.y1 + 22 - tick} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
               </React.Fragment>
             );
           })}
-          {matVerticalUnits.map((unit) => {
-            const y = matBounds.y + unit * matBounds.unitY;
+          {geo.yUnits.map((unit) => {
+            const y = geo.y0 + unit * geo.unit;
             const tick = unit % 5 === 0 ? 13 : 8;
             return (
               <React.Fragment key={`mat-y-tick-${unit}`}>
-                <line x1="36" y1={y} x2={36 + tick} y2={y} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
-                <line x1="1064" y1={y} x2={1064 - tick} y2={y} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
+                <line x1={geo.x0 - 22} y1={y} x2={geo.x0 - 22 + tick} y2={y} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
+                <line x1={geo.x1 + 22} y1={y} x2={geo.x1 + 22 - tick} y2={y} strokeWidth={unit % 5 === 0 ? 1 : 0.7} />
               </React.Fragment>
             );
           })}
         </g>
 
-        <g fill="rgba(237,241,116,0.6)" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontSize="9" fontWeight="700">
-          {matMajorXUnits.map((unit) => {
-            const x = matBounds.x + unit * matBounds.unitX;
+        <g fill="rgba(237,241,116,0.72)" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontSize="9" fontWeight="700">
+          {geo.xUnits.filter(unit => unit % 5 === 0).map((unit) => {
+            const x = geo.x0 + unit * geo.unit;
             return (
               <React.Fragment key={`mat-x-label-${unit}`}>
-                <text x={x} y="28" textAnchor="middle">{unit}</text>
-                <text x={x} y="744" textAnchor="middle">{unit}</text>
+                <text x={x} y={geo.y0 - 30} textAnchor="middle">{unit}</text>
+                <text x={x} y={geo.y1 + 42} textAnchor="middle">{unit}</text>
               </React.Fragment>
             );
           })}
-          {matMajorYUnits.map((unit) => {
-            const y = matBounds.y + unit * matBounds.unitY + 3;
+          {geo.yUnits.filter(unit => unit % 5 === 0).map((unit) => {
+            const y = geo.y0 + unit * geo.unit + 3;
             return (
               <React.Fragment key={`mat-y-label-${unit}`}>
-                <text x="26" y={y} textAnchor="middle">{unit}</text>
-                <text x="1074" y={y} textAnchor="middle">{unit}</text>
+                <text x={geo.x0 - 32} y={y} textAnchor="middle">{unit}</text>
+                <text x={geo.x1 + 32} y={y} textAnchor="middle">{unit}</text>
               </React.Fragment>
             );
           })}
         </g>
 
-        <g stroke="rgba(229,229,90,0.34)" strokeWidth="0.85" strokeDasharray="3 5" fill="none" vectorEffect="non-scaling-stroke">
+        <g stroke="rgba(229,229,90,0.34)" strokeWidth="0.85" strokeDasharray="3 5" fill="none">
           {matAngles.map((angle) => {
             const radians = angle * Math.PI / 180;
-            const length = 675;
-            const endX = originX + Math.cos(radians) * length;
-            const endY = originY - Math.sin(radians) * length;
+            const endX = originX + Math.cos(radians) * guideLength;
+            const endY = originY - Math.sin(radians) * guideLength;
             const labelX = originX + Math.cos(radians) * 148;
             const labelY = originY - Math.sin(radians) * 148;
             return (
@@ -304,7 +327,7 @@ const CuttingMatSurface: React.FC<{ active?: boolean }> = ({ active = true }) =>
             );
           })}
 
-          {matRadii.map(radius => (
+          {matRadii.filter(radius => radius <= guideLength).map(radius => (
             <path
               key={`mat-radius-${radius}`}
               d={`M ${originX + radius} ${originY} A ${radius} ${radius} 0 0 0 ${originX} ${originY - radius}`}
@@ -314,16 +337,22 @@ const CuttingMatSurface: React.FC<{ active?: boolean }> = ({ active = true }) =>
           ))}
         </g>
 
-        <g stroke="rgba(0,0,0,0.28)" strokeWidth="1" strokeLinecap="round" vectorEffect="non-scaling-stroke">
+        <g stroke="rgba(0,0,0,0.28)" strokeWidth="1" strokeLinecap="round">
           {matCutMarks.map((mark, index) => (
-            <line key={`mat-cut-${index}`} x1={mark.x1} y1={mark.y1} x2={mark.x2} y2={mark.y2} />
+            <line
+              key={`mat-cut-${index}`}
+              x1={geo.x0 + mark.x1 * (geo.x1 - geo.x0)}
+              y1={geo.y0 + mark.y1 * (geo.y1 - geo.y0)}
+              x2={geo.x0 + mark.x2 * (geo.x1 - geo.x0)}
+              y2={geo.y0 + mark.y2 * (geo.y1 - geo.y0)}
+            />
           ))}
         </g>
 
-        <g fill="rgba(237,241,116,0.5)" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontWeight="800" letterSpacing="3">
-          <text x="64" y="682" fontSize="10">SELF-HEALING CUTTING MAT</text>
-          <text x="64" y="700" fontSize="8" fill="rgba(237,241,116,0.34)">A2 GRID / 10 MM / 15-60 DEGREE GUIDES</text>
-          <text x="914" y="83" fontSize="8" textAnchor="middle" fill="rgba(237,241,116,0.34)">ADI AGARWAL / WORKSHOP GRID</text>
+        <g fill="rgba(237,241,116,0.62)" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontWeight="800" letterSpacing="3">
+          <text x={geo.x0 + 6} y={geo.y1 - 20} fontSize="10">SELF-HEALING CUTTING MAT</text>
+          <text x={geo.x0 + 6} y={geo.y1 - 2} fontSize="8" fill="rgba(237,241,116,0.46)">A2 GRID / 10 MM / 15-60 DEGREE GUIDES</text>
+          <text x={geo.x1 - 20} y={geo.y0 + 25} fontSize="8" textAnchor="end" fill="rgba(237,241,116,0.46)">ADI AGARWAL / WORKSHOP GRID</text>
         </g>
       </svg>
 
@@ -345,48 +374,12 @@ const CuttingMatSurface: React.FC<{ active?: boolean }> = ({ active = true }) =>
 
 interface Props {
   onOpenProfile?: () => void;
+  /** Navigates to the Selected Work section (wired to App's section nav). */
+  onViewWork?: () => void;
   /** False when the hero is hidden behind the timeline — pauses its ambient
    *  animations so they don't steal frame budget from the visible sections. */
   active?: boolean;
 }
-
-// Inline chip component for sentence-integrated keywords
-const InlineChip: React.FC<{
-  label: string;
-  description: string;
-  color: 'indigo' | 'emerald' | 'amber' | 'rose';
-  delay: number;
-}> = ({ label, description, color, delay }) => {
-  const colorStyles = {
-    indigo: 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40 hover:bg-indigo-500/40 hover:border-indigo-400/60',
-    emerald: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40 hover:bg-emerald-500/40 hover:border-emerald-400/60',
-    amber: 'bg-amber-500/20 text-amber-200 border-amber-500/40 hover:bg-amber-500/40 hover:border-amber-400/60',
-    rose: 'bg-rose-500/20 text-rose-200 border-rose-500/40 hover:bg-rose-500/40 hover:border-rose-400/60',
-  };
-
-  return (
-    <motion.span
-      className="group relative inline-block"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-    >
-      <span
-        className={`px-2.5 py-1 rounded-full border text-sm md:text-base lg:text-lg font-semibold cursor-default transition-all duration-300 inline-block ${colorStyles[color]}`}
-      >
-        {label}
-      </span>
-
-      {/* Hover tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/95 backdrop-blur-lg border border-white/20 rounded-lg text-xs text-white/80 w-52 text-center opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none transform scale-95 group-hover:scale-100 shadow-xl z-50">
-        {description}
-        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
-          <div className="border-4 border-transparent border-t-black/95"></div>
-        </div>
-      </div>
-    </motion.span>
-  );
-};
 
 const SkillOverlay: React.FC<{ activeSkillId: number; onClose: () => void }> = ({ activeSkillId, onClose }) => {
   const dialogRef = useDialogA11y(onClose, { historyTag: 'skill' });
@@ -513,22 +506,46 @@ const SkillOverlay: React.FC<{ activeSkillId: number; onClose: () => void }> = (
   );
 };
 
-const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
+const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => {
 
   const [activeSkillId, setActiveSkillId] = useState<number | null>(null);
   const [autoActiveSkillId, setAutoActiveSkillId] = useState<number | null>(null);
-  const [hoveredKeyword, setHoveredKeyword] = useState<string | null>(null);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+  // The skills rail only surfaces its related-project thumbnails while the
+  // visitor is hovering or keyboard-focusing it — keeps ambient noise away
+  // from the headline without deleting the interaction.
+  const [railEngaged, setRailEngaged] = useState(false);
 
   const marqueeContainerRef = useRef<HTMLDivElement>(null);
   const autoActiveRef = useRef<number | null>(null);
+  const railLeaveTimeoutRef = useRef<number | null>(null);
+
+  const engageRail = () => {
+    if (railLeaveTimeoutRef.current) {
+      window.clearTimeout(railLeaveTimeoutRef.current);
+      railLeaveTimeoutRef.current = null;
+    }
+    setRailEngaged(true);
+  };
+
+  // Small delay so the thumbnails survive the mouse travelling between the
+  // rail and the thumbnail column (they are separate absolute containers).
+  const disengageRail = () => {
+    if (railLeaveTimeoutRef.current) window.clearTimeout(railLeaveTimeoutRef.current);
+    railLeaveTimeoutRef.current = window.setTimeout(() => setRailEngaged(false), 180);
+  };
+
+  useEffect(() => () => {
+    if (railLeaveTimeoutRef.current) window.clearTimeout(railLeaveTimeoutRef.current);
+  }, []);
 
   // Track which marquee pill is centered. The marquee drifts on a 30s CSS
   // animation, so polling a few times a second is plenty — a per-frame rAF
   // loop here forced layout reads (getBoundingClientRect) at 60fps for the
-  // whole session, including while the hero was hidden.
+  // whole session, including while the hero was hidden. Only runs while the
+  // rail is engaged, since that's the only time the result is visible.
   useEffect(() => {
-    if (!active || activeSkillId) return;
+    if (!active || activeSkillId || !railEngaged) return;
 
     const updateAutoActive = () => {
       if (!marqueeContainerRef.current) return;
@@ -559,7 +576,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
     updateAutoActive();
     const intervalId = window.setInterval(updateAutoActive, 200);
     return () => window.clearInterval(intervalId);
-  }, [activeSkillId, active]);
+  }, [activeSkillId, active, railEngaged]);
 
   // Computed property for easy access
   const skillExpanded = activeSkillId !== null;
@@ -572,29 +589,27 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
     setActiveSkillId(nodeId);
   };
 
-  const getStatusStyles = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "text-white bg-black border-white";
-      case "in-progress":
-        return "text-black bg-white border-black";
-      case "pending":
-        return "text-white bg-black/40 border-white/50";
-      default:
-        return "text-white bg-black/40 border-white/50";
-    }
+  const handleViewWork = () => {
+    trackEvent('hero_cta_clicked', { cta: 'selected_work' });
+    onViewWork?.();
+    // Rescue hatch: App drives intro→projects with a smooth scroll that can
+    // stall on mobile (the app's own section nav hits the same path). If the
+    // Selected Work section hasn't moved shortly after the handoff and is
+    // still below the fold, jump there instantly instead of leaving the
+    // visitor stranded at the top of the timeline.
+    window.setTimeout(() => {
+      const projects = document.getElementById('projects');
+      if (!projects) return;
+      const firstTop = projects.getBoundingClientRect().top;
+      window.setTimeout(() => {
+        const secondTop = projects.getBoundingClientRect().top;
+        const stalled = Math.abs(secondTop - firstTop) < 4;
+        if (stalled && secondTop > window.innerHeight) {
+          projects.scrollIntoView({ block: 'start' });
+        }
+      }, 350);
+    }, 900);
   };
-
-
-
-  // Keyword definitions for hover explanations
-  const keywords = [
-    { id: 'human-centered', label: 'Human-centered', description: 'I design for real people, not personas. Every decision starts with understanding user needs.' },
-    { id: 'data-driven', label: 'Data-driven', description: 'I validate ideas with research and measure outcomes to inform design decisions.' },
-    { id: 'design-thinking', label: 'Design thinking', description: 'I use iterative cycles of research, ideation, prototyping, and testing.' },
-    { id: 'development', label: 'Hands-on development', description: 'I build what I design — from code to hardware to physical prototypes.' },
-  ];
-
 
   return (
     <div className="relative flex flex-col items-center justify-between h-full w-full pointer-events-none pt-20 pb-12 md:py-16">
@@ -614,10 +629,10 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
         </div>
       </div>
 
-      {/* HERO TEXT BLOCK - Compact, one thought */}
-      <div className={`relative z-50 w-full max-w-[760px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
-        <div className="absolute inset-x-6 -top-10 h-40 md:h-48 rounded-full bg-black/52 blur-3xl -z-10" />
-        <div className="absolute inset-x-20 -top-4 h-20 md:h-24 rounded-full border border-white/10 bg-white/[0.04] blur-xl -z-10" />
+      {/* HERO HEADLINE BLOCK — name + positioning statement + primary actions.
+          This is deliberately the loudest thing in the first viewport. */}
+      <div className={`relative z-50 w-full max-w-[820px] px-6 transition-all duration-500 ${skillExpanded ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 pointer-events-auto'}`}>
+        <div className="absolute inset-x-2 -top-12 -bottom-8 rounded-[3rem] bg-black/55 blur-3xl -z-10" />
 
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -626,38 +641,74 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
           className="text-center"
         >
           <h1
-            className="text-5xl md:text-7xl font-light tracking-tight text-white mb-1"
-            style={{ textShadow: '0 18px 42px rgba(0,0,0,0.62), 0 3px 10px rgba(0,0,0,0.6)' }}
+            className="text-2xl md:text-3xl font-normal tracking-tight text-white/95 mb-2 md:mb-3"
+            style={{ textShadow: '0 10px 26px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.55)' }}
           >
-            Adi <span className="font-normal">Agarwal</span>
+            Adi Agarwal
           </h1>
           <p
-            className="whitespace-nowrap text-[8px] uppercase tracking-[0.15em] text-white/70 sm:text-[10px] sm:tracking-[0.2em] md:text-xs md:tracking-[0.25em] font-normal mb-0"
-            style={{ textShadow: '0 6px 18px rgba(0,0,0,0.5)' }}
+            className="text-[2.65rem] leading-[1.04] sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white"
+            style={{ textShadow: '0 18px 42px rgba(0,0,0,0.62), 0 3px 10px rgba(0,0,0,0.6)' }}
           >
-            Tangible AI · Product Design · Creative Technology
+            I make AI <span className="font-normal">tangible</span>.
           </p>
+          <p
+            className="mx-auto mt-3 md:mt-4 max-w-[36rem] text-sm md:text-base text-white/72 leading-relaxed"
+            style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
+          >
+            Product designer &amp; engineer — I turn invisible models into interfaces, devices, and services people can see, feel, and trust.
+          </p>
+
+          <div className="mt-5 md:mt-7 flex flex-wrap items-center justify-center gap-2.5 md:gap-3">
+            <button
+              type="button"
+              onClick={handleViewWork}
+              className="group inline-flex items-center gap-2 rounded-full bg-[#E5E55A] px-5 py-2.5 md:px-6 md:py-3 text-sm md:text-base font-semibold text-[#141600] shadow-[0_14px_40px_rgba(229,229,90,0.26)] transition-all duration-300 hover:bg-[#f0f570] hover:shadow-[0_18px_48px_rgba(229,229,90,0.38)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+            >
+              View selected work
+              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5" />
+            </button>
+            <a
+              href={SOCIAL_LINKS.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent('hero_cta_clicked', { cta: 'resume' })}
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-4 py-2.5 md:px-5 md:py-3 text-sm md:text-base font-medium text-white/90 backdrop-blur-md transition-all duration-300 hover:border-white/55 hover:bg-black/65 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+            >
+              <FileText size={15} aria-hidden="true" />
+              Resume
+            </a>
+            <a
+              href={SOCIAL_LINKS.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent('hero_cta_clicked', { cta: 'linkedin' })}
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-4 py-2.5 md:px-5 md:py-3 text-sm md:text-base font-medium text-white/90 backdrop-blur-md transition-all duration-300 hover:border-white/55 hover:bg-black/65 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+            >
+              <Linkedin size={15} aria-hidden="true" />
+              LinkedIn
+            </a>
+          </div>
         </motion.div>
       </div>
 
-      {/* FLOATING GITHUB WIDGET - Left wing on desktop, hidden on mobile */}
+      {/* BUILD RECEIPTS — demoted from a full widget stack to two quiet chips
+          in the corner. The full story lives on the GitHub repo it links to. */}
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-        className="hidden md:flex md:w-auto absolute left-4 lg:left-12 xl:left-24 top-1/2 -translate-y-1/2 z-40 justify-start scale-90 md:scale-100 origin-top"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.6, ease: "easeOut" }}
+        className="hidden lg:flex absolute left-8 xl:left-12 bottom-10 z-40 pointer-events-auto"
       >
-        <motion.div
-          animate={active ? { y: [0, -5, 0] } : { y: 0 }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <GitHubActivity variant="compact" />
-        </motion.div>
+        <GitHubActivity variant="inline" />
       </motion.div>
 
-      {/* HIGHLIGHTED SKILL PROJECTS PREVIEW */}
+      {/* HIGHLIGHTED SKILL PROJECTS PREVIEW — reveal-on-engagement only, so the
+          thumbnails don't cycle next to the headline while nobody is looking. */}
       <div
-        className="hidden md:flex flex-col absolute right-[15rem] lg:right-[18rem] xl:right-[22rem] top-1/2 -translate-y-1/2 z-30 h-[280px] lg:h-[400px] w-48 lg:w-56 overflow-hidden pointer-events-none pr-4 justify-center scale-85 md:scale-90 lg:scale-100 origin-right transition-all duration-300"
+        onMouseEnter={engageRail}
+        onMouseLeave={disengageRail}
+        className="hidden md:flex flex-col absolute right-[18rem] lg:right-[19rem] xl:right-[22rem] top-1/2 -translate-y-1/2 z-30 h-[260px] lg:h-[340px] w-48 lg:w-56 overflow-hidden pointer-events-none pr-4 justify-center scale-90 origin-right transition-all duration-300"
         style={{
           WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
           maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)'
@@ -665,7 +716,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
       >
         <div className="relative w-full flex flex-col justify-center items-end">
           <AnimatePresence>
-            {autoActiveSkillId && !activeSkillId && (
+            {railEngaged && autoActiveSkillId && !activeSkillId && (
               <motion.div
                 key={autoActiveSkillId}
                 initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
@@ -703,8 +754,17 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
         </div>
       </div>
 
-      {/* RIGHT WING - Vertical Skills List Desktop */}
-      <div className="hidden md:flex absolute right-0 lg:right-8 xl:right-16 top-1/2 -translate-y-1/2 z-40 h-[280px] lg:h-[400px] w-60 lg:w-72 scale-85 md:scale-90 lg:scale-100 origin-right">
+      {/* RIGHT WING - Vertical Skills List Desktop. Shrunk + dimmed until
+          hovered/focused so it reads as texture, not a competing menu. */}
+      <div
+        onMouseEnter={engageRail}
+        onMouseLeave={disengageRail}
+        onFocus={engageRail}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) disengageRail();
+        }}
+        className="hidden md:flex absolute right-16 xl:right-24 top-1/2 -translate-y-1/2 z-40 h-[260px] lg:h-[340px] w-56 lg:w-64 md:scale-[0.85] lg:scale-90 origin-right opacity-90 transition-opacity duration-300 hover:opacity-100 focus-within:opacity-100"
+      >
 
         <motion.div
           ref={marqueeContainerRef}
@@ -733,9 +793,9 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
               .animate-vertical-marquee { animation: none; }
             }
           `}} />
-          <div className="flex flex-col gap-5 lg:gap-6 items-end w-full animate-vertical-marquee pointer-events-auto py-4 pr-8">
+          <div className="flex flex-col gap-4 lg:gap-5 items-end w-full animate-vertical-marquee pointer-events-auto py-4 pr-8">
             {[...skillsTimelineData, ...skillsTimelineData].map((skill, index) => {
-              const isActive = activeSkillId === skill.id || (!activeSkillId && autoActiveSkillId === skill.id);
+              const isActive = activeSkillId === skill.id || (!activeSkillId && railEngaged && autoActiveSkillId === skill.id);
               return (
                 <motion.div
                   key={`${skill.id}-${index}`}
@@ -748,16 +808,16 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
                   <button
                     onClick={() => handleActiveNodeChange(skill.id)}
                     aria-expanded={activeSkillId === skill.id}
-                    className="group flex items-center gap-4 text-right pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+                    className="group flex items-center gap-3 text-right pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
                   >
                     <span
-                      className={`text-sm lg:text-base font-medium tracking-wider transition-all duration-300 ${isActive ? "text-white" : "text-white/55 group-hover:text-white/85"}`}
+                      className={`text-xs lg:text-sm font-medium tracking-wider transition-all duration-300 ${isActive ? "text-white" : "text-white/70 group-hover:text-white"}`}
                       style={{ textShadow: '0 4px 14px rgba(0,0,0,0.6)' }}
                     >
                       {skill.title}
                     </span>
-                    <div className={`relative w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-300 border backdrop-blur-md shadow-xl ${isActive ? "bg-white text-black border-white shadow-white/30 scale-110" : "bg-black/40 text-white/70 border-white/20 hover:border-white/50 hover:bg-black/60 hover:text-white hover:scale-105"}`}>
-                      <skill.icon size={20} className={isActive ? "" : "opacity-70 group-hover:opacity-100"} />
+                    <div className={`relative w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center transition-all duration-300 border backdrop-blur-md shadow-xl ${isActive ? "bg-white text-black border-white shadow-white/30 scale-110" : "bg-black/40 text-white/60 border-white/15 hover:border-white/50 hover:bg-black/60 hover:text-white hover:scale-105"}`}>
+                      <skill.icon size={17} className={isActive ? "" : "opacity-70 group-hover:opacity-100"} />
                       {isActive && (
                         <div className="absolute inset-0 rounded-full bg-white/20 blur-md pointer-events-none" />
                       )}
@@ -770,28 +830,8 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
         </motion.div>
       </div>
 
-      {/* MOBILE SKILLS ROW - Visible only on small screens */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-        className="flex md:hidden flex-wrap justify-center gap-2 w-full px-4 relative z-40 pointer-events-auto mt-4 mb-2"
-      >
-        {skillsTimelineData.map((skill) => (
-          <button
-            key={skill.id}
-            onClick={() => handleActiveNodeChange(skill.id)}
-            aria-expanded={activeSkillId === skill.id}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-md transition-all duration-300 ${activeSkillId === skill.id ? "bg-white text-black border-white shadow-lg shadow-white/30" : "bg-black/40 text-white/70 border-white/20"}`}
-          >
-            <skill.icon size={14} />
-            <span className="text-xs font-medium tracking-wider">{skill.title}</span>
-          </button>
-        ))}
-      </motion.div>
-
       {/* VISUAL ELEMENT - Secondary */}
-      <div className={`relative w-[300px] h-[300px] md:w-[390px] md:h-[390px] lg:w-[520px] lg:h-[520px] flex items-center justify-center transition-all duration-500 max-w-[56vw] ${skillExpanded ? 'opacity-100' : 'opacity-90'}`}>
+      <div className={`relative w-[260px] h-[260px] md:w-[340px] md:h-[340px] lg:w-[440px] lg:h-[440px] flex items-center justify-center transition-all duration-500 max-w-[56vw] ${skillExpanded ? 'opacity-100' : 'opacity-90'}`}>
 
         {/* Avatar Orbit Rings */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -833,17 +873,17 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
             <motion.div
               className="flex items-center justify-center gap-1.5 md:gap-2"
               initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 0.9, y: 0 }}
+              animate={{ opacity: 0.6, y: 0 }}
               transition={{ delay: 0.65, duration: 0.5, ease: "easeOut" }}
             >
-              <span className="h-px w-3 md:w-5 bg-white/28" />
+              <span className="h-px w-3 md:w-5 bg-white/22" />
               <span
-                className="whitespace-nowrap text-[9px] sm:text-[10px] md:text-xs uppercase tracking-[0.14em] sm:tracking-[0.18em] text-white/82 font-semibold"
+                className="whitespace-nowrap text-[9px] sm:text-[10px] md:text-xs uppercase tracking-[0.14em] sm:tracking-[0.18em] text-white/70 font-medium"
                 style={{ textShadow: '0 8px 18px rgba(0,0,0,0.55)' }}
               >
                 Double diamond enthusiast
               </span>
-              <span className="h-px w-3 md:w-5 bg-white/28" />
+              <span className="h-px w-3 md:w-5 bg-white/22" />
             </motion.div>
           </div>
 
@@ -921,29 +961,28 @@ const Hero: React.FC<Props> = ({ onOpenProfile, active = true }) => {
 
       </div>
 
-      {/* Name Display - Now the introduction, hits harder after headline */}
+      {/* MOBILE SKILLS ROW — demoted to a quiet footer strip below the avatar */}
       <motion.div
-        className="text-center relative z-20 pointer-events-auto max-w-[700px] px-5 md:px-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.6 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, duration: 0.6, ease: "easeOut" }}
+        className="flex md:hidden flex-wrap justify-center gap-1.5 w-full px-6 relative z-40 pointer-events-auto mb-8"
       >
-        <div className="absolute inset-x-0 top-1/2 h-28 md:h-36 -translate-y-1/2 rounded-full bg-black/38 blur-3xl -z-10" />
-        <p
-          className="text-sm sm:text-base md:text-xl lg:text-2xl font-normal text-white leading-snug tracking-tight mb-2 md:whitespace-nowrap"
-          style={{ textShadow: '0 10px 26px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.5)' }}
-        >
-          I make AI tangible.
-        </p>
-
-
-        <span
-          className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/72 font-normal block mb-6"
-          style={{ textShadow: '0 6px 18px rgba(0,0,0,0.5)' }}
-        >
-          Design fluency for technologists · Technical fluency for designers
-        </span>
+        {skillsTimelineData.map((skill) => (
+          <button
+            key={skill.id}
+            onClick={() => handleActiveNodeChange(skill.id)}
+            aria-expanded={activeSkillId === skill.id}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border backdrop-blur-md transition-all duration-300 ${activeSkillId === skill.id ? "bg-white text-black border-white shadow-lg shadow-white/30" : "bg-black/35 text-white/60 border-white/15"}`}
+          >
+            <skill.icon size={12} />
+            <span className="text-[11px] font-medium tracking-wide">{skill.title}</span>
+          </button>
+        ))}
       </motion.div>
+
+      {/* Desktop spacer so justify-between keeps the avatar off the bottom edge */}
+      <div className="hidden md:block h-8" aria-hidden="true" />
     </div>
   );
 };

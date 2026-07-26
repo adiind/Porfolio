@@ -16,6 +16,34 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
     onClose();
   };
 
+  // Rendered twice: near the top on mobile (so the actions are reachable
+  // without scrolling past the bio) and pinned to the bottom on desktop.
+  const actionLinks = (
+    <>
+      <a
+        href={SOCIAL_LINKS.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent('linkedin_clicked', { source: 'profile_modal' })}
+        className="flex min-h-11 items-center gap-2 px-5 py-2.5 bg-[#0077b5] hover:bg-[#006396] text-white rounded-lg transition-all shadow-lg hover:shadow-blue-500/20 font-medium text-sm"
+      >
+        <Linkedin size={16} />
+        <span>Connect on LinkedIn</span>
+      </a>
+      <a
+        href={SOCIAL_LINKS.resume}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent('resume_viewed', { source: 'profile_modal' })}
+        className="flex min-h-11 items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/10 font-medium text-sm group"
+      >
+        <FileText size={16} className="text-rose-400 group-hover:text-rose-300" />
+        <span>View Resume</span>
+        <ExternalLink size={12} className="opacity-50 ml-1" />
+      </a>
+    </>
+  );
+
   return (
     <motion.div
       ref={dialogRef}
@@ -62,6 +90,11 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
             <p className="text-rose-400 font-medium tracking-wide uppercase text-sm">Tangible AI · Product Design · Creative Technology</p>
           </div>
 
+          {/* Mobile: actions surfaced above the bio so they're reachable without scrolling */}
+          <div className="flex md:hidden flex-wrap gap-3 mb-6">
+            {actionLinks}
+          </div>
+
           <div className="space-y-4 text-gray-300 text-sm leading-relaxed mb-6 font-light">
             {PROFILE_BIO.split('\n\n').map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
@@ -82,28 +115,9 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
             </div>
           </div>
 
-          <div className="mt-auto pt-6 border-t border-white/5 flex flex-wrap gap-4">
-            <a
-              href={SOCIAL_LINKS.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackEvent('linkedin_clicked', { source: 'profile_modal' })}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#0077b5] hover:bg-[#006396] text-white rounded-lg transition-all shadow-lg hover:shadow-blue-500/20 font-medium text-sm"
-            >
-              <Linkedin size={16} />
-              <span>Connect on LinkedIn</span>
-            </a>
-            <a
-              href={SOCIAL_LINKS.resume}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackEvent('resume_viewed', { source: 'profile_modal' })}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/10 font-medium text-sm group"
-            >
-              <FileText size={16} className="text-rose-400 group-hover:text-rose-300" />
-              <span>View Resume</span>
-              <ExternalLink size={12} className="opacity-50 ml-1" />
-            </a>
+          {/* Desktop: actions anchored at the bottom of the content column */}
+          <div className="mt-auto pt-6 border-t border-white/5 hidden md:flex flex-wrap gap-4">
+            {actionLinks}
           </div>
         </div>
       </motion.div>

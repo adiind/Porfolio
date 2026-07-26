@@ -320,13 +320,19 @@ const MobileTimeline: React.FC<Props> = ({
 
     return (
         <div className="px-5 py-8 space-y-10 pb-32">
-            {/* TinkerVerse Box at Top */}
+            {/* Professional experience leads the career-reading path */}
+            {corporate.length > 0 && renderSection('Experience', corporate, 'text-indigo-400')}
+
+            {/* Education Section */}
+            {education.length > 0 && renderSection('Education', education, 'text-rose-400')}
+
+            {/* TinkerVerse — supporting maker/community module after the formal narrative */}
             {tinkerverse && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="w-full p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-pointer active:scale-[0.98] transition-transform backdrop-blur-sm shadow-amber-900/10 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+                    className="w-full p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-pointer active:scale-[0.98] transition-transform backdrop-blur-sm shadow-amber-900/10 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
                     onClick={onOpenTinkerVerse}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -338,7 +344,7 @@ const MobileTimeline: React.FC<Props> = ({
                     tabIndex={0}
                     aria-label="Open TinkerVerse"
                 >
-                    <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-4">
                         <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="w-10 h-10 rounded-lg bg-white p-0.5 object-cover" />
                         <div className="flex-1">
                             <h3 className="font-bold text-amber-100 text-base">TinkerVerse</h3>
@@ -346,17 +352,11 @@ const MobileTimeline: React.FC<Props> = ({
                         </div>
                         <div className="text-amber-400 text-xs font-bold tracking-wider bg-amber-500/20 px-3 py-1 rounded-full">OPEN</div>
                     </div>
-                    <p className="text-sm text-amber-100/70 leading-relaxed font-light">
-                        A sandbox for physical computing and creative tech — from 3D printing to IoT prototypes, all documented on Instagram.
+                    <p className="text-sm text-amber-100/70 leading-relaxed font-light mt-3 line-clamp-2">
+                        Independent making and community work — physical computing and creative tech experiments, documented on Instagram.
                     </p>
                 </motion.div>
             )}
-
-            {/* Education Section */}
-            {education.length > 0 && renderSection('Education', education, 'text-rose-400')}
-
-            {/* Corporate Section */}
-            {corporate.length > 0 && renderSection('Experience', corporate, 'text-indigo-400')}
         </div>
     );
 };
