@@ -41,7 +41,7 @@
     "summary": "Live with @formlabs!",
     "url": "https://www.instagram.com/p/DaCPDMMgMGG/",
     "caption": "Live with @formlabs!",
-    "likes": 1840,
+    "likes": 1844,
     "comments": 29
   },
   {
@@ -50,7 +50,7 @@
     "summary": "Industrial automation!",
     "url": "https://www.instagram.com/p/DaCOtOeAUJb/",
     "caption": "Industrial automation!",
-    "likes": 246,
+    "likes": 250,
     "comments": 7
   },
   {
@@ -420,7 +420,7 @@
     "url": "https://www.instagram.com/p/DDqweMUT021/",
     "caption": "Meet Helios! 🌞\nIt’s the culmination of many of my skills, testing not only mine but my 3D printer’s tolerances.\nAll parts for Helios was designed in such a way that they print without supports. This was one of the largest designs I could think of on my print bed.\nThis also tested my capabilities in mechanical modelling, thanks to you all for recommending to use a ring gear.\nThe drilling at the start was not necessary but I did print the initial base without the wire cutout, to avoid waste I just drilled instead.\nFor an instant IOT addition I’ve added a smart lamp in there, making the project a physical first but with smart convinces product.\nThe files for the lamp will be on my thingyverse and GitHub!#\nTell me your thoughts on the project in the comments!\n\n#diy #lamp #3dprinting #iot",
     "likes": 237,
-    "comments": 15
+    "comments": 13
   },
   {
     "id": "https://www.instagram.com/p/DDYn_KUTIPx/",
@@ -546,7 +546,7 @@
     "url": "https://www.instagram.com/p/C-x-BKqysf4/",
     "caption": "Here I’ve achieved a feat on my 8yr old MI tablet running super old android that I couldn’t on my latest and greatest iPhone 15 pro!\nYes you read that right, I can’t do this on an iPhone.\nThis is due to security restrictions and need for permissions for everything in ios, it has definitely made it more secure but we did lose some functionality.\nSo here I was able to fetch the device orientation details as yaw pitch and role (alpha beta gamma), then I was able to map it to steering control, I tried mapping the movement to forward and backward tilt but I’m not good enough driver to control it like that.\nAnyway,  I was also able to have some proper mapping and create a AsyncWebserver with a websocket for fast and reliable connection. This was one of the biggest problem statement for me as typical R.C modules cost 10x the actual cost of this project. (7-10k)\n\nRequest me in the comments to share steps and how to create this on @instructables, and if actually people want it , I’ll make it!\n\n#tinkertronics #diy #electronics #esp8266 \n#microcontroller #car #rc #rccars #mechanicalengineering  #Conceptbytes",
     "likes": 33,
-    "comments": 5
+    "comments": 4
   },
   {
     "id": "https://www.instagram.com/p/C-pmAFYvpb8/",
