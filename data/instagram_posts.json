@@ -14,7 +14,7 @@
     "summary": "Meet Glyph!",
     "url": "https://www.instagram.com/p/DaheCVMi-A0/",
     "caption": "Meet Glyph!",
-    "likes": 19,
+    "likes": 20,
     "comments": 0
   },
   {
@@ -50,7 +50,7 @@
     "summary": "Industrial automation!",
     "url": "https://www.instagram.com/p/DaCOtOeAUJb/",
     "caption": "Industrial automation!",
-    "likes": 254,
+    "likes": 262,
     "comments": 7
   },
   {
@@ -348,7 +348,7 @@
     "url": "https://www.instagram.com/p/DKGhVkazqCF/",
     "caption": "A simple idea, a simple solution—packed with design lessons! 🚀\nFeels like my first true multi-part 3D-print + IoT + embedded-electronics + lighting project.\n\nMy goal was to craft a physical product that shows where my design game is right now—and I think I nailed it. ✔️\n\nFunction-first dispenser:\n• Wireless control 📶\n• RGB “boob” light 🌈\n• Continuous-flow and 30 ml “peg” modes 🥃\n• Proximity sensor with quick toggle 🤖\n\nAll wrapped in clean, modular aesthetics that snap right into place. ✨ #tinkerverse",
     "likes": 205,
-    "comments": 9
+    "comments": 10
   },
   {
     "id": "https://www.instagram.com/p/DJqFANrv1TL/",
@@ -384,7 +384,7 @@
     "url": "https://www.instagram.com/p/DICISpXvndg/",
     "caption": "Not everything needs to be built from the scratch, many of my projects till date were for me to learn the underlying tech.\nHere is where I pivot. 🔄\n\nHere I tried to create the simplest solution that checked all my boxes:\n1. Smart \n2. Small\n3. Simple \n4. Durable\n5. Can handle Ender’s load\n6. Cheap\n7. Manual switches too\n8. And of course pleasant to look at\n\nThe prewired board actually came in cheaper than individual panels, and it saved me a lot of wiring time too.\nThe combined board is also great price for what it does, 600 rupees for the whole board, it uses UART from the ESP-01 to control the relay, I’ve connected it to my home assistant which orchestrates everything.\n#diy #electronics #microcontroller #esp8266 #smarthome",
     "likes": 170,
-    "comments": 9
+    "comments": 2
   },
   {
     "id": "https://www.instagram.com/p/DF4N2-8zdv6/",
