@@ -50,8 +50,8 @@
     "summary": "Industrial automation!",
     "url": "https://www.instagram.com/p/DaCOtOeAUJb/",
     "caption": "Industrial automation!",
-    "likes": 262,
-    "comments": 7
+    "likes": 269,
+    "comments": 8
   },
   {
     "id": "https://www.instagram.com/p/DZ1NC2is0ik/",
@@ -384,7 +384,7 @@
     "url": "https://www.instagram.com/p/DICISpXvndg/",
     "caption": "Not everything needs to be built from the scratch, many of my projects till date were for me to learn the underlying tech.\nHere is where I pivot. 🔄\n\nHere I tried to create the simplest solution that checked all my boxes:\n1. Smart \n2. Small\n3. Simple \n4. Durable\n5. Can handle Ender’s load\n6. Cheap\n7. Manual switches too\n8. And of course pleasant to look at\n\nThe prewired board actually came in cheaper than individual panels, and it saved me a lot of wiring time too.\nThe combined board is also great price for what it does, 600 rupees for the whole board, it uses UART from the ESP-01 to control the relay, I’ve connected it to my home assistant which orchestrates everything.\n#diy #electronics #microcontroller #esp8266 #smarthome",
     "likes": 170,
-    "comments": 2
+    "comments": 9
   },
   {
     "id": "https://www.instagram.com/p/DF4N2-8zdv6/",
@@ -420,7 +420,7 @@
     "url": "https://www.instagram.com/p/DDqweMUT021/",
     "caption": "Meet Helios! 🌞\nIt’s the culmination of many of my skills, testing not only mine but my 3D printer’s tolerances.\nAll parts for Helios was designed in such a way that they print without supports. This was one of the largest designs I could think of on my print bed.\nThis also tested my capabilities in mechanical modelling, thanks to you all for recommending to use a ring gear.\nThe drilling at the start was not necessary but I did print the initial base without the wire cutout, to avoid waste I just drilled instead.\nFor an instant IOT addition I’ve added a smart lamp in there, making the project a physical first but with smart convinces product.\nThe files for the lamp will be on my thingyverse and GitHub!#\nTell me your thoughts on the project in the comments!\n\n#diy #lamp #3dprinting #iot",
     "likes": 237,
-    "comments": 15
+    "comments": 13
   },
   {
     "id": "https://www.instagram.com/p/DDYn_KUTIPx/",
@@ -438,7 +438,7 @@
     "url": "https://www.instagram.com/p/DDUmuGEv_ww/",
     "caption": "The perfectionist in me didn’t work properly without my perfect conditions, I needed some soul quenching warm light to light my setup, it of course had to be concentrated to my desk for that smartphone’s sensor and it had to be top down.\nObviously it won’t be a Tinker Verse project without it being smart, I had a smart switch breaker lying around so used that, maybe I’ll create another PIR sensor setup for the desk later.\n#diy #lighting #desksetup #smart #smarthome",
     "likes": 185,
-    "comments": 13
+    "comments": 5
   },
   {
     "id": "https://www.instagram.com/p/DCMjkgEMbsA/",
@@ -447,7 +447,7 @@
     "url": "https://www.instagram.com/p/DCMjkgEMbsA/",
     "caption": "You too can make your own Alfred/Jarvis! 👨‍💻\nCheckout my YouTube channel for the full video and GitHub for all files to recreate your own assistant!\n#jarvis #alfred #ai #iot #smarthome",
     "likes": 128,
-    "comments": 8
+    "comments": 6
   },
   {
     "id": "https://www.instagram.com/p/DAI3nmbPb5W/",
@@ -510,7 +510,7 @@
     "url": "https://www.instagram.com/p/C_Mx7B2z3y7/",
     "caption": "Comment RC Car 🚗 and I’ll share the code in your DMs \n\nWhat I loved in this setup was the D1 mini stack, the battery charging module, then the d1 mini itself and then the motor driver just stacked up so perfectly!\n\n#diy #electronics #tech #microcontroller #esp8266 #rccars",
     "likes": 217,
-    "comments": 7
+    "comments": 5
   },
   {
     "id": "https://www.instagram.com/p/C--ciwvvFRj/",
@@ -717,7 +717,7 @@
     "url": "https://www.instagram.com/p/C9SX5aws2hG/",
     "caption": "Comment literally anything below and I’ll send it to you, even if you’re on android",
     "likes": 43,
-    "comments": 5
+    "comments": 1
   },
   {
     "id": "https://www.instagram.com/p/C9M8iNjoYBY/",
