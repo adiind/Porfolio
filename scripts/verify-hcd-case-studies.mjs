@@ -57,6 +57,17 @@ const forbiddenPublicPatterns = [
   /\bverification\b/i,
 ];
 
+const rendererForbiddenPublicPatterns = [
+  ['Figma', /\bfigma\b/i],
+  ['View source/source-label UI', /\bview\s+source\b|\bsource[-\s]?label\b/i],
+  ['Boundary', /\bboundary\b/i],
+  ['evidence', /\bevidence\b/i],
+  ['provenance', /\bprovenance\b/i],
+  ['verification', /\bverification\b/i],
+  ['artifact', /\bartifact\b/i],
+  ['proof', /\bproof\b/i],
+];
+
 const sharedRequirements = {
   'components/hcd/types.ts': [
     'export interface HcdVisual',
@@ -174,6 +185,16 @@ function verifyShared() {
       if (source.includes(marker)) {
         errors.push(`${relativePath} contains forbidden marker: ${marker}`);
       }
+    }
+  }
+
+  const rendererPath = 'components/hcd/HcdCaseStudy.tsx';
+  const rendererAbsolutePath = requireFile(rendererPath);
+  if (!rendererAbsolutePath) return;
+  const rendererSource = fs.readFileSync(rendererAbsolutePath, 'utf8');
+  for (const [label, pattern] of rendererForbiddenPublicPatterns) {
+    if (pattern.test(rendererSource)) {
+      errors.push(`${rendererPath} contains forbidden public language: ${label}`);
     }
   }
 }
