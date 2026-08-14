@@ -10,7 +10,7 @@ export interface HcdEvidence {
   caption: string;
   sourceUrl: string;
   sourceLabel: string;
-  treatment: 'full' | 'focus' | 'editorial';
+  treatment: HcdTreatment;
   aspect?: string;
   objectPosition?: string;
 }

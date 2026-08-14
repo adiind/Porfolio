@@ -13,7 +13,7 @@ const errors = [];
 const sharedRequirements = {
   'components/hcd/types.ts': [
     'export interface HcdEvidence',
-    "treatment: 'full' | 'focus' | 'editorial'",
+    'treatment: HcdTreatment;',
     'export interface HcdProjectStory',
   ],
   'components/hcd/HcdCaseStudy.tsx': [
@@ -25,8 +25,25 @@ const sharedRequirements = {
     'sizes=',
     'prefers-reduced-motion',
     'View source in Figma',
+    'onClick={() => scrollToChapter(chapter.key)}',
+    'ref={setClosePortalTarget}',
+    'ReactDOM.createPortal(',
+    'closePortalTarget,',
+    'LIGHTBOX_FOCUSABLE',
+    'lightboxRef.current?.querySelectorAll<HTMLElement>',
+    'event.shiftKey',
   ],
   'scripts/build-hcd-assets.py': ['Image.Resampling.LANCZOS', "format='WEBP'"],
+};
+
+const sharedForbiddenMarkers = {
+  'components/hcd/types.ts': ["treatment: 'full' | 'focus' | 'editorial'"],
+  'components/hcd/HcdCaseStudy.tsx': [
+    'href={`#${story.projectId}-${chapter.key}`}',
+    'lightboxCloseRef.current?.focus();',
+    'text-white/45',
+    'document.body,',
+  ],
 };
 
 const canonicalEvidence = {
@@ -90,6 +107,16 @@ function requireMarkers(relativePath, markers) {
 function verifyShared() {
   for (const [relativePath, markers] of Object.entries(sharedRequirements)) {
     requireMarkers(relativePath, markers);
+  }
+  for (const [relativePath, markers] of Object.entries(sharedForbiddenMarkers)) {
+    const absolutePath = requireFile(relativePath);
+    if (!absolutePath) continue;
+    const source = fs.readFileSync(absolutePath, 'utf8');
+    for (const marker of markers) {
+      if (source.includes(marker)) {
+        errors.push(`${relativePath} contains forbidden marker: ${marker}`);
+      }
+    }
   }
 }
 

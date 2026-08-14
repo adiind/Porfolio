@@ -36,6 +36,8 @@ const chapterGrid: Record<string, string> = {
   wide: 'grid-cols-1',
 };
 
+const LIGHTBOX_FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 function usePrefersReducedMotion() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -85,7 +87,7 @@ const EvidenceFigure: React.FC<{
       <figcaption className="grid gap-3 py-4 text-sm leading-relaxed text-white/65 sm:grid-cols-[1fr_auto] sm:items-start">
         <span>
           <span className="block">{evidence.caption}</span>
-          <span className="mt-2 block font-mono text-[9px] uppercase tracking-[0.16em] text-white/45">{evidence.sourceLabel}</span>
+          <span className="mt-2 block font-mono text-[9px] uppercase tracking-[0.16em] text-white/60">{evidence.sourceLabel}</span>
         </span>
         <a
           href={evidence.sourceUrl}
@@ -109,7 +111,9 @@ export const HcdCaseStudyShell: React.FC<{
   const activeEvidenceRef = useRef<HcdEvidence | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const lightboxCloseRef = useRef<HTMLButtonElement | null>(null);
+  const lightboxRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [closePortalTarget, setClosePortalTarget] = useState<HTMLDivElement | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const theme = THEMES[story.accent];
   const titleId = `hcd-${story.projectId}-title`;
@@ -131,9 +135,16 @@ export const HcdCaseStudyShell: React.FC<{
         event.stopImmediatePropagation();
         closeLightbox();
       } else if (event.key === 'Tab') {
+        const focusable = [...(lightboxRef.current?.querySelectorAll<HTMLElement>(LIGHTBOX_FOCUSABLE) ?? [])]
+          .filter((element) => element.offsetParent !== null || element === document.activeElement);
+        if (!focusable.length) return;
+        const activeIndex = focusable.indexOf(document.activeElement as HTMLElement);
+        const nextIndex = event.shiftKey
+          ? (activeIndex <= 0 ? focusable.length - 1 : activeIndex - 1)
+          : (activeIndex < 0 || activeIndex === focusable.length - 1 ? 0 : activeIndex + 1);
         event.preventDefault();
         event.stopImmediatePropagation();
-        lightboxCloseRef.current?.focus();
+        focusable[nextIndex].focus();
       }
     };
     window.addEventListener('keydown', handleLightboxKeyDown, true);
@@ -156,6 +167,13 @@ export const HcdCaseStudyShell: React.FC<{
 
   const scrollToStory = () => {
     scrollRef.current?.querySelector<HTMLElement>('[data-hcd-chapter]')?.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  };
+
+  const scrollToChapter = (chapterKey: string) => {
+    scrollRef.current?.querySelector<HTMLElement>(`[data-hcd-chapter="${chapterKey}"]`)?.scrollIntoView({
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
       block: 'start',
     });
@@ -200,7 +218,9 @@ export const HcdCaseStudyShell: React.FC<{
         }
       `}</style>
 
-      {!activeEvidence && ReactDOM.createPortal(
+      <div ref={setClosePortalTarget} className="contents" />
+
+      {!activeEvidence && closePortalTarget && ReactDOM.createPortal(
         <button
           type="button"
           onClick={onClose}
@@ -210,7 +230,7 @@ export const HcdCaseStudyShell: React.FC<{
           <X aria-hidden="true" size={18} strokeWidth={2.25} />
           <span className="hidden sm:inline">Close</span>
         </button>,
-        document.body,
+        closePortalTarget,
       )}
 
       <div ref={scrollRef} className="h-full overflow-y-auto overflow-x-hidden overscroll-contain">
@@ -237,11 +257,11 @@ export const HcdCaseStudyShell: React.FC<{
 
               <div className="mt-12 grid gap-5 border-t border-[var(--hcd-rule)] pt-6 text-sm sm:grid-cols-2">
                 <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">Role</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/60">Role</p>
                   <p className="mt-2 leading-relaxed text-white/75">{story.role}</p>
                 </div>
                 <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">Boundary</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/60">Boundary</p>
                   <p className="mt-2 leading-relaxed text-white/75">{story.status}</p>
                 </div>
               </div>
@@ -264,13 +284,14 @@ export const HcdCaseStudyShell: React.FC<{
         <div className="border-b border-[var(--hcd-rule)] bg-[#0d0e0b]">
           <nav aria-label={`${story.title} chapters`} className="mx-auto flex max-w-[1600px] gap-5 overflow-x-auto px-5 py-4 sm:px-8 md:px-12 lg:px-16">
             {story.chapters.map((chapter) => (
-              <a
+              <button
+                type="button"
                 key={chapter.key}
-                href={`#${story.projectId}-${chapter.key}`}
+                onClick={() => scrollToChapter(chapter.key)}
                 className="shrink-0 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/55 underline decoration-transparent underline-offset-4 hover:text-[var(--hcd-accent)] hover:decoration-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)]"
               >
                 {chapter.index} · {chapter.eyebrow}
-              </a>
+              </button>
             ))}
           </nav>
         </div>
@@ -343,6 +364,7 @@ export const HcdCaseStudyShell: React.FC<{
 
       {activeEvidence && (
         <div
+          ref={lightboxRef}
           role="dialog"
           aria-modal="true"
           aria-label={`Full evidence: ${activeEvidence.alt}`}
