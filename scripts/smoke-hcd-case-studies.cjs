@@ -29,7 +29,7 @@ if (!baseUrl) {
 }
 
 const sectionKeys = ['situation', 'learning', 'idea', 'mechanics', 'reflection'];
-const forbiddenPublicText = /\b(evidence|boundary|provenance|verification)\b|view source|figma/i;
+const forbiddenPublicText = /\b(?:evidence|boundary|provenance|verification|source|artifact|proof|figma)\b|\bslide\s*(?:(?:number|no\.?)\s*)?#?\s*\d+\b|\bnode(?:\s+(?:id|identifier))?\s*[:#-]?\s*\d+(?::\d+)+\b|\b\d{1,6}:\d{1,6}\b|\b(?:board|file)(?:\s+(?:name|label))?\s*:/i;
 
 const projects = [
   {
@@ -148,6 +148,144 @@ async function activateWithKeyboard(page, control) {
   await page.keyboard.press('Enter');
 }
 
+async function assertNoForbiddenVisitorLanguage(root, context) {
+  assert.doesNotMatch(await root.innerText(), forbiddenPublicText, `${context}: no forbidden rendered public language`);
+
+  const labelledElements = await root.locator('[aria-label], [title], [alt]').evaluateAll((elements) => elements.map((element) => ({
+    tag: element.tagName,
+    ariaLabel: element.getAttribute('aria-label') ?? '',
+    title: element.getAttribute('title') ?? '',
+    alt: element.getAttribute('alt') ?? '',
+  })));
+  for (const element of labelledElements) {
+    assert.doesNotMatch(
+      `${element.ariaLabel} ${element.title} ${element.alt}`,
+      forbiddenPublicText,
+      `${context}: ${element.tag} accessible label/title/alt has no forbidden public language`,
+    );
+  }
+
+  const links = await root.locator('a').evaluateAll((elements) => elements.map((element) => ({
+    text: element.innerText.trim(),
+    href: element.getAttribute('href') ?? '',
+    ariaLabel: element.getAttribute('aria-label') ?? '',
+    title: element.getAttribute('title') ?? '',
+  })));
+  for (const link of links) {
+    assert.doesNotMatch(
+      `${link.text} ${link.href} ${link.ariaLabel} ${link.title}`,
+      forbiddenPublicText,
+      `${context}: public link has no forbidden text or destination (${JSON.stringify(link)})`,
+    );
+  }
+}
+
+async function assertCaseStudyOverflow(projectDialog, project) {
+  const workshopSurface = projectDialog.locator('[data-hcd-workshop-surface]');
+  const scrollContainer = workshopSurface.locator('..');
+  assert.equal(await scrollContainer.count(), 1, `${project.title}: one internal case-study scroll container`);
+
+  const state = await scrollContainer.evaluate((container) => {
+    const containerRect = container.getBoundingClientRect();
+    const epsilon = 1;
+    const offenders = [];
+
+    for (const element of container.querySelectorAll('*')) {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) continue;
+      if (rect.left < containerRect.left - epsilon || rect.right > containerRect.right + epsilon) {
+        offenders.push({
+          tag: element.tagName,
+          marker: element.getAttribute('data-hcd-section')
+            ?? element.getAttribute('data-hcd-visual-id')
+            ?? element.getAttribute('data-hcd-post-it')
+            ?? element.getAttribute('aria-label')
+            ?? element.className?.toString().slice(0, 100)
+            ?? '',
+          left: Math.round(rect.left * 100) / 100,
+          right: Math.round(rect.right * 100) / 100,
+        });
+      }
+    }
+
+    const style = getComputedStyle(container);
+    return {
+      clientWidth: container.clientWidth,
+      scrollWidth: container.scrollWidth,
+      overflowX: style.overflowX,
+      overflowY: style.overflowY,
+      containerLeft: Math.round(containerRect.left * 100) / 100,
+      containerRight: Math.round(containerRect.right * 100) / 100,
+      offenders,
+    };
+  });
+
+  assert.equal(state.overflowX, 'hidden', `${project.title}: internal container clips horizontal overflow`);
+  assert.equal(state.overflowY, 'auto', `${project.title}: internal container owns vertical scrolling`);
+  assert.ok(
+    state.scrollWidth <= state.clientWidth + 1,
+    `${project.title}: internal horizontal overflow ${state.scrollWidth}px > ${state.clientWidth}px`,
+  );
+  assert.deepEqual(
+    state.offenders,
+    [],
+    `${project.title}: descendants remain inside internal container bounds ${state.containerLeft}px–${state.containerRight}px`,
+  );
+}
+
+async function assertPortalOverflow(lightbox, panRegion, visualId) {
+  assert.equal(
+    await lightbox.evaluate((element) => element.parentElement === document.body),
+    true,
+    `${visualId}: full view is portaled to document.body`,
+  );
+
+  const state = await lightbox.evaluate((dialog) => {
+    const pan = dialog.querySelector('[role="region"]');
+    const viewportLeft = 0;
+    const viewportRight = document.documentElement.clientWidth;
+    const epsilon = 1;
+    const offenders = [];
+
+    for (const element of [dialog, ...dialog.querySelectorAll('*')]) {
+      if (pan && element !== pan && pan.contains(element)) continue;
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) continue;
+      if (rect.left < viewportLeft - epsilon || rect.right > viewportRight + epsilon) {
+        offenders.push({
+          tag: element.tagName,
+          label: element.getAttribute('aria-label') ?? element.textContent?.trim().slice(0, 80) ?? '',
+          left: Math.round(rect.left * 100) / 100,
+          right: Math.round(rect.right * 100) / 100,
+        });
+      }
+    }
+
+    return {
+      clientWidth: dialog.clientWidth,
+      scrollWidth: dialog.scrollWidth,
+      viewportRight,
+      offenders,
+    };
+  });
+
+  assert.ok(
+    state.scrollWidth <= state.clientWidth + 1,
+    `${visualId}: portaled viewer outer overflow ${state.scrollWidth}px > ${state.clientWidth}px`,
+  );
+  assert.deepEqual(
+    state.offenders,
+    [],
+    `${visualId}: portaled viewer chrome stays inside the ${state.viewportRight}px viewport; the pan-region image is intentionally excluded`,
+  );
+  assert.ok(
+    await panRegion.evaluate((element) => element.scrollWidth > element.clientWidth && element.scrollHeight > element.clientHeight),
+    `${visualId}: intentional image overflow remains contained inside the pan region`,
+  );
+}
+
 async function assertPublicStory(projectDialog, project) {
   assertNoPublicSourceMetadata(project.story, project.title);
 
@@ -173,7 +311,7 @@ async function assertPublicStory(projectDialog, project) {
   assert.equal(await projectDialog.getByText(project.closingContext, { exact: true }).count(), 1, `${project.title}: exact closing context once`);
   assert.equal(await projectDialog.locator('a[href*="figma.com"]').count(), 0, `${project.title}: no public Figma links`);
   assert.equal(await projectDialog.locator('nav').count(), 0, `${project.title}: no chapter navigation`);
-  assert.doesNotMatch(await projectDialog.innerText(), forbiddenPublicText, `${project.title}: no forbidden public language`);
+  await assertNoForbiddenVisitorLanguage(projectDialog, `${project.title} normal case study`);
 }
 
 async function assertVisuals(projectDialog, project) {
@@ -189,6 +327,12 @@ async function assertVisuals(projectDialog, project) {
   assert.equal(renderedIds.length, project.visualCount, `${project.title}: rendered visual count`);
   assert.equal(new Set(renderedIds).size, renderedIds.length, `${project.title}: rendered visual IDs must be unique`);
   assert.deepEqual([...renderedIds].sort(), [...expectedIds].sort(), `${project.title}: rendered visual set`);
+
+  const viewLargerLabels = projectDialog.getByText('View larger', { exact: true });
+  assert.equal(await viewLargerLabels.count(), project.visualCount, `${project.title}: one exact View larger label per visual`);
+  for (let index = 0; index < project.visualCount; index += 1) {
+    assert.equal(await viewLargerLabels.nth(index).isVisible(), true, `${project.title}: View larger label ${index + 1} is visible`);
+  }
 
   for (const visual of expectedVisuals) {
     assert.ok(visual.alt.trim().length >= 20, `${visual.id}: alt text must be specific`);
@@ -222,6 +366,9 @@ async function assertLightbox(page, projectDialog, project, viewport) {
   const lightbox = page.getByRole('dialog', { name: `Full view: ${visual.alt}`, exact: true });
   await lightbox.waitFor({ state: 'visible' });
   assert.equal(await projectDialog.isVisible(), true, `${visual.id}: project remains open behind full view`);
+  const fitStatus = lightbox.getByText('Fit to screen', { exact: true });
+  assert.equal(await fitStatus.count(), 1, `${visual.id}: one exact Fit to screen status`);
+  assert.equal(await fitStatus.isVisible(), true, `${visual.id}: Fit to screen status is visible`);
 
   const fullImage = lightbox.locator('img');
   assert.equal(new URL(await fullImage.getAttribute('src'), baseUrl).pathname, visual.fullSrc, `${visual.id}: full asset source`);
@@ -234,6 +381,14 @@ async function assertLightbox(page, projectDialog, project, viewport) {
   assert.equal(await fullSizeButton.count(), 1, `${visual.id}: one full-size control`);
   assert.equal(await fullSizeButton.getAttribute('aria-label'), 'View image at full size', `${visual.id}: full-size control label`);
   assert.equal(await fullSizeButton.getAttribute('aria-pressed'), 'false', `${visual.id}: initial fit state`);
+  const fullSizeText = fullSizeButton.getByText('Full size', { exact: true });
+  assert.equal(await fullSizeText.count(), 1, `${visual.id}: exact Full size control text exists`);
+  assert.equal(
+    await fullSizeText.isVisible(),
+    viewport.label === 'desktop',
+    `${visual.id}: Full size text follows the approved desktop-visible/mobile-icon responsive treatment`,
+  );
+  await assertNoForbiddenVisitorLanguage(lightbox, `${visual.id} portaled viewer fit state`);
   if (viewport.label === 'desktop') {
     await activateWithPointer(page, fullSizeButton, `${visual.id}: full-size control`);
   } else {
@@ -264,6 +419,8 @@ async function assertLightbox(page, projectDialog, project, viewport) {
   assert.equal(panState.overflowY, 'auto', `${visual.id}: vertical overflow is inspectable`);
   assert.ok(panState.hasHorizontalRange && panState.movedX, `${visual.id}: full-size visual pans horizontally`);
   assert.ok(panState.hasVerticalRange && panState.movedY, `${visual.id}: full-size visual pans vertically`);
+  await assertNoForbiddenVisitorLanguage(lightbox, `${visual.id} portaled viewer full-size state`);
+  await assertPortalOverflow(lightbox, panRegion, visual.id);
 
   await panRegion.focus();
   await page.keyboard.press('Escape');
@@ -291,6 +448,7 @@ async function verifyProject(browser, project, viewport) {
 
     await assertPublicStory(projectDialog, project);
     await assertVisuals(projectDialog, project);
+    await assertCaseStudyOverflow(projectDialog, project);
     await assertLightbox(page, projectDialog, project, viewport);
 
     const overflow = await page.evaluate(() => ({
@@ -313,7 +471,7 @@ async function verifyProject(browser, project, viewport) {
 
     await page.waitForLoadState('networkidle');
     assert.deepEqual(errors, [], `${project.title} ${viewport.label}: browser errors\n${errors.join('\n')}`);
-    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.visualCount} visuals, ${project.postItCount} post-its, 5 sections, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} visual/full-size activation, two-axis pan, viewer Escape/focus return, project Escape, Back, no public Figma/nav/forbidden language, no overflow/errors`);
+    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.visualCount} visuals, ${project.postItCount} post-its, 5 sections, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} visual/full-size activation, two-axis pan, viewer Escape/focus return, project Escape, Back, normal/viewer language clean, internal/descendant/portal overflow clean, no browser errors`);
   } finally {
     await page.close();
   }
