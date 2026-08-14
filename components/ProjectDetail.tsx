@@ -12,6 +12,8 @@ import GitHubActivity from './GitHubActivity';
 import { useDialogA11y } from '../hooks/useDialogA11y';
 import { projectPath } from '../lib/workRoutes';
 import GlyphProjectDetail from './GlyphProjectDetail';
+import FamilySyncProjectDetail from './hcd/FamilySyncProjectDetail';
+import McDonaldsProjectDetail from './hcd/McDonaldsProjectDetail';
 
 interface Props {
     project: Project;
@@ -450,10 +452,11 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     );
 };
 
-const ProjectDetail: React.FC<Props> = (props) => (
-    props.project.id === 'glyph'
-        ? <GlyphProjectDetail {...props} />
-        : <DefaultProjectDetail {...props} />
-);
+const ProjectDetail: React.FC<Props> = (props) => {
+    if (props.project.id === 'glyph') return <GlyphProjectDetail {...props} />;
+    if (props.project.id === 'familysync-jpmorgan') return <FamilySyncProjectDetail {...props} />;
+    if (props.project.id === 'mcdonalds-interaction-design') return <McDonaldsProjectDetail {...props} />;
+    return <DefaultProjectDetail {...props} />;
+};
 
 export default ProjectDetail;
