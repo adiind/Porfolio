@@ -45,12 +45,6 @@
       "crop": [220, 350, 1250, 2925]
     },
     {
-      "source": "review/hcd-figma-selector/assets/care-service-blueprint.png",
-      "output": "public/images/hcd/care/care-service-blueprint.webp",
-      "maxWidth": 1920,
-      "quality": 84
-    },
-    {
       "source": "review/hcd-figma-selector/assets/care-familysync-intro.png",
       "output": "public/images/hcd/care/care-familysync-intro.webp",
       "maxWidth": 1920,

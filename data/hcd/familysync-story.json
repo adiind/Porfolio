@@ -16,10 +16,10 @@
     "id": "care-visibility-presence",
     "src": "/images/hcd/care/care-visibility-presence.webp",
     "fullSrc": "/images/hcd/care/care-visibility-presence.webp",
-    "alt": "FamilySync updates showing pickup accepted, child picked up, and safely home",
-    "caption": "A strong emotional payoff frame: automatic status updates help absent caregivers remain connected without taking over the task.",
-    "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=381-2555",
-    "sourceLabel": "FINAL – TEAM CARE · slide 51",
+    "alt": "FamilySync concept showing Cynthia home with Leo while Robert and Stacy receive automatic updates",
+    "caption": "Our team used automatic handoff and home-arrival updates to show how absent caregivers could remain informed without taking over the task.",
+    "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=406-1678",
+    "sourceLabel": "FINAL – TEAM CARE · slide 50",
     "treatment": "full",
     "aspect": "16 / 9"
   },
@@ -36,8 +36,8 @@
           "id": "care-familysync-intro",
           "src": "/images/hcd/care/care-familysync-intro.webp",
           "fullSrc": "/images/hcd/care/care-familysync-intro.webp",
-          "alt": "FamilySync concept introduction",
-          "caption": "A concise concept statement: reduce logistics during routine and unexpected schedules so caregivers can focus on loved ones.",
+          "alt": "FamilySync logo on a blue gradient presentation slide",
+          "caption": "We named the concept FamilySync and used this identity frame to introduce the service before showing how it would coordinate care.",
           "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=108-3729",
           "sourceLabel": "FINAL – TEAM CARE · slide 16",
           "treatment": "full",
@@ -61,8 +61,8 @@
           "id": "care-stakeholders",
           "src": "/images/hcd/care/care-stakeholders.webp",
           "fullSrc": "/images/hcd/care/care-stakeholders.webp",
-          "alt": "FamilySync stakeholder profiles for Stacy, Robert, Cynthia, and Leo",
-          "caption": "Profiles the working parent, traveling parent, nearby grandmother, and child with distinct needs. Strong opening evidence for shared authority and coordination complexity.",
+          "alt": "FamilySync stakeholder profiles for Stacy, Robert, and Cynthia",
+          "caption": "We modeled the family around a working parent, a frequently traveling parent, and a nearby grandmother so coordination and authority would not collapse into one user.",
           "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=177-2111",
           "sourceLabel": "FINAL – TEAM CARE · slide 9",
           "treatment": "full",
@@ -73,7 +73,7 @@
           "src": "/images/hcd/care/care-trust-takeaways.webp",
           "fullSrc": "/images/hcd/care/care-trust-takeaways.webp",
           "alt": "Team Care research takeaways about care, control, trust, and privacy",
-          "caption": "Condenses the central findings: people want proactive care but retain control; institutional trust does not erase privacy boundaries. Strong evidence for the project’s design principles.",
+          "caption": "We carried two tensions forward: proactive care had to preserve control, and institutional trust did not erase privacy boundaries.",
           "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=562-3444",
           "sourceLabel": "FINAL – TEAM CARE · slide 85",
           "treatment": "full",
@@ -110,7 +110,7 @@
           "src": "/images/hcd/care/care-three-pillars.webp",
           "fullSrc": "/images/hcd/care/care-three-pillars.webp",
           "alt": "FamilySync pillars of coordination, communication, and connection",
-          "caption": "Turns research into three concept pillars. Especially useful as a compact case-study framework before showing detailed flows.",
+          "caption": "Our team translated the research into three responsibilities for the concept: coordination, communication, and connection.",
           "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=86-2402",
           "sourceLabel": "FINAL – TEAM CARE · slide 20",
           "treatment": "full",
@@ -128,7 +128,7 @@
       "index": "04",
       "eyebrow": "Journey",
       "title": "We designed the service around handoffs",
-      "intro": "The detailed flows forced our team to resolve escalation, time windows, temporary guardianship, missing information, and backstage dependencies instead of treating the assistant as a single screen.",
+      "intro": "The detailed flows forced our team to resolve escalation, time windows, temporary guardianship, and missing information instead of treating the assistant as a single screen.",
       "layout": "wide",
       "evidence": [
         {
@@ -152,23 +152,12 @@
           "sourceLabel": "Service Design – Care Bears · Clinical guardian flow",
           "treatment": "focus",
           "aspect": "2 / 5"
-        },
-        {
-          "id": "care-service-blueprint",
-          "src": "/images/hcd/care/care-service-blueprint.webp",
-          "fullSrc": "/images/hcd/care/care-service-blueprint.webp",
-          "alt": "FamilySync service blueprint presentation frame",
-          "caption": "Use when the portfolio needs explicit service-design language and visible frontstage/backstage orchestration.",
-          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=593-1873",
-          "sourceLabel": "FINAL – TEAM CARE · slide 92",
-          "treatment": "full",
-          "aspect": "16 / 9"
         }
       ],
       "takeaways": [
         "The system escalates from parents to backup guardians through explicit response windows.",
         "Clinical updates are bundled or surfaced according to significance and caregiver need.",
-        "Frontstage messages depend on backstage calendar, mobility, and service integrations."
+        "Both journeys expose the information gaps and approval decisions a caregiver would need to resolve."
       ]
     },
     {
@@ -202,7 +191,7 @@
       "index": "06",
       "eyebrow": "Interaction",
       "title": "Visibility creates presence",
-      "intro": "The hero frame captures the interaction principle we returned to: timely pickup, arrival, and safety updates let an absent caregiver stay connected without taking control away from the person doing the care.",
+      "intro": "The hero frame captures the interaction principle we returned to: handoff and home-arrival updates let absent caregivers stay connected without taking control away from the person doing the care.",
       "layout": "single",
       "evidence": [],
       "takeaways": [
@@ -215,7 +204,7 @@
       "index": "07",
       "eyebrow": "Outcome",
       "title": "A concept for care with consent",
-      "intro": "The work resolved into a service concept that connects coordination, communication, and connection while preserving clear human checkpoints. The hero is the intended payoff: support that makes care visible without making the agent the caregiver.",
+      "intro": "The work resolved into a service concept that connects coordination, communication, and connection while preserving clear human checkpoints. The home-update frame is the intended payoff: support that makes care visible without making the agent the caregiver.",
       "layout": "single",
       "evidence": [],
       "takeaways": [

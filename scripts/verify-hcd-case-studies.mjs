@@ -53,8 +53,8 @@ const canonicalEvidence = {
   care: [
     'care-stakeholders', 'care-trust-takeaways', 'care-crisis-journey',
     'care-schedule-management', 'care-clinical-guardian-flow',
-    'care-service-blueprint', 'care-familysync-intro', 'care-three-pillars',
-    'care-escalation-flow', 'care-visibility-presence',
+    'care-familysync-intro', 'care-three-pillars', 'care-escalation-flow',
+    'care-visibility-presence',
   ],
   mcdonalds: [
     'mcd-research-proof', 'mcd-research-insight', 'mcd-capabilities-gap',
@@ -241,6 +241,20 @@ function verifyProject(projectMode) {
   const unexpectedIds = [...seenIds].filter((id) => !expectedIds.includes(id));
   if (missingIds.length) errors.push(`${projectMode} is missing canonical evidence: ${missingIds.join(', ')}`);
   if (unexpectedIds.length) errors.push(`${projectMode} has unexpected evidence: ${unexpectedIds.join(', ')}`);
+
+  if (projectMode === 'care') {
+    const expectedHeroSource = 'https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=406-1678';
+    if (story.hero?.sourceUrl !== expectedHeroSource) {
+      errors.push(`care hero must use the verified home-update sequence: ${expectedHeroSource}`);
+    }
+
+    const storySource = JSON.stringify(story);
+    for (const phrase of ['Strong opening evidence', 'Strong evidence', 'Especially useful', 'Use when the portfolio needs']) {
+      if (storySource.includes(phrase)) {
+        errors.push(`care story contains selector commentary: ${phrase}`);
+      }
+    }
+  }
 }
 
 function verifyIntegration() {
