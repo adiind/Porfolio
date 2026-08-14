@@ -56,15 +56,25 @@ function usePrefersReducedMotion() {
   return prefersReducedMotion;
 }
 
+function isPortraitAspect(aspect?: string) {
+  if (!aspect) return false;
+  const [width, height] = aspect.split('/').map((part) => Number(part.trim()));
+  return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0 && width < height;
+}
+
 const ProjectVisual: React.FC<{
   visual: HcdVisual;
   isHero?: boolean;
   onOpen: (visual: HcdVisual, trigger: HTMLButtonElement) => void;
 }> = ({ visual, isHero = false, onOpen }) => {
   const objectFit = visual.treatment === 'full' ? 'object-contain' : 'object-cover';
+  const portrait = isPortraitAspect(visual.aspect);
 
   return (
-    <figure data-hcd-visual-id={visual.id} className="group min-w-0">
+    <figure
+      data-hcd-visual-id={visual.id}
+      className={`group min-w-0 ${portrait ? 'sm:mx-auto sm:w-full sm:max-w-[30rem]' : ''}`}
+    >
       <div className="hcd-project-print rounded-[0.9rem] bg-[#fffaf0] p-2 shadow-[0_15px_32px_rgba(39,31,17,0.16)] sm:p-3">
         <button
           type="button"
