@@ -352,6 +352,96 @@ async function assertVisuals(projectDialog, project) {
   }
 }
 
+async function assertCarePortraitGeometry(projectDialog, project, viewport) {
+  if (project.story.projectId !== 'familysync-jpmorgan') return;
+
+  const visualId = 'care-clinical-guardian-flow';
+  const figure = projectDialog.locator(`[data-hcd-visual-id="${visualId}"]`);
+  const trigger = figure.locator(`[data-hcd-visual-trigger="${visualId}"]`);
+  assert.equal(await figure.count(), 1, `${visualId}: one portrait figure`);
+  assert.equal(await trigger.count(), 1, `${visualId}: one portrait trigger`);
+  await figure.scrollIntoViewIfNeeded();
+
+  const geometry = await figure.evaluate((element) => {
+    const triggerElement = element.querySelector('[data-hcd-visual-trigger]');
+    const workshopSurface = element.closest('[data-hcd-workshop-surface]');
+    const scrollContainer = workshopSurface?.parentElement;
+    const availableContainer = element.parentElement;
+    if (!triggerElement || !scrollContainer || !availableContainer) throw new Error('Portrait geometry anchors are missing');
+
+    const figureRect = element.getBoundingClientRect();
+    const triggerRect = triggerElement.getBoundingClientRect();
+    const scrollRect = scrollContainer.getBoundingClientRect();
+    const availableRect = availableContainer.getBoundingClientRect();
+    const viewportWidth = document.documentElement.clientWidth;
+
+    return {
+      figure: {
+        left: figureRect.left,
+        right: figureRect.right,
+        width: figureRect.width,
+        height: figureRect.height,
+        centerX: figureRect.left + figureRect.width / 2,
+      },
+      trigger: {
+        left: triggerRect.left,
+        right: triggerRect.right,
+        width: triggerRect.width,
+        height: triggerRect.height,
+        centerX: triggerRect.left + triggerRect.width / 2,
+      },
+      scroll: {
+        left: scrollRect.left,
+        right: scrollRect.right,
+        clientWidth: scrollContainer.clientWidth,
+        scrollWidth: scrollContainer.scrollWidth,
+      },
+      available: {
+        width: availableRect.width,
+        centerX: availableRect.left + availableRect.width / 2,
+      },
+      viewportWidth,
+    };
+  });
+
+  const ratio = geometry.trigger.width / geometry.trigger.height;
+  assert.ok(ratio >= 0.38 && ratio <= 0.42, `${visualId} ${viewport.label}: trigger preserves the 2/5 portrait ratio (${ratio})`);
+  assert.ok(
+    Math.abs(geometry.figure.centerX - geometry.available.centerX) <= 10,
+    `${visualId} ${viewport.label}: figure is centered in its available row`,
+  );
+  assert.ok(
+    Math.abs(geometry.trigger.centerX - geometry.figure.centerX) <= 2,
+    `${visualId} ${viewport.label}: trigger is centered inside the figure`,
+  );
+
+  if (viewport.label === 'desktop') {
+    assert.ok(geometry.figure.width <= 500, `${visualId}: desktop figure width is capped (${geometry.figure.width}px)`);
+    assert.ok(geometry.figure.height <= 1250, `${visualId}: desktop figure height is capped (${geometry.figure.height}px)`);
+    assert.ok(geometry.trigger.width <= 500, `${visualId}: desktop trigger width is capped (${geometry.trigger.width}px)`);
+    assert.ok(geometry.trigger.height <= 1250, `${visualId}: desktop trigger height is capped (${geometry.trigger.height}px)`);
+    assert.ok(
+      geometry.figure.width < geometry.available.width / 2,
+      `${visualId}: desktop portrait no longer expands to the full ${geometry.available.width}px sheet row`,
+    );
+  } else {
+    const leftBoundary = Math.max(0, geometry.scroll.left);
+    const rightBoundary = Math.min(geometry.viewportWidth, geometry.scroll.right);
+    assert.ok(geometry.figure.left >= leftBoundary - 1, `${visualId}: mobile figure stays inside the internal scroller on the left`);
+    assert.ok(geometry.figure.right <= rightBoundary + 1, `${visualId}: mobile figure stays inside the internal scroller on the right`);
+    assert.ok(geometry.trigger.left >= leftBoundary - 1, `${visualId}: mobile trigger stays inside the viewport on the left`);
+    assert.ok(geometry.trigger.right <= rightBoundary + 1, `${visualId}: mobile trigger stays inside the viewport on the right`);
+    assert.ok(
+      geometry.figure.width >= geometry.available.width * 0.95 && geometry.figure.width <= geometry.available.width + 1,
+      `${visualId}: mobile portrait uses the available content width (${geometry.figure.width}px of ${geometry.available.width}px)`,
+    );
+    assert.ok(
+      geometry.scroll.scrollWidth <= geometry.scroll.clientWidth + 1,
+      `${visualId}: mobile portrait creates no internal horizontal overflow`,
+    );
+  }
+}
+
 async function assertLightbox(page, projectDialog, project, viewport) {
   const visual = retainedVisuals(project.story)[0];
   const trigger = projectDialog.locator(`[data-hcd-visual-trigger="${visual.id}"]`);
@@ -448,6 +538,7 @@ async function verifyProject(browser, project, viewport) {
 
     await assertPublicStory(projectDialog, project);
     await assertVisuals(projectDialog, project);
+    await assertCarePortraitGeometry(projectDialog, project, viewport);
     await assertCaseStudyOverflow(projectDialog, project);
     await assertLightbox(page, projectDialog, project, viewport);
 
@@ -471,7 +562,7 @@ async function verifyProject(browser, project, viewport) {
 
     await page.waitForLoadState('networkidle');
     assert.deepEqual(errors, [], `${project.title} ${viewport.label}: browser errors\n${errors.join('\n')}`);
-    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.visualCount} visuals, ${project.postItCount} post-its, 5 sections, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} visual/full-size activation, two-axis pan, viewer Escape/focus return, project Escape, Back, normal/viewer language clean, internal/descendant/portal overflow clean, no browser errors`);
+    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.visualCount} visuals, ${project.postItCount} post-its, 5 sections, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} visual/full-size activation, two-axis pan, viewer Escape/focus return, project Escape, Back, normal/viewer language clean, internal/descendant/portal overflow clean${project.story.projectId === 'familysync-jpmorgan' ? ', Care portrait cap/ratio/containment clean' : ''}, no browser errors`);
   } finally {
     await page.close();
   }
