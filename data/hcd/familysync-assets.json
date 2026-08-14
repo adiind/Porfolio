@@ -1,0 +1,78 @@
+{
+  "assets": [
+    {
+      "source": "review/hcd-figma-selector/assets/care-stakeholders.png",
+      "output": "public/images/hcd/care/care-stakeholders.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-trust-takeaways.png",
+      "output": "public/images/hcd/care/care-trust-takeaways.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-crisis-journey.png",
+      "output": "public/images/hcd/care/care-crisis-journey.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-schedule-management.png",
+      "output": "public/images/hcd/care/care-schedule-management.webp",
+      "maxWidth": 2400,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-schedule-management.png",
+      "output": "public/images/hcd/care/care-schedule-management-focus.webp",
+      "maxWidth": 2400,
+      "quality": 84,
+      "crop": [300, 380, 3800, 2100]
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-clinical-guardian-flow.png",
+      "output": "public/images/hcd/care/care-clinical-guardian-flow.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-clinical-guardian-flow.png",
+      "output": "public/images/hcd/care/care-clinical-guardian-flow-focus.webp",
+      "maxWidth": 1920,
+      "quality": 84,
+      "crop": [220, 350, 1250, 2925]
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-service-blueprint.png",
+      "output": "public/images/hcd/care/care-service-blueprint.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-familysync-intro.png",
+      "output": "public/images/hcd/care/care-familysync-intro.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-three-pillars.png",
+      "output": "public/images/hcd/care/care-three-pillars.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-escalation-flow.png",
+      "output": "public/images/hcd/care/care-escalation-flow.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/care-visibility-presence.png",
+      "output": "public/images/hcd/care/care-visibility-presence.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    }
+  ]
+}

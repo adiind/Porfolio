@@ -1,0 +1,230 @@
+{
+  "projectId": "familysync-jpmorgan",
+  "accent": "care",
+  "label": "Northwestern EDI · Service design concept",
+  "title": "FamilySync",
+  "proposition": "Reducing the invisible coordination work of family care without erasing control, consent, or human judgment.",
+  "context": "This was a Northwestern EDI team concept developed with JPMorgan Chase as the project partner, not a shipped JPMorgan Chase product. We explored how an agentic service might support routine and urgent family-care coordination while keeping people informed and in control.",
+  "role": "Service design · Research synthesis · Agentic interaction design",
+  "status": "Concept developed with JPMorgan Chase as the project partner",
+  "disciplines": [
+    "Service design",
+    "Research synthesis",
+    "Agentic interaction design"
+  ],
+  "hero": {
+    "id": "care-visibility-presence",
+    "src": "/images/hcd/care/care-visibility-presence.webp",
+    "fullSrc": "/images/hcd/care/care-visibility-presence.webp",
+    "alt": "FamilySync updates showing pickup accepted, child picked up, and safely home",
+    "caption": "A strong emotional payoff frame: automatic status updates help absent caregivers remain connected without taking over the task.",
+    "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=381-2555",
+    "sourceLabel": "FINAL – TEAM CARE · slide 51",
+    "treatment": "full",
+    "aspect": "16 / 9"
+  },
+  "chapters": [
+    {
+      "key": "frame",
+      "index": "01",
+      "eyebrow": "Frame",
+      "title": "Care coordination is work",
+      "intro": "Our team framed the opportunity around the logistics surrounding care, not the care itself: the calls, schedules, permissions, and updates that compete for attention when a family needs to act.",
+      "layout": "single",
+      "evidence": [
+        {
+          "id": "care-familysync-intro",
+          "src": "/images/hcd/care/care-familysync-intro.webp",
+          "fullSrc": "/images/hcd/care/care-familysync-intro.webp",
+          "alt": "FamilySync concept introduction",
+          "caption": "A concise concept statement: reduce logistics during routine and unexpected schedules so caregivers can focus on loved ones.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=108-3729",
+          "sourceLabel": "FINAL – TEAM CARE · slide 16",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "The service would support both routine schedules and sudden exceptions.",
+        "The goal was to reduce coordination burden, not replace caregiver judgment."
+      ]
+    },
+    {
+      "key": "tension",
+      "index": "02",
+      "eyebrow": "Tension",
+      "title": "Support can become surveillance",
+      "intro": "We synthesized the family as a network with different responsibilities, then made the design tension explicit: proactive support only works when permissions, privacy, and interruption remain legible.",
+      "layout": "sequence",
+      "evidence": [
+        {
+          "id": "care-stakeholders",
+          "src": "/images/hcd/care/care-stakeholders.webp",
+          "fullSrc": "/images/hcd/care/care-stakeholders.webp",
+          "alt": "FamilySync stakeholder profiles for Stacy, Robert, Cynthia, and Leo",
+          "caption": "Profiles the working parent, traveling parent, nearby grandmother, and child with distinct needs. Strong opening evidence for shared authority and coordination complexity.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=177-2111",
+          "sourceLabel": "FINAL – TEAM CARE · slide 9",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "care-trust-takeaways",
+          "src": "/images/hcd/care/care-trust-takeaways.webp",
+          "fullSrc": "/images/hcd/care/care-trust-takeaways.webp",
+          "alt": "Team Care research takeaways about care, control, trust, and privacy",
+          "caption": "Condenses the central findings: people want proactive care but retain control; institutional trust does not erase privacy boundaries. Strong evidence for the project’s design principles.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=562-3444",
+          "sourceLabel": "FINAL – TEAM CARE · slide 85",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "care-crisis-journey",
+          "src": "/images/hcd/care/care-crisis-journey.webp",
+          "fullSrc": "/images/hcd/care/care-crisis-journey.webp",
+          "alt": "Caregiver thoughts and coordination questions after a child becomes sick at school",
+          "caption": "Makes the caregiver burden legible through concurrent questions about work, pickup, food, family communication, and time.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=519-14455",
+          "sourceLabel": "FINAL – TEAM CARE · slide 14",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "Helpful behavior needs clear permission and approval boundaries.",
+        "A trusted institution still does not earn unrestricted access to personal data.",
+        "Urgency multiplies coordination tasks at the exact moment attention is scarce."
+      ]
+    },
+    {
+      "key": "opportunity",
+      "index": "03",
+      "eyebrow": "Opportunity",
+      "title": "Three principles held the concept together",
+      "intro": "We translated the research into three connected responsibilities for the service: coordinate the work, communicate what is happening, and help family members remain emotionally present.",
+      "layout": "single",
+      "evidence": [
+        {
+          "id": "care-three-pillars",
+          "src": "/images/hcd/care/care-three-pillars.webp",
+          "fullSrc": "/images/hcd/care/care-three-pillars.webp",
+          "alt": "FamilySync pillars of coordination, communication, and connection",
+          "caption": "Turns research into three concept pillars. Especially useful as a compact case-study framework before showing detailed flows.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=86-2402",
+          "sourceLabel": "FINAL – TEAM CARE · slide 20",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "Coordination organizes people, calendars, and handoffs.",
+        "Communication keeps status and next actions visible.",
+        "Connection preserves the human meaning behind the logistics."
+      ]
+    },
+    {
+      "key": "journey",
+      "index": "04",
+      "eyebrow": "Journey",
+      "title": "We designed the service around handoffs",
+      "intro": "The detailed flows forced our team to resolve escalation, time windows, temporary guardianship, missing information, and backstage dependencies instead of treating the assistant as a single screen.",
+      "layout": "wide",
+      "evidence": [
+        {
+          "id": "care-schedule-management",
+          "src": "/images/hcd/care/care-schedule-management-focus.webp",
+          "fullSrc": "/images/hcd/care/care-schedule-management.webp",
+          "alt": "Large FamilySync schedule management and pickup escalation flow",
+          "caption": "A detailed operational journey from school alert through availability checks, escalation, conflict handling, confirmation, status updates, and recap.",
+          "sourceUrl": "https://www.figma.com/board/cG0v5db8S70mQbbOaysmgg/Service-Design---Care-Bears?node-id=430-1388",
+          "sourceLabel": "Service Design – Care Bears · Schedule Management",
+          "treatment": "focus",
+          "aspect": "2 / 1"
+        },
+        {
+          "id": "care-clinical-guardian-flow",
+          "src": "/images/hcd/care/care-clinical-guardian-flow-focus.webp",
+          "fullSrc": "/images/hcd/care/care-clinical-guardian-flow.webp",
+          "alt": "Clinical care journey for a child arriving with a temporary guardian",
+          "caption": "Explores permissions, missing medical context, milestone updates, support-system handoffs, and caregiver visibility during a clinical visit.",
+          "sourceUrl": "https://www.figma.com/board/cG0v5db8S70mQbbOaysmgg/Service-Design---Care-Bears?node-id=441-1378",
+          "sourceLabel": "Service Design – Care Bears · Clinical guardian flow",
+          "treatment": "focus",
+          "aspect": "2 / 5"
+        },
+        {
+          "id": "care-service-blueprint",
+          "src": "/images/hcd/care/care-service-blueprint.webp",
+          "fullSrc": "/images/hcd/care/care-service-blueprint.webp",
+          "alt": "FamilySync service blueprint presentation frame",
+          "caption": "Use when the portfolio needs explicit service-design language and visible frontstage/backstage orchestration.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=593-1873",
+          "sourceLabel": "FINAL – TEAM CARE · slide 92",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "The system escalates from parents to backup guardians through explicit response windows.",
+        "Clinical updates are bundled or surfaced according to significance and caregiver need.",
+        "Frontstage messages depend on backstage calendar, mobility, and service integrations."
+      ]
+    },
+    {
+      "key": "decisions",
+      "index": "05",
+      "eyebrow": "Decisions",
+      "title": "Automation stays visible and interruptible",
+      "intro": "We made the agent’s action and escalation state visible so a caregiver can understand who is being contacted, why, and where to intervene.",
+      "layout": "single",
+      "evidence": [
+        {
+          "id": "care-escalation-flow",
+          "src": "/images/hcd/care/care-escalation-flow.webp",
+          "fullSrc": "/images/hcd/care/care-escalation-flow.webp",
+          "alt": "FamilySync pickup request and caregiver escalation interface",
+          "caption": "Shows the system checking calendars and contacting a secondary caregiver while keeping the primary user informed.",
+          "sourceUrl": "https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=73-1371",
+          "sourceLabel": "FINAL – TEAM CARE · slide 34",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "The primary caregiver can interrupt the process.",
+        "Escalation is communicated as a sequence, not hidden as background automation.",
+        "The service reports status without pretending uncertainty has disappeared."
+      ]
+    },
+    {
+      "key": "interaction",
+      "index": "06",
+      "eyebrow": "Interaction",
+      "title": "Visibility creates presence",
+      "intro": "The hero frame captures the interaction principle we returned to: timely pickup, arrival, and safety updates let an absent caregiver stay connected without taking control away from the person doing the care.",
+      "layout": "single",
+      "evidence": [],
+      "takeaways": [
+        "Status updates should answer the emotional question as well as the logistical one.",
+        "Presence can come from trustworthy visibility, not constant intervention."
+      ]
+    },
+    {
+      "key": "outcome",
+      "index": "07",
+      "eyebrow": "Outcome",
+      "title": "A concept for care with consent",
+      "intro": "The work resolved into a service concept that connects coordination, communication, and connection while preserving clear human checkpoints. The hero is the intended payoff: support that makes care visible without making the agent the caregiver.",
+      "layout": "single",
+      "evidence": [],
+      "takeaways": [
+        "The strongest concept value came from orchestrating handoffs across a family network.",
+        "Permission and interruptibility remained design requirements, not policy footnotes."
+      ]
+    }
+  ],
+  "outcome": "Our team developed an end-to-end service concept that makes urgent family coordination visible across caregivers, calendars, backup guardians, and updates. The outcome shown here is a designed concept and evidence trail, not a measured product launch.",
+  "limitation": "FamilySync remained a Northwestern EDI concept developed with JPMorgan Chase as the project partner. It was not shipped by JPMorgan Chase, and these artifacts do not establish production feasibility, adoption, clinical compliance, or real-world impact.",
+  "reflection": "The project sharpened how I think about agentic systems: usefulness comes from exposing intent, permissions, escalation, and uncertainty at the moments when people need to understand or override the system."
+}
