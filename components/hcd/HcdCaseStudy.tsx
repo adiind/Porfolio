@@ -427,7 +427,7 @@ export const HcdCaseStudyShell: React.FC<{
                 onClick={toggleLightboxSize}
                 aria-pressed={isLightboxFullSize}
                 aria-label={isLightboxFullSize ? 'Fit image to screen' : 'View image at full size'}
-                className="flex h-11 items-center gap-2 rounded-full border border-white/25 bg-[#08130f] px-3 text-xs font-semibold text-white transition hover:border-white/50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] sm:px-4"
+                className="flex h-11 min-w-11 items-center gap-2 rounded-full border border-white/25 bg-[#08130f] px-3 text-xs font-semibold text-white transition hover:border-white/50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] sm:px-4"
               >
                 {isLightboxFullSize
                   ? <Minimize2 aria-hidden="true" size={17} />
@@ -439,7 +439,7 @@ export const HcdCaseStudyShell: React.FC<{
                 type="button"
                 onClick={closeLightbox}
                 aria-label="Close full view"
-                className="flex h-11 shrink-0 items-center gap-2 rounded-full bg-[#f6f0e2] px-3 text-sm font-semibold text-[#17231d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06100d] sm:px-4"
+                className="flex h-11 min-w-11 shrink-0 items-center gap-2 rounded-full bg-[#f6f0e2] px-3 text-sm font-semibold text-[#17231d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06100d] sm:px-4"
               >
                 <X aria-hidden="true" size={18} /> <span className="hidden sm:inline">Close</span>
               </button>
