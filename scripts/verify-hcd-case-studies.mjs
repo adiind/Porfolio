@@ -10,60 +10,105 @@ const mode = process.argv[2];
 const validModes = new Set(['shared', 'care', 'mcdonalds', 'integration', 'all']);
 const errors = [];
 
+const allowedSectionKeys = ['situation', 'learning', 'idea', 'mechanics', 'reflection'];
+
+const expectedHeadings = {
+  care: [
+    'Care coordination is work',
+    'The family is the system',
+    'Three principles shaped the idea',
+    'Designing the handoff',
+    'What I took forward',
+  ],
+  mcdonalds: [
+    'The order starts before checkout',
+    'One person becomes the coordinator',
+    'One order, individual agency',
+    'From invite to pickup',
+    'What I took forward',
+  ],
+};
+
+const approvedNotes = {
+  care: [
+    'Care coordination expands when attention is already scarce.',
+    'Proactive help still needs clear permission.',
+    'Trust does not erase privacy boundaries.',
+  ],
+  mcdonalds: [
+    'The order is part of the hangout, not a separate task.',
+    'One person coordinates the food, or everyone coordinates payment.',
+    'Group visibility and payment clarity have to improve together.',
+  ],
+};
+
+const allowedPostItTones = {
+  care: new Set(['yellow', 'blue', 'green']),
+  mcdonalds: new Set(['yellow', 'cream', 'red']),
+};
+
+const forbiddenPublicPatterns = [
+  /figma\.com/i,
+  /view source/i,
+  /slide\s*\d+/i,
+  /\bevidence\b/i,
+  /\bboundary\b/i,
+  /\bprovenance\b/i,
+  /\bverification\b/i,
+];
+
 const sharedRequirements = {
   'components/hcd/types.ts': [
-    'export interface HcdEvidence',
-    'treatment: HcdTreatment;',
+    'export interface HcdVisual',
+    'export interface HcdPostIt',
+    'export interface HcdVisualGroup',
+    'export interface HcdStorySection',
     'export interface HcdProjectStory',
+    'treatment: HcdTreatment;',
   ],
   'components/hcd/HcdCaseStudy.tsx': [
-    'export const HcdCaseStudyShell',
-    'useDialogA11y',
-    'aria-modal="true"',
-    'aria-labelledby=',
-    "loading={isHero ? 'eager' : 'lazy'}",
-    'sizes=',
-    'prefers-reduced-motion',
-    'View source in Figma',
-    'onClick={() => scrollToChapter(chapter.key)}',
-    'ref={setClosePortalTarget}',
-    '<div ref={setClosePortalTarget} className="fixed right-3 top-3 z-[9999] md:right-6 md:top-6" />',
+    'HcdVisual',
+    'HcdPostIt',
+    'data-hcd-workshop-surface',
+    'data-hcd-post-it',
+    'data-hcd-visual-id',
+    'View larger',
+    'Fit to screen',
     'ReactDOM.createPortal(',
-    'closePortalTarget,',
-    'LIGHTBOX_FOCUSABLE',
-    'lightboxRef.current?.querySelectorAll<HTMLElement>',
-    'event.shiftKey',
-    'const [isLightboxFullSize, setIsLightboxFullSize] = useState(false);',
-    'ref={lightboxViewportRef}',
-    'aria-pressed={isLightboxFullSize}',
-    "aria-label={isLightboxFullSize ? 'Fit evidence to screen' : 'View evidence at full size'}",
-    'Full size · scroll in any direction to inspect',
-    'touch-pan-x touch-pan-y overflow-auto',
-    "isLightboxFullSize ? 'mx-auto block h-auto max-w-none",
-    'setIsLightboxFullSize(false);',
-    'activeEvidence && ReactDOM.createPortal(',
-    'className="hcd-case fixed inset-0 z-[20000] pointer-events-auto flex flex-col overflow-hidden overscroll-contain bg-black/95 p-3 sm:p-5"',
-    'document.body.style.overflow = \'hidden\';',
+    "document.body.style.overflow = 'hidden';",
     'document.body.style.overflow = previousBodyOverflow;',
     'document.body,',
+    'touch-pan-x touch-pan-y overflow-auto',
+    "isLightboxFullSize ? 'mx-auto block h-auto max-w-none",
   ],
   'scripts/build-hcd-assets.py': ['Image.Resampling.LANCZOS', "format='WEBP'"],
 };
 
 const sharedForbiddenMarkers = {
-  'components/hcd/types.ts': ["treatment: 'full' | 'focus' | 'editorial'"],
+  'components/hcd/types.ts': [
+    'HcdEvidence',
+    'HcdChapter',
+    'sourceUrl',
+    'sourceLabel',
+  ],
   'components/hcd/HcdCaseStudy.tsx': [
-    'href={`#${story.projectId}-${chapter.key}`}',
-    'lightboxCloseRef.current?.focus();',
-    'text-white/45',
-    'className="contents"',
-    'className="fixed right-3 top-3 z-[9999] flex',
-    'className="mx-auto h-auto max-h-full max-w-full object-contain"',
-    '{activeEvidence && (',
+    'HcdEvidence',
+    'EvidenceFigure',
+    'data-evidence',
+    'Read the evidence',
+    'View source in Figma',
+    'ArrowUpRight',
+    'sourceUrl',
+    'sourceLabel',
+    'story.chapters',
+    'scrollToChapter',
+    'data-hcd-chapter',
+    'chapter.index',
+    'chapter.eyebrow',
   ],
 };
 
-const canonicalEvidence = {
+const canonicalVisuals = {
   care: [
     'care-stakeholders', 'care-trust-takeaways', 'care-crisis-journey',
     'care-schedule-management', 'care-clinical-guardian-flow',
@@ -92,10 +137,6 @@ const projectConfig = {
     componentMarkers: ['HcdCaseStudyShell', 'mcdonalds-story.json'],
   },
 };
-
-const allowedChapterKeys = new Set([
-  'frame', 'tension', 'opportunity', 'journey', 'decisions', 'interaction', 'outcome',
-]);
 
 function resolveRepo(relativePath) {
   return path.join(repoRoot, relativePath);
@@ -141,63 +182,87 @@ function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function publicAssetPath(sourcePath, field, evidenceId) {
+function publicAssetPath(sourcePath, field, visualId) {
   if (typeof sourcePath !== 'string' || !sourcePath.startsWith('/images/hcd/')) {
-    errors.push(`${evidenceId}.${field} must reference /images/hcd/: ${String(sourcePath)}`);
+    errors.push(`${visualId}.${field} must reference /images/hcd/: ${String(sourcePath)}`);
     return null;
   }
   const publicRoot = resolveRepo('public/images/hcd');
   const absolutePath = resolveRepo(path.join('public', sourcePath.slice(1)));
   const relativePath = path.relative(publicRoot, absolutePath);
   if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-    errors.push(`${evidenceId}.${field} escapes public/images/hcd: ${sourcePath}`);
+    errors.push(`${visualId}.${field} escapes public/images/hcd: ${sourcePath}`);
     return null;
   }
   return absolutePath;
 }
 
-function verifyEvidence(evidence, seenIds, location) {
-  if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence)) {
-    errors.push(`${location} must be an evidence object`);
+function verifyCaption(caption, visualId) {
+  if (!isNonEmptyString(caption)) {
+    errors.push(`${visualId}.caption must be a non-empty string`);
+    return;
+  }
+  const wordCount = caption.trim().split(/\s+/).length;
+  if (wordCount < 8 || wordCount > 20) {
+    errors.push(`${visualId}.caption must contain 8–20 words; received ${wordCount}`);
+  }
+}
+
+function verifyVisual(visual, seenIds, location) {
+  if (!visual || typeof visual !== 'object' || Array.isArray(visual)) {
+    errors.push(`${location} must be a visual object`);
     return;
   }
 
-  const evidenceId = isNonEmptyString(evidence.id) ? evidence.id : `${location} (missing id)`;
-  if (!isNonEmptyString(evidence.id)) {
+  const visualId = isNonEmptyString(visual.id) ? visual.id : `${location} (missing id)`;
+  if (!isNonEmptyString(visual.id)) {
     errors.push(`${location}.id must be a non-empty string`);
-  } else if (seenIds.has(evidence.id)) {
-    errors.push(`Duplicate evidence id: ${evidence.id}`);
+  } else if (seenIds.has(visual.id)) {
+    errors.push(`Duplicate visual id: ${visual.id}`);
   } else {
-    seenIds.add(evidence.id);
+    seenIds.add(visual.id);
   }
 
-  for (const field of ['alt', 'caption', 'sourceLabel']) {
-    if (!isNonEmptyString(evidence[field])) {
-      errors.push(`${evidenceId}.${field} must be a non-empty string`);
-    }
+  if (!isNonEmptyString(visual.alt)) {
+    errors.push(`${visualId}.alt must be a non-empty string`);
   }
+  verifyCaption(visual.caption, visualId);
 
-  if (!['full', 'focus', 'editorial'].includes(evidence.treatment)) {
-    errors.push(`${evidenceId}.treatment is not allowed: ${String(evidence.treatment)}`);
-  }
-
-  if (!isNonEmptyString(evidence.sourceUrl)) {
-    errors.push(`${evidenceId}.sourceUrl must be a non-empty Figma URL`);
-  } else {
-    try {
-      const sourceUrl = new URL(evidence.sourceUrl);
-      if (sourceUrl.protocol !== 'https:' || !/(^|\.)figma\.com$/i.test(sourceUrl.hostname)) {
-        errors.push(`${evidenceId}.sourceUrl is not a Figma URL: ${evidence.sourceUrl}`);
-      }
-    } catch {
-      errors.push(`${evidenceId}.sourceUrl is not a valid URL: ${evidence.sourceUrl}`);
-    }
+  if (!['full', 'focus', 'editorial'].includes(visual.treatment)) {
+    errors.push(`${visualId}.treatment is not allowed: ${String(visual.treatment)}`);
   }
 
   for (const field of ['src', 'fullSrc']) {
-    const absolutePath = publicAssetPath(evidence[field], field, evidenceId);
+    const absolutePath = publicAssetPath(visual[field], field, visualId);
     if (absolutePath && !fs.existsSync(absolutePath)) {
-      errors.push(`Missing ${field} asset for ${evidenceId}: ${evidence[field]}`);
+      errors.push(`Missing ${field} asset for ${visualId}: ${visual[field]}`);
+    }
+  }
+}
+
+function verifyPostIt(note, projectMode, location) {
+  if (!note || typeof note !== 'object' || Array.isArray(note)) {
+    errors.push(`${location} must be a post-it object`);
+    return;
+  }
+  const noteId = isNonEmptyString(note.id) ? note.id : `${location} (missing id)`;
+  if (!isNonEmptyString(note.id)) errors.push(`${location}.id must be a non-empty string`);
+  if (!approvedNotes[projectMode].includes(note.text)) {
+    errors.push(`${noteId}.text is not an approved ${projectMode} post-it`);
+  }
+  if (!allowedPostItTones[projectMode].has(note.tone)) {
+    errors.push(`${noteId}.tone is not allowed by the ${projectMode} palette: ${String(note.tone)}`);
+  }
+  if (typeof note.rotation !== 'number' || !Number.isFinite(note.rotation) || note.rotation < -2 || note.rotation > 2) {
+    errors.push(`${noteId}.rotation must be a number between -2 and 2: ${String(note.rotation)}`);
+  }
+}
+
+function verifyPublicLanguage(story, projectMode) {
+  const publicStory = JSON.stringify(story);
+  for (const pattern of forbiddenPublicPatterns) {
+    if (pattern.test(publicStory)) {
+      errors.push(`${projectMode} story contains forbidden public language: ${pattern}`);
     }
   }
 }
@@ -216,59 +281,71 @@ function verifyProject(projectMode) {
     return;
   }
 
-  const seenIds = new Set();
-  verifyEvidence(story.hero, seenIds, `${config.storyPath}.hero`);
+  verifyPublicLanguage(story, projectMode);
 
-  if (!Array.isArray(story.chapters)) {
-    errors.push(`${config.storyPath}.chapters must be an array`);
+  const seenIds = new Set();
+  verifyVisual(story.hero, seenIds, `${config.storyPath}.hero`);
+
+  if (!Array.isArray(story.sections)) {
+    errors.push(`${config.storyPath}.sections must be an array`);
   } else {
-    const seenChapterKeys = new Set();
-    for (const [chapterIndex, chapter] of story.chapters.entries()) {
-      const location = `${config.storyPath}.chapters[${chapterIndex}]`;
-      if (!chapter || typeof chapter !== 'object' || Array.isArray(chapter)) {
-        errors.push(`${location} must be a chapter object`);
-        continue;
-      }
-      if (!allowedChapterKeys.has(chapter.key)) {
-        errors.push(`${location}.key is not allowed: ${String(chapter.key)}`);
-      } else if (seenChapterKeys.has(chapter.key)) {
-        errors.push(`Duplicate chapter key: ${chapter.key}`);
-      } else {
-        seenChapterKeys.add(chapter.key);
-      }
-      if (!Array.isArray(chapter.evidence)) {
-        errors.push(`${location}.evidence must be an array`);
-        continue;
-      }
-      for (const [evidenceIndex, evidence] of chapter.evidence.entries()) {
-        verifyEvidence(evidence, seenIds, `${location}.evidence[${evidenceIndex}]`);
-      }
+    const sectionKeys = story.sections.map((section) => section?.key);
+    if (sectionKeys.length !== allowedSectionKeys.length || sectionKeys.some((key, index) => key !== allowedSectionKeys[index])) {
+      errors.push(`${projectMode}.sections must contain these keys once and in order: ${allowedSectionKeys.join(', ')}`);
     }
-    const missingChapterKeys = [...allowedChapterKeys].filter((key) => !seenChapterKeys.has(key));
-    if (missingChapterKeys.length) {
-      errors.push(`${projectMode} is missing chapter keys: ${missingChapterKeys.join(', ')}`);
+
+    const sectionTitles = story.sections.map((section) => section?.title);
+    if (sectionTitles.length !== expectedHeadings[projectMode].length || sectionTitles.some((title, index) => title !== expectedHeadings[projectMode][index])) {
+      errors.push(`${projectMode}.sections must use the approved headings in order: ${expectedHeadings[projectMode].join(' | ')}`);
+    }
+
+    const seenSectionKeys = new Set();
+    for (const [sectionIndex, section] of story.sections.entries()) {
+      const location = `${config.storyPath}.sections[${sectionIndex}]`;
+      if (!section || typeof section !== 'object' || Array.isArray(section)) {
+        errors.push(`${location} must be a story section object`);
+        continue;
+      }
+      if (seenSectionKeys.has(section.key)) {
+        errors.push(`Duplicate section key: ${String(section.key)}`);
+      } else {
+        seenSectionKeys.add(section.key);
+      }
+      if (!Array.isArray(section.groups)) {
+        errors.push(`${location}.groups must be an array`);
+      } else {
+        for (const [groupIndex, group] of section.groups.entries()) {
+          const groupLocation = `${location}.groups[${groupIndex}]`;
+          if (!group || typeof group !== 'object' || Array.isArray(group)) {
+            errors.push(`${groupLocation} must be a visual group object`);
+            continue;
+          }
+          if (!Array.isArray(group.visuals)) {
+            errors.push(`${groupLocation}.visuals must be an array`);
+            continue;
+          }
+          for (const [visualIndex, visual] of group.visuals.entries()) {
+            verifyVisual(visual, seenIds, `${groupLocation}.visuals[${visualIndex}]`);
+          }
+        }
+      }
+      if (section.notes !== undefined) {
+        if (!Array.isArray(section.notes)) {
+          errors.push(`${location}.notes must be an array when present`);
+        } else {
+          for (const [noteIndex, note] of section.notes.entries()) {
+            verifyPostIt(note, projectMode, `${location}.notes[${noteIndex}]`);
+          }
+        }
+      }
     }
   }
 
-  const expectedIds = canonicalEvidence[projectMode];
+  const expectedIds = canonicalVisuals[projectMode];
   const missingIds = expectedIds.filter((id) => !seenIds.has(id));
   const unexpectedIds = [...seenIds].filter((id) => !expectedIds.includes(id));
-  if (missingIds.length) errors.push(`${projectMode} is missing canonical evidence: ${missingIds.join(', ')}`);
-  if (unexpectedIds.length) errors.push(`${projectMode} has unexpected evidence: ${unexpectedIds.join(', ')}`);
-
-  if (projectMode === 'care') {
-    const expectedHeroSource = 'https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=406-1678';
-    if (story.hero?.sourceUrl !== expectedHeroSource) {
-      errors.push(`care hero must use the verified home-update sequence: ${expectedHeroSource}`);
-    }
-
-    const storySource = JSON.stringify(story);
-    for (const phrase of ['Strong opening evidence', 'Strong evidence', 'Especially useful', 'Use when the portfolio needs']) {
-      if (storySource.includes(phrase)) {
-        errors.push(`care story contains selector commentary: ${phrase}`);
-      }
-    }
-  }
+  if (missingIds.length) errors.push(`${projectMode} is missing canonical visuals: ${missingIds.join(', ')}`);
+  if (unexpectedIds.length) errors.push(`${projectMode} has unexpected visuals: ${unexpectedIds.join(', ')}`);
 }
 
 function verifyIntegration() {

@@ -1,29 +1,41 @@
 export type HcdAccent = 'care' | 'mcdonalds';
 export type HcdTreatment = 'full' | 'focus' | 'editorial';
-export type HcdChapterKey = 'frame' | 'tension' | 'opportunity' | 'journey' | 'decisions' | 'interaction' | 'outcome';
+export type HcdSectionKey = 'situation' | 'learning' | 'idea' | 'mechanics' | 'reflection';
+export type HcdVisualLayout = 'single' | 'pair' | 'sequence' | 'wide';
+export type HcdPostItTone = 'yellow' | 'blue' | 'green' | 'cream' | 'red';
 
-export interface HcdEvidence {
+export interface HcdVisual {
   id: string;
   src: string;
   fullSrc: string;
   alt: string;
   caption: string;
-  sourceUrl: string;
-  sourceLabel: string;
   treatment: HcdTreatment;
   aspect?: string;
   objectPosition?: string;
 }
 
-export interface HcdChapter {
-  key: HcdChapterKey;
-  index: string;
-  eyebrow: string;
+export interface HcdPostIt {
+  id: string;
+  text: string;
+  tone: HcdPostItTone;
+  rotation: number;
+}
+
+export interface HcdVisualGroup {
+  id: string;
+  title?: string;
+  layout: HcdVisualLayout;
+  visuals: HcdVisual[];
+}
+
+export interface HcdStorySection {
+  key: HcdSectionKey;
   title: string;
   intro: string;
-  layout: 'single' | 'pair' | 'sequence' | 'wide';
-  evidence: HcdEvidence[];
+  notes?: HcdPostIt[];
   takeaways?: string[];
+  groups: HcdVisualGroup[];
 }
 
 export interface HcdProjectStory {
@@ -34,12 +46,8 @@ export interface HcdProjectStory {
   proposition: string;
   context: string;
   role: string;
-  status: string;
-  disciplines: string[];
-  hero: HcdEvidence;
+  hero: HcdVisual;
   metrics?: Array<{ value: string; label: string }>;
-  chapters: HcdChapter[];
-  outcome: string;
-  limitation: string;
-  reflection: string;
+  sections: HcdStorySection[];
+  closingContext: string;
 }
