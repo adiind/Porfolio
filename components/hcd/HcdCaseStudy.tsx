@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
-import { ArrowDown, ArrowUpRight, X } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Maximize2, Minimize2, X } from 'lucide-react';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
 import { projectPath } from '../../lib/workRoutes';
 import { HcdAccent, HcdEvidence, HcdProjectStory } from './types';
@@ -108,10 +108,12 @@ export const HcdCaseStudyShell: React.FC<{
   onClose: () => void;
 }> = ({ story, onClose }) => {
   const [activeEvidence, setActiveEvidence] = useState<HcdEvidence | null>(null);
+  const [isLightboxFullSize, setIsLightboxFullSize] = useState(false);
   const activeEvidenceRef = useRef<HcdEvidence | null>(null);
   const evidenceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const lightboxCloseRef = useRef<HTMLButtonElement | null>(null);
   const lightboxRef = useRef<HTMLDivElement | null>(null);
+  const lightboxViewportRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [closePortalTarget, setClosePortalTarget] = useState<HTMLDivElement | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -120,6 +122,7 @@ export const HcdCaseStudyShell: React.FC<{
   activeEvidenceRef.current = activeEvidence;
 
   const closeLightbox = useCallback(() => {
+    setIsLightboxFullSize(false);
     setActiveEvidence(null);
     window.requestAnimationFrame(() => evidenceTriggerRef.current?.focus({ preventScroll: true }));
   }, []);
@@ -157,13 +160,24 @@ export const HcdCaseStudyShell: React.FC<{
   });
 
   useEffect(() => {
-    if (activeEvidence) lightboxCloseRef.current?.focus({ preventScroll: true });
+    if (!activeEvidence) return;
+    setIsLightboxFullSize(false);
+    window.requestAnimationFrame(() => {
+      lightboxViewportRef.current?.scrollTo({ top: 0, left: 0 });
+      lightboxCloseRef.current?.focus({ preventScroll: true });
+    });
   }, [activeEvidence]);
 
   const openEvidence = useCallback((evidence: HcdEvidence, trigger: HTMLButtonElement) => {
     evidenceTriggerRef.current = trigger;
+    setIsLightboxFullSize(false);
     setActiveEvidence(evidence);
   }, []);
+
+  const toggleLightboxSize = () => {
+    setIsLightboxFullSize((current) => !current);
+    window.requestAnimationFrame(() => lightboxViewportRef.current?.scrollTo({ top: 0, left: 0 }));
+  };
 
   const scrollToStory = () => {
     scrollRef.current?.querySelector<HTMLElement>('[data-hcd-chapter]')?.scrollIntoView({
@@ -373,22 +387,49 @@ export const HcdCaseStudyShell: React.FC<{
             if (event.target === event.currentTarget) closeLightbox();
           }}
         >
-          <div className="flex shrink-0 items-center justify-between gap-4 border-b border-white/15 pb-3">
-            <p className="min-w-0 truncate font-mono text-[9px] uppercase tracking-[0.18em] text-white/60">{activeEvidence.sourceLabel}</p>
-            <button
-              ref={lightboxCloseRef}
-              type="button"
-              onClick={closeLightbox}
-              className="flex h-11 shrink-0 items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-            >
-              <X aria-hidden="true" size={18} /> Close evidence
-            </button>
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/15 pb-3">
+            <div className="min-w-0">
+              <p className="truncate font-mono text-[9px] uppercase tracking-[0.18em] text-white/60">{activeEvidence.sourceLabel}</p>
+              <p aria-live="polite" className="mt-1 font-mono text-[9px] uppercase tracking-[0.14em] text-white/60">
+                {isLightboxFullSize ? 'Full size · scroll in any direction to inspect' : 'Fit to screen'}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleLightboxSize}
+                aria-pressed={isLightboxFullSize}
+                aria-label={isLightboxFullSize ? 'Fit evidence to screen' : 'View evidence at full size'}
+                className="flex h-11 items-center gap-2 rounded-full border border-white/25 bg-black px-3 text-xs font-semibold text-white transition hover:border-white/50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] sm:px-4"
+              >
+                {isLightboxFullSize
+                  ? <Minimize2 aria-hidden="true" size={17} />
+                  : <Maximize2 aria-hidden="true" size={17} />}
+                <span className="hidden sm:inline">{isLightboxFullSize ? 'Fit' : 'Full size'}</span>
+              </button>
+              <button
+                ref={lightboxCloseRef}
+                type="button"
+                onClick={closeLightbox}
+                className="flex h-11 shrink-0 items-center gap-2 rounded-full bg-white px-3 text-sm font-semibold text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hcd-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:px-4"
+              >
+                <X aria-hidden="true" size={18} /> <span className="hidden sm:inline">Close evidence</span>
+                <span className="sm:hidden">Close</span>
+              </button>
+            </div>
           </div>
-          <div className="min-h-0 flex-1 overflow-auto py-4">
+          <div
+            ref={lightboxViewportRef}
+            tabIndex={0}
+            role="region"
+            aria-label={`${activeEvidence.sourceLabel} image — ${isLightboxFullSize ? 'full size; scroll in any direction to inspect' : 'fit to screen'}`}
+            className={`min-h-0 flex-1 touch-pan-x touch-pan-y overflow-auto py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--hcd-accent)] ${isLightboxFullSize ? '' : 'flex items-center justify-center'}`}
+          >
             <img
               src={activeEvidence.fullSrc}
               alt={activeEvidence.alt}
-              className="mx-auto h-auto max-h-full max-w-full object-contain"
+              draggable={false}
+              className={isLightboxFullSize ? 'mx-auto block h-auto max-w-none select-none' : 'mx-auto block h-auto max-h-full max-w-full object-contain'}
               sizes="100vw"
             />
           </div>

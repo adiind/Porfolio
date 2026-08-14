@@ -33,6 +33,14 @@ const sharedRequirements = {
     'LIGHTBOX_FOCUSABLE',
     'lightboxRef.current?.querySelectorAll<HTMLElement>',
     'event.shiftKey',
+    'const [isLightboxFullSize, setIsLightboxFullSize] = useState(false);',
+    'ref={lightboxViewportRef}',
+    'aria-pressed={isLightboxFullSize}',
+    "aria-label={isLightboxFullSize ? 'Fit evidence to screen' : 'View evidence at full size'}",
+    'Full size · scroll in any direction to inspect',
+    'touch-pan-x touch-pan-y overflow-auto',
+    "isLightboxFullSize ? 'mx-auto block h-auto max-w-none",
+    'setIsLightboxFullSize(false);',
   ],
   'scripts/build-hcd-assets.py': ['Image.Resampling.LANCZOS', "format='WEBP'"],
 };
@@ -46,6 +54,7 @@ const sharedForbiddenMarkers = {
     'document.body,',
     'className="contents"',
     'className="fixed right-3 top-3 z-[9999] flex',
+    'className="mx-auto h-auto max-h-full max-w-full object-contain"',
   ],
 };
 
