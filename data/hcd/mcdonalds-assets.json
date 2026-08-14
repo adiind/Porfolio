@@ -1,0 +1,112 @@
+{
+  "assets": [
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-research-proof.png",
+      "output": "public/images/hcd/mcdonalds/mcd-research-proof.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-research-insight.png",
+      "output": "public/images/hcd/mcdonalds/mcd-research-insight.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-capabilities-gap.png",
+      "output": "public/images/hcd/mcdonalds/mcd-capabilities-gap.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-problem-landscape.png",
+      "output": "public/images/hcd/mcdonalds/mcd-problem-landscape.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-opportunity-brief.png",
+      "output": "public/images/hcd/mcdonalds/mcd-opportunity-brief.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-value-props.png",
+      "output": "public/images/hcd/mcdonalds/mcd-value-props.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-kiosk-journey.png",
+      "output": "public/images/hcd/mcdonalds/mcd-kiosk-journey.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-app-journey.png",
+      "output": "public/images/hcd/mcdonalds/mcd-app-journey.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-trigger-setup.png",
+      "output": "public/images/hcd/mcdonalds/mcd-trigger-setup.webp",
+      "maxWidth": 2400,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-join-architecture.png",
+      "output": "public/images/hcd/mcdonalds/mcd-join-architecture.webp",
+      "maxWidth": 2400,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-system-map.png",
+      "output": "public/images/hcd/mcdonalds/mcd-system-map.webp",
+      "maxWidth": 2400,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-readiness-engine.png",
+      "output": "public/images/hcd/mcdonalds/mcd-readiness-engine.webp",
+      "maxWidth": 2400,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-invite-touchpoints.png",
+      "output": "public/images/hcd/mcdonalds/mcd-invite-touchpoints.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-live-progress.png",
+      "output": "public/images/hcd/mcdonalds/mcd-live-progress.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-squad-details.png",
+      "output": "public/images/hcd/mcdonalds/mcd-squad-details.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-delegated-payment.png",
+      "output": "public/images/hcd/mcdonalds/mcd-delegated-payment.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-readiness.png",
+      "output": "public/images/hcd/mcdonalds/mcd-readiness.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    },
+    {
+      "source": "review/hcd-figma-selector/assets/mcd-order-complete.png",
+      "output": "public/images/hcd/mcdonalds/mcd-order-complete.webp",
+      "maxWidth": 1920,
+      "quality": 84
+    }
+  ]
+}

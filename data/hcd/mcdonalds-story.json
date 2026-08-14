@@ -1,0 +1,333 @@
+{
+  "projectId": "mcdonalds-interaction-design",
+  "accent": "mcdonalds",
+  "label": "Northwestern EDI · Interaction design concept",
+  "title": "Squad Up",
+  "proposition": "Turning a messy group order into a shared, visible sequence of joining, choosing, paying, and getting ready.",
+  "context": "This was a Northwestern EDI team concept created using McDonald’s ordering as the design context. McDonald’s did not sponsor, approve, or participate in the project, and Squad Up was not an official or shipped McDonald’s product.",
+  "role": "User research · Journey design · Interaction architecture · Prototyping",
+  "status": "Concept exploration using McDonald’s ordering context",
+  "disciplines": [
+    "User research",
+    "Journey design",
+    "Interaction architecture",
+    "Prototyping"
+  ],
+  "hero": {
+    "id": "mcd-live-progress",
+    "src": "/images/hcd/mcdonalds/mcd-live-progress.webp",
+    "fullSrc": "/images/hcd/mcdonalds/mcd-live-progress.webp",
+    "alt": "McDonald’s Squad Up interface showing live participant progress",
+    "caption": "Our team made each participant’s bag a live status signal, so the group could see who had joined, who was still building, and who was ready without another chat thread.",
+    "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=537-9761",
+    "sourceLabel": "Squad Up final deck · slide 29",
+    "treatment": "full",
+    "aspect": "16 / 9"
+  },
+  "metrics": [
+    {
+      "value": "4",
+      "label": "Site observations"
+    },
+    {
+      "value": "8",
+      "label": "Qualitative interviews"
+    },
+    {
+      "value": "22",
+      "label": "Survey responses"
+    }
+  ],
+  "chapters": [
+    {
+      "key": "frame",
+      "index": "01",
+      "eyebrow": "Frame",
+      "title": "Make the group visible before checkout",
+      "intro": "We treated group ordering as a coordination problem rather than a larger cart. The hero shows the intended payoff: a shared state that lets everyone understand progress without one person manually managing the room.",
+      "layout": "single",
+      "evidence": [],
+      "takeaways": [
+        "Each person keeps ownership of their choices while the group shares progress.",
+        "Coordination begins before payment and continues through pickup."
+      ]
+    },
+    {
+      "key": "tension",
+      "index": "02",
+      "eyebrow": "Human tension",
+      "title": "A social stop becomes administrative work",
+      "intro": "Across 4 observations · 8 interviews · 22 survey responses, our team saw that McDonald’s often sits between other events. Existing ordering paths forced one person to consolidate choices and chase payment, or left everyone to coordinate separate orders under time pressure.",
+      "layout": "sequence",
+      "evidence": [
+        {
+          "id": "mcd-research-proof",
+          "src": "/images/hcd/mcdonalds/mcd-research-proof.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-research-proof.webp",
+          "alt": "McDonald’s research sample showing four site observations, eight interviews, and twenty-two survey responses",
+          "caption": "We grounded the concept in 4 site observations, 8 qualitative interviews, and 22 survey responses rather than beginning with interface features.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=366-1828",
+          "sourceLabel": "Squad Up final deck · slide 9",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-research-insight",
+          "src": "/images/hcd/mcdonalds/mcd-research-insight.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-research-insight.webp",
+          "alt": "Research quote about McDonald’s fitting into an after-class routine",
+          "caption": "A participant’s after-class routine helped us frame McDonald’s as a stop between activities, where time and social momentum matter.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=301-998",
+          "sourceLabel": "Squad Up final deck · slide 12",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-capabilities-gap",
+          "src": "/images/hcd/mcdonalds/mcd-capabilities-gap.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-capabilities-gap.webp",
+          "alt": "Comparison of group ordering through one payer versus individual orders and payment chasing",
+          "caption": "We identified a tradeoff in current ordering: consolidate the food and chase payments later, or separate payment and lose coordination.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=301-603",
+          "sourceLabel": "Squad Up final deck · slide 15",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-problem-landscape",
+          "src": "/images/hcd/mcdonalds/mcd-problem-landscape.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-problem-landscape.webp",
+          "alt": "Teen group-ordering problem landscape and needs",
+          "caption": "The synthesis connected easy ordering with social reinforcement, financial clarity, and a concept that fits existing teen behavior.",
+          "sourceUrl": "https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=82-1235",
+          "sourceLabel": "Concepts + Opportunity Briefs · slide 3",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "The order is part of a social journey, not an isolated transaction.",
+        "Payment clarity and group visibility need to improve together.",
+        "The experience has to preserve momentum between activities."
+      ]
+    },
+    {
+      "key": "opportunity",
+      "index": "03",
+      "eyebrow": "Opportunity",
+      "title": "One order, individual agency",
+      "intro": "We reframed the opportunity around synchronized participation: let people choose and pay with more independence while giving the group one shared path from invitation to fulfillment.",
+      "layout": "pair",
+      "evidence": [
+        {
+          "id": "mcd-opportunity-brief",
+          "src": "/images/hcd/mcdonalds/mcd-opportunity-brief.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-opportunity-brief.webp",
+          "alt": "Opportunity brief for a synchronized multi-user McDonald’s order",
+          "caption": "The opportunity brief turned the research into a testable multi-user order with an explicit coordination benefit, interaction risk, and low-fidelity validation plan.",
+          "sourceUrl": "https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=82-1102",
+          "sourceLabel": "Concepts + Opportunity Briefs · slide 5",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-value-props",
+          "src": "/images/hcd/mcdonalds/mcd-value-props.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-value-props.webp",
+          "alt": "Squad Up value propositions for payment, pickup, and customization",
+          "caption": "We used accurate customization, payment coordination, and pickup or delivery coordination as the three customer-value checks for the concept.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=10-149",
+          "sourceLabel": "Squad Up final deck · slide 38",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "Shared does not have to mean one person controls every choice.",
+        "The concept must reduce coordination work without adding fragile setup."
+      ]
+    },
+    {
+      "key": "journey",
+      "index": "04",
+      "eyebrow": "Journey",
+      "title": "The concept had to work before arrival",
+      "intro": "We explored kiosk and mobile journeys as distinct alternatives, then resolved the upstream questions both exposed: where a host starts, how invitations travel, and how guests join without assuming the same device or app setup.",
+      "layout": "wide",
+      "evidence": [
+        {
+          "id": "mcd-kiosk-journey",
+          "src": "/images/hcd/mcdonalds/mcd-kiosk-journey.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-kiosk-journey.webp",
+          "alt": "Storyboard of a teen group building and paying for a McDonald’s kiosk order",
+          "caption": "The kiosk journey tested separate personal carts and payment methods converging into one coordinated in-store order.",
+          "sourceUrl": "https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=20-207",
+          "sourceLabel": "Concepts + Opportunity Briefs · slide 6",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-app-journey",
+          "src": "/images/hcd/mcdonalds/mcd-app-journey.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-app-journey.webp",
+          "alt": "Storyboard of teens creating a shared McDonald’s order from their phones",
+          "caption": "The app journey moved invitation and cart building into the ride between activities, then rejoined the group at pickup.",
+          "sourceUrl": "https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=20-248",
+          "sourceLabel": "Concepts + Opportunity Briefs · slide 7",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-trigger-setup",
+          "src": "/images/hcd/mcdonalds/mcd-trigger-setup.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-trigger-setup.webp",
+          "alt": "Group-order trigger, delivery mode, and invitation setup map",
+          "caption": "The setup map made entry placement, pickup or delivery choice, invite channel, and immediate host recognition part of the experience.",
+          "sourceUrl": "https://www.figma.com/board/6DKpYA1IipVMN6tnOop1e8/McCrew-Group-Order-Experience-Board?node-id=1-21",
+          "sourceLabel": "McCrew Group Order Experience Board",
+          "treatment": "full",
+          "aspect": "3.15 / 1"
+        },
+        {
+          "id": "mcd-join-architecture",
+          "src": "/images/hcd/mcdonalds/mcd-join-architecture.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-join-architecture.webp",
+          "alt": "Decision map for app, browser, and no-phone group-order guests",
+          "caption": "We preserved three join paths—signed-in app, install-free web, and assisted guest creation—so participation did not depend on one device assumption.",
+          "sourceUrl": "https://www.figma.com/board/6DKpYA1IipVMN6tnOop1e8/McCrew-Group-Order-Experience-Board?node-id=1-40",
+          "sourceLabel": "McCrew Group Order Experience Board",
+          "treatment": "full",
+          "aspect": "2.22 / 1"
+        }
+      ],
+      "takeaways": [
+        "Kiosk and app journeys represented distinct context alternatives.",
+        "Invitations need to communicate both the host and the commitment immediately.",
+        "A no-phone guest remains part of the group state through assisted creation."
+      ]
+    },
+    {
+      "key": "decisions",
+      "index": "05",
+      "eyebrow": "Design decisions",
+      "title": "Readiness became the coordination engine",
+      "intro": "We converted the social ambiguity of “are we all done?” into explicit shared states, then connected those states to invitation entry points and the host actions needed only when progress stalls.",
+      "layout": "wide",
+      "evidence": [
+        {
+          "id": "mcd-system-map",
+          "src": "/images/hcd/mcdonalds/mcd-system-map.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-system-map.webp",
+          "alt": "Shared group-order state from invite opened to all participants ready",
+          "caption": "The system map joined invitation, cart, payment, progress, and confirmation into one shared state rather than a set of disconnected screens.",
+          "sourceUrl": "https://www.figma.com/board/8ELluDtBmW4GPGm8XFkK4g/McCrew-Group-Order-System-Map?node-id=1-128",
+          "sourceLabel": "McCrew Group Order System Map",
+          "treatment": "full",
+          "aspect": "2.79 / 1"
+        },
+        {
+          "id": "mcd-readiness-engine",
+          "src": "/images/hcd/mcdonalds/mcd-readiness-engine.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-readiness-engine.webp",
+          "alt": "Four-stage readiness engine for a shared group order",
+          "caption": "The readiness engine defined when a member is invited, building, payment-pending, or ready, plus when the host can nudge, wait, or remove an incomplete participant.",
+          "sourceUrl": "https://www.figma.com/board/6DKpYA1IipVMN6tnOop1e8/McCrew-Group-Order-Experience-Board?node-id=1-81",
+          "sourceLabel": "McCrew Group Order Experience Board",
+          "treatment": "full",
+          "aspect": "4.42 / 1"
+        },
+        {
+          "id": "mcd-invite-touchpoints",
+          "src": "/images/hcd/mcdonalds/mcd-invite-touchpoints.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-invite-touchpoints.webp",
+          "alt": "Multiple group-order invitation touchpoints in the McDonald’s app",
+          "caption": "The final interaction translated one invitation model across share sheet, QR or tap, and direct recent-squad entry points.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=248-706",
+          "sourceLabel": "Squad Up final deck · slide 23",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "Readiness is a system state, not a decorative progress bar.",
+        "The host intervenes only when an incomplete state blocks submission.",
+        "Multiple invitation modes support different social and physical contexts."
+      ]
+    },
+    {
+      "key": "interaction",
+      "index": "06",
+      "eyebrow": "Interaction evidence",
+      "title": "Ownership stays legible through fulfillment",
+      "intro": "The final sequence carries the earlier decisions into four concrete moments: understanding the squad, choosing whom to cover, seeing readiness, and keeping individual ownership visible after submission.",
+      "layout": "sequence",
+      "evidence": [
+        {
+          "id": "mcd-squad-details",
+          "src": "/images/hcd/mcdonalds/mcd-squad-details.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-squad-details.webp",
+          "alt": "Squad details showing members, cart values, status, and guest addition",
+          "caption": "Squad details expose member identity, cart value, payment status, and assisted guest creation in one host overview.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=77-316",
+          "sourceLabel": "Squad Up final deck · slide 31",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-delegated-payment",
+          "src": "/images/hcd/mcdonalds/mcd-delegated-payment.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-delegated-payment.webp",
+          "alt": "Squad Up checkout screen for selecting another member’s order to pay",
+          "caption": "Delegated payment turns the informal act of covering a friend into an explicit choice before the group order is submitted.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=77-309",
+          "sourceLabel": "Squad Up final deck · slide 34",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-readiness",
+          "src": "/images/hcd/mcdonalds/mcd-readiness.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-readiness.webp",
+          "alt": "Waiting for Squad to ready up interface",
+          "caption": "The readiness screen proves the state model in the interface by separating complete, priced, and still-incomplete members before checkout.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=432-7733",
+          "sourceLabel": "Squad Up final deck · slide 35",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        },
+        {
+          "id": "mcd-order-complete",
+          "src": "/images/hcd/mcdonalds/mcd-order-complete.webp",
+          "fullSrc": "/images/hcd/mcdonalds/mcd-order-complete.webp",
+          "alt": "Squad Up order completion and pickup interface",
+          "caption": "Separate pickup identifiers carry individual ownership into fulfillment instead of ending the shared model at digital checkout.",
+          "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=85-782",
+          "sourceLabel": "Squad Up final deck · slide 37",
+          "treatment": "full",
+          "aspect": "16 / 9"
+        }
+      ],
+      "takeaways": [
+        "Membership, cost, and readiness remain inspectable before submission.",
+        "Payment flexibility does not erase who owns each order.",
+        "Fulfillment preserves the group structure through pickup."
+      ]
+    },
+    {
+      "key": "outcome",
+      "index": "07",
+      "eyebrow": "Outcome",
+      "title": "A visible sequence for moving together",
+      "intro": "Squad Up resolved the concept into a shared sequence from invitation through pickup. The live-progress hero is the clearest summary: individual work remains visible inside one group order, without requiring one person to narrate every step.",
+      "layout": "single",
+      "evidence": [],
+      "takeaways": [
+        "The strongest design move was making coordination state visible across people.",
+        "The concept connects invitation, ordering, payment, readiness, and fulfillment as one experience."
+      ]
+    }
+  ],
+  "outcome": "Our team developed an end-to-end interaction concept that gives a group shared visibility while preserving individual choice, payment flexibility, and pickup ownership. The outcome shown here is a concept and prototype evidence trail, not a measured product launch.",
+  "limitation": "Squad Up remained a Northwestern EDI interaction-design concept using McDonald’s ordering context. McDonald’s did not sponsor, approve, or participate in the project; it was not shipped, and these artifacts do not establish technical feasibility, adoption, business impact, or real-world usability.",
+  "reflection": "The project reinforced a durable interaction-design lesson for me: group experiences become calmer when ownership and readiness are explicit states, not information people have to reconstruct through conversation."
+}
