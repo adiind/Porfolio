@@ -27,6 +27,7 @@ const sharedRequirements = {
     'View source in Figma',
     'onClick={() => scrollToChapter(chapter.key)}',
     'ref={setClosePortalTarget}',
+    '<div ref={setClosePortalTarget} className="fixed right-3 top-3 z-[9999] md:right-6 md:top-6" />',
     'ReactDOM.createPortal(',
     'closePortalTarget,',
     'LIGHTBOX_FOCUSABLE',
@@ -43,6 +44,8 @@ const sharedForbiddenMarkers = {
     'lightboxCloseRef.current?.focus();',
     'text-white/45',
     'document.body,',
+    'className="contents"',
+    'className="fixed right-3 top-3 z-[9999] flex',
   ],
 };
 

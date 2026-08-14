@@ -218,14 +218,14 @@ export const HcdCaseStudyShell: React.FC<{
         }
       `}</style>
 
-      <div ref={setClosePortalTarget} className="contents" />
+      <div ref={setClosePortalTarget} className="fixed right-3 top-3 z-[9999] md:right-6 md:top-6" />
 
       {!activeEvidence && closePortalTarget && ReactDOM.createPortal(
         <button
           type="button"
           onClick={onClose}
           aria-label={`Close ${story.title} case study`}
-          className="fixed right-3 top-3 z-[9999] flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-[#f3efe5] p-0 text-sm font-semibold text-black shadow-2xl transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 sm:w-auto sm:px-4 md:right-6 md:top-6"
+          className="relative flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-[#f3efe5] p-0 text-sm font-semibold text-black shadow-2xl transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 sm:w-auto sm:px-4"
         >
           <X aria-hidden="true" size={18} strokeWidth={2.25} />
           <span className="hidden sm:inline">Close</span>
