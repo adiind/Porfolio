@@ -168,6 +168,15 @@ export const HcdCaseStudyShell: React.FC<{
     });
   }, [activeEvidence]);
 
+  useEffect(() => {
+    if (!activeEvidence) return;
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [activeEvidence]);
+
   const openEvidence = useCallback((evidence: HcdEvidence, trigger: HTMLButtonElement) => {
     evidenceTriggerRef.current = trigger;
     setIsLightboxFullSize(false);
@@ -376,13 +385,14 @@ export const HcdCaseStudyShell: React.FC<{
         </div>
       </div>
 
-      {activeEvidence && (
+      {activeEvidence && ReactDOM.createPortal(
         <div
           ref={lightboxRef}
           role="dialog"
           aria-modal="true"
           aria-label={`Full evidence: ${activeEvidence.alt}`}
-          className="absolute inset-0 z-[10000] flex flex-col bg-black/95 p-3 sm:p-5"
+          className="hcd-case fixed inset-0 z-[20000] pointer-events-auto flex flex-col overflow-hidden overscroll-contain bg-black/95 p-3 sm:p-5"
+          style={cssVariables}
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) closeLightbox();
           }}
@@ -444,7 +454,8 @@ export const HcdCaseStudyShell: React.FC<{
               View source in Figma <ArrowUpRight aria-hidden="true" size={13} />
             </a>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </motion.div>
   );

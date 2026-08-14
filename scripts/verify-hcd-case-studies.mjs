@@ -41,6 +41,11 @@ const sharedRequirements = {
     'touch-pan-x touch-pan-y overflow-auto',
     "isLightboxFullSize ? 'mx-auto block h-auto max-w-none",
     'setIsLightboxFullSize(false);',
+    'activeEvidence && ReactDOM.createPortal(',
+    'className="hcd-case fixed inset-0 z-[20000] pointer-events-auto flex flex-col overflow-hidden overscroll-contain bg-black/95 p-3 sm:p-5"',
+    'document.body.style.overflow = \'hidden\';',
+    'document.body.style.overflow = previousBodyOverflow;',
+    'document.body,',
   ],
   'scripts/build-hcd-assets.py': ['Image.Resampling.LANCZOS', "format='WEBP'"],
 };
@@ -51,10 +56,10 @@ const sharedForbiddenMarkers = {
     'href={`#${story.projectId}-${chapter.key}`}',
     'lightboxCloseRef.current?.focus();',
     'text-white/45',
-    'document.body,',
     'className="contents"',
     'className="fixed right-3 top-3 z-[9999] flex',
     'className="mx-auto h-auto max-h-full max-w-full object-contain"',
+    '{activeEvidence && (',
   ],
 };
 
