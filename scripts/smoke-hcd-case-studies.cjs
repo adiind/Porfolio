@@ -132,7 +132,7 @@ async function assertEvidence(page, projectDialog, project) {
   }
 }
 
-async function assertLightbox(page, projectDialog, project) {
+async function assertLightbox(page, projectDialog, project, viewport) {
   const evidence = retainedEvidence(project.story)[0];
   const trigger = projectDialog.locator(`[data-evidence-trigger="${evidence.id}"]`);
   await trigger.scrollIntoViewIfNeeded();
@@ -149,8 +149,26 @@ async function assertLightbox(page, projectDialog, project) {
 
   const fullSizeButton = lightbox.locator('button[aria-pressed]');
   assert.equal(await fullSizeButton.getAttribute('aria-label'), 'View evidence at full size', `${evidence.id}: full-size control label`);
-  await fullSizeButton.focus();
-  await page.keyboard.press('Enter');
+  if (viewport.label === 'desktop') {
+    const pointerTarget = await fullSizeButton.evaluate((button) => {
+      const bounds = button.getBoundingClientRect();
+      const target = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+      return {
+        ownsCenter: target === button || (target !== null && button.contains(target)),
+        targetTag: target?.tagName ?? 'null',
+        targetLabel: target?.getAttribute('aria-label') ?? target?.textContent?.trim().slice(0, 80) ?? '',
+      };
+    });
+    assert.equal(
+      pointerTarget.ownsCenter,
+      true,
+      `${evidence.id}: full-size button must own its center pointer target; received ${pointerTarget.targetTag} ${JSON.stringify(pointerTarget.targetLabel)}`,
+    );
+    await fullSizeButton.click();
+  } else {
+    await fullSizeButton.focus();
+    await page.keyboard.press('Enter');
+  }
   assert.equal(await fullSizeButton.getAttribute('aria-pressed'), 'true', `${evidence.id}: full-size state`);
 
   const panRegion = lightbox.getByRole('region', { name: /full size; scroll in any direction to inspect/i });
@@ -203,7 +221,7 @@ async function verifyProject(browser, project, viewport) {
     assert.deepEqual(renderedChapters, chapterKeys, `${project.title}: seven ordered chapters`);
 
     await assertEvidence(page, projectDialog, project);
-    await assertLightbox(page, projectDialog, project);
+    await assertLightbox(page, projectDialog, project, viewport);
 
     const overflow = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
@@ -225,7 +243,7 @@ async function verifyProject(browser, project, viewport) {
 
     await page.waitForLoadState('networkidle');
     assert.deepEqual(errors, [], `${project.title} ${viewport.label}: browser errors\n${errors.join('\n')}`);
-    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.evidenceCount} evidence, 7 chapters, full-size two-axis pan, Escape/focus return, page Escape, Back, no overflow/errors`);
+    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.evidenceCount} evidence, 7 chapters, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} full-size activation, two-axis pan, Escape/focus return, page Escape, Back, no overflow/errors`);
   } finally {
     await page.close();
   }
