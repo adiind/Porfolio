@@ -60,7 +60,7 @@ const forbiddenPublicPatterns = [
 const rendererForbiddenPublicPatterns = [
   ['Figma', /\bfigma\b/i],
   ['View source/source-label UI', /\bview\s+source\b|\bsource[-\s]?label\b/i],
-  ['source', /(?:>\s*[^<\n]*\bsource\b[^<\n]*<|\b(?:aria-label|title|placeholder)\s*=\s*{?\s*(?:`[^`]*\bsource\b[^`]*`|'[^']*\bsource\b[^']*'|"[^"]*\bsource\b[^"]*")|\{\s*(?:`[^`]*\bsource\b[^`]*`|'[^']*\bsource\b[^']*'|"[^"]*\bsource\b[^"]*")\s*\})/i],
+  ['source', /(?:>\s*(?!\{)[^<{]*\bsource\b[^<{]*<|\b(?:aria-label|title|placeholder)\s*=\s*{?\s*(?:`[^`]*\bsource\b[^`]*`|'[^']*\bsource\b[^']*'|"[^"]*\bsource\b[^"]*")|\{\s*(?:`[^`]*\bsource\b[^`]*`|'[^']*\bsource\b[^']*'|"[^"]*\bsource\b[^"]*")\s*\})/i],
   ['Boundary', /\bboundary\b/i],
   ['evidence', /\bevidence\b/i],
   ['provenance', /\bprovenance\b/i],
