@@ -3,8 +3,18 @@ import ReactDOM from 'react-dom/client';
 import { MotionConfig } from 'framer-motion';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
+import { isWorkPath } from './lib/workRoutes';
 
 const isStudioRoute = /^\/studio\/?$/.test(window.location.pathname);
+
+// Deep link: /work/<id> opens the matching Selected Work detail (captured in
+// lib/workRoutes as INITIAL_WORK_PROJECT_ID before this runs). Reset the
+// address bar to the site root so the detail overlay owns the /work/<id>
+// history entry it pushes via useDialogA11y — browser Back then closes the
+// detail without leaving the site. Unknown ids simply land on /.
+if (!isStudioRoute && isWorkPath(window.location.pathname)) {
+  window.history.replaceState(null, '', '/');
+}
 const StudioApp = import.meta.env.DEV
   ? React.lazy(() => import('./components/StudioApp'))
   : null;

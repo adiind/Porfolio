@@ -6,11 +6,7 @@ import BlogDetail from './BlogDetail';
 import { BLOG_POSTS } from '../data/posts';
 import { trackEvent } from '../lib/analytics';
 
-interface BlogSectionProps {
-    isUnlocked?: boolean;
-}
-
-const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
+const BlogSection: React.FC = () => {
     const [activePost, setActivePost] = useState<BlogPost | null>(null);
 
     const openPost = (post: BlogPost) => {
@@ -35,10 +31,17 @@ const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
         window.dispatchEvent(new CustomEvent(activePost ? 'blogDetailOpen' : 'blogDetailClose'));
     }, [activePost]);
 
-    // Filter to only show public posts
-    const visiblePosts = BLOG_POSTS.filter(p => p.visibility === 'public');
+    // Only published, public posts appear on the site — drafts stay in the
+    // data file but are never rendered.
+    const visiblePosts = BLOG_POSTS.filter(p => p.status === 'Published' && p.visibility === 'public');
 
-    if (!isUnlocked) return null;
+    // With only one or two posts, keep the grid intentional instead of leaving
+    // empty columns: a single post reads as a featured card, two share a row.
+    const gridColumnsClass = visiblePosts.length === 1
+        ? 'grid-cols-1 md:max-w-2xl'
+        : visiblePosts.length === 2
+            ? 'grid-cols-1 md:grid-cols-2'
+            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
 
     return (
         <>
@@ -72,7 +75,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
                     </div>
 
                     {/* Blog Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className={`grid ${gridColumnsClass} gap-6`}>
                         {visiblePosts.map((post, index) => (
                             <div key={post.id} data-post-id={post.id}>
                                 <BlogCard
@@ -82,46 +85,19 @@ const BlogSection: React.FC<BlogSectionProps> = ({ isUnlocked = false }) => {
                                 />
                             </div>
                         ))}
-
-                        {/* Coming Soon Placeholder if few posts */}
-                        {visiblePosts.length < 3 && Array.from({ length: 3 - visiblePosts.length }).map((_, i) => (
-                            <motion.div
-                                key={`placeholder-${i}`}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: '-50px' }}
-                                transition={{
-                                    duration: 0.6,
-                                    delay: (visiblePosts.length + i) * 0.1,
-                                }}
-                                className="
-                                    relative cursor-default
-                                    bg-white/[0.02]
-                                    border border-dashed border-white/10
-                                    rounded-2xl p-6 md:p-8
-                                    flex items-center justify-center
-                                    min-h-[200px]
-                                "
-                            >
-                                <div className="text-center">
-                                    <p className="text-white/55 text-sm font-medium mb-1">More Thoughts</p>
-                                    <p className="text-white/55 text-xs">Coming Soon</p>
-                                </div>
-                            </motion.div>
-                        ))}
                     </div>
                 </motion.div>
             </section>
 
-            {/* Blog Detail Modal */}
-            <AnimatePresence>
-                {activePost && (
-                    <BlogDetail
-                        post={activePost}
-                        onClose={() => setActivePost(null)}
-                    />
-                )}
-            </AnimatePresence>
+            {/* Blog Detail Modal — plain conditional: an AnimatePresence exit
+                would keep the closed dialog as an invisible click-eating layer
+                whenever frames are throttled (see App.tsx overlay note). */}
+            {activePost && (
+                <BlogDetail
+                    post={activePost}
+                    onClose={() => setActivePost(null)}
+                />
+            )}
         </>
     );
 };

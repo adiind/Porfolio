@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Project } from '../types/Project';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { projectPath } from '../lib/workRoutes';
 
 interface Props {
     project: Project;
@@ -191,7 +192,7 @@ const NothingCarousel: React.FC = () => {
 
 const GlyphProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
-    const dialogRef = useDialogA11y(onClose, { historyTag: 'project' });
+    const dialogRef = useDialogA11y(onClose, { historyTag: 'project', historyPath: projectPath(project.id) });
     const year = useMemo(() => new Date().getFullYear(), []);
 
     return ReactDOM.createPortal(

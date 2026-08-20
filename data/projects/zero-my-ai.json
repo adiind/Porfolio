@@ -104,19 +104,19 @@
         {
             "title": "Voice + Chat Assistant",
             "description": "Zero supports spoken conversation for quick, ambient moments and text chat for more deliberate work. The goal was not to make a louder chatbot, but to choose the interface that fits the task.",
-            "image": "/images/zero_voice_chat.png",
+            "image": "/images/zero_voice_chat.webp",
             "tags": ["Voice", "Chat", "Context"]
         },
         {
             "title": "People + Project Memory",
             "description": "Zero keeps four layers of memory: quick preferences, SQL records for facts, semantic search for related old context, and live session context for what is happening right now. That means it can remember people, projects, notes, bugs, and decisions without pretending a giant chat log is a brain.",
-            "image": "/images/zero_project_graph.png",
+            "image": "/images/zero_project_graph.webp",
             "tags": ["4-Layer Memory", "SQL Facts", "Semantic Search"]
         },
         {
             "title": "Live Coding Workspace + Council",
             "description": "This is the focused workspace where Zero helps me code. It can talk to Codex, keep track of bugs, turn rough feature ideas into next steps, and call in a small council of perspectives like engineer, designer, critic, and product brain when a decision needs more than one angle.",
-            "image": "/images/zero_text_mode.png",
+            "image": "/images/zero_text_mode.webp",
             "tags": ["Codex", "Bug Loop", "Council"]
         }
     ],
@@ -128,8 +128,8 @@
     },
     "heroImage": "/images/zero_hero_banner.png",
     "gallery": [
-        "/images/zero_voice_chat.png",
-        "/images/zero_text_mode.png",
-        "/images/zero_project_graph.png"
+        "/images/zero_voice_chat.webp",
+        "/images/zero_text_mode.webp",
+        "/images/zero_project_graph.webp"
     ]
 }

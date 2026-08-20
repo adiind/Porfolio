@@ -72,7 +72,7 @@
             "description": "Balancing quick ordering with group readiness and payment handoffs."
         }
     ],
-    "heroImage": "/images/mcdonalds_order.png",
+    "heroImage": "/images/mcdonalds_order.webp",
     "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T",
     "sourceLabel": "View Figma Slides"
 }

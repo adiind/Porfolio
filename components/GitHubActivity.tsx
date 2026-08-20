@@ -163,13 +163,13 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ variant = 'full' }) => 
                     href={`https://github.com/${REPO_OWNER}/${REPO_NAME}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 hover:border-emerald-500/40 rounded-full text-xs text-white/70 hover:text-emerald-300 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-black/50 backdrop-blur-md border border-white/20 hover:border-emerald-500/50 rounded-full text-xs text-white/85 hover:text-emerald-300 transition-all"
                 >
                     <GitCommit size={13} />
                     <span>{stats.totalCommits}+ commits</span>
                 </a>
                 {lastCommitDate && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-white/50">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/50 backdrop-blur-md border border-white/20 rounded-full text-xs text-white/70">
                         <Calendar size={13} />
                         <span>Last push {lastCommitDate}</span>
                     </div>
