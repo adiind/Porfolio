@@ -6,6 +6,26 @@
   "proposition": "A family-care service concept that coordinates urgent handoffs without hiding consent or responsibility.",
   "context": "When a child needs help, care is only part of the work. Families also juggle calendars, permissions, pickup, medical context, and constant updates.",
   "role": "Service design · Research synthesis · Agentic interaction design",
+  "heroNotes": [
+    {
+      "id": "care-hero-coordination",
+      "text": "Urgent care is a coordination problem.",
+      "tone": "yellow",
+      "rotation": -0.8
+    },
+    {
+      "id": "care-hero-permission",
+      "text": "Permissions and responsibility stay visible.",
+      "tone": "blue",
+      "rotation": 0.7
+    },
+    {
+      "id": "care-hero-connection",
+      "text": "Keep caregivers connected and in control.",
+      "tone": "green",
+      "rotation": -0.4
+    }
+  ],
   "hero": {
     "id": "care-visibility-presence",
     "src": "/images/hcd/care/care-visibility-presence.webp",
@@ -20,6 +40,32 @@
       "key": "situation",
       "title": "Care coordination is work",
       "intro": "When a child gets sick at school, a parent is not solving one problem. Work, pickup, food, medical decisions, and family communication all arrive at once. We focused on the invisible coordination layer that becomes hardest when attention is already stretched.",
+      "storyNotes": [
+        {
+          "id": "care-situation-many-problems",
+          "text": "A sick day creates several problems at once.",
+          "tone": "yellow",
+          "rotation": -0.9
+        },
+        {
+          "id": "care-situation-work-pickup",
+          "text": "Work and pickup collide.",
+          "tone": "blue",
+          "rotation": 0.6
+        },
+        {
+          "id": "care-situation-decisions-updates",
+          "text": "Food and medical decisions follow.",
+          "tone": "green",
+          "rotation": -0.4
+        },
+        {
+          "id": "care-situation-stretched-attention",
+          "text": "Family updates compete for attention.",
+          "tone": "yellow",
+          "rotation": 0.8
+        }
+      ],
       "groups": [
         {
           "id": "care-situation",
@@ -42,22 +88,23 @@
       "key": "learning",
       "title": "The family is the system",
       "intro": "Care does not belong to one user. Parents, nearby relatives, schools, and clinicians hold different information and different authority. The concept had to make those roles visible without turning support into surveillance.",
+      "storyNotes": [],
       "notes": [
         {
           "id": "care-note-attention",
-          "text": "Care coordination expands when attention is already scarce.",
+          "text": "Coordination grows as attention shrinks.",
           "tone": "yellow",
           "rotation": -1.2
         },
         {
           "id": "care-note-permission",
-          "text": "Proactive help still needs clear permission.",
+          "text": "Proactive help still needs permission.",
           "tone": "blue",
           "rotation": 0.8
         },
         {
           "id": "care-note-trust",
-          "text": "Trust does not erase privacy boundaries.",
+          "text": "Trust does not erase privacy.",
           "tone": "green",
           "rotation": -0.5
         }
@@ -65,17 +112,8 @@
       "groups": [
         {
           "id": "care-family-system",
-          "layout": "pair",
+          "layout": "single",
           "visuals": [
-            {
-              "id": "care-stakeholders",
-              "src": "/images/hcd/care/care-stakeholders.webp",
-              "fullSrc": "/images/hcd/care/care-stakeholders.webp",
-              "alt": "FamilySync stakeholder profiles for Stacy, Robert, and Cynthia",
-              "caption": "Three family roles reveal how responsibility and information move across the care network.",
-              "treatment": "full",
-              "aspect": "16 / 9"
-            },
             {
               "id": "care-trust-takeaways",
               "src": "/images/hcd/care/care-trust-takeaways.webp",
@@ -93,20 +131,32 @@
       "key": "idea",
       "title": "Three principles shaped the idea",
       "intro": "We organized the concept around three responsibilities: coordinate the work, communicate what is happening, and preserve the human connection behind the logistics.",
+      "storyNotes": [],
+      "notes": [
+        {
+          "id": "care-principle-coordinate",
+          "text": "Coordinate the work.",
+          "tone": "yellow",
+          "rotation": -1.1
+        },
+        {
+          "id": "care-principle-communicate",
+          "text": "Communicate what is happening.",
+          "tone": "blue",
+          "rotation": 0.8
+        },
+        {
+          "id": "care-principle-connect",
+          "text": "Preserve the human connection.",
+          "tone": "green",
+          "rotation": -0.6
+        }
+      ],
       "groups": [
         {
           "id": "care-concept-principles",
-          "layout": "pair",
+          "layout": "single",
           "visuals": [
-            {
-              "id": "care-familysync-intro",
-              "src": "/images/hcd/care/care-familysync-intro.webp",
-              "fullSrc": "/images/hcd/care/care-familysync-intro.webp",
-              "alt": "FamilySync logo on a blue gradient presentation slide",
-              "caption": "FamilySync gives the coordinated care service one calm, recognizable identity.",
-              "treatment": "full",
-              "aspect": "16 / 9"
-            },
             {
               "id": "care-three-pillars",
               "src": "/images/hcd/care/care-three-pillars.webp",
@@ -124,6 +174,32 @@
       "key": "mechanics",
       "title": "Designing the handoff",
       "intro": "The service is built around explicit handoffs. It checks availability, escalates through trusted caregivers, carries the right context forward, and shows the primary caregiver where they can step in.",
+      "storyNotes": [
+        {
+          "id": "care-mechanics-availability",
+          "text": "Check availability.",
+          "tone": "yellow",
+          "rotation": -0.8
+        },
+        {
+          "id": "care-mechanics-escalation",
+          "text": "Escalate through trusted caregivers.",
+          "tone": "blue",
+          "rotation": 0.7
+        },
+        {
+          "id": "care-mechanics-context",
+          "text": "Carry the right context forward.",
+          "tone": "green",
+          "rotation": -0.5
+        },
+        {
+          "id": "care-mechanics-control",
+          "text": "Keep the caregiver able to step in.",
+          "tone": "blue",
+          "rotation": 0.9
+        }
+      ],
       "groups": [
         {
           "id": "care-pickup-handoff",
@@ -139,36 +215,6 @@
               "aspect": "2 / 1"
             }
           ]
-        },
-        {
-          "id": "care-clinical-handoff",
-          "layout": "wide",
-          "visuals": [
-            {
-              "id": "care-clinical-guardian-flow",
-              "src": "/images/hcd/care/care-clinical-guardian-flow-focus.webp",
-              "fullSrc": "/images/hcd/care/care-clinical-guardian-flow.webp",
-              "alt": "Clinical care journey for a child arriving with a temporary guardian",
-              "caption": "The clinical journey carries permissions, missing context, and milestone updates across temporary guardianship.",
-              "treatment": "focus",
-              "aspect": "2 / 5"
-            }
-          ]
-        },
-        {
-          "id": "care-escalation",
-          "layout": "single",
-          "visuals": [
-            {
-              "id": "care-escalation-flow",
-              "src": "/images/hcd/care/care-escalation-flow.webp",
-              "fullSrc": "/images/hcd/care/care-escalation-flow.webp",
-              "alt": "FamilySync pickup request and caregiver escalation interface",
-              "caption": "Caregivers can see who is being contacted, why, and when to step in.",
-              "treatment": "full",
-              "aspect": "16 / 9"
-            }
-          ]
         }
       ]
     },
@@ -176,6 +222,26 @@
       "key": "reflection",
       "title": "What I took forward",
       "intro": "FamilySync changed how I think about agentic services. The useful part is not invisible automation; it is making intent, permission, uncertainty, and escalation understandable at the moment someone needs to trust or interrupt the system.",
+      "storyNotes": [
+        {
+          "id": "care-reflection-intent",
+          "text": "Make intent and permission visible.",
+          "tone": "yellow",
+          "rotation": -0.7
+        },
+        {
+          "id": "care-reflection-uncertainty",
+          "text": "Make uncertainty and escalation clear.",
+          "tone": "blue",
+          "rotation": 0.6
+        },
+        {
+          "id": "care-reflection-interrupt",
+          "text": "Keep the system easy to interrupt.",
+          "tone": "green",
+          "rotation": -0.4
+        }
+      ],
       "groups": []
     }
   ],

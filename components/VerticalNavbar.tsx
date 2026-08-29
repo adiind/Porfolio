@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Sparkles, BookOpen } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Briefcase, Sparkles, User } from 'lucide-react';
+import { REAL_USER_IMAGE, USER_IMAGE_URL } from '../constants';
 import { TimelineMode } from '../types';
+import GlassSurface from './ui/GlassSurface';
+
+type PublicNavSection = 'profile' | 'experiences' | 'projects';
+type ActiveSection = PublicNavSection | 'footer' | 'writings';
 
 interface VerticalNavbarProps {
-    activeSection: 'profile' | 'experiences' | 'projects' | 'writings';
-    onNavigate: (section: 'profile' | 'experiences' | 'projects' | 'writings') => void;
+    activeSection: ActiveSection;
+    onNavigate: (section: PublicNavSection) => void;
     mode: TimelineMode;
     isHidden?: boolean;
 }
@@ -14,26 +19,27 @@ const navItems = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'experiences', label: 'Experiences', icon: Briefcase },
     { id: 'projects', label: 'Projects', icon: Sparkles },
-    { id: 'writings', label: 'Writings', icon: BookOpen },
 ] as const;
 
 const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNavigate, mode, isHidden = false }) => {
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
-    const handleNavClick = (id: 'profile' | 'experiences' | 'projects' | 'writings') => {
-        // Dispatch event to close any open modals (ProjectDetail, BlogDetail, etc.)
+    const handleNavClick = (id: PublicNavSection) => {
         window.dispatchEvent(new CustomEvent('closeAllModals'));
-
-        // Prevent redundant updates if already active (optional, but good for perf)
-        // if (activeSection === id) return;
         onNavigate(id);
     };
 
     return (
-        <div className={isHidden ? 'hidden' : undefined}>
-            {/* Desktop - Vertical on Right Side */}
-            <div className="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center">
-                <nav aria-label="Sections" className="flex flex-col gap-6 items-center bg-white/10 backdrop-blur-md border border-white/5 rounded-full py-6 px-3 shadow-2xl shadow-black/50">
+        <div className={isHidden ? 'hidden' : undefined} data-navigation-mode={mode}>
+            <div className="fixed right-6 top-1/2 z-50 hidden -translate-y-1/2 flex-col items-center md:flex">
+                <GlassSurface
+                    as="nav"
+                    data-nav-glass
+                    aria-label="Sections"
+                    strength="strong"
+                    blur="strong"
+                    className="flex flex-col items-center gap-5 rounded-full px-3 py-5"
+                >
                     {navItems.map((item) => {
                         const isActive = activeSection === item.id;
                         const isHovered = hoveredTab === item.id;
@@ -43,81 +49,101 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                             <motion.button
                                 key={item.id}
                                 type="button"
-                                className={`relative flex items-center justify-end group pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
+                                className="group relative flex h-11 w-11 cursor-pointer items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A]"
                                 onMouseEnter={() => setHoveredTab(item.id)}
                                 onMouseLeave={() => setHoveredTab(null)}
                                 onClick={() => handleNavClick(item.id)}
                                 aria-label={`Navigate to ${item.label}`}
-                                aria-current={isActive ? 'true' : undefined}
+                                aria-current={isActive ? 'page' : undefined}
                             >
-                                {/* Label (Tooltip) */}
                                 <AnimatePresence>
-                                    {(isHovered) && (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 20, scale: 0.9 }}
-                                            animate={{ opacity: 1, x: -20, scale: 1 }}
-                                            exit={{ opacity: 0, x: 20, scale: 0.9 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute right-full mr-4 px-3 py-1.5 rounded-md bg-white/10 backdrop-blur-md border border-white/10 shadow-xl whitespace-nowrap"
+                                    {isHovered && (
+                                        <motion.span
+                                            initial={{ opacity: 0, x: 12, scale: 0.96 }}
+                                            animate={{ opacity: 1, x: -12, scale: 1 }}
+                                            exit={{ opacity: 0, x: 12, scale: 0.96 }}
+                                            transition={{ duration: 0.16 }}
+                                            className="absolute right-full mr-3 whitespace-nowrap rounded-lg border border-white/15 bg-[#06100e]/92 px-3 py-1.5 text-xs font-medium text-white/90 shadow-xl backdrop-blur-xl"
                                         >
-                                            <span className="text-sm font-medium text-white/90">
-                                                {item.label}
-                                            </span>
-                                        </motion.div>
+                                            {item.label}
+                                        </motion.span>
                                     )}
                                 </AnimatePresence>
 
-                                {/* Indicator / Icon Container */}
-                                <div
-                                    className={`
-                    relative flex items-center justify-center 
-                    w-10 h-10 rounded-full transition-all duration-300 z-10
-                    ${isActive ? 'text-white scale-110' : 'text-white/55 hover:text-white/80 hover:scale-105'}
-                  `}
-                                >
-                                    <Icon size={18} strokeWidth={isActive ? 2 : 1.5} />
-                                </div>
-
-                                {/* Active Bubble Background */}
+                                <span className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full transition-all ${isActive ? 'scale-105 text-[#171900]' : 'text-white/62 group-hover:text-white'}`}>
+                                    <Icon size={18} strokeWidth={isActive ? 2.2 : 1.6} aria-hidden="true" />
+                                </span>
                                 {isActive && (
-                                    <motion.div
+                                    <motion.span
                                         layoutId="active-nav-bubble"
-                                        className="absolute right-0 w-10 h-10 rounded-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] z-0"
-                                        transition={{ type: "tween", duration: 0.3, ease: "circOut" }}
+                                        className="absolute inset-0 rounded-full bg-[#E5E55A] shadow-[0_0_24px_rgba(229,229,90,0.24)]"
+                                        transition={{ type: 'tween', duration: 0.22, ease: 'circOut' }}
+                                        aria-hidden="true"
                                     />
                                 )}
                             </motion.button>
                         );
                     })}
-                </nav>
+                </GlassSurface>
             </div>
 
-            {/* Mobile - Top Navbar */}
-            <div className="flex md:hidden fixed top-0 left-0 right-0 z-[60] justify-center px-4 py-3 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 pointer-events-auto">
-                <nav aria-label="Sections" className="flex flex-row gap-8 items-center w-full justify-center">
-                    {navItems.map((item) => {
-                        const isActive = activeSection === item.id;
-                        const Icon = item.icon;
+            <div className="fixed inset-x-0 top-0 z-[60] flex py-2 pl-2 pr-[4.5rem] pointer-events-auto md:hidden">
+                <GlassSurface
+                    as="nav"
+                    data-nav-glass
+                    aria-label="Sections"
+                    strength="strong"
+                    blur="strong"
+                    className="flex w-full items-center justify-between rounded-2xl px-1.5 py-1"
+                >
+                    <button
+                        type="button"
+                        data-mobile-identity
+                        onClick={() => handleNavClick('profile')}
+                        className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl px-1.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A]"
+                        aria-label="Navigate to Profile"
+                        aria-current={activeSection === 'profile' ? 'page' : undefined}
+                    >
+                        <span
+                            data-header-photo-fallback
+                            className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/20 bg-[#10231d] bg-cover bg-center"
+                            style={{ backgroundImage: `url(${USER_IMAGE_URL})` }}
+                        >
+                            <img
+                                data-header-photo
+                                src={REAL_USER_IMAGE}
+                                alt=""
+                                decoding="async"
+                                fetchPriority="high"
+                                className="h-full w-full object-cover object-[center_32%]"
+                            />
+                        </span>
+                        <span className="min-w-0">
+                            <span className="block truncate text-[11px] font-semibold leading-tight text-white">Adi Agarwal</span>
+                            <span className="block max-w-[76px] truncate text-[8px] leading-tight text-white/58">Tangible AI + Product Systems</span>
+                        </span>
+                    </button>
 
-                        return (
-                            <button
-                                key={item.id}
-                                className={`
-                                    relative flex flex-col items-center justify-center gap-1 min-w-11 min-h-11 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80
-                                    ${isActive ? 'text-indigo-400' : 'text-white/50 hover:text-white/80'}
-                                `}
-                                onClick={() => handleNavClick(item.id)}
-                                aria-label={`Navigate to ${item.label}`}
-                                aria-current={isActive ? 'true' : undefined}
-                            >
-                                <Icon size={20} className="relative z-10" />
-                                {isActive && (
-                                    <div className="absolute -bottom-3 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
-                                )}
-                            </button>
-                        );
-                    })}
-                </nav>
+                    <span className="flex shrink-0 items-center gap-0.5">
+                        {navItems.filter((item) => item.id !== 'profile').map((item) => {
+                            const isActive = activeSection === item.id;
+                            const Icon = item.icon;
+                            return (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A] ${isActive ? 'text-[#E5E55A]' : 'text-white/55'}`}
+                                    onClick={() => handleNavClick(item.id)}
+                                    aria-label={`Navigate to ${item.label}`}
+                                    aria-current={isActive ? 'page' : undefined}
+                                >
+                                    <Icon size={18} aria-hidden="true" />
+                                    {isActive && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-[#E5E55A]" aria-hidden="true" />}
+                                </button>
+                            );
+                        })}
+                    </span>
+                </GlassSurface>
             </div>
         </div>
     );

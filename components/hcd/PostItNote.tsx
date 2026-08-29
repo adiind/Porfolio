@@ -12,7 +12,7 @@ const toneClass: Record<HcdPostIt['tone'], string> = {
 export const PostItNote: React.FC<{ note: HcdPostIt }> = ({ note }) => (
   <aside
     data-hcd-post-it={note.id}
-    className={`hcd-post-it relative flex aspect-[4/3] w-full max-w-[19rem] items-start p-5 text-[15px] font-semibold leading-snug shadow-[0_12px_24px_rgba(24,20,10,0.22)] even:justify-self-end sm:max-w-none sm:justify-self-stretch ${toneClass[note.tone]}`}
+    className={`hcd-post-it relative inline-flex aspect-square w-[clamp(9.25rem,26vw,11.5rem)] shrink-0 items-start overflow-hidden p-4 text-[14px] font-semibold leading-[1.32] shadow-[0_12px_26px_rgba(0,0,0,0.28)] ${toneClass[note.tone]}`}
     style={{ transform: `rotate(${note.rotation}deg)` }}
   >
     <span className="relative z-10">{note.text}</span>

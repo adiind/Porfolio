@@ -1,19 +1,27 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, ScrollText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TimelineItem, CaseStudy, FeatureCard } from '../types';
+import { Project } from '../types/Project';
 import { formatDate } from '../utils';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { useProjects } from '../context/ProjectsContext';
+import ProjectDetail from './ProjectDetail';
+import { trackEvent } from '../lib/analytics';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
     item: TimelineItem;
     onClose: () => void;
     onOpenCaseStudy: (study: CaseStudy) => void;
+    analyticsSource: string;
+    analyticsActive?: boolean;
 }
 
-const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) => {
+const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, analyticsSource, analyticsActive = true }) => {
     const carouselRef = useRef<HTMLDivElement>(null);
+    const { getProjectsByIds } = useProjects();
 
     const scrollCarousel = (direction: 'left' | 'right') => {
         if (carouselRef.current) {
@@ -27,6 +35,34 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
 
     // State for Feature Card Modal
     const [selectedFeatureCard, setSelectedFeatureCard] = useState<FeatureCard | null>(null);
+    const [activeLinkedProject, setActiveLinkedProject] = useState<Project | null>(null);
+
+    useEffect(() => {
+        trackEvent('experience_opened', {
+            id: item.id,
+            type: item.type,
+            source: analyticsSource,
+            surface: 'dialog',
+        });
+    }, [analyticsSource, item.id, item.type]);
+
+    useContentEngagement({
+        contentType: 'experience',
+        contentId: item.id,
+        section: 'detail',
+        active: analyticsActive && !selectedFeatureCard && !activeLinkedProject,
+    });
+
+    const openFeatureCard = (card: FeatureCard) => {
+        if (card.projectId) {
+            const [linkedProject] = getProjectsByIds([card.projectId]);
+            if (linkedProject) {
+                setActiveLinkedProject(linkedProject);
+                return;
+            }
+        }
+        setSelectedFeatureCard(card);
+    };
 
     const handleCaseStudyClick = () => {
         if (item.caseStudy) {
@@ -43,10 +79,24 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
     };
     const accent = getAccentColor();
 
-    const dialogRef = useDialogA11y(onClose, { historyTag: 'experience' });
+    // Parent and child dialogs both listen for Escape. Keep the experience
+    // mounted whenever a nested feature/project is the topmost surface.
+    const handleTopmostClose = () => {
+        if (activeLinkedProject) {
+            setActiveLinkedProject(null);
+            return;
+        }
+        if (selectedFeatureCard) {
+            setSelectedFeatureCard(null);
+            return;
+        }
+        onClose();
+    };
+
+    const dialogRef = useDialogA11y(handleTopmostClose, { historyTag: 'experience' });
 
     const handleManualClose = () => {
-        onClose();
+        handleTopmostClose();
     };
 
     return (
@@ -56,10 +106,11 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
             role="dialog"
             aria-modal="true"
             aria-labelledby="experience-detail-title"
+            data-experience-id={item.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[45] bg-black/95 overflow-hidden focus:outline-none"
+            className={`fixed inset-0 bg-black/95 overflow-hidden focus:outline-none ${selectedFeatureCard || activeLinkedProject ? 'z-[100]' : 'z-[45]'}`}
             onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}
@@ -69,7 +120,7 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
             </div>
 
             {/* Close Button */}
-            {ReactDOM.createPortal(
+            {!selectedFeatureCard && !activeLinkedProject && ReactDOM.createPortal(
                 <motion.button
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -88,7 +139,8 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 30, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="relative z-10 h-full overflow-y-auto custom-scrollbar"
+                aria-hidden={selectedFeatureCard || activeLinkedProject ? true : undefined}
+                className={`relative z-10 h-full overflow-y-auto custom-scrollbar ${selectedFeatureCard || activeLinkedProject ? 'hidden' : ''}`}
             // No onClick listener here that stops propagation generically
             // We want creating a specific container for the content that stops propagation
             >
@@ -214,7 +266,7 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                                                     card={card}
                                                     index={i}
                                                     accent={accent}
-                                                    onClick={() => setSelectedFeatureCard(card)}
+                                                    onClick={() => openFeatureCard(card)}
                                                 />
                                             ))}
                                         </div>
@@ -311,6 +363,16 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy }) =
                     />
                 )}
             </AnimatePresence>
+
+            {/* Linked Selected Work opens above the experience. Keeping the
+                parent mounted preserves its scroll position and focus context. */}
+            {activeLinkedProject && (
+                <ProjectDetail
+                    project={activeLinkedProject}
+                    analyticsSource="experience_feature"
+                    onClose={() => setActiveLinkedProject(null)}
+                />
+            )}
         </motion.div>
     );
 };
@@ -342,8 +404,13 @@ const SkillPill: React.FC<{ label: string; description?: string }> = ({ label, d
 // Sub-component for Feature Cards (Compact in Marquee)
 const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: string; onClick: () => void }> = ({ card, index, accent, onClick }) => {
     return (
-        <div
-            className="group w-[260px] max-w-[calc(100vw-3rem)] flex-shrink-0 snap-start rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer hover:bg-white/[0.08] hover:scale-[1.02]"
+        <button
+            type="button"
+            data-feature-card
+            data-linked-project-id={card.projectId}
+            aria-haspopup="dialog"
+            aria-label={`Open project ${card.title}`}
+            className="group w-[260px] max-w-[calc(100vw-3rem)] flex-shrink-0 snap-start rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer hover:bg-white/[0.08] hover:scale-[1.02] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
             onClick={onClick}
         >
             {/* Card Header with gradient or image */}
@@ -353,7 +420,7 @@ const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: stri
                         <img
                             src={card.imageUrl}
                             alt={card.title}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className={`absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105 ${card.media?.length ? 'object-contain bg-[#111]' : 'object-cover'}`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
                     </>
@@ -362,7 +429,7 @@ const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: stri
                 )}
 
                 <div className="relative z-10">
-                    <h3 className="text-base font-bold text-white leading-tight line-clamp-1 drop-shadow-md">
+                    <h3 data-full-feature-title className="text-base font-bold text-white leading-tight drop-shadow-md">
                         {card.title}
                     </h3>
                     <span className="text-[10px] text-white/70 font-medium mt-0.5 drop-shadow-md">{card.subtitle}</span>
@@ -394,13 +461,14 @@ const FeatureCardItem: React.FC<{ card: FeatureCard; index: number; accent: stri
                     </div>
                 )}
             </div>
-        </div>
+        </button>
     );
 };
 
 // Feature Card Modal (Detailed View)
 const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accent: string }> = ({ card, onClose, accent }) => {
     const dialogRef = useDialogA11y(onClose, { historyTag: 'feature' });
+    const hasMediaGallery = Boolean(card.media?.length);
 
     return (
         <div
@@ -409,6 +477,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
             role="dialog"
             aria-modal="true"
             aria-labelledby="feature-card-modal-title"
+            data-feature-detail
             className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md focus:outline-none"
             onClick={(e) => {
                 e.stopPropagation();
@@ -420,7 +489,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] relative"
+                className={`w-full bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] relative ${hasMediaGallery ? 'max-w-5xl' : 'max-w-2xl'}`}
             >
                 <button
                     onClick={onClose}
@@ -432,7 +501,7 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
 
                 <div className="overflow-y-auto custom-scrollbar flex-1">
                     {/* Header with visual flare or Image */}
-                    <div className="relative h-[450px] flex items-end px-6 pt-6 pb-2 md:px-8 md:pt-8 md:pb-2 overflow-hidden">
+                    {!hasMediaGallery && <div className="relative h-[450px] flex items-end px-6 pt-6 pb-2 md:px-8 md:pt-8 md:pb-2 overflow-hidden">
                         {card.imageUrl ? (
                             <>
                                 <img
@@ -459,7 +528,32 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </div>}
+
+                    {hasMediaGallery && (
+                        <div className="px-6 pb-2 pt-16 md:px-8 md:pt-20">
+                            <h2 id="feature-card-modal-title" className="text-2xl md:text-3xl font-bold text-white mb-1">
+                                {card.title}
+                            </h2>
+                            <p className={`text-${accent}-300 font-medium text-sm md:text-base mb-6`}>{card.subtitle}</p>
+                            <div data-feature-media className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                {card.media?.map((media) => (
+                                    <figure key={media.url} className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+                                        <img
+                                            src={media.url}
+                                            alt={media.alt}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="block h-auto max-h-[52vh] w-full object-contain"
+                                        />
+                                        <figcaption className="border-t border-white/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/60">
+                                            {media.label}
+                                        </figcaption>
+                                    </figure>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Content */}
                     <div className="p-6 md:p-8">

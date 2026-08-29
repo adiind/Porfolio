@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,10 +14,13 @@ import { projectPath } from '../lib/workRoutes';
 import GlyphProjectDetail from './GlyphProjectDetail';
 import FamilySyncProjectDetail from './hcd/FamilySyncProjectDetail';
 import McDonaldsProjectDetail from './hcd/McDonaldsProjectDetail';
+import { trackEvent } from '../lib/analytics';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
     project: Project;
     onClose: () => void;
+    analyticsSource?: string;
 }
 
 const colorMap = {
@@ -453,6 +456,21 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
 };
 
 const ProjectDetail: React.FC<Props> = (props) => {
+    useEffect(() => {
+        trackEvent('project_opened', {
+            id: props.project.id,
+            title: props.project.hero.title,
+            status: props.project.outcome.status,
+            source: props.analyticsSource ?? 'unknown',
+        });
+    }, [props.analyticsSource, props.project.hero.title, props.project.id, props.project.outcome.status]);
+
+    useContentEngagement({
+        contentType: 'project',
+        contentId: props.project.id,
+        section: 'detail',
+    });
+
     if (props.project.id === 'glyph') return <GlyphProjectDetail {...props} />;
     if (props.project.id === 'familysync-jpmorgan') return <FamilySyncProjectDetail {...props} />;
     if (props.project.id === 'mcdonalds-interaction-design') return <McDonaldsProjectDetail {...props} />;

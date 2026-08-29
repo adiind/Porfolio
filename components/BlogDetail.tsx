@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { X, Calendar, BookOpen, ArrowLeft } from 'lucide-react';
 import { BlogPost } from '../types/BlogPost';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
     post: BlogPost;
@@ -264,6 +265,11 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
     };
 
     const dialogRef = useDialogA11y(onClose, { historyTag: 'writing' });
+    useContentEngagement({
+        contentType: 'writing',
+        contentId: post.id,
+        section: 'detail',
+    });
 
     const handleManualClose = () => {
         onClose();

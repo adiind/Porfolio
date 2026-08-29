@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { ChevronDown, Trophy } from 'lucide-react';
 import { Project } from '../types/Project';
 
@@ -85,6 +85,7 @@ const splashColors = [
 const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
+    const shouldReduceMotion = useReducedMotion();
 
     // Motion values for 3D tilt
     const x = useMotionValue(0);
@@ -160,6 +161,7 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             role="button"
             tabIndex={0}
             aria-label={`Open project ${project.hero.title}`}
+            data-project-card
             className={`
                 group relative cursor-pointer overflow-hidden
                 border ${isHovered ? colors.borderHover : colors.border}
@@ -245,11 +247,11 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
                     layout="position"
                     className={isHovered ? 'mt-10' : 'mt-auto'}
                 >
-                    <h3 className={`text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 transition-colors duration-300 ${isHovered ? colors.text : ''}`}>
+                    <h3 data-project-card-title className={`break-words text-sm font-bold text-white leading-tight mb-0.5 transition-colors duration-300 ${isHovered ? colors.text : ''}`}>
                         {titleParts[0]}
                     </h3>
                     {titleParts[1] && (
-                        <p className="text-[10px] text-white/60 font-medium uppercase tracking-wide truncate">
+                        <p data-project-card-title className="break-words text-[10px] font-medium uppercase leading-snug tracking-wide text-white/60">
                             {titleParts[1]}
                         </p>
                     )}
@@ -309,7 +311,7 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
                                 transition={{ delay: 0.15, duration: 0.2 }}
                                 className="mt-4 flex items-center gap-2 text-white/55"
                             >
-                                <ChevronDown size={14} className="animate-bounce" />
+                                <ChevronDown size={14} className={shouldReduceMotion ? '' : 'animate-bounce'} />
                                 <span className="text-[10px] uppercase tracking-widest">Click to explore</span>
                             </motion.div>
                         </motion.div>

@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TimelineItem, CaseStudy } from '../types';
 import { Briefcase, GraduationCap, Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
 import { formatDate } from '../utils';
-import { TINKERVERSE_LOGO, SOCIAL_POSTS } from '../constants';
+import { TINKERVERSE_JOURNAL, TINKERVERSE_LOGO } from '../constants';
 import { trackEvent } from '../lib/analytics';
+import { Project } from '../types/Project';
+import { useProjects } from '../context/ProjectsContext';
+import ProjectDetail from './ProjectDetail';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
     items: TimelineItem[];
     onOpenCaseStudy: (study: CaseStudy) => void;
     onOpenProject: (project: TimelineItem) => void;
     onOpenTinkerVerse: () => void;
+    analyticsActive?: boolean;
 }
 
 
@@ -18,11 +24,37 @@ const MobileTimeline: React.FC<Props> = ({
     items,
     onOpenCaseStudy,
     onOpenProject,
-    onOpenTinkerVerse
+    onOpenTinkerVerse,
+    analyticsActive = true,
 }) => {
+    const { getProjectsByIds } = useProjects();
     // Track expanded card and feature card
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [expandedFeatureId, setExpandedFeatureId] = useState<string | null>(null);
+    const [activeLinkedProject, setActiveLinkedProject] = useState<Project | null>(null);
+    const expandedItem = items.find((item) => item.id === expandedId) ?? null;
+
+    useContentEngagement({
+        contentType: 'experience',
+        contentId: expandedItem?.id ?? 'mobile-none',
+        section: 'detail',
+        active: analyticsActive && expandedItem !== null && activeLinkedProject === null,
+    });
+
+    useEffect(() => {
+        if (!activeLinkedProject) return;
+        window.dispatchEvent(new CustomEvent('projectDetailOpen'));
+        return () => {
+            window.dispatchEvent(new CustomEvent('projectDetailClose'));
+        };
+    }, [activeLinkedProject]);
+
+    const openLinkedProject = (projectId: string): boolean => {
+        const [project] = getProjectsByIds([projectId]);
+        if (!project) return false;
+        setActiveLinkedProject(project);
+        return true;
+    };
 
     // Separate items by type
     const tinkerverse = items.find(i => i.id === 'tinkerverse');
@@ -79,6 +111,12 @@ const MobileTimeline: React.FC<Props> = ({
                 title: item.title,
                 type: item.type,
             });
+            trackEvent('experience_opened', {
+                id: item.id,
+                type: item.type,
+                source: 'mobile_timeline',
+                surface: 'inline',
+            });
             setExpandedId(item.id);
         }
     };
@@ -89,6 +127,7 @@ const MobileTimeline: React.FC<Props> = ({
         return (
             <motion.div
                 key={item.id}
+                data-mobile-experience-id={item.id}
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -145,7 +184,7 @@ const MobileTimeline: React.FC<Props> = ({
                     {/* Title and Company */}
                     <div className="mb-2">
                         <div className="flex items-start justify-between gap-2">
-                            <h3 className="font-bold text-white text-lg leading-tight">{item.title}</h3>
+                            <h3 data-full-timeline-title className="font-bold text-white text-lg leading-tight">{item.title}</h3>
                             {/* Logo */}
                             {item.logoUrl && (
                                 <div className={`shrink-0 flex items-center justify-center ${item.id === 'ms-edi' ? 'min-w-[56px] pl-2' : 'w-8 h-8 rounded bg-white/5 p-0.5'}`}>
@@ -222,9 +261,12 @@ const MobileTimeline: React.FC<Props> = ({
                                                     return (
                                                         <div
                                                             key={idx}
+                                                            data-feature-card
+                                                            data-linked-project-id={card.projectId}
                                                             className={`p-3 rounded-xl border transition-all ${isFeatureExpanded ? 'bg-indigo-500/20 border-indigo-500/40 shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/10'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                if (card.projectId && openLinkedProject(card.projectId)) return;
                                                                 trackEvent(isFeatureExpanded ? 'mobile_feature_card_collapsed' : 'mobile_feature_card_expanded', {
                                                                     parent_id: item.id,
                                                                     title: card.title,
@@ -235,6 +277,7 @@ const MobileTimeline: React.FC<Props> = ({
                                                                 if (e.key === 'Enter' || e.key === ' ') {
                                                                     e.stopPropagation();
                                                                     e.preventDefault();
+                                                                    if (card.projectId && openLinkedProject(card.projectId)) return;
                                                                     trackEvent(isFeatureExpanded ? 'mobile_feature_card_collapsed' : 'mobile_feature_card_expanded', {
                                                                         parent_id: item.id,
                                                                         title: card.title,
@@ -244,12 +287,13 @@ const MobileTimeline: React.FC<Props> = ({
                                                             }}
                                                             role="button"
                                                             tabIndex={0}
-                                                            aria-expanded={isFeatureExpanded}
-                                                            aria-label={card.title}
+                                                            aria-expanded={card.projectId ? undefined : isFeatureExpanded}
+                                                            aria-haspopup={card.projectId ? 'dialog' : undefined}
+                                                            aria-label={card.projectId ? `Open project ${card.title}` : card.title}
                                                         >
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <div className="flex-1">
-                                                                    <div className={`text-xs font-bold ${isFeatureExpanded ? 'text-indigo-200' : 'text-white/80'}`}>{card.title}</div>
+                                                                    <div data-mobile-feature-title className={`text-xs font-bold leading-snug ${isFeatureExpanded ? 'text-indigo-200' : 'text-white/80'}`}>{card.title}</div>
                                                                     {!isFeatureExpanded && <div className="text-[10px] text-white/50 mt-0.5">{card.subtitle}</div>}
                                                                 </div>
                                                                 <div className={`p-1 rounded-full ${isFeatureExpanded ? 'bg-indigo-500/20 text-indigo-300' : 'bg-transparent text-white/55'}`}>
@@ -275,6 +319,24 @@ const MobileTimeline: React.FC<Props> = ({
                                                                                     </li>
                                                                                 ))}
                                                                             </ul>
+                                                                        )}
+                                                                        {card.media && card.media.length > 0 && (
+                                                                            <div data-feature-media className="mt-3 grid grid-cols-1 gap-3">
+                                                                                {card.media.map((media) => (
+                                                                                    <figure key={media.url} className="overflow-hidden rounded-lg border border-white/10 bg-black/20">
+                                                                                        <img
+                                                                                            src={media.url}
+                                                                                            alt={media.alt}
+                                                                                            loading="lazy"
+                                                                                            decoding="async"
+                                                                                            className="block h-auto max-h-[55vh] w-full object-contain"
+                                                                                        />
+                                                                                        <figcaption className="border-t border-white/10 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-white/60">
+                                                                                            {media.label}
+                                                                                        </figcaption>
+                                                                                    </figure>
+                                                                                ))}
+                                                                            </div>
                                                                         )}
                                                                     </motion.div>
                                                                 )}
@@ -319,20 +381,16 @@ const MobileTimeline: React.FC<Props> = ({
     );
 
     return (
+        <>
         <div className="px-5 py-8 space-y-10 pb-32">
-            {/* Professional experience leads the career-reading path */}
-            {corporate.length > 0 && renderSection('Experience', corporate, 'text-indigo-400')}
-
-            {/* Education Section */}
-            {education.length > 0 && renderSection('Education', education, 'text-rose-400')}
-
-            {/* TinkerVerse — supporting maker/community module after the formal narrative */}
+            {/* TinkerVerse is a primary timeline story, not a supporting footer module. */}
             {tinkerverse && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="w-full p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-pointer active:scale-[0.98] transition-transform backdrop-blur-sm shadow-amber-900/10 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+                    data-tinkerverse-preview
+                    className="group relative w-full min-h-[250px] overflow-hidden rounded-2xl border border-[#e5e55a]/20 bg-[#06231d] cursor-pointer active:scale-[0.98] transition-transform shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e5e55a]"
                     onClick={onOpenTinkerVerse}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -344,20 +402,53 @@ const MobileTimeline: React.FC<Props> = ({
                     tabIndex={0}
                     aria-label="Open TinkerVerse"
                 >
-                    <div className="flex items-center gap-4">
-                        <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="w-10 h-10 rounded-lg bg-white p-0.5 object-cover" />
-                        <div className="flex-1">
-                            <h3 className="font-bold text-amber-100 text-base">TinkerVerse</h3>
-                            <p className="text-[11px] text-amber-200/60 font-mono mt-0.5">{SOCIAL_POSTS.length} experiments logged</p>
+                    {TINKERVERSE_JOURNAL[0] && (
+                        <img
+                            src={TINKERVERSE_JOURNAL[0].localMediaUrl}
+                            alt={TINKERVERSE_JOURNAL[0].alt}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 h-full w-full object-contain opacity-90 transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                    )}
+                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#03110e] via-[#03110e]/55 to-black/15" />
+                    <div className="relative z-10 flex min-h-[250px] flex-col p-4 text-left">
+                        <div className="flex items-center gap-3">
+                            <img src={TINKERVERSE_LOGO} alt="" className="h-9 w-9 rounded-lg border border-white/15 bg-black object-cover" />
+                            <div className="min-w-0 flex-1">
+                                <h3 className="font-bold text-white text-base">TinkerVerse</h3>
+                                <p className="mt-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a]">Live workshop journal</p>
+                            </div>
+                            <div className="rounded-full border border-[#e5e55a]/30 bg-black/[0.45] px-3 py-1 text-[10px] font-bold tracking-wider text-[#f0f18a] backdrop-blur-sm">OPEN</div>
                         </div>
-                        <div className="text-amber-400 text-xs font-bold tracking-wider bg-amber-500/20 px-3 py-1 rounded-full">OPEN</div>
+                        <div className="mt-auto">
+                            <p className="text-lg font-bold leading-tight text-white">One honest build at a time.</p>
+                            <p className="mt-2 text-sm leading-relaxed text-white/[0.72]">
+                                Physical computing and creative-tech experiments, documented while they are still being figured out.
+                            </p>
+                            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60">
+                                {TINKERVERSE_JOURNAL.length} curated field notes
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-sm text-amber-100/70 leading-relaxed font-light mt-3 line-clamp-2">
-                        Independent making and community work — physical computing and creative tech experiments, documented on Instagram.
-                    </p>
                 </motion.div>
             )}
+
+            {/* Education Section */}
+            {education.length > 0 && renderSection('Education', education, 'text-rose-400')}
+
+            {/* Experience Section */}
+            {corporate.length > 0 && renderSection('Experience', corporate, 'text-indigo-400')}
         </div>
+        {activeLinkedProject && ReactDOM.createPortal(
+            <ProjectDetail
+                project={activeLinkedProject}
+                analyticsSource="mobile_feature"
+                onClose={() => setActiveLinkedProject(null)}
+            />,
+            document.body
+        )}
+        </>
     );
 };
 

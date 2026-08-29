@@ -4,6 +4,8 @@ import { X, Linkedin, FileText, ExternalLink } from 'lucide-react';
 import { REAL_USER_IMAGE, PROFILE_BIO, PROFILE_SKILLS, SOCIAL_LINKS } from '../constants';
 import { trackEvent } from '../lib/analytics';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import GlassSurface from './ui/GlassSurface';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
   onClose: () => void;
@@ -11,6 +13,11 @@ interface Props {
 
 const ProfileModal: React.FC<Props> = ({ onClose }) => {
   const dialogRef = useDialogA11y(onClose, { historyTag: 'profile' });
+  useContentEngagement({
+    contentType: 'profile',
+    contentId: 'profile',
+    section: 'detail',
+  });
 
   const handleManualClose = () => {
     onClose();
@@ -54,40 +61,45 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl focus:outline-none"
+      data-profile-backdrop
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020706]/45 p-3 backdrop-blur-sm focus:outline-none sm:p-5 md:p-8"
       onClick={handleManualClose}
     >
-      <motion.div
+      <GlassSurface
+        as={motion.div}
+        data-profile-glass
+        strength="strong"
+        blur="strong"
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-[95vw] md:w-full max-w-6xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] scale-100 md:scale-90 origin-center"
+        className="relative flex max-h-[92vh] w-full max-w-5xl origin-center flex-col overflow-hidden rounded-[1.75rem] md:max-h-[88vh] md:flex-row"
       >
         <button
           onClick={handleManualClose}
           aria-label="Close profile"
-          className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-colors z-20"
+          className="absolute right-3 top-3 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#06100e]/75 text-white/70 transition-colors hover:border-white/35 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A] md:right-4 md:top-4"
         >
           <X size={20} />
         </button>
 
         {/* Left Column: Image */}
-        <div className="w-full md:w-2/5 relative h-72 md:h-auto overflow-hidden bg-black">
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#0a0a0a] z-10 opacity-80" />
+        <div className="relative h-64 w-full overflow-hidden bg-[#071411]/70 sm:h-72 md:h-auto md:w-[38%]">
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#06100e]/95 via-transparent to-transparent opacity-80 md:bg-gradient-to-r md:from-transparent md:to-[#06100e]/90" />
           <img
             src={REAL_USER_IMAGE}
             alt="Adi Agarwal"
-            className="w-full h-full object-contain"
+            className="h-full w-full object-cover object-[center_28%]"
           />
         </div>
 
         {/* Right Column: Content */}
-        <div className="flex-1 p-6 md:p-8 flex flex-col overflow-y-auto custom-scrollbar">
+        <div className="custom-scrollbar flex flex-1 flex-col overflow-y-auto p-6 md:p-9">
           <div className="mb-6">
             <h2 id="profile-modal-title" className="text-2xl md:text-3xl font-bold text-white mb-2">Hello, I'm Adi.</h2>
-            <p className="text-rose-400 font-medium tracking-wide uppercase text-sm">Tangible AI · Product Design · Creative Technology</p>
+            <p className="text-[#F0F570] font-medium tracking-[0.12em] uppercase text-xs">Tangible AI · Product Design · Creative Technology</p>
           </div>
 
           {/* Mobile: actions surfaced above the bio so they're reachable without scrolling */}
@@ -95,7 +107,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
             {actionLinks}
           </div>
 
-          <div className="space-y-4 text-gray-300 text-sm leading-relaxed mb-6 font-light">
+          <div className="mb-6 space-y-4 text-sm font-light leading-relaxed text-white/78">
             {PROFILE_BIO.split('\n\n').map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
@@ -107,7 +119,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
               {PROFILE_SKILLS.map((skill, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-300 hover:bg-white/10 hover:border-rose-500/30 transition-colors cursor-default"
+                  className="cursor-default rounded-full border border-white/15 bg-white/[0.07] px-3 py-1 text-xs text-white/76 transition-colors hover:border-[#E5E55A]/35 hover:bg-white/10"
                 >
                   {skill}
                 </span>
@@ -120,7 +132,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
             {actionLinks}
           </div>
         </div>
-      </motion.div>
+      </GlassSurface>
     </motion.div >
   );
 };

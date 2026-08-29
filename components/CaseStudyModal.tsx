@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote, ExternalLink } from 'lucide-react';
 import { CaseStudy } from '../types';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
   caseStudy: CaseStudy;
@@ -39,6 +40,11 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
   };
   const tc = getThemeClasses();
   const dialogRef = useDialogA11y(onClose, { historyTag: 'casestudy' });
+  useContentEngagement({
+    contentType: 'project',
+    contentId: caseStudy.title,
+    section: 'case_study',
+  });
 
   return (
     <motion.div

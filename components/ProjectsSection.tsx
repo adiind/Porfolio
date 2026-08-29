@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project } from '../types/Project';
 import ProjectCard from './ProjectCard';
@@ -6,6 +7,8 @@ import ProjectDetail from './ProjectDetail';
 import { trackEvent } from '../lib/analytics';
 import { useProjects } from '../context/ProjectsContext';
 import { INITIAL_WORK_PROJECT_ID } from '../lib/workRoutes';
+import CuttingMatSurface from './ui/CuttingMatSurface';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 type ProjectIntent = 'all' | 'tangible-ai' | 'product-thinking' | 'physical-craft';
 
@@ -52,7 +55,18 @@ const ProjectsSection: React.FC = () => {
     const [activeProject, setActiveProject] = useState<Project | null>(
         () => (INITIAL_WORK_PROJECT_ID ? projects.find((p) => p.id === INITIAL_WORK_PROJECT_ID) ?? null : null)
     );
+    const [activeProjectSource, setActiveProjectSource] = useState(
+        INITIAL_WORK_PROJECT_ID ? 'deep_link' : 'selected_work'
+    );
     const [activeIntent, setActiveIntent] = useState<ProjectIntent>('all');
+    const matContentRef = useRef<HTMLDivElement>(null);
+    const [matHeight, setMatHeight] = useState(720);
+    const engagementRef = useContentEngagement<HTMLElement>({
+        contentType: 'section',
+        contentId: 'projects',
+        active: activeProject === null,
+        observeVisibility: true,
+    });
     const activeIntentConfig = PROJECT_INTENTS.find((intent) => intent.id === activeIntent) ?? PROJECT_INTENTS[0];
     const visibleProjects = useMemo(() => {
         if (!activeIntentConfig.projectIds) return projects;
@@ -77,27 +91,9 @@ const ProjectsSection: React.FC = () => {
     };
 
     const openProject = (project: Project) => {
-        trackEvent('project_opened', {
-            id: project.id,
-            title: project.hero.title,
-            status: project.outcome.status,
-            source: 'selected_work',
-        });
+        setActiveProjectSource('selected_work');
         setActiveProject(project);
     };
-
-    // Deep-link opens bypass openProject(), so track them once on mount.
-    useEffect(() => {
-        if (!INITIAL_WORK_PROJECT_ID) return;
-        const project = projects.find((p) => p.id === INITIAL_WORK_PROJECT_ID);
-        if (!project) return;
-        trackEvent('project_opened', {
-            id: project.id,
-            title: project.hero.title,
-            status: project.outcome.status,
-            source: 'deep_link',
-        });
-    }, []);
 
     // Listen for closeAllModals event (e.g., from navbar navigation)
     useEffect(() => {
@@ -111,123 +107,135 @@ const ProjectsSection: React.FC = () => {
         window.dispatchEvent(new CustomEvent(activeProject ? 'projectDetailOpen' : 'projectDetailClose'));
     }, [activeProject]);
 
+    // CuttingMatSurface intentionally fills its parent. Measure this variable-
+    // height section locally so the grid can grow/shrink without clipping the
+    // mat, its lower ruler, or the final project row.
+    useEffect(() => {
+        const content = matContentRef.current;
+        if (!content) return;
+        const syncHeight = () => {
+            const nextHeight = Math.max(720, Math.ceil(content.scrollHeight));
+            setMatHeight((current) => current === nextHeight ? current : nextHeight);
+        };
+        const observer = new ResizeObserver(syncHeight);
+        observer.observe(content);
+        syncHeight();
+        return () => observer.disconnect();
+    }, []);
+
     return (
         <>
-            <section id="projects" className="relative w-full max-w-6xl mx-auto px-6 py-12 md:py-24 border-t border-white/5 mt-6 md:mt-20">
+            <section ref={engagementRef} id="projects" className="relative mx-auto mt-6 w-full max-w-7xl px-2 py-12 sm:px-4 md:mt-20 md:py-24">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-50px' }}
                     transition={{ duration: 0.6 }}
                 >
-                    {/* Section Header */}
-                    <div className="mb-12 md:mb-16">
-                        <motion.h2
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5 }}
-                            className="text-3xl md:text-5xl font-bold text-white mb-4"
-                        >
-                            Selected Work
-                        </motion.h2>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            className="text-white/50 text-lg md:text-xl max-w-xl"
-                        >
-                            Start with the capability you need to see.
-                        </motion.p>
-                    </div>
+                    <div data-selected-work-frame style={{ height: `${matHeight}px` }}>
+                        <CuttingMatSurface active density="comfortable">
+                        <div ref={matContentRef} data-selected-work-mat className="min-w-0 p-5 pt-8 sm:p-8 sm:pt-10 md:p-12 lg:p-14">
+                            <div className="rounded-2xl border border-white/[0.16] bg-[#04110f]/[0.88] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.38)] backdrop-blur-lg sm:p-6 md:p-7">
+                                <motion.h2
+                                    initial={{ opacity: 0, y: 18 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.45 }}
+                                    className="text-[1.7rem] font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl"
+                                >
+                                    I want to see how Adi…
+                                </motion.h2>
 
-                    <div className="mb-10 md:mb-12">
-                        <p className="mb-2 ml-2 text-xs text-white/45">I want to see how Adi…</p>
-                        <div className="inline-flex w-full rounded-full border border-white/5 bg-white/[0.08] p-1 shadow-2xl shadow-black/40 backdrop-blur-md sm:w-auto">
-                            <div className="flex w-full items-center gap-1" role="group" aria-label="Choose what you want to evaluate">
-                                {PROJECT_INTENTS.map((intent) => {
-                                    const isActive = activeIntent === intent.id;
-                                    return (
-                                        <button
-                                            key={intent.id}
-                                            type="button"
-                                            aria-label={intent.label}
-                                            aria-pressed={isActive}
-                                            aria-controls="selected-work-grid"
-                                            onClick={() => selectIntent(intent.id)}
-                                            className={`group relative flex min-h-10 min-w-0 flex-1 items-center justify-center rounded-full px-2.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 sm:flex-none sm:px-4 ${isActive ? 'text-white' : 'text-white/55 hover:text-white/85'}`}
+                                <div className="mt-5 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap" role="group" aria-label="Choose what you want to evaluate">
+                                    {PROJECT_INTENTS.map((intent) => {
+                                        const isActive = activeIntent === intent.id;
+                                        return (
+                                            <button
+                                                key={intent.id}
+                                                type="button"
+                                                data-project-intent={intent.id}
+                                                aria-label={intent.label}
+                                                aria-pressed={isActive}
+                                                aria-controls="selected-work-grid"
+                                                onClick={() => selectIntent(intent.id)}
+                                                className={`group relative flex min-h-12 min-w-0 items-center justify-center rounded-xl border px-3 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0f18a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#04110f] lg:flex-none lg:rounded-full lg:px-5 ${isActive ? 'border-[#e5e55a]/70 text-[#07110f]' : 'border-white/15 bg-white/[0.06] text-white/70 hover:border-white/30 hover:text-white'}`}
+                                            >
+                                                {isActive && (
+                                                    <motion.span
+                                                        layoutId="selected-work-intent-marker"
+                                                        className="absolute inset-0 rounded-[inherit] bg-[#e5e55a] shadow-[0_0_24px_rgba(229,229,90,0.22)]"
+                                                        transition={{ type: 'tween', duration: 0.25, ease: 'circOut' }}
+                                                    />
+                                                )}
+                                                <span className="relative z-10 text-[11px] font-semibold leading-tight sm:text-xs md:text-sm">
+                                                    {intent.label}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="mt-4 flex min-h-10 items-start justify-between gap-4 border-t border-white/10 pt-4 md:items-center">
+                                    <AnimatePresence mode="wait" initial={false}>
+                                        <motion.p
+                                            key={activeIntentConfig.id}
+                                            initial={{ opacity: 0, y: 4 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -3 }}
+                                            transition={{ duration: 0.18 }}
+                                            className="max-w-2xl text-xs leading-relaxed text-white/70 md:text-sm"
                                         >
-                                            {isActive && (
-                                                <motion.span
-                                                    layoutId="selected-work-intent-marker"
-                                                    className="absolute inset-0 rounded-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.45)]"
-                                                    transition={{ type: 'tween', duration: 0.25, ease: 'circOut' }}
-                                                />
-                                            )}
-                                            <span className="relative z-10 truncate text-[11px] font-medium transition-colors sm:text-sm">
-                                                <span className="sm:hidden">{intent.shortLabel}</span>
-                                                <span className="hidden sm:inline">{intent.label}</span>
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                                            {activeIntentConfig.cue}
+                                        </motion.p>
+                                    </AnimatePresence>
+                                    <span
+                                        data-visible-project-count={visibleProjects.length}
+                                        className="shrink-0 rounded-full border border-white/15 bg-black/25 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-white/65 sm:text-[10px]"
+                                        aria-live="polite"
+                                    >
+                                        {visibleProjects.length} {visibleProjects.length === 1 ? 'project' : 'projects'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div id="selected-work-grid" className={`mt-5 grid items-start ${gridColumnsClass} gap-4 sm:mt-6 sm:gap-5 md:gap-6`} aria-live="polite">
+                                <AnimatePresence mode="popLayout" initial={false}>
+                                    {visibleProjects.map((project, index) => (
+                                        <motion.div
+                                            layout
+                                            key={project.id}
+                                            data-project-id={project.id}
+                                            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                                            transition={{ duration: 0.24, delay: Math.min(index * 0.035, 0.14) }}
+                                            className={`min-w-0 ${activeIntent === 'all' && visibleProjects.length === 10 && index === 9 ? 'lg:col-start-2' : ''}`}
+                                        >
+                                            <ProjectCard
+                                                project={project}
+                                                index={index}
+                                                onClick={() => openProject(project)}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
                             </div>
                         </div>
-
-                        <div className="mt-3 flex min-h-7 items-start justify-between gap-4 px-2 md:items-center">
-                            <AnimatePresence mode="wait" initial={false}>
-                                <motion.p
-                                    key={activeIntentConfig.id}
-                                    initial={{ opacity: 0, y: 4 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -3 }}
-                                    transition={{ duration: 0.18 }}
-                                    className="max-w-2xl text-xs leading-relaxed text-white/50 md:text-sm"
-                                >
-                                    {activeIntentConfig.cue}
-                                </motion.p>
-                            </AnimatePresence>
-                            <span className="hidden shrink-0 text-xs text-white/45 sm:block" aria-live="polite">
-                                {visibleProjects.length} {visibleProjects.length === 1 ? 'project' : 'projects'}
-                            </span>
-                        </div>
+                        </CuttingMatSurface>
                     </div>
-
-                    {/* Projects Grid */}
-                    <div id="selected-work-grid" className={`grid ${gridColumnsClass} gap-6`} aria-live="polite">
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            {visibleProjects.map((project, index) => (
-                                <motion.div
-                                    layout
-                                    key={project.id}
-                                    data-project-id={project.id}
-                                    initial={{ opacity: 0, y: 18, scale: 0.98 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -12, scale: 0.98 }}
-                                    transition={{ duration: 0.24, delay: Math.min(index * 0.035, 0.14) }}
-                                >
-                                    <ProjectCard
-                                        project={project}
-                                        index={index}
-                                        onClick={() => openProject(project)}
-                                    />
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-                    </div>
-
                 </motion.div>
             </section>
 
             {/* Project Detail Modal — plain conditional: an AnimatePresence exit
                 would keep the closed dialog as an invisible click-eating layer
                 whenever frames are throttled (see App.tsx overlay note). */}
-            {activeProject && (
+            {activeProject && ReactDOM.createPortal(
                 <ProjectDetail
                     project={activeProject}
+                    analyticsSource={activeProjectSource}
                     onClose={() => setActiveProject(null)}
-                />
+                />,
+                document.body,
             )}
         </>
     );

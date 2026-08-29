@@ -35,8 +35,8 @@ const projects = [
   {
     path: '/work/familysync-jpmorgan',
     title: 'FamilySync',
-    visualCount: 9,
-    postItCount: 3,
+    visualCount: 5,
+    visualIds: ['care-visibility-presence', 'care-crisis-journey', 'care-trust-takeaways', 'care-three-pillars', 'care-schedule-management'],
     closingContext: 'Student team project created at Northwestern EDI with JPMorgan Chase as project partner; not a shipped product.',
     sectionTitles: ['Care coordination is work', 'The family is the system', 'Three principles shaped the idea', 'Designing the handoff', 'What I took forward'],
     story: require(path.join(__dirname, '..', 'data', 'hcd', 'familysync-story.json')),
@@ -44,8 +44,8 @@ const projects = [
   {
     path: '/work/mcdonalds-interaction-design',
     title: 'Squad Up',
-    visualCount: 18,
-    postItCount: 3,
+    visualCount: 6,
+    visualIds: ['mcd-live-progress', 'mcd-research-insight', 'mcd-capabilities-gap', 'mcd-value-props', 'mcd-squad-details', 'mcd-order-complete'],
     closingContext: 'Student team project created at Northwestern EDI using McDonald’s ordering as the design context; not affiliated with or shipped by McDonald’s.',
     sectionTitles: ['The order starts before checkout', 'One person becomes the coordinator', 'One order, individual agency', 'From invite to pickup', 'What I took forward'],
     story: require(path.join(__dirname, '..', 'data', 'hcd', 'mcdonalds-story.json')),
@@ -54,6 +54,7 @@ const projects = [
 
 const viewports = [
   { label: 'desktop', width: 1440, height: 1000 },
+  { label: 'intermediate', width: 629, height: 863 },
   { label: 'mobile', width: 390, height: 844 },
 ];
 
@@ -62,7 +63,13 @@ function retainedVisuals(story) {
 }
 
 function retainedNotes(story) {
-  return story.sections.flatMap((section) => section.notes ?? []);
+  return [
+    ...(story.heroNotes ?? []),
+    ...story.sections.flatMap((section) => [
+      ...(section.storyNotes ?? []),
+      ...(section.notes ?? []),
+    ]),
+  ];
 }
 
 function assertNoPublicSourceMetadata(value, location = 'story') {
@@ -181,8 +188,7 @@ async function assertNoForbiddenVisitorLanguage(root, context) {
 }
 
 async function assertCaseStudyOverflow(projectDialog, project) {
-  const workshopSurface = projectDialog.locator('[data-hcd-workshop-surface]');
-  const scrollContainer = workshopSurface.locator('..');
+  const scrollContainer = projectDialog.locator('[data-hcd-scroll-container]');
   assert.equal(await scrollContainer.count(), 1, `${project.title}: one internal case-study scroll container`);
 
   const state = await scrollContainer.evaluate((container) => {
@@ -232,6 +238,134 @@ async function assertCaseStudyOverflow(projectDialog, project) {
     [],
     `${project.title}: descendants remain inside internal container bounds ${state.containerLeft}px–${state.containerRight}px`,
   );
+}
+
+async function assertEditorialGeometry(projectDialog, project, viewport) {
+  assert.ok(
+    (await projectDialog.getAttribute('class'))?.split(/\s+/).includes('hcd-case'),
+    `${project.title}: dialog is the HCD case canvas`,
+  );
+  assert.equal(
+    await projectDialog.evaluate((element) => getComputedStyle(element).backgroundColor),
+    'rgb(5, 5, 5)',
+    `${project.title}: case canvas uses portfolio black #050505`,
+  );
+
+  assert.equal(await projectDialog.locator('[data-hcd-workshop-surface]').count(), 0, `${project.title}: no retired full-page workshop surface`);
+  assert.equal(await projectDialog.locator('.hcd-paper-sheet').count(), 0, `${project.title}: no retired paper sheet`);
+
+  const storyPanels = projectDialog.locator('[data-hcd-story-panel]');
+  assert.equal(await storyPanels.count(), 0, `${project.title}: no white story-copy panels remain`);
+
+  const matBoards = projectDialog.locator('[data-hcd-mat-board]');
+  assert.equal(await matBoards.count(), 6, `${project.title}: one contained mat hero plus five contained story mats`);
+  assert.equal(await matBoards.locator('[data-cutting-mat-surface]').count(), 6, `${project.title}: every HCD board reuses the portfolio cutting mat`);
+
+  const heroTitle = projectDialog.getByRole('heading', { name: project.title, exact: true });
+  const heroTitleGeometry = await heroTitle.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  assert.ok(
+    heroTitleGeometry.scrollWidth <= heroTitleGeometry.clientWidth + 1,
+    `${project.title}: hero title fits its copy track (${heroTitleGeometry.scrollWidth}px inside ${heroTitleGeometry.clientWidth}px)`,
+  );
+
+  if (viewport.label !== 'mobile') {
+    const firstSection = projectDialog.locator('[data-hcd-section]').first();
+    const splitGeometry = await firstSection.evaluate((section) => {
+      const panel = section.querySelector('[data-hcd-copy-cluster]');
+      const figure = section.querySelector('[data-hcd-visual-id]');
+      const noteList = section.querySelector('[data-hcd-post-it-list]');
+      if (!panel || !figure || !noteList) throw new Error('First story mat is missing its copy cluster, notes, or visual');
+      const panelRect = panel.getBoundingClientRect();
+      const figureRect = figure.getBoundingClientRect();
+      return {
+        panelRight: panelRect.right,
+        panelBottom: panelRect.bottom,
+        panelWidth: panelRect.width,
+        figureLeft: figureRect.left,
+        figureTop: figureRect.top,
+        figureWidth: figureRect.width,
+        noteColumns: getComputedStyle(noteList).gridTemplateColumns.split(' ').filter(Boolean).length,
+      };
+    });
+    if (viewport.label === 'desktop') {
+      assert.ok(splitGeometry.figureLeft > splitGeometry.panelRight, `${project.title}: first story image remains to the right of its contextual copy`);
+    } else {
+      assert.ok(splitGeometry.figureTop > splitGeometry.panelBottom, `${project.title}: intermediate story image stacks below its contextual copy`);
+      assert.ok(splitGeometry.figureWidth >= 450, `${project.title}: intermediate story image remains readable without opening the viewer (${splitGeometry.figureWidth}px)`);
+      assert.equal(splitGeometry.noteColumns, 2, `${project.title}: intermediate notes retain a compact two-column cluster`);
+    }
+  }
+
+  const imageShells = projectDialog.locator('[data-hcd-image-shell]');
+  assert.equal(await imageShells.count(), project.visualCount, `${project.title}: one transparent shell per visual`);
+  const shellColors = await imageShells.evaluateAll((shells) => shells.map((shell) => getComputedStyle(shell).backgroundColor));
+  for (const [index, color] of shellColors.entries()) {
+    const values = color.match(/[\d.]+/g)?.map(Number) ?? [];
+    const [red = 0, green = 0, blue = 0, alpha = 1] = values;
+    const isTransparent = color === 'transparent' || (values.length >= 4 && alpha === 0);
+    const isPortfolioBlack = red === 5 && green === 5 && blue === 5;
+    const isWhite = red >= 245 && green >= 245 && blue >= 245 && alpha !== 0;
+    assert.equal(isWhite, false, `${project.title}: image shell ${index + 1} is not white; received ${color}`);
+    assert.ok(
+      isTransparent || isPortfolioBlack,
+      `${project.title}: image shell ${index + 1} is transparent on portfolio black; received ${color}`,
+    );
+  }
+
+  const notes = projectDialog.locator('[data-hcd-post-it]');
+  const noteGeometry = await notes.evaluateAll((elements) => elements.map((element) => {
+    const style = getComputedStyle(element);
+    return {
+      id: element.getAttribute('data-hcd-post-it'),
+      fontSize: Number.parseFloat(style.fontSize),
+      aspectRatio: style.aspectRatio,
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+      clientWidth: element.clientWidth,
+      clientHeight: element.clientHeight,
+      scrollWidth: element.scrollWidth,
+      scrollHeight: element.scrollHeight,
+    };
+  }));
+  assert.ok(noteGeometry.length > 0, `${project.title}: story includes post-it notes`);
+  for (const note of noteGeometry) {
+    assert.ok(note.fontSize >= 14, `${project.title} ${note.id}: post-it type is at least 14px (${note.fontSize}px)`);
+    assert.ok(Math.abs(note.width - note.height) <= 1, `${project.title} ${note.id}: post-it is square (${note.width}x${note.height})`);
+    assert.ok(note.width >= 148, `${project.title} ${note.id}: post-it retains adequate reading width (${note.width}px)`);
+    assert.ok(note.width <= 184, `${project.title} ${note.id}: post-it stays physically restrained (${note.width}px)`);
+    assert.ok(
+      note.scrollHeight <= note.clientHeight + 1 && note.scrollWidth <= note.clientWidth + 1,
+      `${project.title} ${note.id}: post-it text is not clipped (${note.scrollWidth}x${note.scrollHeight} inside ${note.clientWidth}x${note.clientHeight})`,
+    );
+  }
+}
+
+async function assertNativeWheelScroll(page, projectDialog, project) {
+  const scrollContainer = projectDialog.locator('[data-hcd-scroll-container]');
+  await scrollContainer.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  const center = await scrollContainer.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + Math.min(rect.height / 2, 320) };
+  });
+  await page.mouse.move(center.x, center.y);
+  await page.mouse.wheel(0, 700);
+  await page.waitForFunction(
+    () => (document.querySelector('[data-hcd-scroll-container]')?.scrollTop ?? 0) > 0,
+    null,
+    { timeout: 1500 },
+  );
+  assert.ok(
+    await scrollContainer.evaluate((element) => element.scrollTop > 0),
+    `${project.title}: a real mouse wheel gesture advances the internal case-study scroller`,
+  );
+  await scrollContainer.evaluate((element) => {
+    element.scrollTop = 0;
+  });
 }
 
 async function assertPortalOverflow(lightbox, panRegion, visualId) {
@@ -289,7 +423,7 @@ async function assertPortalOverflow(lightbox, panRegion, visualId) {
 async function assertPublicStory(projectDialog, project) {
   assertNoPublicSourceMetadata(project.story, project.title);
 
-  assert.equal(await projectDialog.locator('[data-hcd-workshop-surface]').count(), 1, `${project.title}: workshop surface`);
+  assert.equal(await projectDialog.locator('[data-hcd-scroll-container]').count(), 1, `${project.title}: one marked internal scroller`);
   assert.deepEqual(
     await projectDialog.locator('[data-hcd-section]').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-hcd-section'))),
     sectionKeys,
@@ -300,8 +434,8 @@ async function assertPublicStory(projectDialog, project) {
   assert.deepEqual(sectionTitles.map((title) => title.trim()), project.sectionTitles, `${project.title}: exact section headings`);
 
   const expectedNotes = retainedNotes(project.story);
-  assert.equal(expectedNotes.length, project.postItCount, `${project.title}: manifest post-it count`);
-  assert.equal(await projectDialog.locator('[data-hcd-post-it]').count(), project.postItCount, `${project.title}: rendered post-it count`);
+  assert.ok(expectedNotes.length > 0, `${project.title}: manifest includes post-it notes`);
+  assert.equal(await projectDialog.locator('[data-hcd-post-it]').count(), expectedNotes.length, `${project.title}: rendered post-it count`);
   assert.deepEqual(
     (await projectDialog.locator('[data-hcd-post-it]').allTextContents()).map((text) => text.trim()),
     expectedNotes.map((note) => note.text),
@@ -319,6 +453,7 @@ async function assertVisuals(projectDialog, project) {
   assert.equal(expectedVisuals.length, project.visualCount, `${project.title}: manifest visual count`);
 
   const expectedIds = expectedVisuals.map((visual) => visual.id);
+  assert.deepEqual(expectedIds, project.visualIds, `${project.title}: manifest contains only the curated final-presentation visual sequence`);
   assert.equal(new Set(expectedIds).size, expectedIds.length, `${project.title}: manifest visual IDs must be unique`);
 
   const renderedIds = await projectDialog.locator('[data-hcd-visual-id]').evaluateAll((figures) =>
@@ -352,96 +487,6 @@ async function assertVisuals(projectDialog, project) {
   }
 }
 
-async function assertCarePortraitGeometry(projectDialog, project, viewport) {
-  if (project.story.projectId !== 'familysync-jpmorgan') return;
-
-  const visualId = 'care-clinical-guardian-flow';
-  const figure = projectDialog.locator(`[data-hcd-visual-id="${visualId}"]`);
-  const trigger = figure.locator(`[data-hcd-visual-trigger="${visualId}"]`);
-  assert.equal(await figure.count(), 1, `${visualId}: one portrait figure`);
-  assert.equal(await trigger.count(), 1, `${visualId}: one portrait trigger`);
-  await figure.scrollIntoViewIfNeeded();
-
-  const geometry = await figure.evaluate((element) => {
-    const triggerElement = element.querySelector('[data-hcd-visual-trigger]');
-    const workshopSurface = element.closest('[data-hcd-workshop-surface]');
-    const scrollContainer = workshopSurface?.parentElement;
-    const availableContainer = element.parentElement;
-    if (!triggerElement || !scrollContainer || !availableContainer) throw new Error('Portrait geometry anchors are missing');
-
-    const figureRect = element.getBoundingClientRect();
-    const triggerRect = triggerElement.getBoundingClientRect();
-    const scrollRect = scrollContainer.getBoundingClientRect();
-    const availableRect = availableContainer.getBoundingClientRect();
-    const viewportWidth = document.documentElement.clientWidth;
-
-    return {
-      figure: {
-        left: figureRect.left,
-        right: figureRect.right,
-        width: figureRect.width,
-        height: figureRect.height,
-        centerX: figureRect.left + figureRect.width / 2,
-      },
-      trigger: {
-        left: triggerRect.left,
-        right: triggerRect.right,
-        width: triggerRect.width,
-        height: triggerRect.height,
-        centerX: triggerRect.left + triggerRect.width / 2,
-      },
-      scroll: {
-        left: scrollRect.left,
-        right: scrollRect.right,
-        clientWidth: scrollContainer.clientWidth,
-        scrollWidth: scrollContainer.scrollWidth,
-      },
-      available: {
-        width: availableRect.width,
-        centerX: availableRect.left + availableRect.width / 2,
-      },
-      viewportWidth,
-    };
-  });
-
-  const ratio = geometry.trigger.width / geometry.trigger.height;
-  assert.ok(ratio >= 0.38 && ratio <= 0.42, `${visualId} ${viewport.label}: trigger preserves the 2/5 portrait ratio (${ratio})`);
-  assert.ok(
-    Math.abs(geometry.figure.centerX - geometry.available.centerX) <= 10,
-    `${visualId} ${viewport.label}: figure is centered in its available row`,
-  );
-  assert.ok(
-    Math.abs(geometry.trigger.centerX - geometry.figure.centerX) <= 2,
-    `${visualId} ${viewport.label}: trigger is centered inside the figure`,
-  );
-
-  if (viewport.label === 'desktop') {
-    assert.ok(geometry.figure.width <= 500, `${visualId}: desktop figure width is capped (${geometry.figure.width}px)`);
-    assert.ok(geometry.figure.height <= 1250, `${visualId}: desktop figure height is capped (${geometry.figure.height}px)`);
-    assert.ok(geometry.trigger.width <= 500, `${visualId}: desktop trigger width is capped (${geometry.trigger.width}px)`);
-    assert.ok(geometry.trigger.height <= 1250, `${visualId}: desktop trigger height is capped (${geometry.trigger.height}px)`);
-    assert.ok(
-      geometry.figure.width < geometry.available.width / 2,
-      `${visualId}: desktop portrait no longer expands to the full ${geometry.available.width}px sheet row`,
-    );
-  } else {
-    const leftBoundary = Math.max(0, geometry.scroll.left);
-    const rightBoundary = Math.min(geometry.viewportWidth, geometry.scroll.right);
-    assert.ok(geometry.figure.left >= leftBoundary - 1, `${visualId}: mobile figure stays inside the internal scroller on the left`);
-    assert.ok(geometry.figure.right <= rightBoundary + 1, `${visualId}: mobile figure stays inside the internal scroller on the right`);
-    assert.ok(geometry.trigger.left >= leftBoundary - 1, `${visualId}: mobile trigger stays inside the viewport on the left`);
-    assert.ok(geometry.trigger.right <= rightBoundary + 1, `${visualId}: mobile trigger stays inside the viewport on the right`);
-    assert.ok(
-      geometry.figure.width >= geometry.available.width * 0.95 && geometry.figure.width <= geometry.available.width + 1,
-      `${visualId}: mobile portrait uses the available content width (${geometry.figure.width}px of ${geometry.available.width}px)`,
-    );
-    assert.ok(
-      geometry.scroll.scrollWidth <= geometry.scroll.clientWidth + 1,
-      `${visualId}: mobile portrait creates no internal horizontal overflow`,
-    );
-  }
-}
-
 async function assertLightbox(page, projectDialog, project, viewport) {
   const visual = retainedVisuals(project.story)[0];
   const trigger = projectDialog.locator(`[data-hcd-visual-trigger="${visual.id}"]`);
@@ -465,6 +510,7 @@ async function assertLightbox(page, projectDialog, project, viewport) {
   await waitForLoadedImage(fullImage, visual.id);
 
   const closeButton = lightbox.getByRole('button', { name: 'Close full view', exact: true });
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Close full view');
   assert.equal(await closeButton.evaluate((element) => element === document.activeElement), true, `${visual.id}: full-view close receives focus`);
 
   const fullSizeButton = lightbox.locator('button[aria-pressed]');
@@ -512,7 +558,25 @@ async function assertLightbox(page, projectDialog, project, viewport) {
   await assertNoForbiddenVisitorLanguage(lightbox, `${visual.id} portaled viewer full-size state`);
   await assertPortalOverflow(lightbox, panRegion, visual.id);
 
-  await panRegion.focus();
+  await page.goBack();
+  await lightbox.waitFor({ state: 'detached' });
+  assert.equal(await projectDialog.isVisible(), true, `${visual.id}: Back closes only the full view`);
+  assert.equal(new URL(page.url()).pathname, project.path, `${visual.id}: full-view Back preserves the project route`);
+  await page.waitForFunction(
+    (visualId) => document.activeElement?.getAttribute('data-hcd-visual-trigger') === visualId,
+    visual.id,
+  );
+  assert.equal(
+    await trigger.evaluate((element) => element === document.activeElement),
+    true,
+    `${visual.id}: Back returns focus to visual trigger`,
+  );
+
+  await page.goForward();
+  await lightbox.waitFor({ state: 'visible' });
+  assert.equal(await projectDialog.isVisible(), true, `${visual.id}: Forward restores the full view without closing the project`);
+  assert.equal(new URL(page.url()).pathname, project.path, `${visual.id}: full-view Forward preserves the project route`);
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Close full view');
   await page.keyboard.press('Escape');
   await lightbox.waitFor({ state: 'detached' });
   assert.equal(await projectDialog.isVisible(), true, `${visual.id}: Escape closes only the full view`);
@@ -537,9 +601,10 @@ async function verifyProject(browser, project, viewport) {
     await projectDialog.getByRole('heading', { name: project.title, exact: true }).waitFor();
 
     await assertPublicStory(projectDialog, project);
-    await assertVisuals(projectDialog, project);
-    await assertCarePortraitGeometry(projectDialog, project, viewport);
+    await assertEditorialGeometry(projectDialog, project, viewport);
     await assertCaseStudyOverflow(projectDialog, project);
+    await assertNativeWheelScroll(page, projectDialog, project);
+    await assertVisuals(projectDialog, project);
     await assertLightbox(page, projectDialog, project, viewport);
 
     const overflow = await page.evaluate(() => ({
@@ -562,7 +627,7 @@ async function verifyProject(browser, project, viewport) {
 
     await page.waitForLoadState('networkidle');
     assert.deepEqual(errors, [], `${project.title} ${viewport.label}: browser errors\n${errors.join('\n')}`);
-    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.visualCount} visuals, ${project.postItCount} post-its, 5 sections, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} visual/full-size activation, two-axis pan, viewer Escape/focus return, project Escape, Back, normal/viewer language clean, internal/descendant/portal overflow clean${project.story.projectId === 'familysync-jpmorgan' ? ', Care portrait cap/ratio/containment clean' : ''}, no browser errors`);
+    console.log(`PASS ${project.title} ${viewport.width}x${viewport.height}: ${project.visualCount} curated visuals, ${retainedNotes(project.story).length} square post-its, 6 contained portfolio mats, real wheel scrolling, ${viewport.label === 'desktop' ? 'pointer' : 'keyboard'} visual/full-size activation, two-axis pan, viewer Escape/Back/Forward/focus return, project Escape/Back, normal/viewer language clean, internal/descendant/portal overflow clean, no browser errors`);
   } finally {
     await page.close();
   }
@@ -577,10 +642,10 @@ async function verifyDefaultRenderer(browser) {
     const dialog = page.getByRole('dialog', { name: /Portfolio/i });
     await dialog.waitFor({ state: 'visible' });
     await dialog.getByRole('heading', { name: 'The Story', exact: true }).waitFor();
-    assert.equal(await page.locator('[data-hcd-workshop-surface]').count(), 0, 'default project must not use the HCD workshop shell');
+    assert.equal(await page.locator('[data-hcd-scroll-container]').count(), 0, 'default project must not use the HCD case-study shell');
     assert.equal(await page.locator('[data-hcd-section]').count(), 0, 'default project must not use HCD story sections');
     assert.deepEqual(errors, [], `default renderer browser errors\n${errors.join('\n')}`);
-    console.log('PASS default renderer: /work/portfolio-website renders The Story without HCD workshop markers');
+    console.log('PASS default renderer: /work/portfolio-website renders The Story without HCD case-study markers');
   } finally {
     await page.close();
   }
@@ -595,7 +660,7 @@ async function verifyDefaultRenderer(browser) {
       }
     }
     await verifyDefaultRenderer(browser);
-    console.log('HCD workshop case study browser smoke passed with zero errors.');
+    console.log('HCD contained-mat case study browser smoke passed with zero errors.');
   } finally {
     await browser.close();
   }

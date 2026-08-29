@@ -1,20 +1,18 @@
-type AnalyticsValue = string | number | boolean;
-export type AnalyticsProperties = Record<string, AnalyticsValue | null | undefined>;
+import { getAnalyticsPreference, sanitizeAnalyticsProperties, type AnalyticsScalar } from './analyticsPrivacy';
+import { trackOpenPanelEvent } from './openpanel';
 
-const cleanProperties = (properties: AnalyticsProperties = {}) => {
-  return Object.fromEntries(
-    Object.entries(properties).filter(([, value]) => value !== null && value !== undefined)
-  ) as Record<string, AnalyticsValue>;
-};
+export type AnalyticsProperties = Record<string, AnalyticsScalar | null | undefined>;
 
 export const trackEvent = (eventName: string, properties: AnalyticsProperties = {}) => {
   if (typeof window === 'undefined') return;
+  if (getAnalyticsPreference() === 'opted_out') return;
 
-  const payload = cleanProperties({
+  const payload = sanitizeAnalyticsProperties({
     path: window.location.pathname,
     ...properties,
   });
 
+  trackOpenPanelEvent(eventName, payload);
   window.zaraz?.track?.(eventName, payload);
   window.posthog?.capture?.(eventName, payload);
   window.plausible?.(eventName, { props: payload });

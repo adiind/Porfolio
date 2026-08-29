@@ -1,12 +1,12 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useInView } from 'framer-motion';
-import { TimelineItem, TimelineMode, SocialPost, CaseStudy } from '../types';
+import { TimelineItem, TimelineMode, CaseStudy } from '../types';
 import SnapdealAdsCard from './SnapdealAdsCard';
-import { SOCIAL_POSTS, CONFIG, TINKERVERSE_LOGO } from '../constants';
+import { CONFIG, TINKERVERSE_JOURNAL, TINKERVERSE_LOGO } from '../constants';
 import { getMonthDiff, parseDate, formatDate, getLogarithmicPosition, getLogarithmicHeight, mapTimelineItemToProject } from '../utils';
 import { useProjects } from '../context/ProjectsContext';
-import { Briefcase, GraduationCap, User, Sparkles, Heart, MessageCircle, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
+import { Briefcase, GraduationCap, User, Sparkles, ArrowUpRight, Trophy, ScrollText, PlayCircle, Flower, Eye, ExternalLink } from 'lucide-react';
 
 interface Props {
   item: TimelineItem;
@@ -167,12 +167,8 @@ const TimelineEvent: React.FC<Props> = ({
         >
           <TinkerVerseGrid
             item={item}
-            posts={SOCIAL_POSTS}
-            height={600}
-            pixelsPerMonth={pixelsPerMonth}
             styles={tinkerStyles}
             isFit={true}
-            onClick={handleGridClick}
           />
         </motion.div>
       );
@@ -243,7 +239,8 @@ const TimelineEvent: React.FC<Props> = ({
             />
           )}
           <h3
-            className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 group-focus-within:text-indigo-200 transition-colors"
+            data-full-timeline-title
+            className={`text-sm font-bold text-white leading-tight mb-0.5 group-hover:text-indigo-200 group-focus-within:text-indigo-200 transition-colors ${item.id === 'bits' ? '' : 'line-clamp-1'}`}
           >
             {item.title}
           </h3>
@@ -598,9 +595,6 @@ const TimelineEvent: React.FC<Props> = ({
       >
         <TinkerVerseGrid
           item={item}
-          posts={SOCIAL_POSTS}
-          height={height}
-          pixelsPerMonth={pixelsPerMonth}
           styles={s}
           isFit={isFit}
           onClick={() => !isScrolling && onOpenTinkerVerse && onOpenTinkerVerse()}
@@ -794,7 +788,10 @@ const TimelineEvent: React.FC<Props> = ({
 
         {/* Spacer: In Grid mode, NO margin (center). In Expanded, margin below image. */}
         <div className={`transition-all duration-500 flex flex-col justify-end ${(!isFit && isHovered) ? 'mt-32' : 'mt-0'}`}>
-          <h3 className="text-sm font-bold text-white leading-tight mb-0.5 line-clamp-1 group-hover:text-indigo-200 group-focus-within:text-indigo-200 transition-colors">
+          <h3
+            data-full-timeline-title
+            className={`text-sm font-bold text-white leading-tight mb-0.5 group-hover:text-indigo-200 group-focus-within:text-indigo-200 transition-colors ${item.id === 'bits' ? '' : 'line-clamp-1'}`}
+          >
             {item.title}
           </h3>
           <p className="text-[10px] text-white/60 font-medium uppercase tracking-wide truncate">
@@ -1055,200 +1052,71 @@ const TimelineEvent: React.FC<Props> = ({
 
 const TinkerVerseGrid: React.FC<{
   item: TimelineItem,
-  posts: SocialPost[],
-  height: number,
-  pixelsPerMonth: number,
   styles: any,
   isFit: boolean,
   onClick?: () => void
-}> = ({ item, posts, height, pixelsPerMonth, styles, isFit, onClick }) => {
+}> = ({ item, styles, isFit, onClick }) => {
   const { getProjectsByIds } = useProjects();
-  const startDate = parseDate(item.start);
-  const endDate = parseDate(item.end);
-  const [hoveredPost, setHoveredPost] = useState<SocialPost | null>(null);
-
-  const rows = useMemo(() => {
-    const r = [];
-    let current = new Date(endDate);
-    current.setDate(1);
-    while (current >= startDate) {
-      const year = current.getFullYear();
-      const month = current.getMonth();
-      const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
-      const monthPosts = posts.filter(p => p.date.startsWith(monthKey));
-      r.push({ date: new Date(current), monthKey, posts: monthPosts });
-      current.setMonth(current.getMonth() - 1);
-    }
-    return r;
-  }, [startDate, endDate, posts]);
-
-  const rowHeight = pixelsPerMonth;
-
-  const tinkerverseProjects = useMemo(
-    () => getProjectsByIds((item.projects ?? []).map((project) => project.id)),
-    [item.projects]
+  const [previewFailed, setPreviewFailed] = useState(false);
+  const leadEntry = TINKERVERSE_JOURNAL[0];
+  const leadProject = useMemo(
+    () => leadEntry?.projectId ? getProjectsByIds([leadEntry.projectId])[0] : undefined,
+    [getProjectsByIds, leadEntry?.projectId],
   );
-  const projectsToShow = tinkerverseProjects.slice(0, 3);
-
-  if (isFit) {
-    return (
-      <div
-        className="w-full h-full flex flex-col p-2 overflow-hidden relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
-        onClick={onClick}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onClick && onClick();
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label="Open TinkerVerse"
-      >
-        {/* Project thumbnails grid */}
-        <div className="flex-1 grid grid-cols-2 gap-1.5 overflow-hidden">
-          {projectsToShow.map((project, i) => (
-            <div
-              key={project.id}
-              className={`relative rounded overflow-hidden ${i === 0 ? 'col-span-2 row-span-1' : ''}`}
-            >
-              <img
-                src={project.heroImage}
-                alt={project.hero.title}
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-              />
-              {/* Dark overlay for legibility */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              {/* Mini label */}
-              <div className="absolute bottom-1 left-1 right-1">
-                <span className="text-[8px] font-medium text-white/90 line-clamp-1">
-                  {project.hero.title.split('–')[0].trim()}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* Footer info */}
-        <div className="mt-auto relative z-10 pt-2">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-[8px] font-mono text-amber-400/80 uppercase tracking-wider">
-              {tinkerverseProjects.length} Projects
-            </span>
-          </div>
-          <h3 className={`font-bold text-[10px] leading-tight ${styles.text}`}>{item.title}</h3>
-          <p className={`text-[9px] opacity-70 ${styles.subtext}`}>{item.company}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
-      onClick={onClick}
-      onKeyDown={(e) => {
+      data-tinkerverse-preview
+      onClick={isFit ? undefined : onClick}
+      onKeyDown={isFit ? undefined : (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onClick && onClick();
         }
       }}
-      role="button"
-      tabIndex={0}
-      aria-label="Open TinkerVerse"
-      className="relative w-full p-2 pb-4 flex flex-col items-center pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+      role={isFit ? undefined : 'button'}
+      tabIndex={isFit ? undefined : 0}
+      aria-label={isFit ? undefined : 'Open TinkerVerse'}
+      className={`relative h-full w-full overflow-hidden ${isFit ? '' : 'pointer-events-auto cursor-pointer'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e5e55a]`}
     >
-      <div className="flex flex-col w-full px-2 mb-2 sticky top-0 z-10">
-        <div className="flex items-center gap-2 opacity-80">
-          <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="w-4 h-4 rounded-sm bg-white p-[1px] object-cover" />
-          <span className={`text-xs font-bold uppercase tracking-widest ${styles.text}`}>TinkerVerse</span>
+      {leadEntry && !previewFailed ? (
+        <img
+          src={leadEntry.localMediaUrl}
+          alt={leadEntry.alt}
+          loading="lazy"
+          decoding="async"
+          onError={() => setPreviewFailed(true)}
+          className="absolute inset-0 h-full w-full object-contain opacity-90 transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-[linear-gradient(145deg,#0b3028,#04110e)]" aria-label="TinkerVerse image unavailable" role="img" />
+      )}
+      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#03100d] via-[#03100d]/25 to-black/15" />
+
+      <div className={`relative z-10 flex h-full flex-col ${isFit ? 'p-3 md:p-5' : 'p-3'}`}>
+        <div className="flex items-center gap-2">
+          <img src={TINKERVERSE_LOGO} alt="" className="h-6 w-6 rounded-md border border-white/15 bg-black object-cover" />
+          <span className={`text-[10px] font-bold uppercase tracking-[0.16em] ${styles.text}`}>TinkerVerse</span>
         </div>
-        {item.headline && (
-          <p className={`text-[10px] leading-tight opacity-70 mt-1 ${styles.subtext}`}>
-            {item.headline}
+
+        <div className="mt-auto">
+          <span className="inline-flex rounded-full border border-[#e5e55a]/35 bg-black/60 px-2 py-1 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a] backdrop-blur-sm">
+            Live workshop journal
+          </span>
+          <h3 className={`mt-2 font-bold leading-tight ${isFit ? 'text-sm md:text-lg' : 'text-sm'} ${styles.text}`}>
+            {leadProject?.hero.title ?? item.title}
+          </h3>
+          <p className={`mt-1 font-mono text-[9px] uppercase tracking-[0.12em] ${styles.subtext}`}>
+            {TINKERVERSE_JOURNAL.length} field notes · Open journal
           </p>
-        )}
-      </div>
-      <div className="w-full flex-1 flex flex-col relative">
-        {rows.map((row, idx) => (
-          <div
-            key={row.monthKey}
-            className="flex items-center gap-2 w-full border-b border-amber-500/5 hover:bg-amber-500/5 transition-colors relative"
-            style={{ height: `${rowHeight}px`, minHeight: '24px' }}
-          >
-            {rowHeight > 20 && (
-              <div className="hidden md:block w-8 text-[9px] font-mono text-amber-200/60 text-right shrink-0">
-                {row.date.toLocaleDateString('en-US', { month: 'short' })}
-              </div>
-            )}
-            <div className="hidden md:flex flex-1 flex-wrap gap-1 items-center content-center h-full">
-              {Array.from({ length: 8 }).map((_, i) => {
-                const post = row.posts[i];
-                const hasPost = !!post;
-                return (
-                  <div
-                    key={i}
-                    onMouseEnter={(e) => {
-                      if (hasPost) {
-                        e.stopPropagation();
-                        setHoveredPost(post);
-                      }
-                    }}
-                    onMouseLeave={() => hasPost && setHoveredPost(null)}
-                    onClick={(e) => {
-                      if (hasPost) {
-                        e.stopPropagation();
-                        window.open(post.url, '_blank');
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (hasPost && (e.key === 'Enter' || e.key === ' ')) {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        window.open(post.url, '_blank');
-                      }
-                    }}
-                    role={hasPost ? 'button' : undefined}
-                    tabIndex={hasPost ? 0 : undefined}
-                    aria-label={hasPost ? `View post from ${formatDate(post.date)}` : undefined}
-                    className={`
-                         w-3 h-3 md:w-4 md:h-4 rounded-[3px] transition-all duration-300 relative
-                         ${hasPost
-                        ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)] cursor-pointer hover:scale-125 hover:z-[200] hover:bg-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80'
-                        : 'bg-amber-900/20'
-                      }
-                       `}
-                  >
-                    <AnimatePresence>
-                      {hoveredPost === post && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                          animate={{ opacity: 1, scale: 1, x: 0 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          style={{ zIndex: 9999 }} // Force extreme Z-index
-                          className="fixed md:absolute right-full mr-4 top-1/2 -translate-y-1/2 w-64 bg-[#111] border border-amber-500/30 rounded-lg shadow-2xl p-3 overflow-hidden"
-                        >
-                          <div className="absolute inset-0 bg-amber-500/5 pointer-events-none" />
-                          <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-2">
-                              <img src={TINKERVERSE_LOGO} className="w-6 h-6 rounded-full bg-white p-0.5 object-cover" alt="TinkerVerse" />
-                              <span className="text-[10px] font-bold text-amber-100">tinker_verse</span>
-                              <span className="text-[9px] text-white/60 ml-auto">{formatDate(post.date)}</span>
-                            </div>
-                            <p className="text-[10px] text-white/80 line-clamp-3 mb-2 leading-relaxed">{post.caption}</p>
-                            <div className="flex items-center gap-3 text-white/50 text-[10px] border-t border-white/10 pt-2">
-                              <div className="flex items-center gap-1"><Heart size={10} className="text-red-400" /> {post.likes}</div>
-                              <div className="flex items-center gap-1"><MessageCircle size={10} /> {post.comments}</div>
-                              <div className="ml-auto text-[9px] text-amber-400">Click to view</div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
-            </div>
+        </div>
+        {isFit && (
+          <div className="mt-3 grid grid-cols-4 gap-1.5" aria-hidden="true">
+            {TINKERVERSE_JOURNAL.slice(1, 5).map((entry) => (
+              <div key={entry.id} className="h-1 rounded-full bg-[#e5e55a]/55" />
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

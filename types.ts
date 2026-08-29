@@ -30,6 +30,12 @@ export interface Publication {
   link?: string;
 }
 
+export interface FeatureCardMedia {
+  url: string;
+  alt: string;
+  label: string;
+}
+
 export interface FeatureCard {
   title: string;
   subtitle: string;
@@ -42,6 +48,8 @@ export interface FeatureCard {
   details: string[]; // Bullet points for open state
   skills?: { label: string; description: string }[]; // Skills with descriptions for this project
   imageUrl?: string; // Optional image for hover view and detail page
+  media?: FeatureCardMedia[]; // Labeled evidence shown without destructive crops
+  projectId?: string; // Existing rich portfolio project to open in context
   projectLinks?: { label: string; url: string }[]; // Optional links
 }
 
@@ -95,6 +103,18 @@ export interface SocialPost {
   caption: string;
   likes: number;
   comments: number;
+}
+
+export interface JournalEntry {
+  id: string;
+  instagramUrl: string;
+  publishedAt: string;
+  caption: string;
+  mediaType: 'image' | 'video-thumbnail';
+  localMediaUrl: string;
+  alt: string;
+  statusLabel: string;
+  projectId?: string;
 }
 
 export interface TimelineConfig {

@@ -33,6 +33,7 @@ export interface HcdStorySection {
   key: HcdSectionKey;
   title: string;
   intro: string;
+  storyNotes: HcdPostIt[];
   notes?: HcdPostIt[];
   takeaways?: string[];
   groups: HcdVisualGroup[];
@@ -47,6 +48,7 @@ export interface HcdProjectStory {
   context: string;
   role: string;
   hero: HcdVisual;
+  heroNotes: HcdPostIt[];
   metrics?: Array<{ value: string; label: string }>;
   sections: HcdStorySection[];
   closingContext: string;

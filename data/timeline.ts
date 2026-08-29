@@ -110,6 +110,42 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Rapid Prototyping", description: "Iterative testing of physical and digital concepts." },
           { label: "Design for Manufacturing", description: "Designing within real-world production constraints." }
         ]
+      },
+      {
+        title: "FamilySync – JPMorgan Chase Service Design Concept",
+        subtitle: "Service Design · Agentic Coordination",
+        summary: "A caregiver coordination concept exploring visible, consent-based autonomy across family logistics and shared payments.",
+        expandedSummary: "This Northwestern EDI service design project with JPMorgan Chase explored where agentic systems could take on real coordination work across care, money, logistics, and trust without hiding decisions from families.",
+        imageUrl: "/images/familysync_jpmorgan_chase.webp",
+        projectId: "familysync-jpmorgan",
+        pills: [
+          { label: "Service Design", description: "Mapping people, interactions, and operational dependencies across a service." },
+          { label: "Agentic Systems", description: "Defining visible, consent-based boundaries for delegated coordination." },
+          { label: "Family Finance", description: "Connecting care logistics with shared payments and household trust." }
+        ],
+        details: [
+          "Mapped coordination friction across caregivers, children, transportation, groceries, and shared payments",
+          "Defined consent and visibility boundaries for agentic assistance",
+          "Translated the service system into a recruiter-facing case study"
+        ]
+      },
+      {
+        title: "McDonald's – Group Ordering Interaction Design",
+        subtitle: "Interaction Design · Shared Ordering",
+        summary: "A shared-cart concept that lets a group coordinate one McDonald's order without one person managing every choice.",
+        expandedSummary: "This Northwestern EDI interaction design project explored how friends could join from a link, add their own items, see who added what, review the group order, and coordinate checkout without turning the experience into a busy social app.",
+        imageUrl: "/images/mcdonalds_order.webp",
+        projectId: "mcdonalds-interaction-design",
+        pills: [
+          { label: "Interaction Design", description: "Designing clear shared-cart and participant flows." },
+          { label: "Group Coordination", description: "Reducing the work placed on the person collecting an order." },
+          { label: "Prototyping", description: "Testing invite, participant, review, and checkout states." }
+        ],
+        details: [
+          "Designed join, participant, and shared-cart states",
+          "Kept ownership of each item visible through review",
+          "Explored delegated payment and coordinated checkout"
+        ]
       }
     ]
   },
@@ -729,6 +765,19 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
         subtitle: "Sanitation Design",
         summary: "Designed a modular water closet system adaptable to multiple settings with a focus on efficiency and sustainability.",
         expandedSummary: "Approached sanitation as a systems design problem balancing user comfort, resource use, and scalability. Integrated water-saving flush mechanisms, ergonomic interactions, and responsible material selection. Developed concept renders featuring an adjustable ergonomic handle with angle and force control, along with an attachable bidet compatible with standard Western toilets.",
+        imageUrl: "/images/bits/bidet-design-concept.webp",
+        media: [
+          {
+            url: "/images/bits/bidet-design-concept.webp",
+            alt: "Concept render of the attachable bidet for the Modular Water Closet System",
+            label: "Bidet system · concept render"
+          },
+          {
+            url: "/images/bits/bidet-handle-concept.webp",
+            alt: "Concept render of the adjustable ergonomic bidet handle",
+            label: "Adjustable handle · concept render"
+          }
+        ],
         pills: [
           { label: "Sustainability", description: "Water-saving and resource-conscious design principles." },
           { label: "Ergonomics", description: "Designing for user comfort and physical interaction." },

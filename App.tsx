@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, LayoutGroup } from 'framer-motion';
-import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS, REAL_USER_IMAGE, TINKERVERSE_LOGO } from './constants';
+import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS, REAL_USER_IMAGE } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
 import TimelineEvent from './components/TimelineEvent';
 import TimelineRail from './components/TimelineRail';
@@ -17,6 +17,7 @@ import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
 import BlogSection from './components/BlogSection';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
+import PortfolioFooter from './components/PortfolioFooter';
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 import { Project } from './types/Project';
@@ -26,12 +27,25 @@ import { useScrollDetection } from './hooks/useScrollDetection';
 import { trackEvent } from './lib/analytics';
 import { INITIAL_WORK_PROJECT_ID } from './lib/workRoutes';
 
+type PublicNavSection = 'profile' | 'experiences' | 'projects';
+type ActiveSection = PublicNavSection | 'footer' | 'writings';
+
+const SECTION_LABELS: Record<ActiveSection, string> = {
+  profile: 'Profile',
+  experiences: 'Experience',
+  projects: 'Selected Work',
+  footer: 'Closing note',
+  writings: 'Writings',
+};
 
 const PortfolioApp: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [hoveredLane, setHoveredLane] = useState<number | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
-  const [activeSection, setActiveSection] = useState<'profile' | 'experiences' | 'projects' | 'writings'>('profile'); // Added
+  const [activeSection, setActiveSection] = useState<ActiveSection>('profile');
+  const [showDirectWritings, setShowDirectWritings] = useState(
+    () => typeof window !== 'undefined' && window.location.hash === '#writings'
+  );
 
 
   // Mouse tracking for Spotlight
@@ -47,7 +61,9 @@ const PortfolioApp: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   // Deep link (/work/<id>) skips the intro hero so the project detail opens
   // over the timeline/fit view instead of the intro flow.
-  const [mode, setMode] = useState<TimelineMode>(INITIAL_WORK_PROJECT_ID ? 'fit' : 'intro');
+  const [mode, setMode] = useState<TimelineMode>(
+    INITIAL_WORK_PROJECT_ID || (typeof window !== 'undefined' && window.location.hash === '#writings') ? 'fit' : 'intro'
+  );
   const [pixelsPerMonth, setPixelsPerMonth] = useState<number>(35);
   const [isAnimating, setIsAnimating] = useState(false);
   const isAnimatingRef = useRef(false);
@@ -69,6 +85,7 @@ const PortfolioApp: React.FC = () => {
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
   const [activeProject, setActiveProject] = useState<TimelineItem | null>(null);
+  const [activeProjectSource, setActiveProjectSource] = useState('timeline');
   const { projects } = useProjects();
 
   const richProject = useMemo(() => {
@@ -115,6 +132,22 @@ const PortfolioApp: React.FC = () => {
       window.removeEventListener('blogDetailClose', onClose);
     };
   }, []);
+
+  // Writings stay intact and directly addressable, but are absent from the
+  // ordinary public flow unless the visitor arrives with the retained hash.
+  useEffect(() => {
+    const syncDirectWritings = () => setShowDirectWritings(window.location.hash === '#writings');
+    window.addEventListener('hashchange', syncDirectWritings);
+    return () => window.removeEventListener('hashchange', syncDirectWritings);
+  }, []);
+
+  useEffect(() => {
+    if (!showDirectWritings || mode === 'intro') return;
+    const writingsEl = document.getElementById('writings');
+    if (writingsEl && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = Math.max(0, writingsEl.offsetTop - 50);
+    }
+  }, [mode, showDirectWritings]);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   const handleCardExpand = useCallback((cardId: string | null) => {
@@ -142,6 +175,7 @@ const PortfolioApp: React.FC = () => {
       type: item.type,
       source,
     });
+    setActiveProjectSource(source);
     setActiveProject(item);
   }, []);
 
@@ -173,11 +207,12 @@ const PortfolioApp: React.FC = () => {
   );
 
   const finishModeTransition = useCallback(() => {
+    const transitionDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 550;
     window.setTimeout(() => {
       setIsAnimating(false);
       isAnimatingRef.current = false;
       // Debug logging removed
-    }, 550);
+    }, transitionDelay);
   }, []);
 
   // 1. Handle Zoom Transitions - simplified
@@ -241,6 +276,7 @@ const PortfolioApp: React.FC = () => {
       if (mode !== 'intro' || hasBlockingOverlay) return;
 
       const target = e.target as HTMLElement | null;
+      if (e.defaultPrevented || target?.closest('[data-project-wheel]')) return;
       const isFormField = target && ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'].includes(target.tagName);
       if (isFormField) return;
 
@@ -397,7 +433,7 @@ const PortfolioApp: React.FC = () => {
     timelinePointerRef.current = null;
   }, []);
 
-  // Listen for openProject events from skill cards in Hero
+  // Listen for openProject events from the Hero project wheel.
   useEffect(() => {
     const handleOpenProject = (e: CustomEvent<{ id: string; type: 'project' | 'experience' }>) => {
       const { id, type } = e.detail;
@@ -467,121 +503,71 @@ const PortfolioApp: React.FC = () => {
     });
   };
 
-  // 2. Scroll Snap Logic - Snaps between sections: Profile → Experiences → Projects → Writings
-  const snapCooldownRef = useRef(false);
-  const SNAP_COOLDOWN_MS = 700; // Prevent rapid snapping
+  // One scroll model: the hero hands off once to the inner portfolio flow;
+  // experience, work, and footer then use ordinary native scrolling in both
+  // directions. An upward boundary gesture returns to the hero.
   const SCROLL_THRESHOLD = 25; // Intentional scroll threshold
 
-  // Helper to get section positions
   const getSectionPositions = useCallback(() => {
     const projectsEl = document.getElementById('projects');
-    const writingsEl = document.getElementById('writings');
+    const footerEl = document.getElementById('footer');
     return {
       experiences: 0,
       projects: projectsEl ? projectsEl.offsetTop - 100 : 0,
-      writings: writingsEl ? writingsEl.offsetTop - 100 : 0,
+      footer: footerEl ? footerEl.offsetTop - 80 : 0,
     };
   }, []);
 
-  // Helper to determine current section based on scroll position
-  const getCurrentSection = useCallback((scrollTop: number): 'profile' | 'experiences' | 'projects' | 'writings' => {
+  const getCurrentSection = useCallback((scrollTop: number): ActiveSection => {
     if (mode === 'intro') return 'profile';
 
     const positions = getSectionPositions();
-    const viewportBuffer = window.innerHeight * 0.3; // 30% buffer for section detection
+    const viewportBuffer = window.innerHeight * 0.3;
 
-    // Check from bottom to top for proper detection
-    if (scrollTop >= positions.writings - viewportBuffer) return 'writings';
+    if (scrollTop >= positions.footer - viewportBuffer) return 'footer';
     if (scrollTop >= positions.projects - viewportBuffer) return 'projects';
     return 'experiences';
   }, [mode, getSectionPositions]);
 
   useEffect(() => {
-    const isTouchViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
-
     const handleGlobalWheel = (e: WheelEvent) => {
-      if (isAnimatingRef.current || hasBlockingOverlay) return;
-      if (snapCooldownRef.current) {
+      if (hasBlockingOverlay) return;
+
+      if (isAnimatingRef.current) {
         e.preventDefault();
         return;
       }
 
-      const container = scrollContainerRef.current;
-      const positions = getSectionPositions();
-      const currentScrollTop = container?.scrollTop ?? 0;
-      const currentSection = getCurrentSection(currentScrollTop);
       const isScrollingDown = e.deltaY > SCROLL_THRESHOLD;
-      const isScrollingUp = e.deltaY < -SCROLL_THRESHOLD;
+      const container = scrollContainerRef.current;
 
-      if (isTouchViewport) {
-        if (mode === 'intro' && isScrollingDown) {
-          e.preventDefault();
-          snapCooldownRef.current = true;
-          dismissIntroForTouchScroll('mobile_wheel');
-          scrollTimelineBy(Math.min(window.innerHeight * 0.45, Math.max(SCROLL_THRESHOLD + 1, e.deltaY)));
-          setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
-        } else if (mode !== 'intro' && container && (isScrollingDown || isScrollingUp)) {
-          e.preventDefault();
+      if (mode === 'intro' && isScrollingDown) {
+        e.preventDefault();
+        dismissIntroForTouchScroll('wheel');
+        return;
+      }
 
-          if (isScrollingUp && currentScrollTop <= 10) {
-            handleZoom('intro', 'mobile_wheel');
-            return;
-          }
+      if (mode !== 'intro' && container && e.deltaY < -SCROLL_THRESHOLD && container.scrollTop <= 1) {
+        e.preventDefault();
+        handleZoom('intro', 'wheel_boundary');
+        return;
+      }
 
+      if (
+        mode !== 'intro'
+        && container
+        && !container.contains(e.target as Node)
+        && !e.defaultPrevented
+      ) {
+        // Fixed shell chrome (header/sidebar) sits outside the scroll
+        // container. Forward its wheel deltas into the exact same flow so the
+        // page never stalls simply because the pointer followed a nav click.
+        e.preventDefault();
+        if (e.deltaY < -SCROLL_THRESHOLD && container.scrollTop <= 1) {
+          handleZoom('intro', 'wheel_boundary');
+        } else {
           scrollTimelineBy(e.deltaY);
         }
-        return;
-      }
-
-      // --- SCROLL DOWN ---
-      if (isScrollingDown) {
-        snapCooldownRef.current = true;
-
-        if (mode === 'intro') {
-          // Profile → Experiences
-          e.preventDefault();
-          handleZoom('fit', 'scroll_snap');
-        } else if (currentSection === 'experiences' && container) {
-          // Experiences → Projects
-          e.preventDefault();
-          smoothScrollTo(container, positions.projects);
-        } else if (currentSection === 'projects' && container) {
-          // Projects → Writings
-          e.preventDefault();
-          smoothScrollTo(container, positions.writings);
-        } else {
-          // Already at bottom, allow natural scroll
-          snapCooldownRef.current = false;
-          return;
-        }
-
-        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
-        return;
-      }
-
-      // --- SCROLL UP ---
-      if (isScrollingUp) {
-        snapCooldownRef.current = true;
-
-        if (currentSection === 'writings' && container) {
-          // Writings → Projects
-          e.preventDefault();
-          smoothScrollTo(container, positions.projects);
-        } else if (currentSection === 'projects' && container) {
-          // Projects → Experiences
-          e.preventDefault();
-          smoothScrollTo(container, positions.experiences);
-        } else if (currentSection === 'experiences' && container && currentScrollTop <= 10) {
-          // Experiences (at top) → Profile
-          handleZoom('intro', 'scroll_snap');
-        } else {
-          // Not at section boundary, allow natural scroll
-          snapCooldownRef.current = false;
-          return;
-        }
-
-        setTimeout(() => { snapCooldownRef.current = false; }, SNAP_COOLDOWN_MS);
-        return;
       }
     };
 
@@ -590,7 +576,7 @@ const PortfolioApp: React.FC = () => {
     return () => {
       window.removeEventListener('wheel', handleGlobalWheel);
     };
-  }, [mode, isAnimating, hasBlockingOverlay, handleZoom, dismissIntroForTouchScroll, scrollTimelineBy, getSectionPositions, getCurrentSection]);
+  }, [mode, hasBlockingOverlay, handleZoom, dismissIntroForTouchScroll, scrollTimelineBy]);
 
 
   // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
@@ -708,19 +694,21 @@ const PortfolioApp: React.FC = () => {
     if (mode === 'intro') return;
 
     const projectsEl = document.getElementById('projects');
+    const footerEl = document.getElementById('footer');
     const writingsEl = document.getElementById('writings');
 
-    // Track which sections are currently intersecting
     let projectsIntersecting = false;
+    let footerIntersecting = false;
     let writingsIntersecting = false;
 
     const updateActiveSection = () => {
       if (writingsIntersecting) {
         setActiveSection('writings');
+      } else if (footerIntersecting) {
+        setActiveSection('footer');
       } else if (projectsIntersecting) {
         setActiveSection('projects');
       } else {
-        // Neither projects nor writings is in view - we're in experiences
         setActiveSection('experiences');
       }
     };
@@ -745,14 +733,26 @@ const PortfolioApp: React.FC = () => {
       { rootMargin: '-40% 0px -40% 0px' }
     );
 
+    const footerObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          footerIntersecting = entry.isIntersecting;
+          updateActiveSection();
+        });
+      },
+      { rootMargin: '-40% 0px -40% 0px' }
+    );
+
     if (projectsEl) projectsObserver.observe(projectsEl);
     if (writingsEl) writingsObserver.observe(writingsEl);
+    if (footerEl) footerObserver.observe(footerEl);
 
     return () => {
       projectsObserver.disconnect();
       writingsObserver.disconnect();
+      footerObserver.disconnect();
     };
-  }, [mode]);
+  }, [mode, showDirectWritings]);
 
   // Simple hover handlers - block during animation, intro, or scrolling.
   // Read gating state from refs so these callbacks stay referentially stable
@@ -896,7 +896,7 @@ const PortfolioApp: React.FC = () => {
     ease: [0.32, 0.72, 0, 1] // Custom cubic-bezier for smooth feel
   };
 
-  const handleNavigate = (section: 'profile' | 'experiences' | 'projects' | 'writings') => {
+  const handleNavigate = (section: PublicNavSection) => {
     trackEvent('section_nav_clicked', {
       section,
       from: activeSection,
@@ -918,11 +918,6 @@ const PortfolioApp: React.FC = () => {
             if (projectsEl && scrollContainerRef.current) {
               smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50); // Small buffer
             }
-          } else if (section === 'writings') {
-            const writingsEl = document.getElementById('writings');
-            if (writingsEl && scrollContainerRef.current) {
-              smoothScrollTo(scrollContainerRef.current, writingsEl.offsetTop - 50);
-            }
           }
         }, 100);
       } else {
@@ -933,11 +928,6 @@ const PortfolioApp: React.FC = () => {
           const projectsEl = document.getElementById('projects');
           if (projectsEl && scrollContainerRef.current) {
             smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50);
-          }
-        } else if (section === 'writings') {
-          const writingsEl = document.getElementById('writings');
-          if (writingsEl && scrollContainerRef.current) {
-            smoothScrollTo(scrollContainerRef.current, writingsEl.offsetTop - 50);
           }
         }
       }
@@ -979,6 +969,8 @@ const PortfolioApp: React.FC = () => {
       {activeProject && (
         <ExperienceDetail
           item={richProject ? { ...activeProject, ...richProject } as TimelineItem : activeProject}
+          analyticsSource={activeProjectSource}
+          analyticsActive={activeCaseStudy === null}
           onClose={() => setActiveProject(null)}
           onOpenCaseStudy={handleOpenCaseStudy}
         />
@@ -999,12 +991,17 @@ const PortfolioApp: React.FC = () => {
       )}
 
       {/* --- HEADER --- */}
-      <header className="hidden md:block fixed top-0 left-0 right-0 z-50 px-6 py-4 pointer-events-none">
+      <header
+        data-scroll-header
+        aria-hidden={mode === 'intro'}
+        inert={mode === 'intro' ? true : undefined}
+        className={`fixed left-0 right-0 top-0 z-50 hidden px-6 py-3 pointer-events-none md:block ${mode === 'intro' ? 'invisible' : 'visible'}`}
+      >
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: mode === 'intro' ? 0 : 1 }}
           transition={{ duration: 0.8 }}
-          className={`absolute inset-0 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          className={`absolute inset-0 border-b border-white/15 bg-[#050d0c]/78 backdrop-blur-xl ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         />
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -1013,35 +1010,37 @@ const PortfolioApp: React.FC = () => {
             y: mode === 'intro' ? -20 : 0
           }}
           transition={pageTransition}
-          className={`relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-3 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          className={`relative mx-auto flex max-w-6xl items-center justify-between gap-6 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         >
           {/* Status Badge Header */}
           <button
             type="button"
-            className="group flex items-center gap-3 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+            data-header-identity
+            className="group relative flex min-h-11 items-center gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A]"
             onClick={() => handleOpenProfile('header_badge')}
             aria-label="View profile"
           >
             {/* Profile Photo */}
-            <div className="relative w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 transition-colors duration-300">
+            <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full border border-white/25 bg-[#10231d] transition-colors duration-300 group-hover:border-white/45">
               <img
+                data-header-photo
                 src={REAL_USER_IMAGE}
                 alt="Adi Agarwal"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover object-[center_32%]"
               />
             </div>
 
             {/* Name and profile signal */}
-            <div className="flex flex-col">
-              <span className="text-white font-medium text-sm tracking-tight group-hover:text-indigo-300 transition-colors">Adi Agarwal</span>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-semibold tracking-tight text-white transition-colors group-hover:text-[#F0F570]">Adi Agarwal</span>
 
               {/* Practice tag */}
               <div className="relative flex items-center gap-1.5">
                 <div className="relative">
-                  <div className="absolute inset-0 w-2 h-2 bg-indigo-300 rounded-full blur-sm opacity-50 group-hover:opacity-80" />
-                  <div className="relative w-2 h-2 bg-indigo-300 rounded-full shadow-[0_0_6px_1px_rgba(165,180,252,0.35)] group-hover:shadow-[0_0_10px_3px_rgba(165,180,252,0.45)] transition-shadow duration-300" />
+                  <div className="absolute inset-0 h-2 w-2 rounded-full bg-[#E5E55A] opacity-40 blur-sm group-hover:opacity-70" />
+                  <div className="relative h-2 w-2 rounded-full bg-[#E5E55A] shadow-[0_0_8px_rgba(229,229,90,0.34)]" />
                 </div>
-                <span className="text-white/50 text-[10px] group-hover:text-white/70 transition-colors duration-300">Tangible AI + product systems</span>
+                <span className="text-[10px] text-white/62 transition-colors duration-300 group-hover:text-white/80">Tangible AI + Product Systems</span>
               </div>
             </div>
 
@@ -1053,6 +1052,15 @@ const PortfolioApp: React.FC = () => {
               </div>
             </div>
           </button>
+
+          <div
+            data-section-indicator
+            aria-live="polite"
+            className="rounded-full border border-white/15 bg-[#07110f]/72 px-3.5 py-2 text-right shadow-[0_12px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+          >
+            <span className="block text-[9px] font-medium uppercase tracking-[0.18em] text-white/45">Viewing</span>
+            <span className="block text-xs font-semibold text-white/86">{SECTION_LABELS[activeSection]}</span>
+          </div>
 
         </motion.div>
 
@@ -1085,7 +1093,7 @@ const PortfolioApp: React.FC = () => {
         }}
         transition={pageTransition}
       >
-        <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} onViewWork={() => handleNavigate('projects')} active={mode === 'intro'} />
+        <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} onViewWork={() => handleNavigate('projects')} active={mode === 'intro' && !hasBlockingOverlay} />
 
         {/* Plain conditional (no exit) so a frozen exit frame can never leave a
             ghost hint with its pointer-events-auto button over the timeline. */}
@@ -1094,7 +1102,7 @@ const PortfolioApp: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="absolute bottom-8 left-0 right-0 flex justify-center text-white/60 pointer-events-none"
+              className="absolute bottom-8 left-0 right-0 z-[80] flex justify-center text-white/60 pointer-events-none"
             >
               <button
                 type="button"
@@ -1113,9 +1121,11 @@ const PortfolioApp: React.FC = () => {
       {/* --- TIMELINE SECTION (Slide Up Entrance) --- */}
       <motion.div
         id="resume"
-        className="flex-1 relative w-full h-full will-change-transform"
+        aria-hidden={mode === 'intro'}
+        inert={mode === 'intro' ? true : undefined}
+        className={`flex-1 relative w-full h-full will-change-transform ${mode === 'intro' ? 'hidden pointer-events-none' : 'block'}`}
         animate={{
-          opacity: mode === 'intro' ? 0.3 : 1,
+          opacity: mode === 'intro' ? 0 : 1,
           y: mode === 'intro' ? '80vh' : 0,
           scale: mode === 'intro' ? 0.98 : 1
         }}
@@ -1171,13 +1181,14 @@ const PortfolioApp: React.FC = () => {
           onPointerMove={handleTimelinePointerMove}
           onPointerUp={handleTimelinePointerEnd}
           onPointerCancel={handleTimelinePointerEnd}
-          className="h-full overflow-y-auto overflow-x-hidden relative no-scrollbar"
+          className={`relative h-full overflow-x-hidden no-scrollbar ${hasBlockingOverlay ? 'overflow-y-hidden' : 'overflow-y-auto'}`}
           style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorY: 'contain', touchAction: 'pan-y' }}
         >
           {/* Mobile Layout - Stacked Sections */}
           <div className="block md:hidden mt-[150px] pb-6">
             <MobileTimeline
               items={TIMELINE_DATA}
+              analyticsActive={!hasBlockingOverlay}
               onOpenCaseStudy={handleOpenCaseStudy}
               onOpenProject={(item) => handleOpenTimelineProject(item, 'mobile_timeline')}
               onOpenTinkerVerse={() => handleOpenTinkerVerse('mobile_timeline')}
@@ -1219,99 +1230,98 @@ const PortfolioApp: React.FC = () => {
                   {/* Spacer matching timeline rail width */}
                   <div className="hidden md:block w-28 md:w-36 flex-shrink-0" />
 
-                  {/* Primary grid: professional experience leads, education supports; TinkerVerse below */}
-                  <div className="flex-1 px-4 md:pr-0 md:pl-0">
-                    <div className="grid grid-cols-5 gap-3 items-start">
-
-                      {/* PRIMARY LANE: EXPERIENCE */}
-                      <div className="col-span-3 space-y-3">
-                        <h2 className="text-[10px] uppercase tracking-widest font-bold text-indigo-400 mb-4 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                          Experience
-                        </h2>
-                        {TIMELINE_DATA
-                          .filter(i => (i.type === 'corporate' || i.type === 'project' || i.type === 'competition') && i.id !== 'tinkerverse')
-                          .filter(i => !i.title.toLowerCase().includes('jarvis'))
-                          .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
-                          .map(item => (
-                            <TimelineEvent
-                              key={item.id}
-                              item={item}
-                              isHovered={hoveredId === item.id}
-                              onHover={handleHover}
-                              onLaneHover={handleLaneHover}
-                              isDimmed={hoveredId !== null && hoveredId !== item.id}
-                              pixelsPerMonth={pixelsPerMonth}
-                              totalHeight={totalContainerHeight}
-                              mode={mode}
-                              onOpenCaseStudy={handleOpenCaseStudy}
-                              onOpenProject={openTimelineProjectFromGrid}
-                              onOpenTinkerVerse={openTinkerVerseFromGrid}
-                              isScrolling={false}
-                              layoutMode="grid"
-                              isExpanded={expandedCardId === item.id}
-                              onExpand={handleCardExpand}
-                            />
-                          ))}
-                      </div>
-
-                      {/* SECONDARY LANE: EDUCATION */}
-                      <div className="col-span-2 space-y-3">
-                        <h2 className="text-[10px] uppercase tracking-widest font-bold text-rose-400 mb-4 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                          Education
-                        </h2>
-                        {TIMELINE_DATA
-                          .filter(i => i.type === 'education' || i.type === 'foundational')
-                          .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
-                          .map(item => (
-                            <TimelineEvent
-                              key={item.id}
-                              item={item}
-                              isHovered={hoveredId === item.id}
-                              onHover={handleHover}
-                              onLaneHover={handleLaneHover}
-                              isDimmed={hoveredId !== null && hoveredId !== item.id}
-                              pixelsPerMonth={pixelsPerMonth}
-                              totalHeight={totalContainerHeight}
-                              mode={mode}
-                              onOpenCaseStudy={handleOpenCaseStudy}
-                              onOpenProject={openTimelineProjectFromGrid}
-                              onOpenTinkerVerse={openTinkerVerseFromGrid}
-                              isScrolling={false}
-                              layoutMode="grid"
-                              isExpanded={expandedCardId === item.id}
-                              onExpand={handleCardExpand}
-                            />
-                          ))}
-                      </div>
+                  <div
+                    data-timeline-lanes="education-experience-tinkerverse"
+                    className="flex-1 grid grid-cols-3 gap-3 items-start px-4 md:pr-0 md:pl-0"
+                  >
+                    <div data-timeline-lane="education" className="space-y-3">
+                      <h2 className="text-[10px] uppercase tracking-widest font-bold text-rose-400 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                        Education
+                      </h2>
+                      {TIMELINE_DATA
+                        .filter(i => i.type === 'education' || i.type === 'foundational')
+                        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+                        .map(item => (
+                          <TimelineEvent
+                            key={item.id}
+                            item={item}
+                            isHovered={hoveredId === item.id}
+                            onHover={handleHover}
+                            onLaneHover={handleLaneHover}
+                            isDimmed={hoveredId !== null && hoveredId !== item.id}
+                            pixelsPerMonth={pixelsPerMonth}
+                            totalHeight={totalContainerHeight}
+                            mode={mode}
+                            onOpenCaseStudy={handleOpenCaseStudy}
+                            onOpenProject={openTimelineProjectFromGrid}
+                            onOpenTinkerVerse={openTinkerVerseFromGrid}
+                            isScrolling={false}
+                            layoutMode="grid"
+                            isExpanded={expandedCardId === item.id}
+                            onExpand={handleCardExpand}
+                          />
+                        ))}
                     </div>
 
-                    {/* TINKERVERSE — supporting maker/community module */}
-                    <div
-                      className="mt-8 w-full p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 hover:border-amber-500/40 cursor-pointer transition-colors backdrop-blur-sm flex items-center gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
-                      onClick={openTinkerVerseFromGrid}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          openTinkerVerseFromGrid();
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      aria-label="Open TinkerVerse"
-                    >
-                      <img src={TINKERVERSE_LOGO} alt="TinkerVerse" className="w-10 h-10 rounded-lg bg-white p-0.5 object-cover" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-3">
-                          <h2 className="font-bold text-amber-100 text-sm">TinkerVerse</h2>
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-amber-400/80">Independent making · Community</span>
-                        </div>
-                        <p className="text-xs text-amber-100/70 mt-1 truncate">
-                          Physical computing and creative tech experiments, documented on Instagram — {SOCIAL_POSTS.length} experiments logged.
-                        </p>
-                      </div>
-                      <div className="text-amber-400 text-xs font-bold tracking-wider bg-amber-500/20 px-3 py-1 rounded-full shrink-0">OPEN</div>
+                    <div data-timeline-lane="experience" className="space-y-3">
+                      <h2 className="text-[10px] uppercase tracking-widest font-bold text-indigo-400 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                        Experience
+                      </h2>
+                      {TIMELINE_DATA
+                        .filter(i => (i.type === 'corporate' || i.type === 'project' || i.type === 'competition') && i.id !== 'tinkerverse')
+                        .filter(i => !i.title.toLowerCase().includes('jarvis'))
+                        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+                        .map(item => (
+                          <TimelineEvent
+                            key={item.id}
+                            item={item}
+                            isHovered={hoveredId === item.id}
+                            onHover={handleHover}
+                            onLaneHover={handleLaneHover}
+                            isDimmed={hoveredId !== null && hoveredId !== item.id}
+                            pixelsPerMonth={pixelsPerMonth}
+                            totalHeight={totalContainerHeight}
+                            mode={mode}
+                            onOpenCaseStudy={handleOpenCaseStudy}
+                            onOpenProject={openTimelineProjectFromGrid}
+                            onOpenTinkerVerse={openTinkerVerseFromGrid}
+                            isScrolling={false}
+                            layoutMode="grid"
+                            isExpanded={expandedCardId === item.id}
+                            onExpand={handleCardExpand}
+                          />
+                        ))}
+                    </div>
+
+                    <div data-timeline-lane="tinkerverse" className="space-y-3">
+                      <h2 className="text-[10px] uppercase tracking-widest font-bold text-amber-400 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        TinkerVerse
+                      </h2>
+                      {TIMELINE_DATA
+                        .filter(i => i.id === 'tinkerverse')
+                        .map(item => (
+                          <TimelineEvent
+                            key={item.id}
+                            item={item}
+                            isHovered={hoveredId === item.id}
+                            onHover={handleHover}
+                            onLaneHover={handleLaneHover}
+                            isDimmed={hoveredId !== null && hoveredId !== item.id}
+                            pixelsPerMonth={pixelsPerMonth}
+                            totalHeight={totalContainerHeight}
+                            mode={mode}
+                            onOpenCaseStudy={handleOpenCaseStudy}
+                            onOpenProject={openTimelineProjectFromGrid}
+                            onOpenTinkerVerse={openTinkerVerseFromGrid}
+                            isScrolling={false}
+                            layoutMode="grid"
+                            isExpanded={expandedCardId === item.id}
+                            onExpand={handleCardExpand}
+                          />
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -1405,16 +1415,16 @@ const PortfolioApp: React.FC = () => {
           {/* --- PROJECTS SECTION --- */}
           <ProjectsSection />
 
-          {/* --- WRITINGS SECTION --- */}
-          <BlogSection />
+          {/* Writings remain available only through the retained direct hash. */}
+          {showDirectWritings && <BlogSection />}
 
-          <div className="h-32 w-full" />
+          <PortfolioFooter />
         </div>
       </motion.div>
 
       {/* --- VERTICAL NAVIGATION --- */}
       <VerticalNavbar
-        activeSection={activeSection}
+        activeSection={mode === 'intro' ? 'profile' : activeSection}
         onNavigate={handleNavigate}
         mode={mode}
         isHidden={hasBlockingOverlay}

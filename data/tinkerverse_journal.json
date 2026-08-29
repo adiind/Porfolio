@@ -1,0 +1,57 @@
+[
+  {
+    "id": "DSzLYXbFJGW",
+    "instagramUrl": "https://www.instagram.com/p/DSzLYXbFJGW/",
+    "publishedAt": "2025-12-28T00:00:00.000Z",
+    "caption": "SoloPump is now available for free! ✨\nA single-handed, countertop-worthy way to get the perfect dose every time.\n\nComment “SP” if you want the link and tag one person who would actually use this.\nMore comments = more reach, so help me get this out there.",
+    "mediaType": "image",
+    "localMediaUrl": "/images/tinkerverse/solopump-project-fallback.webp",
+    "alt": "SoloPump one-handed liquid dispenser on a workshop table, shown in the existing portfolio project image.",
+    "statusLabel": "Shipped build",
+    "projectId": "solopump"
+  },
+  {
+    "id": "DPm6dEjjCmO",
+    "instagramUrl": "https://www.instagram.com/p/DPm6dEjjCmO/",
+    "publishedAt": "2025-10-10T00:08:58.000Z",
+    "caption": "✨ Finding my True North — Surya\n\nConnection. Direction. Identity.\nCamp EDI @segaldesign wasn’t just about learning the tools, it was about realizing what I could create with them.\n\nFor me, that became Surya — an international clock that connects my family across time zones.\n🌸 The flowers bloom when they wake and close when they sleep.\n💡 The LEDs illuminate time and connection through light.\n⚙️ The automation ties it all together, quietly syncing lives across continents.\n\nWhat started as a project became a reminder — of home, of purpose, of balance.\n\n3 things I’m proud of:\n🪻 3D-printed flowers that move like breathing petals\n🔲 Laser-cut mandala base etched in wood\n🔌 A custom microcontroller board bringing it all to life\n\n#CampEDI",
+    "mediaType": "image",
+    "localMediaUrl": "/images/tinkerverse/surya-project-fallback.webp",
+    "alt": "Portfolio project card showing Surya, a kinetic wall timepiece with a mandala-shaped face.",
+    "statusLabel": "Shipped build",
+    "projectId": "surya"
+  },
+  {
+    "id": "DOcq0bHjLHT",
+    "instagramUrl": "https://www.instagram.com/p/DOcq0bHjLHT/",
+    "publishedAt": "2025-09-11T04:08:03.000Z",
+    "caption": "Macro to micro of my DIY CNC Plotter! ⚙️",
+    "mediaType": "image",
+    "localMediaUrl": "/images/tinkerverse/plotter-project-fallback.webp",
+    "alt": "Portfolio project card showing the pen carriage and gantry of the DIY speech-to-draw plotter.",
+    "statusLabel": "Shipped build",
+    "projectId": "plotter"
+  },
+  {
+    "id": "DDqweMUT021",
+    "instagramUrl": "https://www.instagram.com/p/DDqweMUT021/",
+    "publishedAt": "2024-12-17T05:40:00.000Z",
+    "caption": "Meet Helios! 🌞\nIt’s the culmination of many of my skills, testing not only mine but my 3D printer’s tolerances.\nAll parts for Helios was designed in such a way that they print without supports. This was one of the largest designs I could think of on my print bed.\nThis also tested my capabilities in mechanical modelling, thanks to you all for recommending to use a ring gear.\nThe drilling at the start was not necessary but I did print the initial base without the wire cutout, to avoid waste I just drilled instead.\nFor an instant IOT addition I’ve added a smart lamp in there, making the project a physical first but with smart convinces product.\nThe files for the lamp will be on my thingyverse and GitHub!#\nTell me your thoughts on the project in the comments!\n\n#diy #lamp #3dprinting #iot",
+    "mediaType": "image",
+    "localMediaUrl": "/images/tinkerverse/helios-project-fallback.webp",
+    "alt": "Glowing orange Helios mechanical lamp on a black workshop cutting mat.",
+    "statusLabel": "Shipped build",
+    "projectId": "helios"
+  },
+  {
+    "id": "DCMjkgEMbsA",
+    "instagramUrl": "https://www.instagram.com/p/DCMjkgEMbsA/",
+    "publishedAt": "2024-11-10T15:53:40.000Z",
+    "caption": "You too can make your own Alfred/Jarvis! 👨‍💻\nCheckout my YouTube channel for the full video and GitHub for all files to recreate your own assistant!\n#jarvis #alfred #ai #iot #smarthome",
+    "mediaType": "image",
+    "localMediaUrl": "/images/tinkerverse/jarvis-project-fallback.webp",
+    "alt": "Portfolio project card showing the DIY Jarvis voice-controlled smart-home assistant hardware.",
+    "statusLabel": "Shipped build",
+    "projectId": "jarvis"
+  }
+]

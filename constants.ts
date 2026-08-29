@@ -1,6 +1,6 @@
 
-import { TimelineConfig, SocialPost } from './types';
-import RAW_INSTAGRAM_POSTS from './data/instagram_posts.json';
+import { JournalEntry, TimelineConfig, SocialPost } from './types';
+import RAW_TINKERVERSE_JOURNAL from './data/tinkerverse_journal.json';
 import { TIMELINE_DATA } from './data/timeline';
 import { USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO } from './assets';
 
@@ -30,22 +30,19 @@ export const CONFIG: TimelineConfig = {
   endDate: '2026-03-31'
 };
 
-export const SOCIAL_POSTS: SocialPost[] = (RAW_INSTAGRAM_POSTS as any[]).map((post: any) => {
-  // Handle both 'timestamp' (ISO format) and 'date' (YYYY-MM-DD) fields
-  let dateStr = '';
-  if (post.timestamp) {
-    dateStr = post.timestamp.split('T')[0];
-  } else if (post.date) {
-    dateStr = post.date;
-  }
+export const TINKERVERSE_JOURNAL: JournalEntry[] = RAW_TINKERVERSE_JOURNAL as JournalEntry[];
 
+// Compatibility data for older timeline analytics/call sites. The durable
+// five-entry journal is the public source; the legacy caption archive remains
+// on disk but is intentionally not bundled into the portfolio.
+export const SOCIAL_POSTS: SocialPost[] = TINKERVERSE_JOURNAL.map((entry) => {
   return {
-    id: post.url || post.id,
-    date: dateStr,
-    summary: post.caption || post.summary || '',
-    url: post.url,
-    caption: post.caption || '',
-    likes: post.likesCount ?? post.likes ?? 0,
-    comments: post.commentsCount ?? post.comments ?? 0
+    id: entry.id,
+    date: entry.publishedAt.split('T')[0],
+    summary: entry.caption,
+    url: entry.instagramUrl,
+    caption: entry.caption,
+    likes: 0,
+    comments: 0,
   };
 });

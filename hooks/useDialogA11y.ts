@@ -2,7 +2,11 @@ import { useEffect, useRef } from 'react';
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function useDialogA11y(onClose: () => void, options?: { historyTag?: string; historyPath?: string }) {
+export function useDialogA11y(onClose: () => void, options?: {
+  historyTag?: string;
+  historyPath?: string;
+  childHistoryTags?: string[];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -41,7 +45,10 @@ export function useDialogA11y(onClose: () => void, options?: { historyTag?: stri
       // or a nested child dialog consuming its entry above ours. Flag-based
       // suppression can't cover these because the back() is issued by a
       // different effect instance than the one that hears the popstate.
-      if (window.history.state?.modal === tag) return;
+      if (
+        window.history.state?.modal === tag
+        || options?.childHistoryTags?.includes(window.history.state?.modal)
+      ) return;
       if (consumed) return;
       consumed = true;
       onCloseRef.current();

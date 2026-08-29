@@ -31,14 +31,47 @@ const expectedHeadings = {
 
 const approvedNotes = {
   care: [
-    'Care coordination expands when attention is already scarce.',
-    'Proactive help still needs clear permission.',
-    'Trust does not erase privacy boundaries.',
+    'Urgent care is a coordination problem.',
+    'Permissions and responsibility stay visible.',
+    'Keep caregivers connected and in control.',
+    'A sick day creates several problems at once.',
+    'Work and pickup collide.',
+    'Food and medical decisions follow.',
+    'Family updates compete for attention.',
+    'Coordination grows as attention shrinks.',
+    'Proactive help still needs permission.',
+    'Trust does not erase privacy.',
+    'Coordinate the work.',
+    'Communicate what is happening.',
+    'Preserve the human connection.',
+    'Check availability.',
+    'Escalate through trusted caregivers.',
+    'Carry the right context forward.',
+    'Keep the caregiver able to step in.',
+    'Make intent and permission visible.',
+    'Make uncertainty and escalation clear.',
+    'Keep the system easy to interrupt.',
   ],
   mcdonalds: [
-    'The order is part of the hangout, not a separate task.',
-    'One person coordinates the food, or everyone coordinates payment.',
-    'Group visibility and payment clarity have to improve together.',
+    'One shared order.',
+    'Individual choices stay individual.',
+    'Group progress stays visible.',
+    'McDonald’s is a stop between other activities.',
+    'The order is part of the hangout.',
+    'Ordering should preserve social momentum.',
+    'One person collects everyone’s choices.',
+    'Then they chase payment.',
+    'Separate payments lose the shared view.',
+    'Synchronized participation reframed the opportunity.',
+    'Customize your own bag.',
+    'Keep payment responsibility clear.',
+    'Keep each bag visible through pickup.',
+    'Invite through app, web, QR, or assisted entry.',
+    'Keep every bag and payment state visible.',
+    'Submit when every required state is ready.',
+    'Show who owns each choice.',
+    'Show how the order is progressing.',
+    'Make intervention clear when coordination stalls.',
   ],
 };
 
@@ -77,13 +110,20 @@ const sharedRequirements = {
     'export interface HcdStorySection',
     'export interface HcdProjectStory',
     'treatment: HcdTreatment;',
+    'storyNotes: HcdPostIt[];',
+    'heroNotes: HcdPostIt[];',
   ],
   'components/hcd/HcdCaseStudy.tsx': [
     'HcdVisual',
     'HcdPostIt',
-    'data-hcd-workshop-surface',
+    'CuttingMatSurface',
+    'data-hcd-scroll-container',
+    'data-hcd-mat-board',
+    'data-hcd-copy-cluster',
+    'data-hcd-image-shell',
     'data-hcd-post-it',
     'data-hcd-visual-id',
+    'bg-[#050505]',
     'View larger',
     'Fit to screen',
     'ReactDOM.createPortal(',
@@ -117,23 +157,31 @@ const sharedForbiddenMarkers = {
     'data-hcd-chapter',
     'chapter.index',
     'chapter.eyebrow',
+    'HcdWorkshopSurface',
+    'data-hcd-workshop-surface',
+    'hcd-workshop-surface',
+    'hcd-mat-grid',
+    'hcd-mat-frame',
+    'hcd-paper-sheet',
+    'data-hcd-story-panel',
+  ],
+  'components/hcd/PostItNote.tsx': [
+    'aspect-[4/3]',
   ],
 };
 
+const sharedForbiddenFiles = [
+  'components/hcd/HcdWorkshopSurface.tsx',
+];
+
 const canonicalVisuals = {
   care: [
-    'care-stakeholders', 'care-trust-takeaways', 'care-crisis-journey',
-    'care-schedule-management', 'care-clinical-guardian-flow',
-    'care-familysync-intro', 'care-three-pillars', 'care-escalation-flow',
-    'care-visibility-presence',
+    'care-visibility-presence', 'care-crisis-journey', 'care-trust-takeaways',
+    'care-three-pillars', 'care-schedule-management',
   ],
   mcdonalds: [
-    'mcd-research-proof', 'mcd-research-insight', 'mcd-capabilities-gap',
-    'mcd-problem-landscape', 'mcd-opportunity-brief', 'mcd-kiosk-journey',
-    'mcd-app-journey', 'mcd-trigger-setup', 'mcd-join-architecture',
-    'mcd-system-map', 'mcd-readiness-engine', 'mcd-invite-touchpoints',
-    'mcd-value-props', 'mcd-live-progress', 'mcd-squad-details',
-    'mcd-delegated-payment', 'mcd-readiness', 'mcd-order-complete',
+    'mcd-live-progress', 'mcd-research-insight', 'mcd-capabilities-gap',
+    'mcd-value-props', 'mcd-squad-details', 'mcd-order-complete',
   ],
 };
 
@@ -186,6 +234,11 @@ function verifyShared() {
       if (source.includes(marker)) {
         errors.push(`${relativePath} contains forbidden marker: ${marker}`);
       }
+    }
+  }
+  for (const relativePath of sharedForbiddenFiles) {
+    if (fs.existsSync(resolveRepo(relativePath))) {
+      errors.push(`Retired shared file still exists: ${relativePath}`);
     }
   }
 
@@ -262,15 +315,22 @@ function verifyVisual(visual, seenIds, location) {
   }
 }
 
-function verifyPostIt(note, projectMode, location) {
+function verifyPostIt(note, projectMode, location, seenNoteIds, renderedNoteText) {
   if (!note || typeof note !== 'object' || Array.isArray(note)) {
     errors.push(`${location} must be a post-it object`);
     return;
   }
   const noteId = isNonEmptyString(note.id) ? note.id : `${location} (missing id)`;
   if (!isNonEmptyString(note.id)) errors.push(`${location}.id must be a non-empty string`);
+  if (isNonEmptyString(note.id) && seenNoteIds.has(note.id)) {
+    errors.push(`Duplicate post-it id: ${note.id}`);
+  } else if (isNonEmptyString(note.id)) {
+    seenNoteIds.add(note.id);
+  }
   if (!approvedNotes[projectMode].includes(note.text)) {
     errors.push(`${noteId}.text is not an approved ${projectMode} post-it`);
+  } else {
+    renderedNoteText.push(note.text);
   }
   if (!allowedPostItTones[projectMode].has(note.tone)) {
     errors.push(`${noteId}.tone is not allowed by the ${projectMode} palette: ${String(note.tone)}`);
@@ -306,7 +366,19 @@ function verifyProject(projectMode) {
   verifyPublicLanguage(story, projectMode);
 
   const seenIds = new Set();
+  const seenNoteIds = new Set();
+  const renderedNoteText = [];
   verifyVisual(story.hero, seenIds, `${config.storyPath}.hero`);
+  if (!Array.isArray(story.heroNotes)) {
+    errors.push(`${config.storyPath}.heroNotes must be an array`);
+  } else {
+    if (story.heroNotes.length < 2 || story.heroNotes.length > 4) {
+      errors.push(`${config.storyPath}.heroNotes must contain 2 to 4 notes`);
+    }
+    for (const [noteIndex, note] of story.heroNotes.entries()) {
+      verifyPostIt(note, projectMode, `${config.storyPath}.heroNotes[${noteIndex}]`, seenNoteIds, renderedNoteText);
+    }
+  }
 
   if (!Array.isArray(story.sections)) {
     errors.push(`${config.storyPath}.sections must be an array`);
@@ -351,13 +423,26 @@ function verifyProject(projectMode) {
           }
         }
       }
+      if (!Array.isArray(section.storyNotes)) {
+        errors.push(`${location}.storyNotes must be an array`);
+      } else {
+        for (const [noteIndex, note] of section.storyNotes.entries()) {
+          verifyPostIt(note, projectMode, `${location}.storyNotes[${noteIndex}]`, seenNoteIds, renderedNoteText);
+        }
+      }
       if (section.notes !== undefined) {
         if (!Array.isArray(section.notes)) {
           errors.push(`${location}.notes must be an array when present`);
         } else {
           for (const [noteIndex, note] of section.notes.entries()) {
-            verifyPostIt(note, projectMode, `${location}.notes[${noteIndex}]`);
+            verifyPostIt(note, projectMode, `${location}.notes[${noteIndex}]`, seenNoteIds, renderedNoteText);
           }
+        }
+      }
+      if (Array.isArray(section.storyNotes) && (section.notes === undefined || Array.isArray(section.notes))) {
+        const noteCount = section.storyNotes.length + (section.notes?.length ?? 0);
+        if (noteCount < 2 || noteCount > 4) {
+          errors.push(`${location} must contain 2 to 4 public notes across storyNotes and notes; received ${noteCount}`);
         }
       }
     }
@@ -368,6 +453,12 @@ function verifyProject(projectMode) {
   const unexpectedIds = [...seenIds].filter((id) => !expectedIds.includes(id));
   if (missingIds.length) errors.push(`${projectMode} is missing canonical visuals: ${missingIds.join(', ')}`);
   if (unexpectedIds.length) errors.push(`${projectMode} has unexpected visuals: ${unexpectedIds.join(', ')}`);
+
+  const expectedNoteText = approvedNotes[projectMode];
+  const missingNotes = expectedNoteText.filter((text) => !renderedNoteText.includes(text));
+  const duplicateNotes = renderedNoteText.filter((text, index) => renderedNoteText.indexOf(text) !== index);
+  if (missingNotes.length) errors.push(`${projectMode} is missing approved post-its: ${missingNotes.join(' | ')}`);
+  if (duplicateNotes.length) errors.push(`${projectMode} repeats approved post-its: ${[...new Set(duplicateNotes)].join(' | ')}`);
 }
 
 function verifyIntegration() {

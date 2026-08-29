@@ -5,9 +5,16 @@ import BlogCard from './BlogCard';
 import BlogDetail from './BlogDetail';
 import { BLOG_POSTS } from '../data/posts';
 import { trackEvent } from '../lib/analytics';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 const BlogSection: React.FC = () => {
     const [activePost, setActivePost] = useState<BlogPost | null>(null);
+    const engagementRef = useContentEngagement<HTMLElement>({
+        contentType: 'section',
+        contentId: 'writings',
+        active: activePost === null,
+        observeVisibility: true,
+    });
 
     const openPost = (post: BlogPost) => {
         trackEvent('blog_opened', {
@@ -45,7 +52,7 @@ const BlogSection: React.FC = () => {
 
     return (
         <>
-            <section id="writings" className="relative w-full max-w-6xl mx-auto px-6 py-12 md:py-24 border-t border-white/5 mt-6 md:mt-20">
+            <section ref={engagementRef} id="writings" className="relative w-full max-w-6xl mx-auto px-6 py-12 md:py-24 border-t border-white/5 mt-6 md:mt-20">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}

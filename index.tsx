@@ -4,6 +4,7 @@ import { MotionConfig } from 'framer-motion';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { isWorkPath } from './lib/workRoutes';
+import { initializeOpenPanel } from './lib/openpanel';
 
 const isStudioRoute = /^\/studio\/?$/.test(window.location.pathname);
 
@@ -15,6 +16,10 @@ const isStudioRoute = /^\/studio\/?$/.test(window.location.pathname);
 if (!isStudioRoute && isWorkPath(window.location.pathname)) {
   window.history.replaceState(null, '', '/');
 }
+
+// Initialize only after deep-link normalization so the first automatic screen
+// view reflects the route visible to the visitor, not the temporary boot path.
+void initializeOpenPanel();
 const StudioApp = import.meta.env.DEV
   ? React.lazy(() => import('./components/StudioApp'))
   : null;
