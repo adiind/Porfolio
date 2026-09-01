@@ -47,7 +47,9 @@ assert.doesNotMatch(hero, /skillProjectMapping/, 'Hero must not retain skill-to-
 assert.match(hero, /<ProjectWheel/, 'Hero must render the project-only carousel');
 assert.match(hero, /PROJECT_WHEEL_LOCAL_IMAGES/, 'remote project media must use stable local carousel fallbacks');
 assert.match(hero, /projects\.map\(/, 'Hero must derive the wheel from the canonical project collection');
+assert.match(hero, /<CuttingMatSurface active=\{active\} float=\{false\}/, 'the interactive homepage must not animate the full cutting-mat surface on clicks');
 assert.match(app, /closest\(['"]\[data-project-wheel\]['"]\)/, 'global intro keyboard handling must yield to the carousel');
+assert.match(app, /const pageTransition = \{[\s\S]*?duration: 0\.15/, 'page handoffs must be brief and must not fade the whole interface on ordinary clicks');
 
 assert.doesNotMatch(tinkerVerse, /field note|workshop journal|Founder thesis|Build log/i, 'TinkerVerse must not ship invented journal framing');
 assert.doesNotMatch(timelineEvent, /field notes|open journal|workshop journal/i, 'TinkerVerse preview must use project language');

@@ -84,7 +84,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(229,229,90,0.09),transparent_38%),radial-gradient(circle_at_50%_70%,rgba(0,51,42,0.36),transparent_46%),linear-gradient(180deg,rgba(0,0,0,0.08)_0%,#020302_100%)]" />
 
         <div className="absolute left-1/2 top-[59%] h-[82vh] min-h-[580px] w-[101vw] max-w-[1380px] -translate-x-1/2 -translate-y-1/2 px-3 sm:px-0">
-          <CuttingMatSurface active={active} />
+          <CuttingMatSurface active={active} float={false} />
         </div>
       </div>
 

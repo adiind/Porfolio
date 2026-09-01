@@ -892,7 +892,7 @@ const PortfolioApp: React.FC = () => {
   // Animation Transition Configuration - fast tween for smooth GPU-accelerated animation
   const pageTransition = {
     type: "tween" as const,
-    duration: 0.5,
+    duration: 0.15,
     ease: [0.32, 0.72, 0, 1] // Custom cubic-bezier for smooth feel
   };
 

@@ -57,6 +57,15 @@ async function main() {
         assert.equal(overlaps(heroAvatar, primaryCta), false, `${viewport.label}: avatar must not overlap the primary CTA`);
       }
 
+      if (viewport.label === 'desktop') {
+        const heroMat = page.locator('#profile [data-cutting-mat-surface]');
+        const matTransformBeforeClick = await heroMat.evaluate((element) => getComputedStyle(element).transform);
+        await page.getByRole('button', { name: 'View selected work' }).click();
+        await page.waitForTimeout(300);
+        const matTransformAfterClick = await heroMat.evaluate((element) => getComputedStyle(element).transform);
+        assert.equal(matTransformAfterClick, matTransformBeforeClick, 'desktop: clicking must not restart or move the full cutting-mat surface');
+      }
+
       await page.close();
     }
 
