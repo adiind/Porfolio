@@ -113,7 +113,6 @@ export interface JournalEntry {
   mediaType: 'image' | 'video-thumbnail';
   localMediaUrl: string;
   alt: string;
-  statusLabel: string;
   projectId?: string;
 }
 

@@ -33,7 +33,7 @@ const ProjectWheelFallback: React.FC<Props> = ({ items, activeIndex, onSelect, o
             zIndex: 10 - Math.abs(offset),
             transform: `translate(-50%, calc(-50% + ${offset * 112}px)) rotate(${offset * 7}deg) scale(${isActive ? 1 : 0.82})`,
             borderColor: isActive ? 'rgba(229,229,90,0.86)' : 'rgba(255,255,255,0.24)',
-            transition: 'none',
+            transition: 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease, border-color 200ms ease',
           }}
         >
           <img src={item.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />

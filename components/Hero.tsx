@@ -172,14 +172,8 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
 
         <motion.div
           className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"
-          animate={active && !shouldReduceMotion ? {
-            x: [0, 5, 1, -4, 0],
-            y: [0, -12, -7, -14, 0],
-          } : { x: 0, y: 0 }}
-          transition={{
-            x: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
-            y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
-          }}
+          animate={{ x: 0, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <div className="absolute left-1/2 top-[5%] md:top-[10%] z-30 -translate-x-1/2 pointer-events-none">
             <motion.div
@@ -203,13 +197,13 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{
-              scale: active ? [1, 1.028, 1.014, 1] : 1,
-              rotate: active ? [0, 0.9, 0.25, -0.7, 0] : 0,
+              scale: 1,
+              rotate: 0,
               opacity: 0.98,
             }}
             transition={{
-              scale: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
+              scale: { duration: 0.4, ease: "easeOut" },
+              rotate: { duration: 0.4, ease: "easeOut" },
               opacity: { duration: 0.6, delay: 0.1 }
             }}
             className="group relative z-20 w-[64%] h-[64%] cursor-pointer pointer-events-auto transition-all duration-300 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"

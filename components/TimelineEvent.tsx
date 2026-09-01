@@ -1101,13 +1101,13 @@ const TinkerVerseGrid: React.FC<{
 
         <div className="mt-auto">
           <span className="inline-flex rounded-full border border-[#e5e55a]/35 bg-black/60 px-2 py-1 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a] backdrop-blur-sm">
-            Live workshop journal
+            {item.title}
           </span>
           <h3 className={`mt-2 font-bold leading-tight ${isFit ? 'text-sm md:text-lg' : 'text-sm'} ${styles.text}`}>
             {leadProject?.hero.title ?? item.title}
           </h3>
           <p className={`mt-1 font-mono text-[9px] uppercase tracking-[0.12em] ${styles.subtext}`}>
-            {TINKERVERSE_JOURNAL.length} field notes · Open journal
+            {TINKERVERSE_JOURNAL.length} posts · Open
           </p>
         </div>
         {isFit && (

@@ -19,7 +19,6 @@ const REQUIRED_FIELDS = [
   'mediaType',
   'localMediaUrl',
   'alt',
-  'statusLabel',
 ];
 const MEDIA_TYPES = new Set(['image', 'video-thumbnail']);
 
@@ -182,7 +181,6 @@ function createLastKnownGoodRoot() {
       mediaType: 'image',
       localMediaUrl: '/images/tinkerverse/sentinel.png',
       alt: 'Sentinel image used to verify update safety.',
-      statusLabel: 'Verified fallback',
     },
   ]);
   return root;

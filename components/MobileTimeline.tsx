@@ -417,17 +417,17 @@ const MobileTimeline: React.FC<Props> = ({
                             <img src={TINKERVERSE_LOGO} alt="" className="h-9 w-9 rounded-lg border border-white/15 bg-black object-cover" />
                             <div className="min-w-0 flex-1">
                                 <h3 className="font-bold text-white text-base">TinkerVerse</h3>
-                                <p className="mt-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a]">Live workshop journal</p>
+                                <p className="mt-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a]">{tinkerverse.title}</p>
                             </div>
                             <div className="rounded-full border border-[#e5e55a]/30 bg-black/[0.45] px-3 py-1 text-[10px] font-bold tracking-wider text-[#f0f18a] backdrop-blur-sm">OPEN</div>
                         </div>
                         <div className="mt-auto">
-                            <p className="text-lg font-bold leading-tight text-white">One honest build at a time.</p>
+                            <p className="text-lg font-bold leading-tight text-white">{tinkerverse.headline}</p>
                             <p className="mt-2 text-sm leading-relaxed text-white/[0.72]">
-                                Physical computing and creative-tech experiments, documented while they are still being figured out.
+                                {tinkerverse.summary}
                             </p>
                             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60">
-                                {TINKERVERSE_JOURNAL.length} curated field notes
+                                {TINKERVERSE_JOURNAL.length} posts
                             </p>
                         </div>
                     </div>

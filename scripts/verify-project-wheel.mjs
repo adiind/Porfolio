@@ -11,6 +11,11 @@ const wheel = read('components/project-wheel/ProjectWheel.tsx');
 const fallback = read('components/project-wheel/ProjectWheelFallback.tsx');
 const hero = read('components/Hero.tsx');
 const app = read('App.tsx');
+const tinkerVerse = read('components/TinkerVerseModal.tsx');
+const timelineEvent = read('components/TimelineEvent.tsx');
+const mobileTimeline = read('components/MobileTimeline.tsx');
+const viteConfig = read('vite.config.ts');
+const cuttingMat = read('components/ui/CuttingMatSurface.tsx');
 const notices = read('THIRD_PARTY_NOTICES.md');
 
 assert.match(shader, /float\s+smin\s*\(/, 'shader must implement smooth-min goo fusion');
@@ -32,6 +37,9 @@ assert.match(wheel, /ArrowLeft|ArrowRight/, 'carousel must support arrow steppin
 assert.match(wheel, /aria-live=['"]polite['"]/, 'carousel must announce the current project');
 assert.match(wheel, /Open project/, 'carousel must expose a semantic project-opening action');
 assert.match(fallback, /data-project-wheel-fallback/, 'carousel must render an HTML fallback');
+assert.doesNotMatch(wheel, /projectWheelWebgl/, 'desktop must not require a query parameter to enable the connected wheel');
+assert.match(wheel, /const showFallback = isCompact \|\| prefersReducedMotion \|\| failed/, 'only compact, reduced-motion, or failed rendering may use the fallback');
+assert.doesNotMatch(fallback, /transition:\s*['"]none['"]/, 'fallback cards must not snap between states');
 
 assert.doesNotMatch(hero, /data-discipline-option/, 'Hero must not retain discipline controls');
 assert.doesNotMatch(hero, /data-discipline-arcs/, 'Hero must not retain nested discipline arcs');
@@ -40,6 +48,16 @@ assert.match(hero, /<ProjectWheel/, 'Hero must render the project-only carousel'
 assert.match(hero, /PROJECT_WHEEL_LOCAL_IMAGES/, 'remote project media must use stable local carousel fallbacks');
 assert.match(hero, /projects\.map\(/, 'Hero must derive the wheel from the canonical project collection');
 assert.match(app, /closest\(['"]\[data-project-wheel\]['"]\)/, 'global intro keyboard handling must yield to the carousel');
+
+assert.doesNotMatch(tinkerVerse, /field note|workshop journal|Founder thesis|Build log/i, 'TinkerVerse must not ship invented journal framing');
+assert.doesNotMatch(timelineEvent, /field notes|open journal|workshop journal/i, 'TinkerVerse preview must use project language');
+assert.doesNotMatch(mobileTimeline, /field notes|workshop journal/i, 'mobile TinkerVerse preview must use project language');
+
+assert.match(viteConfig, /api\.github\.com\/repos\/adiind\/Porfolio\/commits/, 'builds must obtain source history from the public repository API');
+assert.match(viteConfig, /portfolio-source-history\.json/, 'builds must retain a verified source-history fallback');
+assert.match(viteConfig, /--is-shallow-repository[\s\S]*?=== 'true'\) return null/, 'a shallow build must never present its local Git count as repository history');
+assert.doesNotMatch(hero, /repeat:\s*Infinity/, 'the homepage must not restart perpetual avatar motion while the app state changes');
+assert.doesNotMatch(cuttingMat, /repeat:\s*Infinity/, 'shared page surfaces must not run perpetual motion on every page');
 
 assert.match(notices, /Copyright \(c\) 2026 Yousuf Soomro/, 'third-party notice must preserve upstream copyright');
 assert.match(notices, /MIT License/, 'third-party notice must preserve the MIT license');

@@ -21,8 +21,6 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
   const [isCompact, setIsCompact] = useState(() => (
     typeof window !== 'undefined' && window.innerWidth <= COMPACT_MAX_WIDTH
   ));
-  const webglRequested = typeof window !== 'undefined'
-    && new URLSearchParams(window.location.search).has('projectWheelWebgl');
   const [frontIndex, setFrontIndex] = useState(0);
   const [ready, setReady] = useState(prefersReducedMotion);
   const [failed, setFailed] = useState(false);
@@ -38,7 +36,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
 
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage || !items.length || prefersReducedMotion || isCompact || !webglRequested) return;
+    if (!stage || !items.length || prefersReducedMotion || isCompact) return;
     const forceFallback = new URLSearchParams(window.location.search).has('projectWheelFallback');
     if (forceFallback) {
       setFailed(true);
@@ -82,7 +80,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
       renderer?.dispose();
       if (rendererRef.current === renderer) rendererRef.current = null;
     };
-  }, [items, onOpen, prefersReducedMotion, isCompact, webglRequested]);
+  }, [items, onOpen, prefersReducedMotion, isCompact]);
 
   useEffect(() => {
     rendererRef.current?.setActive(active);
@@ -115,9 +113,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
     }
   };
 
-  // The HTML treatment is the stable public startup. Keep WebGL available for
-  // focused renderer work without making the first impression depend on it.
-  const showFallback = !webglRequested || isCompact || prefersReducedMotion || failed;
+  const showFallback = isCompact || prefersReducedMotion || failed;
 
   return (
     <section

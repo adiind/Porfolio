@@ -56,26 +56,18 @@ const JournalMedia: React.FC<{
                 >
                     <div>
                         <div className="mx-auto mb-4 h-12 w-12 rounded-full border border-[#e5e55a]/40 bg-[#e5e55a]/10" />
-                        <p className="text-sm font-semibold text-white/85">Workshop image unavailable</p>
-                        <p className="mt-1 text-xs text-white/60">The field note remains readable offline.</p>
+                        <p className="text-sm font-semibold text-white/85">Image unavailable</p>
+                        <p className="mt-1 text-xs text-white/60">The caption below still reads offline.</p>
                     </div>
                 </div>
             )}
 
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
-            <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-                <span
-                    data-journal-fallback="verified-local"
-                    className="rounded-full border border-white/20 bg-black/[0.72] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-md"
-                >
-                    Verified portfolio fallback
+            {entry.mediaType === 'video-thumbnail' && (
+                <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full border border-[#e5e55a]/35 bg-black/[0.72] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a]">
+                    <Play size={10} fill="currentColor" aria-hidden="true" /> Video still
                 </span>
-                {entry.mediaType === 'video-thumbnail' && (
-                    <span className="flex items-center gap-1 rounded-full border border-[#e5e55a]/35 bg-black/[0.72] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#f0f18a] backdrop-blur-md">
-                        <Play size={10} fill="currentColor" aria-hidden="true" /> Video still
-                    </span>
-                )}
-            </div>
+            )}
         </div>
     );
 };
@@ -90,7 +82,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
         section: 'journal',
         active: activeProject === null,
     });
-    const fieldNotes = TINKERVERSE_JOURNAL.slice(1, 5);
+    const morePosts = TINKERVERSE_JOURNAL.slice(1, 5);
     const projectsById = useMemo(() => {
         const ids = TINKERVERSE_JOURNAL
             .map((entry) => entry.projectId)
@@ -156,21 +148,20 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
                 aria-hidden={activeProject ? true : undefined}
                 className={`relative h-full max-h-[96vh] w-full max-w-7xl overflow-hidden rounded-[1.7rem] shadow-2xl focus:outline-none md:rounded-[2.15rem] ${activeProject ? 'hidden' : ''}`}
             >
-                <CuttingMatSurface active={!activeProject} density="auto" className="p-2.5 sm:p-4 md:p-7">
+                <CuttingMatSurface active={!activeProject} float={false} density="auto" className="p-2.5 sm:p-4 md:p-7">
                     <GlassSurface strength="strong" blur="strong" className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1.25rem] md:rounded-[1.6rem]">
                         <header className="relative z-10 flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-3 sm:px-5 md:px-7 md:py-4">
                             <img src={TINKERVERSE_LOGO} alt="" className="h-9 w-9 shrink-0 rounded-lg border border-white/15 bg-black object-cover sm:h-10 sm:w-10" />
                             <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                                     <h2 id="tinkerverse-modal-title" className="text-xl font-bold tracking-tight text-white sm:text-2xl">TinkerVerse</h2>
-                                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e5e55a]">Live workshop journal</span>
                                 </div>
-                                <p className="mt-0.5 hidden text-xs text-white/65 sm:block"><span className="text-white/80">{item.title}</span> · Physical computing, agentic software, and creative-tech experiments in progress.</p>
+                                <p className="mt-0.5 hidden text-xs text-white/65 sm:block"><span className="text-white/80">{item.title}</span> · {item.headline}</p>
                             </div>
                             <button
                                 type="button"
                                 onClick={handleTopmostClose}
-                                aria-label="Close TinkerVerse journal"
+                                aria-label="Close TinkerVerse"
                                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/25 text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0f18a]"
                             >
                                 <X size={19} aria-hidden="true" />
@@ -179,38 +170,24 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
 
                         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-6 pt-4 custom-scrollbar sm:px-5 md:px-7 md:pb-8 md:pt-6">
                             <div className="mx-auto min-w-0 max-w-6xl">
-                                <section className="mb-5 grid gap-3 border-b border-white/10 pb-5 md:mb-7 md:grid-cols-[0.72fr_1.28fr] md:items-end md:gap-8 md:pb-7">
-                                    <div>
-                                        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e5e55a]">Founder thesis</p>
-                                        <p className="mt-2 max-w-xl text-lg font-semibold leading-snug text-white sm:text-xl md:text-2xl">
-                                            A live workshop for making technology tangible, one honest build at a time.
-                                        </p>
-                                    </div>
-                                    <p className="max-w-2xl text-sm leading-relaxed text-white/70 md:justify-self-end">
-                                        TinkerVerse is where I document physical computing, agentic software, and creative-tech experiments while they are still being figured out.
-                                    </p>
-                                </section>
-
                                 {leadEntry && (
                                     <GlassSurface
                                         as="article"
                                         data-journal-lead
                                         data-journal-entry={leadEntry.id}
                                         strength="balanced"
-                                        blur="medium"
+                                        blur="none"
                                         className="mb-6 grid min-w-0 overflow-hidden rounded-2xl lg:grid-cols-[1.45fr_0.75fr]"
                                     >
                                         <div className="aspect-[16/10] min-h-[250px] lg:aspect-auto lg:min-h-[430px]">
                                             <JournalMedia entry={leadEntry} priority />
                                         </div>
                                         <div data-journal-text className="relative flex min-w-0 flex-col p-5 sm:p-6 lg:p-7">
-                                            <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em]">
-                                                <span data-journal-status className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-2.5 py-1 font-semibold text-emerald-200">{leadEntry.statusLabel}</span>
-                                                <span className="text-white/55">{formatJournalDate(leadEntry.publishedAt)}</span>
+                                            <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/55">
+                                                {formatJournalDate(leadEntry.publishedAt)}
                                             </div>
-                                            <p className="mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e5e55a]">Latest field note</p>
-                                            <h3 className="mt-2 break-words text-2xl font-bold leading-tight text-white sm:text-3xl">
-                                                {projectsById.get(leadEntry.projectId ?? '')?.hero.title ?? 'From the workbench'}
+                                            <h3 className="mt-3 break-words text-2xl font-bold leading-tight text-white sm:text-3xl">
+                                                {projectsById.get(leadEntry.projectId ?? '')?.hero.title ?? 'TinkerVerse post'}
                                             </h3>
                                             <p className="mt-3 break-words text-sm leading-relaxed text-white/[0.72] [overflow-wrap:anywhere] sm:text-base">
                                                 {journalExcerpt(leadEntry.caption, 3)}
@@ -220,35 +197,30 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
                                     </GlassSurface>
                                 )}
 
-                                <section aria-labelledby="field-notes-title">
-                                    <div className="mb-4 flex items-end justify-between gap-4">
-                                        <div>
-                                            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e5e55a]">Build log</p>
-                                            <h3 id="field-notes-title" className="mt-1 text-xl font-bold text-white sm:text-2xl">Recent field notes</h3>
-                                        </div>
-                                        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/55">Curated / {TINKERVERSE_JOURNAL.length}</span>
+                                <section aria-labelledby="tinkerverse-projects-title">
+                                    <div className="mb-4">
+                                        <h3 id="tinkerverse-projects-title" className="text-xl font-bold text-white sm:text-2xl">Projects</h3>
                                     </div>
 
                                     <div data-journal-grid className="grid gap-3 sm:grid-cols-2 lg:gap-4">
-                                        {fieldNotes.map((entry) => (
+                                        {morePosts.map((entry) => (
                                             <GlassSurface
                                                 as="article"
                                                 key={entry.id}
                                                 data-journal-entry={entry.id}
                                                 strength="quiet"
-                                                blur="soft"
+                                                blur="none"
                                                 className="grid min-w-0 overflow-hidden rounded-xl sm:grid-cols-[0.95fr_1.05fr]"
                                             >
                                                 <div className="aspect-[4/3] min-h-[180px] sm:aspect-auto sm:min-h-[230px]">
                                                     <JournalMedia entry={entry} />
                                                 </div>
                                                 <div data-journal-text className="flex min-w-0 flex-col p-4">
-                                                    <div className="flex flex-wrap items-center gap-2 font-mono text-[9px] uppercase tracking-[0.13em]">
-                                                        <span data-journal-status className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-2 py-0.5 font-semibold text-emerald-200">{entry.statusLabel}</span>
-                                                        <span className="text-white/55">{formatJournalDate(entry.publishedAt)}</span>
+                                                    <div className="font-mono text-[9px] uppercase tracking-[0.13em] text-white/55">
+                                                        {formatJournalDate(entry.publishedAt)}
                                                     </div>
                                                     <h4 className="mt-3 break-words text-base font-bold leading-snug text-white">
-                                                        {projectsById.get(entry.projectId ?? '')?.hero.title ?? 'Workshop note'}
+                                                        {projectsById.get(entry.projectId ?? '')?.hero.title ?? 'TinkerVerse post'}
                                                     </h4>
                                                     <p className="mt-2 line-clamp-4 break-words text-xs leading-relaxed text-white/[0.68] [overflow-wrap:anywhere]">
                                                         {journalExcerpt(entry.caption)}
@@ -260,18 +232,6 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
                                     </div>
                                 </section>
 
-                                <div className="mt-7 flex justify-center border-t border-white/10 pt-6">
-                                    <a
-                                        data-follow-instagram
-                                        href="https://www.instagram.com/tinker_verse/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-black/25 px-5 py-2.5 text-sm font-semibold text-white/80 transition-colors hover:border-[#e5e55a]/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0f18a]"
-                                    >
-                                        Follow the ongoing work
-                                        <ExternalLink size={14} aria-hidden="true" />
-                                    </a>
-                                </div>
                             </div>
                         </div>
                     </GlassSurface>

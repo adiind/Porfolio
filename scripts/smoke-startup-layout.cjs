@@ -22,7 +22,7 @@ function loadPlaywright() {
 const { chromium } = loadPlaywright();
 const baseUrl = process.argv[2]?.replace(/\/$/, '') || 'http://127.0.0.1:4173';
 const viewports = [
-  { label: 'desktop', width: 1440, height: 900, compact: false, expectedWheelMode: 'fallback' },
+  { label: 'desktop', width: 1440, height: 900, compact: false, expectedWheelMode: 'webgl' },
   { label: 'tablet', width: 919, height: 785, compact: true, expectedWheelMode: 'fallback' },
   { label: 'mobile', width: 390, height: 844, compact: true, expectedWheelMode: 'fallback' },
 ];
@@ -60,15 +60,28 @@ async function main() {
       await page.close();
     }
 
-    const webglPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await webglPage.goto(`${baseUrl}?projectWheelWebgl`, { waitUntil: 'domcontentloaded' });
-    await webglPage.waitForTimeout(1200);
+    const fallbackPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await fallbackPage.goto(`${baseUrl}?projectWheelFallback`, { waitUntil: 'domcontentloaded' });
+    await fallbackPage.waitForTimeout(1200);
     assert.equal(
-      await webglPage.locator('[data-project-wheel]').getAttribute('data-project-wheel-mode'),
-      'webgl',
-      'explicit projectWheelWebgl mode must retain the renderer for focused refinement',
+      await fallbackPage.locator('[data-project-wheel]').getAttribute('data-project-wheel-mode'),
+      'fallback',
+      'explicit fallback mode must remain available for renderer failure diagnosis',
     );
-    await webglPage.close();
+    await fallbackPage.close();
+
+    const reducedMotionPage = await browser.newPage({
+      viewport: { width: 1440, height: 900 },
+      reducedMotion: 'reduce',
+    });
+    await reducedMotionPage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await reducedMotionPage.waitForTimeout(500);
+    assert.equal(
+      await reducedMotionPage.locator('[data-project-wheel]').getAttribute('data-project-wheel-mode'),
+      'fallback',
+      'reduced-motion users must receive the stable non-WebGL carousel',
+    );
+    await reducedMotionPage.close();
   } finally {
     await browser.close();
   }

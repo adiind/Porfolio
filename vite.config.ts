@@ -2,6 +2,7 @@ import path from 'path';
 import { execFileSync } from 'node:child_process';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import sourceHistoryFallback from './data/portfolio-source-history.json';
 
 const getPortfolioRevision = (): string | null => {
   try {
@@ -15,28 +16,24 @@ const getPortfolioRevision = (): string | null => {
   }
 };
 
-const getPortfolioCommitCount = (revision: string | null): number | null => {
-  if (!revision) return null;
-  try {
-    const rawCount = execFileSync('git', ['rev-list', '--count', revision], {
-      cwd: __dirname,
-      encoding: 'utf8',
-    }).trim();
-    const count = Number.parseInt(rawCount, 10);
-    return Number.isFinite(count) ? count : null;
-  } catch {
-    return null;
-  }
-};
-
 type GitActivityDay = {
   date: string;
   count: number;
 };
 
-const getPortfolioGitActivity = (revision: string | null): GitActivityDay[] | null => {
+type PortfolioHistory = {
+  revision: string | null;
+  commitCount: number | null;
+  activity: GitActivityDay[] | null;
+};
+
+const getLocalPortfolioHistory = (): PortfolioHistory | null => {
+  const revision = getPortfolioRevision();
   if (!revision) return null;
   try {
+    if (execFileSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: __dirname, encoding: 'utf8' }).trim() === 'true') return null;
+    const rawCount = execFileSync('git', ['rev-list', '--count', revision], { cwd: __dirname, encoding: 'utf8' }).trim();
+    const commitCount = Number.parseInt(rawCount, 10);
     const dates = execFileSync('git', ['log', revision, '--format=%ad', '--date=short'], {
       cwd: __dirname,
       encoding: 'utf8',
@@ -45,30 +42,64 @@ const getPortfolioGitActivity = (revision: string | null): GitActivityDay[] | nu
       .split('\n')
       .filter(Boolean);
 
-    if (dates.length === 0) return [];
+    if (!Number.isFinite(commitCount) || dates.length === 0) return null;
 
     const counts = new Map<string, number>();
     dates.forEach((date) => counts.set(date, (counts.get(date) ?? 0) + 1));
 
     const latest = new Date(`${dates[0]}T00:00:00Z`);
-    return Array.from({ length: 84 }, (_, index) => {
+    const activity = Array.from({ length: 84 }, (_, index) => {
       const date = new Date(latest);
       date.setUTCDate(latest.getUTCDate() - (83 - index));
       const key = date.toISOString().slice(0, 10);
       return { date: key, count: counts.get(key) ?? 0 };
     });
+    return { revision, commitCount, activity };
   } catch {
     return null;
   }
 };
 
-export default defineConfig(({ mode }) => {
+type GitHubCommit = { sha: string; commit?: { author?: { date?: string } } };
+
+const getGitHubPortfolioHistory = async (): Promise<PortfolioHistory | null> => {
+  const commits: GitHubCommit[] = [];
+  let page = 1;
+  try {
+    while (true) {
+      const response = await fetch(`https://api.github.com/repos/adiind/Porfolio/commits?sha=main&per_page=100&page=${page}`, {
+        headers: { Accept: 'application/vnd.github+json' },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) return null;
+      const batch = await response.json() as GitHubCommit[];
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      commits.push(...batch);
+      if (batch.length < 100) break;
+      page += 1;
+    }
+  } catch {
+    return null;
+  }
+  const dates = commits.map((commit) => commit.commit?.author?.date?.slice(0, 10)).filter((date): date is string => Boolean(date));
+  if (!commits.length || !dates.length) return null;
+  const counts = new Map<string, number>();
+  dates.forEach((date) => counts.set(date, (counts.get(date) ?? 0) + 1));
+  const latest = new Date(`${dates[0]}T00:00:00Z`);
+  const activity = Array.from({ length: 84 }, (_, index) => {
+    const date = new Date(latest);
+    date.setUTCDate(latest.getUTCDate() - (83 - index));
+    const key = date.toISOString().slice(0, 10);
+    return { date: key, count: counts.get(key) ?? 0 };
+  });
+  return { revision: commits[0].sha, commitCount: commits.length, activity };
+};
+
+export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, '.', '');
-  // Pin every build-time Git signal to one resolved revision so a concurrent
-  // commit cannot make the count, chart, and verified artifact disagree.
-  const portfolioRevision = getPortfolioRevision();
-  const portfolioCommitCount = getPortfolioCommitCount(portfolioRevision);
-  const portfolioGitActivity = getPortfolioGitActivity(portfolioRevision);
+  const portfolioHistory = await getGitHubPortfolioHistory()
+    ?? getLocalPortfolioHistory()
+    ?? sourceHistoryFallback;
   return {
     server: {
       port: 3000,
@@ -113,9 +144,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      __PORTFOLIO_REVISION__: JSON.stringify(portfolioRevision),
-      __PORTFOLIO_COMMIT_COUNT__: JSON.stringify(portfolioCommitCount),
-      __PORTFOLIO_GIT_ACTIVITY__: JSON.stringify(portfolioGitActivity),
+      __PORTFOLIO_REVISION__: JSON.stringify(portfolioHistory.revision),
+      __PORTFOLIO_COMMIT_COUNT__: JSON.stringify(portfolioHistory.commitCount),
+      __PORTFOLIO_GIT_ACTIVITY__: JSON.stringify(portfolioHistory.activity),
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
     },

@@ -7,7 +7,6 @@
     "mediaType": "image",
     "localMediaUrl": "/images/tinkerverse/solopump-project-fallback.webp",
     "alt": "SoloPump one-handed liquid dispenser on a workshop table, shown in the existing portfolio project image.",
-    "statusLabel": "Shipped build",
     "projectId": "solopump"
   },
   {
@@ -18,7 +17,6 @@
     "mediaType": "image",
     "localMediaUrl": "/images/tinkerverse/surya-project-fallback.webp",
     "alt": "Portfolio project card showing Surya, a kinetic wall timepiece with a mandala-shaped face.",
-    "statusLabel": "Shipped build",
     "projectId": "surya"
   },
   {
@@ -29,7 +27,6 @@
     "mediaType": "image",
     "localMediaUrl": "/images/tinkerverse/plotter-project-fallback.webp",
     "alt": "Portfolio project card showing the pen carriage and gantry of the DIY speech-to-draw plotter.",
-    "statusLabel": "Shipped build",
     "projectId": "plotter"
   },
   {
@@ -40,7 +37,6 @@
     "mediaType": "image",
     "localMediaUrl": "/images/tinkerverse/helios-project-fallback.webp",
     "alt": "Glowing orange Helios mechanical lamp on a black workshop cutting mat.",
-    "statusLabel": "Shipped build",
     "projectId": "helios"
   },
   {
@@ -51,7 +47,6 @@
     "mediaType": "image",
     "localMediaUrl": "/images/tinkerverse/jarvis-project-fallback.webp",
     "alt": "Portfolio project card showing the DIY Jarvis voice-controlled smart-home assistant hardware.",
-    "statusLabel": "Shipped build",
     "projectId": "jarvis"
   }
 ]

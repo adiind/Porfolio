@@ -79,7 +79,6 @@ function normalizePost(post, index) {
     mediaType,
     candidate,
     alt: `TinkerVerse workshop artifact shared on Instagram: ${caption.replace(/\s+/g, ' ').slice(0, 140)}`,
-    statusLabel: 'Workshop update',
   };
 }
 
@@ -183,7 +182,6 @@ export async function runJournalUpdate(options) {
         mediaType: post.mediaType,
         localMediaUrl: `/images/tinkerverse/${filename}`,
         alt: post.alt,
-        statusLabel: post.statusLabel,
       });
     }
     fs.writeFileSync(stageManifest, `${JSON.stringify(entries, null, 2)}\n`);

@@ -1,7 +1,7 @@
 import React from 'react';
 
 export type GlassOpticalStrength = 'quiet' | 'balanced' | 'strong';
-export type GlassBlurStrength = 'soft' | 'medium' | 'strong';
+export type GlassBlurStrength = 'none' | 'soft' | 'medium' | 'strong';
 
 type GlassSurfaceOwnProps<T extends React.ElementType> = {
   as?: T;
@@ -23,6 +23,10 @@ const strengthClasses: Record<GlassOpticalStrength, string> = {
 };
 
 const blurClasses: Record<GlassBlurStrength, string> = {
+  // 'none' exists so panels stacked on an already-blurred shell can skip a second
+  // backdrop-filter pass — nested backdrop layers cost a composited layer each and
+  // add nothing visible on top of an opaque surface.
+  none: '',
   soft: 'backdrop-blur-sm',
   medium: 'backdrop-blur-md',
   strong: 'backdrop-blur-xl',

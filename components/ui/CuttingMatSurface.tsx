@@ -8,6 +8,10 @@ export interface CuttingMatSurfaceProps {
   children?: React.ReactNode;
   className?: string;
   density?: CuttingMatDensity;
+  /** Perpetual float/tilt. Turn off when the mat hosts glass panels or scrollable
+   *  dialog content — the repeating transform forces every nested backdrop-filter
+   *  layer above it to re-rasterise each frame, which reads as flicker. */
+  float?: boolean;
 }
 
 // Palette and layout are adapted from the Classic preset at cutting-mat-generator.vercel.app.
@@ -26,10 +30,22 @@ export const CuttingMatSurface: React.FC<CuttingMatSurfaceProps> = ({
   children,
   className = '',
   density = 'auto',
+  float = true,
 }) => {
   const surfaceRef = useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ w: 1100, h: 760 });
+  const [reducedMotion, setReducedMotion] = useState(false);
   const gradientId = useId().replace(/:/g, '');
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReducedMotion(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  const drifting = active && float && !reducedMotion;
 
   useEffect(() => {
     const el = surfaceRef.current;
@@ -75,14 +91,14 @@ export const CuttingMatSurface: React.FC<CuttingMatSurfaceProps> = ({
       ref={surfaceRef}
       data-cutting-mat-surface=""
       initial={{ opacity: 0, scale: 0.96, y: 24 }}
-      animate={active
+      animate={drifting
         ? { opacity: 1, scale: 1, y: [0, -6, 0], rotate: [-0.72, -0.38, -0.72] }
         : { opacity: 1, scale: 1, y: 0, rotate: -0.72 }}
-      transition={active ? {
+      transition={drifting ? {
         opacity: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] },
         scale: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] },
-        y: { duration: 12, repeat: Infinity, ease: 'easeInOut' },
-        rotate: { duration: 12, repeat: Infinity, ease: 'easeInOut' },
+        y: { duration: 0.5, ease: 'easeOut' },
+        rotate: { duration: 0.5, ease: 'easeOut' },
       } : {
         opacity: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },
         scale: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },

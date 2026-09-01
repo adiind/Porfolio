@@ -204,6 +204,10 @@ def verify_task2_source_contract() -> None:
         if not (ROOT / "public" / "images" / "tool-marks" / mark).is_file():
             failures.append(f"Missing standalone tool mark: {mark}")
 
+    codex_mark = (ROOT / "public" / "images" / "tool-marks" / "codex.svg").read_text(encoding="utf-8")
+    if 'viewBox="0 0 24 24"' not in codex_mark or 'data-codex-mark="current"' not in codex_mark:
+        failures.append("Codex tool mark is not the current square Codex app mark")
+
     if failures:
         raise AssertionError("Task 2 source contract failed:\n- " + "\n- ".join(failures))
 
