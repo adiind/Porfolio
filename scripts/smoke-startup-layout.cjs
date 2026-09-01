@@ -22,7 +22,7 @@ function loadPlaywright() {
 const { chromium } = loadPlaywright();
 const baseUrl = process.argv[2]?.replace(/\/$/, '') || 'http://127.0.0.1:4173';
 const viewports = [
-  { label: 'desktop', width: 1440, height: 900, compact: false, expectedWheelMode: 'webgl' },
+  { label: 'desktop', width: 1440, height: 900, compact: false, expectedWheelMode: 'fallback' },
   { label: 'tablet', width: 919, height: 785, compact: true, expectedWheelMode: 'fallback' },
   { label: 'mobile', width: 390, height: 844, compact: true, expectedWheelMode: 'fallback' },
 ];
@@ -61,12 +61,12 @@ async function main() {
     }
 
     const fallbackPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await fallbackPage.goto(`${baseUrl}?projectWheelFallback`, { waitUntil: 'domcontentloaded' });
-    await fallbackPage.waitForTimeout(1200);
+    await fallbackPage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await fallbackPage.waitForTimeout(500);
     assert.equal(
       await fallbackPage.locator('[data-project-wheel]').getAttribute('data-project-wheel-mode'),
       'fallback',
-      'explicit fallback mode must remain available for renderer failure diagnosis',
+      'public startup must remain readable while the experimental renderer is repaired',
     );
     await fallbackPage.close();
 

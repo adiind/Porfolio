@@ -21,6 +21,8 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
   const [isCompact, setIsCompact] = useState(() => (
     typeof window !== 'undefined' && window.innerWidth <= COMPACT_MAX_WIDTH
   ));
+  const webglRequested = typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).has('projectWheelWebgl');
   const [frontIndex, setFrontIndex] = useState(0);
   const [ready, setReady] = useState(prefersReducedMotion);
   const [failed, setFailed] = useState(false);
@@ -36,7 +38,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
 
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage || !items.length || prefersReducedMotion || isCompact) return;
+    if (!stage || !items.length || prefersReducedMotion || isCompact || !webglRequested) return;
     const forceFallback = new URLSearchParams(window.location.search).has('projectWheelFallback');
     if (forceFallback) {
       setFailed(true);
@@ -80,7 +82,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
       renderer?.dispose();
       if (rendererRef.current === renderer) rendererRef.current = null;
     };
-  }, [items, onOpen, prefersReducedMotion, isCompact]);
+  }, [items, onOpen, prefersReducedMotion, isCompact, webglRequested]);
 
   useEffect(() => {
     rendererRef.current?.setActive(active);
@@ -113,7 +115,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
     }
   };
 
-  const showFallback = isCompact || prefersReducedMotion || failed;
+  const showFallback = !webglRequested || isCompact || prefersReducedMotion || failed;
 
   return (
     <section

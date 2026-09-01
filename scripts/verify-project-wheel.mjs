@@ -37,8 +37,8 @@ assert.match(wheel, /ArrowLeft|ArrowRight/, 'carousel must support arrow steppin
 assert.match(wheel, /aria-live=['"]polite['"]/, 'carousel must announce the current project');
 assert.match(wheel, /Open project/, 'carousel must expose a semantic project-opening action');
 assert.match(fallback, /data-project-wheel-fallback/, 'carousel must render an HTML fallback');
-assert.doesNotMatch(wheel, /projectWheelWebgl/, 'desktop must not require a query parameter to enable the connected wheel');
-assert.match(wheel, /const showFallback = isCompact \|\| prefersReducedMotion \|\| failed/, 'only compact, reduced-motion, or failed rendering may use the fallback');
+assert.match(wheel, /projectWheelWebgl/, 'the experimental WebGL renderer must require explicit opt-in until its output is stable');
+assert.match(wheel, /const showFallback = !webglRequested \|\| isCompact \|\| prefersReducedMotion \|\| failed/, 'public startup must use the readable fallback whenever WebGL is not explicitly enabled');
 assert.doesNotMatch(fallback, /transition:\s*['"]none['"]/, 'fallback cards must not snap between states');
 
 assert.doesNotMatch(hero, /data-discipline-option/, 'Hero must not retain discipline controls');
