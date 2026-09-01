@@ -18,17 +18,17 @@ const relativeIndex = (index: number, activeIndex: number, count: number) => {
 const layoutFor = (offset: number) => {
   switch (offset) {
     case 0:
-      return { x: 52, y: 46, rotate: 0, scale: 1, opacity: 1, zIndex: 5 };
+      return { translateX: 0, translateY: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 5 };
     case -1:
-      return { x: 23, y: 33, rotate: -8, scale: 0.68, opacity: 0.66, zIndex: 3 };
+      return { translateX: -72, translateY: -58, rotate: -8, scale: 0.68, opacity: 0.66, zIndex: 3 };
     case 1:
-      return { x: 81, y: 61, rotate: 8, scale: 0.68, opacity: 0.66, zIndex: 3 };
+      return { translateX: 70, translateY: 65, rotate: 8, scale: 0.68, opacity: 0.66, zIndex: 3 };
     case -2:
-      return { x: 8, y: 68, rotate: -13, scale: 0.48, opacity: 0.3, zIndex: 2 };
+      return { translateX: -108, translateY: 95, rotate: -13, scale: 0.48, opacity: 0.3, zIndex: 2 };
     case 2:
-      return { x: 94, y: 29, rotate: 13, scale: 0.48, opacity: 0.3, zIndex: 2 };
+      return { translateX: 103, translateY: -75, rotate: 13, scale: 0.48, opacity: 0.3, zIndex: 2 };
     default:
-      return { x: 52, y: 46, rotate: 0, scale: 0.4, opacity: 0, zIndex: 1 };
+      return { translateX: 0, translateY: 0, rotate: 0, scale: 0.4, opacity: 0, zIndex: 1 };
   }
 };
 
@@ -57,15 +57,14 @@ const ProjectWheelFallback: React.FC<Props> = ({ items, activeIndex, onSelect, o
           type="button"
           tabIndex={-1}
           onClick={() => isActive ? onOpen(index) : onSelect(index)}
-          className="absolute aspect-[3/2] w-[56%] min-w-[180px] max-w-[340px] overflow-hidden rounded-2xl border text-left shadow-[0_22px_55px_rgba(0,0,0,0.58)]"
+          className="absolute left-1/2 top-1/2 aspect-[3/2] w-[56%] min-w-[180px] max-w-[340px] overflow-hidden rounded-2xl border text-left shadow-[0_22px_55px_rgba(0,0,0,0.58)]"
           style={{
-            left: `${layout.x}%`,
-            top: `${layout.y}%`,
             opacity: layout.opacity,
             zIndex: layout.zIndex,
-            transform: `translate(-50%, -50%) rotate(${layout.rotate}deg) scale(${layout.scale})`,
+            transform: `translate(-50%, -50%) translate(${layout.translateX}%, ${layout.translateY}%) rotate(${layout.rotate}deg) scale(${layout.scale})`,
             borderColor: isActive ? 'rgba(229,229,90,0.86)' : 'rgba(255,255,255,0.24)',
-            transition: 'left 420ms cubic-bezier(0.22, 1, 0.36, 1), top 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease, border-color 240ms ease',
+            transition: 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1), border-color 160ms ease',
+            willChange: 'transform, opacity',
           }}
         >
           <img src={item.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
