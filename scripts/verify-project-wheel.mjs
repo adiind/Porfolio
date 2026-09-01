@@ -40,6 +40,8 @@ assert.match(fallback, /data-project-wheel-fallback/, 'carousel must render an H
 assert.match(wheel, /projectWheelWebgl/, 'the experimental WebGL renderer must require explicit opt-in until its output is stable');
 assert.match(wheel, /const showFallback = !webglRequested \|\| isCompact \|\| prefersReducedMotion \|\| failed/, 'public startup must use the readable fallback whenever WebGL is not explicitly enabled');
 assert.doesNotMatch(fallback, /transition:\s*['"]none['"]/, 'fallback cards must not snap between states');
+assert.match(fallback, /data-project-wheel-links/, 'the public carousel must retain visible links between project cards');
+assert.match(fallback, /cubic-bezier\(0\.22, 1, 0\.36, 1\)/, 'the public carousel must use deliberate transform motion rather than a static stack');
 
 assert.doesNotMatch(hero, /data-discipline-option/, 'Hero must not retain discipline controls');
 assert.doesNotMatch(hero, /data-discipline-arcs/, 'Hero must not retain nested discipline arcs');

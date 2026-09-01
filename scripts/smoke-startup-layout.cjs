@@ -60,6 +60,11 @@ async function main() {
       if (viewport.label === 'desktop') {
         const heroMat = page.locator('#profile [data-cutting-mat-surface]');
         const matTransformBeforeClick = await heroMat.evaluate((element) => getComputedStyle(element).transform);
+        const focusedProjectBeforeClick = await page.locator('[data-project-wheel] h2').textContent();
+        await page.locator('[data-project-wheel-fallback] button').nth(1).click();
+        await page.waitForTimeout(500);
+        const focusedProjectAfterClick = await page.locator('[data-project-wheel] h2').textContent();
+        assert.notEqual(focusedProjectAfterClick, focusedProjectBeforeClick, 'desktop: clicking a neighboring card must advance the connected carousel');
         await page.getByRole('button', { name: 'View selected work' }).click();
         await page.waitForTimeout(300);
         const matTransformAfterClick = await heroMat.evaluate((element) => getComputedStyle(element).transform);
