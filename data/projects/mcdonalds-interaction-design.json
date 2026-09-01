@@ -1,0 +1,78 @@
+{
+    "id": "mcdonalds-interaction-design",
+    "hero": {
+        "title": "McDonald's – Group Ordering Interaction Design",
+        "oneLiner": "A Winter Quarter interaction design concept for letting friends build one shared McDonald's order without losing track of who picked what."
+    },
+    "context": {
+        "text": "This Northwestern EDI project focused on group ordering: the messy moment where several people want McDonald's together, but one person usually ends up collecting texts, remembering edits, checking totals, and fixing the order. The concept explored how a shared cart could let people join from a link, add their own items, see who added what, review the group order, and split or coordinate checkout without turning the experience into a busy social app."
+    },
+    "build": {
+        "bullets": [
+            "Mapped the group-ordering journey from invite, join, browse, add item, review, split, and final confirmation",
+            "Designed a shared cart model where each item keeps visible ownership instead of becoming an anonymous list",
+            "Created invite and join states so friends could enter the order from a lightweight link or QR flow",
+            "Explored review readiness cues so the organizer can tell who is done before checkout",
+            "Prototyped group cart, participant, and split-payment states using McDonald's visual language from the slide deck",
+            "Kept the interface focused on coordination rather than adding chat, feeds, or social noise"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Shared cart ownership vs one combined item list",
+            "why": "Made it clear who added each item, which reduces organizer memory work and makes review faster.",
+            "tradeoff": "The cart needs more visual structure than a single-user checkout list."
+        },
+        {
+            "decision": "Invite link flow vs account-heavy collaboration",
+            "why": "Let people join quickly without turning a food order into a full social setup process.",
+            "tradeoff": "A lightweight invite model needs clear permissions so people understand what they can edit."
+        },
+        {
+            "decision": "Review readiness vs instant organizer checkout",
+            "why": "Helped the organizer avoid checking out before everyone has confirmed their part of the order.",
+            "tradeoff": "Adds a coordination step before payment, but prevents more expensive mistakes."
+        }
+    ],
+    "review": {
+        "worked": [
+            "The shared-cart framing made the concept more specific than a generic ordering redesign.",
+            "Assigning items to people clarified responsibility without needing chat or comments.",
+            "The invite and review states made the organizer role feel lighter and more controllable."
+        ],
+        "didnt": [
+            "The prototype still needs stronger edge-case work around someone leaving, changing an item late, or failing to pay."
+        ]
+    },
+    "outcome": {
+        "status": "concept",
+        "text": "The result was a group-ordering concept that turns a messy coordination task into a shared cart with visible ownership, lightweight invites, review readiness, and split-oriented checkout. The case study became a focused exercise in designing collaboration inside a quick-service ordering flow.",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "The useful lesson was that group ordering is not mainly a menu problem. It is a coordination problem: who is in, who picked what, who is ready, and who is paying."
+    },
+    "themeColor": "amber",
+    "icon": "pen-tool",
+    "skills": [
+        {
+            "label": "Interaction Design",
+            "description": "Designing how the system behaves, guides, and recovers."
+        },
+        {
+            "label": "Shared Cart UX",
+            "description": "Designing item ownership, review, and checkout for multiple people."
+        },
+        {
+            "label": "Prototype Testing",
+            "description": "Using flows to evaluate coordination and organizer burden."
+        },
+        {
+            "label": "Service Coordination",
+            "description": "Balancing quick ordering with group readiness and payment handoffs."
+        }
+    ],
+    "heroImage": "/images/mcdonalds_order.webp",
+    "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T",
+    "sourceLabel": "View Figma Slides"
+}

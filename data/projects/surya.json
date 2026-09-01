@@ -1,0 +1,89 @@
+{
+    "id": "surya",
+    "hero": {
+        "title": "Surya – Kinetic Wall Timepiece",
+        "oneLiner": "A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep."
+    },
+    "context": {
+        "text": "When I moved to the US, I began missing calls with my family because I never knew if they were awake or asleep. Constantly checking time zones on my phone felt disconnected and impersonal. The limitation was clear: screens show time, but not presence. Surya was built to make their daily rhythms visible at a glance."
+    },
+    "build": {
+        "bullets": [
+            "Layered laser-cut wooden mandala body (wall-mount) inspired by solar geometry",
+            "Set of mechanical flowers (petals) driven by micro-servos",
+            "Custom calibration workflow for tuning servo ranges per flower",
+            "Control electronics + wiring harness (power distribution + servo control)",
+            "Firmware that maps each flower to a family member and syncs motion to that time zone's light cycle",
+            "Physical button inputs for instant 'what time is it for them' checks",
+            "Assembly files: CAD/laser-cut vectors + enclosure/jig files for alignment and mounting"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Micro DC Motors vs Servo Motors",
+            "why": "Micro DC motors allowed smoother, continuous petal motion and finer emotional control without hard positional snapping.",
+            "tradeoff": "Lost absolute position feedback, requiring careful mechanical stops and calibration logic."
+        },
+        {
+            "decision": "Physical Motion vs Screen-Based Display",
+            "why": "Movement communicates presence emotionally and peripherally without demanding attention.",
+            "tradeoff": "Increased mechanical complexity and longer iteration cycles compared to UI changes."
+        },
+        {
+            "decision": "Laser-Cut Wood Layers vs 3D-Printed Structure",
+            "why": "Layered wood provided warmth, scale, and visual depth aligned with the mandala form.",
+            "tradeoff": "Less tolerance for post-build changes compared to reprinting parts."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Slow, continuous motion made the piece feel calm and alive rather than mechanical.",
+            "Assigning one flower per family member made the interaction immediately understandable.",
+            "The wall-mounted, layered mandala form gave it the presence of a lasting artifact, not a gadget."
+        ],
+        "didnt": [
+            "Achieving smooth, synchronized motion across all flowers took far more iteration than expected due to motor and mechanical variance."
+        ]
+    },
+    "outcome": {
+        "status": "shipped",
+        "text": "Surya became a functioning kinetic wall timepiece that stays in constant sync with my family's day-night cycles across time zones. More than a prototype, it became a personal artifact that made distance legible and emotionally present. The project established my approach to translating abstract feelings into physical interaction, using motion and form instead of screens to communicate meaning.",
+        "proof": "https://www.instagram.com/p/DPm6dEjjCmO/"
+    },
+    "reflection": {
+        "text": "Surya showed me that slow, ambient motion can communicate availability and care more clearly than explicit information, especially when distance makes timing fragile."
+    },
+    "themeColor": "amber",
+    "icon": "zap",
+    "skills": [
+        {
+            "label": "Interaction Design",
+            "description": "Designing responsive behaviors and user engagement patterns."
+        },
+        {
+            "label": "Physical Computing",
+            "description": "Integrating sensors, actuators and code into physical objects."
+        },
+        {
+            "label": "Laser Cutting",
+            "description": "Precision fabrication of layered geometric components."
+        },
+        {
+            "label": "Electronics",
+            "description": "Circuit design and component integration for custom hardware."
+        },
+        {
+            "label": "Arduino",
+            "description": "Microcontroller programming for servo and sensor control."
+        },
+        {
+            "label": "Kinetic Sculpture",
+            "description": "Mechanical art with programmed, time-based motion."
+        },
+        {
+            "label": "Prototyping",
+            "description": "Iterative building and testing of physical designs."
+        }
+    ],
+    "heroImage": "https://i.ibb.co/5gWPHd62/IMG-1438.jpg"
+}

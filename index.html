@@ -1,71 +1,195 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adi | Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              background: '#050505',
-            },
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adi Agarwal — Tangible AI, Product Design &amp; Creative Technology</title>
+  <meta name="description" content="Adi Agarwal makes AI tangible through product design, creative technology, agentic systems, embedded intelligence, and physical prototyping." />
+  <meta name="author" content="Adi Agarwal" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#050505" />
+  <link rel="canonical" href="https://adiagarwal.com/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="preload" as="image" href="/images/adi_floating_avatar_workshop.png" fetchpriority="high" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Adi Agarwal" />
+  <meta property="og:title" content="Adi Agarwal — Tangible AI, Product Design &amp; Creative Technology" />
+  <meta property="og:description" content="Design fluency for technologists. Technical fluency for designers. Explore Adi Agarwal's work across tangible AI, products, and physical systems." />
+  <meta property="og:url" content="https://adiagarwal.com/" />
+  <meta property="og:image" content="https://adiagarwal.com/images/portfolio_hero.png" />
+  <meta property="og:image:alt" content="Selected tangible AI and product design work by Adi Agarwal" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Adi Agarwal — Tangible AI, Product Design &amp; Creative Technology" />
+  <meta name="twitter:description" content="Making AI tangible across product design, creative technology, and physical systems." />
+  <meta name="twitter:image" content="https://adiagarwal.com/images/portfolio_hero.png" />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Adi Agarwal",
+      "alternateName": "Adi",
+      "url": "https://adiagarwal.com/",
+      "image": "https://adiagarwal.com/images/adi_floating_avatar_workshop.png",
+      "jobTitle": "Tangible AI Designer and Product Technologist",
+      "description": "A designer and technologist making artificial intelligence tangible, legible, and useful through products, prototypes, and physical systems.",
+      "sameAs": [
+        "https://www.linkedin.com/in/adiind",
+        "https://github.com/adiind"
+      ],
+      "knowsAbout": [
+        "Tangible AI",
+        "Product Design",
+        "Creative Technology",
+        "Agentic Systems",
+        "Embedded Systems",
+        "Rapid Prototyping"
+      ]
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '#050505',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
           }
         }
       }
-    </script>
-    <style>
+    }
+  </script>
+  <style>
+    body {
+      background-color: #050505;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Hide scrollbar for cleaner look */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #050505;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    /* Noise Texture Overlay */
+    .bg-noise {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0.03;
+      filter: contrast(300%) brightness(100%);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+    }
+
+    /* Fast fade-in animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 0.1s ease-out forwards;
+    }
+
+    /* GPU-accelerated grayscale */
+    .grayscale {
+      filter: grayscale(100%);
+    }
+
+    /* Hide scrollbar utility */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Orbital Timeline Animations */
+    @keyframes orbital-pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes orbital-ping {
+
+      75%,
+      100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+
+    .animate-pulse {
+      animation: orbital-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .animate-ping {
+      animation: orbital-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .backdrop-blur-lg {
+      backdrop-filter: blur(16px);
+    }
+
+    .backdrop-blur-xl {
+      backdrop-filter: blur(24px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .animate-pulse,
+      .animate-ping {
+        animation: none !important;
+      }
+
+      html,
       body {
-        background-color: #050505;
-        color: white;
-        overflow-x: hidden;
+        scroll-behavior: auto !important;
       }
-      /* Hide scrollbar for cleaner look */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #050505;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #333;
-        border-radius: 4px;
-      }
-      
-      /* Noise Texture Overlay */
-      .bg-noise {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 5;
-        opacity: 0.03;
-        filter: contrast(300%) brightness(100%);
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.25",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
-  }
-}
-</script>
+    }
+  </style>
 </head>
-  <body>
-    <div id="root"></div>
-    <div class="bg-noise"></div>
-  </body>
+
+<body>
+  <div id="root" style="position: relative; z-index: 10;"></div>
+  <div class="bg-noise"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>

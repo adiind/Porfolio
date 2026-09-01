@@ -1,0 +1,135 @@
+{
+    "id": "zero-my-ai",
+    "hero": {
+        "title": "Zero - Second Brain AI Assistant",
+        "oneLiner": "Part Jarvis, part second brain, part slightly over-caffeinated project partner. Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop."
+    },
+    "context": {
+        "text": "Zero started as a question: what would a second brain feel like if it could also talk back? It grew out of my earlier Jarvis home-assistant experiments, but this version is less about shouting commands at devices and more about living with my context. I built it as an experiment, not a packaged product. It combines voice, chat, image generation, personal memory, coding support, home automation, and project tracking into one assistant. The important part is not that it has a lot of tools; it is that it knows when to use them, when to ask, and when to stay out of the way. It remembers people and projects, knows which devices exist in my space, and keeps a SQL-backed trail of tasks, bugs, feature requests, and decisions so the system improves through real use."
+    },
+    "build": {
+        "bullets": [
+            "Designed voice and chat as two equal ways to interact: talk when my hands are busy, type when I need precision.",
+            "Built four layers of memory: quick preferences, SQL records, semantic search, and active session context.",
+            "Stored people, projects, todos, devices, conversations, bugs, and feature ideas in structured records instead of loose chat history.",
+            "Built a custom router that decides whether a request is conversation, home control, project lookup, image generation, bug capture, feature planning, or research before it reaches a model.",
+            "Added prompt-injection checks and tool permissions around sensitive actions like home devices, calendars, files, and project memory.",
+            "Connected Home Assistant so Zero can work with actual rooms, lights, sensors, aliases, and device state.",
+            "Created an image generation lab with reusable prompt styles, generated assets, feedback notes, and lightweight versioning.",
+            "Built a live coding workspace where Zero can talk to Codex, surface bugs, suggest next features, summarize changes, and bring in a small council of perspectives when a decision needs more than one brain."
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Assistant experiment over product demo",
+            "why": "Zero is strongest when it shows how I think through ambiguous AI interaction: what should be automated, what should be confirmed, and what should stay visible to the user.",
+            "tradeoff": "The scope is intentionally uneven in places, but every part teaches something about designing useful AI systems."
+        },
+        {
+            "decision": "Custom router before model calls",
+            "why": "Many requests have a clear shape: turn on a light, find a project note, log a bug, create an image, or answer normally. Routing first makes the assistant faster, cheaper, and easier to trust.",
+            "tradeoff": "Router logic needs maintenance, especially when a request is ambiguous or combines multiple intents."
+        },
+        {
+            "decision": "Four-layer memory instead of one giant chat log",
+            "why": "Quick memory stores preferences, SQL keeps hard facts auditable, semantic memory finds related old context, and session memory tracks what is happening right now.",
+            "tradeoff": "More plumbing to maintain, but each memory layer has a clear job instead of everything becoming one messy prompt."
+        },
+        {
+            "decision": "Guardrails around tools",
+            "why": "An assistant that can touch home devices, files, calendars, and project records needs permission boundaries and prompt-injection defenses, not just better prompts.",
+            "tradeoff": "Guardrails add friction, but that friction is part of making the system usable by a real person."
+        }
+    ],
+    "review": {
+        "worked": [
+            "Framing Zero as an experiment made the project easier to explain: it is about designing context-aware assistance, not claiming to ship a universal assistant.",
+            "Voice and chat together made the assistant feel more human-centered because each mode fits a different kind of moment.",
+            "The Jarvis lineage makes the home-control part feel grounded, but Zero is much more of a second brain than a remote control.",
+            "The SQL-backed bug and feature loop turned personal tinkering into a product-minded iteration system.",
+            "The live coding workspace makes the project feel useful to me as a developer, not just impressive as an AI demo.",
+            "The router made the assistant feel less random because common actions followed predictable paths."
+        ],
+        "didnt": [
+            "The project can easily look like a pile of AI features if the story is not tightly edited.",
+            "Memory needs clearer user-facing controls so people can see what Zero knows, forget things, and correct records.",
+            "Prompt-injection testing has to keep evolving as more tools become available.",
+            "Some flows still need better onboarding so a first-time viewer understands what Zero can safely do."
+        ]
+    },
+    "outcome": {
+        "status": "in-progress",
+        "text": "Zero is now my daily second-brain assistant experiment. It talks, chats, generates images, remembers people and projects, helps me code with Codex, controls parts of my home, and keeps a structured loop of bugs, feature ideas, and project decisions. The recruiter signal is not only that I can wire AI tools together; it is that I can turn a messy technical possibility into a human-centered system with memory, permissions, iteration, and visible tradeoffs."
+    },
+    "reflection": {
+        "text": "Zero taught me that the hard part of AI product work is not adding another model call. The hard part is shaping context, trust, timing, and feedback so the assistant feels helpful without feeling chaotic. It pushed me to think like a designer, developer, and product owner at the same time."
+    },
+    "themeColor": "violet",
+    "icon": "bot",
+    "skills": [
+        {
+            "label": "Human-Centered AI",
+            "description": "Designing assistant behavior around trust, timing, and user control."
+        },
+        {
+            "label": "Voice + Chat UX",
+            "description": "Supporting both conversational voice and precise text workflows."
+        },
+        {
+            "label": "4-Layer Memory",
+            "description": "Preferences, SQL records, semantic memory, and live session context."
+        },
+        {
+            "label": "Tool Routing",
+            "description": "Classifying intents before model calls so actions stay predictable."
+        },
+        {
+            "label": "Home Automation",
+            "description": "Connecting assistant behavior to real rooms, sensors, and devices."
+        },
+        {
+            "label": "Coding Loops",
+            "description": "Using Codex, bug logs, feature queues, and council-style review to keep building."
+        }
+    ],
+    "stats": [
+        { "value": "Voice", "label": "Talks Back", "description": "Use it hands-free, interrupt it, or switch back to text when precision matters." },
+        { "value": "Chat", "label": "Second Brain", "description": "Project notes, people, questions, and decisions live in one assistant instead of scattered tabs." },
+        { "value": "Images", "label": "Gen Lab", "description": "Reusable prompt styles, generated assets, and feedback notes for visual experiments." },
+        { "value": "4 Layers", "label": "Memory", "description": "Quick preferences, SQL facts, semantic search, and active session context." },
+        { "value": "Codex", "label": "Coding Aid", "description": "A live coding workspace that can talk to Codex, track bugs, and suggest features." },
+        { "value": "Devices", "label": "Smart Home", "description": "Real rooms, lights, sensors, and aliases through Home Assistant." }
+    ],
+    "features": [
+        {
+            "title": "Voice + Chat Assistant",
+            "description": "Zero supports spoken conversation for quick, ambient moments and text chat for more deliberate work. The goal was not to make a louder chatbot, but to choose the interface that fits the task.",
+            "image": "/images/zero_voice_chat.webp",
+            "tags": ["Voice", "Chat", "Context"]
+        },
+        {
+            "title": "People + Project Memory",
+            "description": "Zero keeps four layers of memory: quick preferences, SQL records for facts, semantic search for related old context, and live session context for what is happening right now. That means it can remember people, projects, notes, bugs, and decisions without pretending a giant chat log is a brain.",
+            "image": "/images/zero_project_graph.webp",
+            "tags": ["4-Layer Memory", "SQL Facts", "Semantic Search"]
+        },
+        {
+            "title": "Live Coding Workspace + Council",
+            "description": "This is the focused workspace where Zero helps me code. It can talk to Codex, keep track of bugs, turn rough feature ideas into next steps, and call in a small council of perspectives like engineer, designer, critic, and product brain when a decision needs more than one angle.",
+            "image": "/images/zero_text_mode.webp",
+            "tags": ["Codex", "Bug Loop", "Council"]
+        }
+    ],
+    "techStack": {
+        "backend": ["Python", "SQLite", "Semantic Memory", "WebSockets"],
+        "ai": ["Gemini Live", "Image Generation", "Custom Router", "Prompt Guardrails"],
+        "frontend": ["Voice UI", "Chat UI", "Coding Workspace", "Memory Views"],
+        "integrations": ["Codex", "Home Assistant", "Google Calendar", "Canvas", "Obsidian", "Spotify"]
+    },
+    "heroImage": "/images/zero_hero_banner.png",
+    "gallery": [
+        "/images/zero_voice_chat.webp",
+        "/images/zero_text_mode.webp",
+        "/images/zero_project_graph.webp"
+    ]
+}

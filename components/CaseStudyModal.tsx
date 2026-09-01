@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote, ExternalLink } from 'lucide-react';
 import { CaseStudy } from '../types';
+import { useDialogA11y } from '../hooks/useDialogA11y';
+import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
   caseStudy: CaseStudy;
@@ -26,7 +28,7 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
         border: 'border-orange-500',
         button: 'hover:bg-orange-100'
       };
-      case 'red': 
+      case 'red':
       default: return {
         text: 'text-red-500',
         bg: 'bg-red-500',
@@ -37,22 +39,38 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
     }
   };
   const tc = getThemeClasses();
+  const dialogRef = useDialogA11y(onClose, { historyTag: 'casestudy' });
+  useContentEngagement({
+    contentType: 'project',
+    contentId: caseStudy.title,
+    section: 'case_study',
+  });
 
   return (
-    <motion.div 
+    <motion.div
+      ref={dialogRef}
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="case-study-modal-title"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/90 focus:outline-none"
+      onClick={onClose}
     >
-      <button 
-        onClick={onClose}
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        aria-label="Close case study"
         className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 text-white transition-colors z-50"
       >
         <X size={24} />
       </button>
 
-      <div className="relative w-full max-w-6xl aspect-video bg-white text-black rounded-lg shadow-2xl overflow-hidden flex flex-col font-sans">
+      <div
+        className="relative w-full max-w-6xl aspect-video bg-white text-black rounded-lg shadow-2xl overflow-hidden flex flex-col font-sans"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Slide Content */}
         <div className="flex-1 relative overflow-hidden">
           <AnimatePresence mode="wait">
@@ -62,7 +80,7 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 p-8 md:p-12 flex flex-col"
+              className="absolute inset-0 p-8 md:p-12 flex flex-col overflow-y-auto"
             >
               {renderSlide(slides[currentSlide], tc)}
             </motion.div>
@@ -71,20 +89,22 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
 
         {/* Controls */}
         <div className="h-16 border-t border-gray-100 flex items-center justify-between px-6 bg-gray-50">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <div id="case-study-modal-title" className="text-xs font-bold text-gray-600 uppercase tracking-widest">
             {caseStudy.title} • {currentSlide + 1} / {slides.length}
           </div>
           <div className="flex gap-2">
-            <button 
-              onClick={prevSlide} 
+            <button
+              onClick={prevSlide}
               disabled={currentSlide === 0}
+              aria-label="Previous slide"
               className={`p-2 rounded-full disabled:opacity-30 transition-colors ${tc.button}`}
             >
               <ChevronLeft size={20} className="text-gray-600" />
             </button>
-            <button 
-              onClick={nextSlide} 
+            <button
+              onClick={nextSlide}
               disabled={currentSlide === slides.length - 1}
+              aria-label="Next slide"
               className={`p-2 rounded-full disabled:opacity-30 transition-colors ${tc.button}`}
             >
               <ChevronRight size={20} className="text-gray-600" />
@@ -106,17 +126,17 @@ const renderSlide = (slide: any, tc: any) => {
           <div className="mb-6">
             <span className={`${tc.bg} text-white px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-sm`}>Case Study</span>
           </div>
-          <h1 className={`text-4xl md:text-6xl font-black ${tc.text} mb-6 tracking-tight leading-tight max-w-4xl`}>
+          <h2 className={`text-4xl md:text-6xl font-black ${tc.text} mb-6 tracking-tight leading-tight max-w-4xl`}>
             {slide.title}
-          </h1>
+          </h2>
           <h2 className="text-xl md:text-3xl font-light text-gray-800 max-w-3xl mb-6">
             {slide.content.subtitle}
           </h2>
           <div className="w-20 h-1 bg-gray-200 mb-8" />
-          <p className="text-gray-500 max-w-2xl text-base md:text-lg leading-relaxed mb-12">
+          <p className="text-gray-600 max-w-2xl text-base md:text-lg leading-relaxed mb-12">
             {slide.content.description}
           </p>
-          <div className="mt-auto text-xs font-bold uppercase tracking-widest text-gray-400">
+          <div className="mt-auto text-xs font-bold uppercase tracking-widest text-gray-600">
             {slide.content.role}
           </div>
         </div>
@@ -196,7 +216,7 @@ const renderSlide = (slide: any, tc: any) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {slide.content.features.map((f: any, i: number) => (
               <div key={i} className="bg-gray-800 text-white p-6 rounded-xl shadow-xl">
-                <h4 className={`text-xl font-bold mb-3 ${i===0 ? 'text-yellow-400' : i===1 ? 'text-blue-400' : 'text-green-400'}`}>
+                <h4 className={`text-xl font-bold mb-3 ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-blue-400' : 'text-green-400'}`}>
                   {f.title}
                 </h4>
                 <p className="text-sm text-gray-300 leading-relaxed opacity-90">{f.desc}</p>
@@ -204,13 +224,13 @@ const renderSlide = (slide: any, tc: any) => {
             ))}
           </div>
           <div className="mt-auto bg-gray-100 p-6 rounded-xl flex items-center justify-between">
-            <div className="text-gray-500 font-bold uppercase tracking-widest text-sm">Visual Cues</div>
+            <div className="text-gray-600 font-bold uppercase tracking-widest text-sm">Visual Cues</div>
             <div className="flex gap-12">
               {slide.content.visualCues.map((c: any, i: number) => (
                 <div key={i} className="flex flex-col items-center">
                   <div className="text-2xl mb-1">{c.name === 'Pacman' ? '🟡' : c.name === 'Mario' ? '🔴' : '🔵'}</div>
                   <div className="font-bold text-gray-800">{c.name}</div>
-                  <div className="text-xs text-gray-500 uppercase">{c.context}</div>
+                  <div className="text-xs text-gray-600 uppercase">{c.context}</div>
                 </div>
               ))}
             </div>
@@ -224,7 +244,7 @@ const renderSlide = (slide: any, tc: any) => {
           <div className="flex justify-between items-end mb-8">
             <h3 className={`text-4xl font-black ${tc.text} uppercase`}>Design Outcomes</h3>
             <div className="text-right">
-              <div className="text-xs uppercase tracking-widest text-gray-400">Impact</div>
+              <div className="text-xs uppercase tracking-widest text-gray-600">Impact</div>
               <div className="font-bold text-2xl">Hourly Refresh</div>
             </div>
           </div>
@@ -274,7 +294,7 @@ const renderSlide = (slide: any, tc: any) => {
       return (
         <div className="flex flex-col h-full">
           <div className={`${tc.text} font-black text-2xl uppercase tracking-tighter leading-none mb-8 border-l-4 ${tc.border} pl-3`}>
-            Structural <br/> Breakdown
+            Structural <br /> Breakdown
           </div>
           <div className={`${tc.lightBg} p-4 rounded-lg text-center mb-8`}>
             <p className="font-bold text-gray-800 text-lg">Opportunity 🚀</p>
@@ -289,7 +309,7 @@ const renderSlide = (slide: any, tc: any) => {
                   {s.icon === 'user' && <User size={32} />}
                 </div>
                 <h3 className="font-bold text-lg mb-4">{s.name}</h3>
-                <ul className="text-sm text-gray-500 space-y-2 text-left list-disc pl-4">
+                <ul className="text-sm text-gray-600 space-y-2 text-left list-disc pl-4">
                   {s.points.map((p: string, j: number) => <li key={j}>{p}</li>)}
                 </ul>
               </div>
@@ -302,19 +322,19 @@ const renderSlide = (slide: any, tc: any) => {
       return (
         <div className="flex flex-col h-full relative">
           <div className={`${tc.text} font-black text-2xl uppercase tracking-tighter leading-none mb-4 border-l-4 ${tc.border} pl-3`}>
-            Final <br/> Solution
+            Final <br /> Solution
           </div>
           <div className="flex-1 relative flex items-center justify-center">
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-               <div className={`w-[500px] h-[500px] border-4 ${tc.border} rounded-full flex items-center justify-center`}>
-                 <div className="w-[300px] h-[300px] border-4 border-green-500 rounded-full" />
-               </div>
+              <div className={`w-[500px] h-[500px] border-4 ${tc.border} rounded-full flex items-center justify-center`}>
+                <div className="w-[300px] h-[300px] border-4 border-green-500 rounded-full" />
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-8 w-full z-10">
               {slide.content.steps.map((step: any, i: number) => (
                 <div key={i} className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 flex flex-col">
                   <h3 className="font-bold text-lg mb-2">{step.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{step.desc}</p>
                 </div>
               ))}
             </div>
@@ -324,21 +344,52 @@ const renderSlide = (slide: any, tc: any) => {
 
     case 'impact':
       return (
-        <div className="flex flex-col h-full justify-center">
-          <div className={`${tc.text} font-black text-4xl uppercase tracking-tighter leading-none mb-12 border-l-8 ${tc.border} pl-6`}>
-            Media <br/> Coverage
+        <div className="flex flex-col min-h-full justify-center py-12">
+          <div className={`${tc.text} font-black text-4xl uppercase tracking-tighter leading-none mb-8 border-l-8 ${tc.border} pl-6`}>
+            Media <br /> Coverage
           </div>
           <div className="space-y-8 max-w-3xl">
             {slide.content.quotes.map((q: any, i: number) => (
               <div key={i} className="border-l-4 border-gray-200 pl-6 py-2">
                 <p className="text-xl md:text-2xl font-serif text-gray-800 italic mb-3">"{q.text}"</p>
-                <p className="font-bold text-gray-400 uppercase tracking-widest text-xs">— {q.source}</p>
+                <p className="font-bold text-gray-600 uppercase tracking-widest text-xs">— {q.source}</p>
               </div>
             ))}
           </div>
-        </div>
+          {
+            slide.content.articles && slide.content.articles.length > 0 && (
+              <div className={`mt-8 pt-8 border-t border-gray-100 w-full max-w-3xl`}>
+                <h4 className={`text-xs font-bold uppercase tracking-widest text-gray-600 mb-4`}>Further Reading</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {slide.content.articles.map((article: any, i: number) => (
+                    <a
+                      key={i}
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`group block bg-gray-50 hover:bg-white border border-gray-100 hover:${tc.border} p-6 rounded-xl transition-all duration-300 hover:shadow-lg`}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div className={`p-2 bg-white rounded-lg shadow-sm group-hover:${tc.bg} group-hover:text-white transition-colors duration-300`}>
+                          <Newspaper size={20} />
+                        </div>
+                        <ExternalLink size={16} className="text-gray-600 group-hover:text-gray-800" />
+                      </div>
+                      <h5 className="font-bold text-gray-900 mb-2 leading-tight group-hover:text-gray-900 transition-colors">
+                        {article.title}
+                      </h5>
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-700">
+                        {article.source}
+                      </p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+        </div >
       );
-      
+
     default:
       return null;
   }

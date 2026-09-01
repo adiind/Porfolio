@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2311110f'/%3E%3Cpath d='M17 18h30v8H27v8h17v8H27v12H17z' fill='%23ffcf31'/%3E%3C/svg%3E">
+  <title>HCD Evidence Selector — Care + McDonald’s</title>
+  <style>
+    :root {
+      --ink: #f3efe5;
+      --muted: #aaa69d;
+      --paper: #11110f;
+      --panel: #191916;
+      --line: #37352f;
+      --care: #8fe3bd;
+      --mcd: #ffcf31;
+      --signal: #ff5b45;
+      --focus: #a9c7ff;
+      --max: 1600px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
+        var(--paper);
+      background-size: 24px 24px;
+      font-family: "Avenir Next", Avenir, "Gill Sans", sans-serif;
+    }
+
+    button, select, input { font: inherit; }
+    button, select, a { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: 12px;
+      z-index: 100;
+      transform: translateY(-160%);
+      padding: 10px 14px;
+      color: #111;
+      background: var(--focus);
+      border-radius: 4px;
+    }
+    .skip-link:focus { transform: none; }
+
+    header {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 42px 28px 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 40px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow, .section-index, .kicker, .meta, .source-name, .stat-label {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .11em;
+    }
+
+    .eyebrow { margin: 0 0 12px; color: var(--signal); font-size: 12px; }
+    h1, h2, h3 { font-family: "Iowan Old Style", Baskerville, Charter, Georgia, serif; }
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(42px, 6vw, 96px);
+      font-weight: 400;
+      line-height: .91;
+      letter-spacing: -.055em;
+    }
+    .dek { max-width: 760px; margin: 22px 0 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
+    .header-stats { display: grid; grid-template-columns: repeat(2, 115px); align-self: end; }
+    .stat { padding: 14px; border: 1px solid var(--line); background: rgba(17,17,15,.72); }
+    .stat + .stat { border-left: 0; }
+    .stat-value { display: block; font-family: "Iowan Old Style", serif; font-size: 38px; line-height: 1; }
+    .stat-label { display: block; margin-top: 7px; color: var(--muted); font-size: 9px; }
+
+    .controls-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(17,17,15,.94);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+    }
+    .controls {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 14px 28px;
+      display: flex;
+      gap: 10px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+    .field { display: grid; gap: 5px; min-width: 190px; }
+    .field label { color: var(--muted); font: 9px/1 "SFMono-Regular", Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+    select, .control-button {
+      min-height: 42px;
+      color: var(--ink);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 9px 12px;
+    }
+    select { cursor: pointer; }
+    .control-button { cursor: pointer; }
+    .control-button:hover { border-color: #777267; background: #24231f; }
+    .control-button.primary { color: #111; background: var(--ink); border-color: var(--ink); font-weight: 700; }
+    .control-button.primary:hover { background: white; }
+    .control-spacer { flex: 1; }
+    .count-chip { align-self: center; color: var(--muted); font: 11px/1.3 "SFMono-Regular", Consolas, monospace; }
+    .count-chip strong { color: var(--ink); font-size: 18px; }
+
+    main { max-width: var(--max); margin: 0 auto; padding: 18px 28px 150px; }
+    .project-key {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 54px;
+    }
+    .project-note {
+      position: relative;
+      padding: 18px 18px 17px 24px;
+      border: 1px solid var(--line);
+      background: rgba(25,25,22,.82);
+    }
+    .project-note::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--project-color); }
+    .project-note.care { --project-color: var(--care); }
+    .project-note.mcd { --project-color: var(--mcd); }
+    .project-note strong { display: block; margin-bottom: 5px; font-family: "Iowan Old Style", serif; font-size: 20px; }
+    .project-note p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .evidence-section { margin-top: 72px; }
+    .section-heading {
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1fr) minmax(220px, 420px);
+      gap: 18px;
+      align-items: end;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-index { color: var(--signal); font-size: 12px; }
+    h2 { margin: 0; font-size: clamp(32px, 4vw, 58px); font-weight: 400; letter-spacing: -.035em; }
+    .section-heading p { margin: 0; color: var(--muted); line-height: 1.5; }
+
+    .artifact-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .artifact-card {
+      --accent: var(--ink);
+      grid-column: span 6;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .artifact-card:nth-child(3n) { grid-column: span 12; }
+    .artifact-card[data-project="care"] { --accent: var(--care); }
+    .artifact-card[data-project="mcdonalds"] { --accent: var(--mcd); }
+    .artifact-card:hover { transform: translateY(-2px); border-color: #666258; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+    .artifact-card.is-selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 18px 50px rgba(0,0,0,.32); }
+    .artifact-card[hidden] { display: none; }
+
+    .image-button {
+      position: relative;
+      width: 100%;
+      min-height: 230px;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: #080807;
+      cursor: zoom-in;
+    }
+    .image-button img {
+      display: block;
+      width: 100%;
+      height: min(34vw, 500px);
+      min-height: 230px;
+      object-fit: contain;
+      background: #080807;
+      transition: transform .3s ease;
+    }
+    .artifact-card:nth-child(3n) .image-button img { height: min(52vw, 720px); }
+    .image-button:hover img { transform: scale(1.012); }
+    .zoom-label {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      padding: 7px 9px;
+      color: var(--ink);
+      background: rgba(0,0,0,.76);
+      border: 1px solid rgba(255,255,255,.22);
+      font: 9px/1 "SFMono-Regular", Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .card-copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; padding: 18px; flex: 1; }
+    .kicker { color: var(--accent); font-size: 9px; }
+    h3 { margin: 7px 0 8px; font-size: 25px; line-height: 1.05; font-weight: 400; }
+    .assessment { margin: 0; max-width: 70ch; color: var(--muted); font-size: 13px; line-height: 1.48; }
+    .source-name { margin-top: 13px; color: #77736b; font-size: 8px; }
+    .card-actions { display: flex; flex-direction: column; align-items: end; justify-content: space-between; gap: 12px; }
+    .pick {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+    }
+    .pick input { position: absolute; opacity: 0; pointer-events: none; }
+    .checkmark {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border: 1px solid #6a665e;
+      background: #10100e;
+      transition: all .15s ease;
+    }
+    .pick input:checked + .checkmark { color: #111; background: var(--accent); border-color: var(--accent); }
+    .pick input:checked + .checkmark::after { content: "✓"; font-weight: 900; }
+    .pick input:focus-visible + .checkmark { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .source-link { color: var(--ink); font-size: 11px; text-underline-offset: 4px; }
+    .source-link:hover { color: var(--accent); }
+
+    .selection-dock {
+      position: fixed;
+      z-index: 40;
+      right: 20px;
+      bottom: 20px;
+      width: min(420px, calc(100vw - 40px));
+      border: 1px solid #5b574f;
+      background: rgba(20,20,18,.97);
+      box-shadow: 0 20px 70px rgba(0,0,0,.5);
+    }
+    .dock-top { display: flex; align-items: center; gap: 12px; padding: 13px; }
+    .dock-count { min-width: 46px; color: var(--accent, var(--ink)); font: 30px/1 "Iowan Old Style", serif; }
+    .dock-label { flex: 1; }
+    .dock-label strong { display: block; font-size: 13px; }
+    .dock-label span { color: var(--muted); font-size: 11px; }
+    .dock-toggle { border: 0; color: var(--muted); background: transparent; cursor: pointer; }
+    .selection-output {
+      display: none;
+      width: calc(100% - 26px);
+      height: 140px;
+      margin: 0 13px 13px;
+      resize: vertical;
+      color: var(--ink);
+      background: #0d0d0c;
+      border: 1px solid var(--line);
+      padding: 10px;
+      font: 10px/1.5 "SFMono-Regular", Consolas, monospace;
+    }
+    .selection-dock.is-open .selection-output { display: block; }
+
+    dialog {
+      width: min(96vw, 1500px);
+      height: min(94vh, 1100px);
+      padding: 0;
+      color: var(--ink);
+      background: #080807;
+      border: 1px solid #625e55;
+    }
+    dialog::backdrop { background: rgba(0,0,0,.88); backdrop-filter: blur(10px); }
+    .lightbox-frame { height: 100%; display: grid; grid-template-rows: auto 1fr; }
+    .lightbox-bar { display: flex; align-items: center; gap: 16px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+    .lightbox-title { flex: 1; font-family: "Iowan Old Style", serif; font-size: 20px; }
+    .close-lightbox { color: var(--ink); background: transparent; border: 1px solid var(--line); padding: 8px 11px; cursor: pointer; }
+    #lightbox-image { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+
+    @media (max-width: 900px) {
+      header { grid-template-columns: 1fr; }
+      .header-stats { justify-self: start; }
+      .section-heading { grid-template-columns: 48px 1fr; }
+      .section-heading p { grid-column: 2; }
+      .artifact-card, .artifact-card:nth-child(3n) { grid-column: span 12; }
+      .image-button img, .artifact-card:nth-child(3n) .image-button img { height: min(62vw, 520px); }
+    }
+    @media (max-width: 620px) {
+      header { padding: 28px 18px 22px; }
+      h1 { font-size: 48px; }
+      .header-stats { width: 100%; grid-template-columns: repeat(2, 1fr); }
+      .controls { padding: 12px 18px; gap: 8px; }
+      .field { min-width: 0; flex: 1 1 calc(50% - 4px); }
+      .field select { width: 100%; min-width: 0; }
+      .control-button { flex: 1; }
+      .count-chip { width: 100%; }
+      main { padding: 12px 18px 145px; }
+      .project-key { grid-template-columns: 1fr; margin-bottom: 40px; }
+      .evidence-section { margin-top: 52px; }
+      .section-heading { grid-template-columns: 1fr; gap: 7px; }
+      .section-heading p, .section-index { grid-column: 1; }
+      .artifact-grid { gap: 14px; }
+      .image-button img, .artifact-card:nth-child(3n) .image-button img { height: 66vw; min-height: 190px; }
+      .card-copy { grid-template-columns: 1fr; }
+      .card-actions { flex-direction: row-reverse; align-items: center; }
+      .selection-dock { right: 12px; bottom: 12px; width: calc(100vw - 24px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#evidence">Skip to evidence</a>
+
+  <header>
+    <div>
+      <p class="eyebrow">Private working contact sheet · 12 Aug 2026</p>
+      <h1>Which evidence earns the case study?</h1>
+      <p class="dek">Twenty-eight source-backed artifacts from the Care and McDonald’s projects. Select the frames that best prove research, synthesis, journey thinking, ideation, and interaction design. Every image is a local export; every source link returns to its exact Figma file or node.</p>
+    </div>
+    <div class="header-stats" aria-label="Collection summary">
+      <div class="stat"><span class="stat-value">28</span><span class="stat-label">Artifacts</span></div>
+      <div class="stat"><span class="stat-value">02</span><span class="stat-label">HCD projects</span></div>
+    </div>
+  </header>
+
+  <div class="controls-wrap">
+    <div class="controls">
+      <div class="field">
+        <label for="project-filter">Project</label>
+        <select id="project-filter">
+          <option value="all">Both projects</option>
+          <option value="care">FamilySync / Care</option>
+          <option value="mcdonalds">McDonald’s / Squad Up</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="category-filter">Evidence type</label>
+        <select id="category-filter">
+          <option value="all">All evidence</option>
+          <option value="research">Research + synthesis</option>
+          <option value="journey">Journeys + blueprints</option>
+          <option value="ideation">Ideation + architecture</option>
+          <option value="interface">Final interaction</option>
+        </select>
+      </div>
+      <button class="control-button" id="select-visible" type="button">Select visible</button>
+      <button class="control-button" id="clear-selection" type="button">Clear selection</button>
+      <div class="control-spacer"></div>
+      <div class="count-chip"><strong id="visible-count">28</strong> visible · <strong id="selection-count" aria-live="polite">0</strong> selected</div>
+      <button class="control-button primary" id="copy-selection" type="button">Copy selected list</button>
+    </div>
+  </div>
+
+  <main id="evidence">
+    <div class="project-key">
+      <div class="project-note care"><strong>FamilySync / Team Care</strong><p>JPMorgan Chase partner project. Primary presentation: FINAL – TEAM CARE. Primary process source: Service Design – Care Bears.</p></div>
+      <div class="project-note mcd"><strong>McDonald’s / Squad Up</strong><p>Northwestern EDI team project. Primary presentation: 70-slide Squad Up final deck, supported by opportunity, ideation, and system-mapping boards.</p></div>
+    </div>
+
+    <section class="evidence-section" data-section="research" aria-labelledby="research-heading">
+      <div class="section-heading">
+        <span class="section-index">01 / 04</span>
+        <h2 id="research-heading">Research + synthesis</h2>
+        <p>Use these to establish that the work began with people, observed behavior, and explicit tensions—not a polished screen.</p>
+      </div>
+      <div class="artifact-grid">
+        <article class="artifact-card" data-id="care-stakeholders" data-project="care" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge Family care stakeholders"><img src="assets/care-stakeholders.png" alt="FamilySync stakeholder profiles for Stacy, Robert, Cynthia, and Leo"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Stakeholders</span><h3>Family care is a multi-person system</h3><p class="assessment">Profiles the working parent, traveling parent, nearby grandmother, and child with distinct needs. Strong opening evidence for shared authority and coordination complexity.</p><div class="source-name">FINAL – TEAM CARE · slide 9</div></div><div class="card-actions"><label class="pick" title="Select this artifact"><input type="checkbox" aria-label="Select Family care is a multi-person system"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=177-2111" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="care-trust-takeaways" data-project="care" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge Care trust findings"><img src="assets/care-trust-takeaways.png" alt="Team Care research takeaways about care, control, trust, and privacy"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Research synthesis</span><h3>Helpful versus creepy is a permission boundary</h3><p class="assessment">Condenses the central findings: people want proactive care but retain control; institutional trust does not erase privacy boundaries. Strong evidence for the project’s design principles.</p><div class="source-name">FINAL – TEAM CARE · slide 85</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select Helpful versus creepy is a permission boundary"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=562-3444" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-research-proof" data-project="mcdonalds" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge McDonald’s research proof"><img src="assets/mcd-research-proof.png" alt="McDonald’s research sample showing four site observations, eight interviews, and twenty-two survey responses"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Research proof</span><h3>4 observations · 8 interviews · 22 surveys</h3><p class="assessment">The cleanest credibility frame in the project. Use early if the case study needs to establish primary research quickly.</p><div class="source-name">Squad Up final deck · slide 9</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select McDonald’s research proof"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=366-1828" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-research-insight" data-project="mcdonalds" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge McDonald’s research insight"><img src="assets/mcd-research-insight.png" alt="Research quote about McDonald’s fitting into an after-class routine"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Interview insight</span><h3>McDonald’s sits between other events</h3><p class="assessment">Connects observed teen behavior to an on-the-go ordering context through a participant quote. More human than a demographic slide.</p><div class="source-name">Squad Up final deck · slide 12</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select McDonald’s sits between other events"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=301-998" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-capabilities-gap" data-project="mcdonalds" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge current ordering capabilities gap"><img src="assets/mcd-capabilities-gap.png" alt="Comparison of group ordering through one payer versus individual orders and payment chasing"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Problem synthesis</span><h3>Current ordering fails coordination or payment</h3><p class="assessment">Frames the exact capabilities gap: one person consolidates orders and chases money, or everyone pays separately and coordination becomes hectic.</p><div class="source-name">Squad Up final deck · slide 15</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select current ordering capabilities gap"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=301-603" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-problem-landscape" data-project="mcdonalds" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge teen problem landscape"><img src="assets/mcd-problem-landscape.png" alt="Teen group-ordering problem landscape and needs"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Problem landscape</span><h3>Teens need social coordination and financial clarity</h3><p class="assessment">Defines the target group and needs before selecting the concept: easy group ordering, social reinforcement, and budget adherence.</p><div class="source-name">Concepts + Opportunity Briefs · slide 3</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select teen problem landscape"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=82-1235" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-opportunity-brief" data-project="mcdonalds" data-category="research">
+          <button class="image-button" type="button" aria-label="Enlarge Multi-Cart opportunity brief"><img src="assets/mcd-opportunity-brief.png" alt="Opportunity brief for a synchronized multi-user McDonald’s order"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Opportunity framing</span><h3>Multi-Cart turns the tension into a testable concept</h3><p class="assessment">Captures audience, problem, value, business effect, risk, and an explicit plan for low-fidelity testing. Useful bridge from synthesis into ideation.</p><div class="source-name">Concepts + Opportunity Briefs · slide 5</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select Multi-Cart opportunity brief"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=82-1102" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="evidence-section" data-section="journey" aria-labelledby="journey-heading">
+      <div class="section-heading"><span class="section-index">02 / 04</span><h2 id="journey-heading">Journeys + blueprints</h2><p>These prove the project extends beyond isolated screens into people, handoffs, backstage logic, and time.</p></div>
+      <div class="artifact-grid">
+        <article class="artifact-card" data-id="care-crisis-journey" data-project="care" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge caregiver crisis journey"><img src="assets/care-crisis-journey.png" alt="Caregiver thoughts and coordination questions after a child becomes sick at school"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Current-state journey</span><h3>A school call creates invisible coordination work</h3><p class="assessment">Makes the caregiver burden legible through concurrent questions about work, pickup, food, family communication, and time.</p><div class="source-name">FINAL – TEAM CARE · slide 14</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select caregiver crisis journey"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=519-14455" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="care-schedule-management" data-project="care" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge FamilySync schedule-management flow"><img src="assets/care-schedule-management.png" alt="Large FamilySync schedule management and pickup escalation flow"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Service flow</span><h3>Pickup escalation across parents, backups, and calendars</h3><p class="assessment">A detailed operational journey from school alert through availability checks, escalation, conflict handling, confirmation, status updates, and recap.</p><div class="source-name">Service Design – Care Bears · Schedule Management</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select FamilySync schedule management flow"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/board/cG0v5db8S70mQbbOaysmgg/Service-Design---Care-Bears?node-id=430-1388" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="care-clinical-guardian-flow" data-project="care" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge temporary guardian clinical journey"><img src="assets/care-clinical-guardian-flow.png" alt="Clinical care journey for a child arriving with a temporary guardian"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Edge-case journey</span><h3>Care continuity when the parent is absent</h3><p class="assessment">Explores permissions, missing medical context, milestone updates, support-system handoffs, and caregiver visibility during a clinical visit.</p><div class="source-name">Service Design – Care Bears · Clinical guardian flow</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select temporary guardian clinical journey"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/board/cG0v5db8S70mQbbOaysmgg/Service-Design---Care-Bears?node-id=441-1378" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="care-service-blueprint" data-project="care" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge FamilySync service blueprint"><img src="assets/care-service-blueprint.png" alt="FamilySync service blueprint presentation frame"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Service blueprint</span><h3>The service, not just the assistant interface</h3><p class="assessment">Use when the portfolio needs explicit service-design language and visible frontstage/backstage orchestration.</p><div class="source-name">FINAL – TEAM CARE · slide 92</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select FamilySync service blueprint"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=593-1873" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-kiosk-journey" data-project="mcdonalds" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge kiosk group-order journey"><img src="assets/mcd-kiosk-journey.png" alt="Storyboard of a teen group building and paying for a McDonald’s kiosk order"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Concept journey</span><h3>Kiosk path: individual choices, one coordinated order</h3><p class="assessment">Early journey exploration showing how separate personal carts and payments could converge at a physical kiosk.</p><div class="source-name">Concepts + Opportunity Briefs · slide 6</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select kiosk group-order journey"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=20-207" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-app-journey" data-project="mcdonalds" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge mobile group-order journey"><img src="assets/mcd-app-journey.png" alt="Storyboard of teens creating a shared McDonald’s order from their phones"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Concept journey</span><h3>App path: invite before arrival, collect together</h3><p class="assessment">Shows the mobile concept embedded in the real social context—friends traveling between events—rather than as a disconnected screen flow.</p><div class="source-name">Concepts + Opportunity Briefs · slide 7</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select mobile group-order journey"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/cD4eTZUBZJmcC5CiHNkVpH/Concepts---Opportunity-Briefs-Shareout?node-id=20-248" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-trigger-setup" data-project="mcdonalds" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge group-order trigger and setup map"><img src="assets/mcd-trigger-setup.png" alt="Group-order trigger, delivery mode, and invitation setup map"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Experience map</span><h3>Trigger and setup before anyone builds a cart</h3><p class="assessment">Clarifies entry-point decisions, mode selection, invite channels, and the guest’s need to understand host identity immediately.</p><div class="source-name">McCrew Group Order Experience Board</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select group-order trigger and setup map"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/board/6DKpYA1IipVMN6tnOop1e8/McCrew-Group-Order-Experience-Board?node-id=1-21" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-join-architecture" data-project="mcdonalds" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge join architecture"><img src="assets/mcd-join-architecture.png" alt="Decision map for app, browser, and no-phone group-order guests"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Inclusive journey</span><h3>Three join paths: app, web, or assisted</h3><p class="assessment">Important HCD evidence because it addresses download friction and guests without phones instead of assuming every participant has the same setup.</p><div class="source-name">McCrew Group Order Experience Board</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select join architecture"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/board/6DKpYA1IipVMN6tnOop1e8/McCrew-Group-Order-Experience-Board?node-id=1-40" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-system-map" data-project="mcdonalds" data-category="journey">
+          <button class="image-button" type="button" aria-label="Enlarge shared system-state map"><img src="assets/mcd-system-map.png" alt="Shared group-order state from invite opened to all participants ready"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · System map</span><h3>A shared state connects every participant</h3><p class="assessment">Maps invite opened, items in cart, payment pending, fully ready, group progress, and all-ready confirmation as one coordinated system.</p><div class="source-name">McCrew Group Order System Map</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select shared system-state map"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/board/8ELluDtBmW4GPGm8XFkK4g/McCrew-Group-Order-System-Map?node-id=1-128" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="evidence-section" data-section="ideation" aria-labelledby="ideation-heading">
+      <div class="section-heading"><span class="section-index">03 / 04</span><h2 id="ideation-heading">Ideation + architecture</h2><p>These are the bridge artifacts: concept principles and system choices that explain why the final interaction behaves the way it does.</p></div>
+      <div class="artifact-grid">
+        <article class="artifact-card" data-id="care-familysync-intro" data-project="care" data-category="ideation">
+          <button class="image-button" type="button" aria-label="Enlarge FamilySync concept introduction"><img src="assets/care-familysync-intro.png" alt="FamilySync concept introduction"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Concept frame</span><h3>FamilySync removes the chore of coordination</h3><p class="assessment">A concise concept statement: reduce logistics during routine and unexpected schedules so caregivers can focus on loved ones.</p><div class="source-name">FINAL – TEAM CARE · slide 16</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select FamilySync concept introduction"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=108-3729" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="care-three-pillars" data-project="care" data-category="ideation">
+          <button class="image-button" type="button" aria-label="Enlarge FamilySync’s three pillars"><img src="assets/care-three-pillars.png" alt="FamilySync pillars of coordination, communication, and connection"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Design principles</span><h3>Coordination · Communication · Connection</h3><p class="assessment">Turns research into three concept pillars. Especially useful as a compact case-study framework before showing detailed flows.</p><div class="source-name">FINAL – TEAM CARE · slide 20</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select FamilySync’s three pillars"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=86-2402" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-readiness-engine" data-project="mcdonalds" data-category="ideation">
+          <button class="image-button" type="button" aria-label="Enlarge readiness engine"><img src="assets/mcd-readiness-engine.png" alt="Four-stage readiness engine for a shared group order"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Interaction architecture</span><h3>Readiness is a designed state machine</h3><p class="assessment">Shows how an invite progresses from opened to cart building, payment pending, and fully ready—with host action only when needed.</p><div class="source-name">McCrew Group Order Experience Board</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select readiness engine"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/board/6DKpYA1IipVMN6tnOop1e8/McCrew-Group-Order-Experience-Board?node-id=1-81" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-invite-touchpoints" data-project="mcdonalds" data-category="ideation">
+          <button class="image-button" type="button" aria-label="Enlarge invitation touchpoints"><img src="assets/mcd-invite-touchpoints.png" alt="Multiple group-order invitation touchpoints in the McDonald’s app"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Concept translation</span><h3>One concept, multiple social entry points</h3><p class="assessment">Explores how the same group-order behavior appears across different moments and invitation modes rather than through a single fragile entry point.</p><div class="source-name">Squad Up final deck · slide 23</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select invitation touchpoints"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=248-706" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-value-props" data-project="mcdonalds" data-category="ideation">
+          <button class="image-button" type="button" aria-label="Enlarge Squad Up value propositions"><img src="assets/mcd-value-props.png" alt="Squad Up value propositions for payment, pickup, and customization"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Concept synthesis</span><h3>Payment, pickup, and customization become coordinated</h3><p class="assessment">A useful summary frame when the case study needs to connect interaction decisions back to customer value.</p><div class="source-name">Squad Up final deck · slide 38</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select Squad Up value propositions"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=10-149" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="evidence-section" data-section="interface" aria-labelledby="interface-heading">
+      <div class="section-heading"><span class="section-index">04 / 04</span><h2 id="interface-heading">Final interaction evidence</h2><p>Representative outputs only. Select these after the research and journey artifacts explain the reasoning behind them.</p></div>
+      <div class="artifact-grid">
+        <article class="artifact-card" data-id="care-escalation-flow" data-project="care" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge FamilySync escalation interface"><img src="assets/care-escalation-flow.png" alt="FamilySync pickup request and caregiver escalation interface"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Scenario prototype</span><h3>Escalation remains visible and interruptible</h3><p class="assessment">Shows the system checking calendars and contacting a secondary caregiver while keeping the primary user informed.</p><div class="source-name">FINAL – TEAM CARE · slide 34</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select FamilySync escalation interface"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=73-1371" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="care-visibility-presence" data-project="care" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge FamilySync home-arrival update sequence"><img src="assets/care-visibility-presence.png" alt="FamilySync concept showing Cynthia home with Leo while Robert and Stacy receive automatic updates"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">Care · Scenario outcome</span><h3>Automatic updates keep absent caregivers informed</h3><p class="assessment">Shows Cynthia home with Leo while Robert and Stacy receive automatic updates, connecting the handoff outcome to caregiver visibility.</p><div class="source-name">FINAL – TEAM CARE · slide 50</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select FamilySync home-arrival update sequence"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/1QewB1TAZ1vx7sdz3wiwqg/FINAL---TEAM-CARE?node-id=406-1678" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-live-progress" data-project="mcdonalds" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge live group progress"><img src="assets/mcd-live-progress.png" alt="McDonald’s Squad Up interface showing live participant progress"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Core interaction</span><h3>Live progress makes coordination glanceable</h3><p class="assessment">The key UI contribution: participant bags communicate who joined, who is building, and who is ready without a chat thread.</p><div class="source-name">Squad Up final deck · slide 29</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select live group progress"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=537-9761" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-squad-details" data-project="mcdonalds" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge Squad details"><img src="assets/mcd-squad-details.png" alt="Squad details showing members, cart values, status, and guest addition"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Group overview</span><h3>Squad details expose ownership and status</h3><p class="assessment">At-a-glance coordination for the host and participants, including guests who join without their own device.</p><div class="source-name">Squad Up final deck · slide 31</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select Squad details"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=77-316" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-delegated-payment" data-project="mcdonalds" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge delegated payment"><img src="assets/mcd-delegated-payment.png" alt="Squad Up checkout screen for selecting another member’s order to pay"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Payment coordination</span><h3>Pay for yourself—or cover someone else</h3><p class="assessment">Translates social reciprocity into an explicit payment interaction while removing post-order Venmo chasing.</p><div class="source-name">Squad Up final deck · slide 34</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select delegated payment"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=77-309" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-readiness" data-project="mcdonalds" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge waiting-for-squad state"><img src="assets/mcd-readiness.png" alt="Waiting for Squad to ready up interface"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Readiness state</span><h3>The host knows when the group can submit</h3><p class="assessment">Makes incomplete versus ready participants visible, reducing premature checkout and repeated verbal checking.</p><div class="source-name">Squad Up final deck · slide 35</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select waiting-for-squad state"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=432-7733" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+
+        <article class="artifact-card" data-id="mcd-order-complete" data-project="mcdonalds" data-category="interface">
+          <button class="image-button" type="button" aria-label="Enlarge order completion"><img src="assets/mcd-order-complete.png" alt="Squad Up order completion and pickup interface"><span class="zoom-label">Open large</span></button>
+          <div class="card-copy"><div><span class="kicker">McDonald’s · Fulfillment</span><h3>The group order remains legible at pickup</h3><p class="assessment">Carries ownership into fulfillment through separately identified bags rather than ending the experience at digital checkout.</p><div class="source-name">Squad Up final deck · slide 37</div></div><div class="card-actions"><label class="pick"><input type="checkbox" aria-label="Select order completion"><span class="checkmark"></span></label><a class="source-link" href="https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T?node-id=85-782" target="_blank" rel="noreferrer">Figma ↗</a></div></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <aside class="selection-dock" aria-label="Selected artifacts summary">
+    <div class="dock-top">
+      <span class="dock-count" id="dock-count">0</span>
+      <div class="dock-label"><strong>Selected evidence</strong><span>Saved locally in this browser</span></div>
+      <button class="dock-toggle" id="dock-toggle" type="button" aria-expanded="false">Review list</button>
+    </div>
+    <textarea class="selection-output" id="selection-output" readonly aria-label="Selected artifact titles and Figma links"></textarea>
+  </aside>
+
+  <dialog id="lightbox" aria-labelledby="lightbox-title">
+    <div class="lightbox-frame">
+      <div class="lightbox-bar"><span class="lightbox-title" id="lightbox-title"></span><button class="close-lightbox" type="button">Close</button></div>
+      <img id="lightbox-image" alt="">
+    </div>
+  </dialog>
+
+  <script>
+    const storageKey = 'hcd-figma-selector-v1';
+    const cards = [...document.querySelectorAll('.artifact-card')];
+    const projectFilter = document.getElementById('project-filter');
+    const categoryFilter = document.getElementById('category-filter');
+    const visibleCount = document.getElementById('visible-count');
+    const selectionCount = document.getElementById('selection-count');
+    const dockCount = document.getElementById('dock-count');
+    const selectionOutput = document.getElementById('selection-output');
+    const selectionDock = document.querySelector('.selection-dock');
+    const dockToggle = document.getElementById('dock-toggle');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const lightboxTitle = document.getElementById('lightbox-title');
+
+    const selectedIds = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+
+    const sourceFor = (card) => card.querySelector('.source-link').href;
+    const titleFor = (card) => card.querySelector('h3').textContent.trim();
+    const projectFor = (card) => card.dataset.project === 'care' ? 'FamilySync / Care' : 'McDonald’s / Squad Up';
+
+    function applyFilters() {
+      let count = 0;
+      cards.forEach((card) => {
+        const projectMatch = projectFilter.value === 'all' || card.dataset.project === projectFilter.value;
+        const categoryMatch = categoryFilter.value === 'all' || card.dataset.category === categoryFilter.value;
+        card.hidden = !(projectMatch && categoryMatch);
+        if (!card.hidden) count += 1;
+      });
+      document.querySelectorAll('.evidence-section').forEach((section) => {
+        section.hidden = ![...section.querySelectorAll('.artifact-card')].some((card) => !card.hidden);
+      });
+      visibleCount.textContent = count;
+    }
+
+    function syncSelection() {
+      cards.forEach((card) => {
+        const checked = selectedIds.has(card.dataset.id);
+        card.querySelector('input[type="checkbox"]').checked = checked;
+        card.classList.toggle('is-selected', checked);
+      });
+      const chosen = cards.filter((card) => selectedIds.has(card.dataset.id));
+      const count = chosen.length;
+      selectionCount.textContent = count;
+      dockCount.textContent = count;
+      selectionOutput.value = chosen.length
+        ? chosen.map((card, index) => `${index + 1}. [${projectFor(card)}] ${titleFor(card)}\n${sourceFor(card)}`).join('\n\n')
+        : 'No artifacts selected yet.';
+      localStorage.setItem(storageKey, JSON.stringify([...selectedIds]));
+    }
+
+    projectFilter.addEventListener('change', applyFilters);
+    categoryFilter.addEventListener('change', applyFilters);
+
+    cards.forEach((card) => {
+      const checkbox = card.querySelector('input[type="checkbox"]');
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) selectedIds.add(card.dataset.id);
+        else selectedIds.delete(card.dataset.id);
+        syncSelection();
+      });
+
+      card.querySelector('.image-button').addEventListener('click', () => {
+        const image = card.querySelector('img');
+        lightboxImage.src = image.src;
+        lightboxImage.alt = image.alt;
+        lightboxTitle.textContent = titleFor(card);
+        lightbox.showModal();
+      });
+    });
+
+    document.getElementById('select-visible').addEventListener('click', () => {
+      cards.filter((card) => !card.hidden).forEach((card) => selectedIds.add(card.dataset.id));
+      syncSelection();
+    });
+
+    document.getElementById('clear-selection').addEventListener('click', () => {
+      selectedIds.clear();
+      syncSelection();
+    });
+
+    document.getElementById('copy-selection').addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      if (!selectedIds.size) {
+        button.textContent = 'Select something first';
+        setTimeout(() => { button.textContent = 'Copy selected list'; }, 1400);
+        return;
+      }
+      try {
+        if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(selectionOutput.value);
+        else throw new Error('Clipboard API unavailable');
+      } catch {
+        selectionOutput.hidden = false;
+        selectionOutput.select();
+        document.execCommand('copy');
+      }
+      button.textContent = 'Copied';
+      setTimeout(() => { button.textContent = 'Copy selected list'; }, 1400);
+    });
+
+    dockToggle.addEventListener('click', () => {
+      const open = selectionDock.classList.toggle('is-open');
+      dockToggle.setAttribute('aria-expanded', String(open));
+      dockToggle.textContent = open ? 'Hide list' : 'Review list';
+    });
+
+    lightbox.querySelector('.close-lightbox').addEventListener('click', () => lightbox.close());
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox) lightbox.close();
+    });
+
+    applyFilters();
+    syncSelection();
+  </script>
+</body>
+</html>

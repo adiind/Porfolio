@@ -1,0 +1,163 @@
+{
+  "projectId": "mcdonalds-interaction-design",
+  "accent": "mcdonalds",
+  "label": "Northwestern EDI · Team project",
+  "title": "Squad Up",
+  "proposition": "A shared ordering concept that lets a group join, choose, pay, and get ready without one person managing everyone.",
+  "context": "A group order starts before checkout. People are still arriving, changing plans, choosing food, and figuring out who owes what.",
+  "heroNotes": [
+    { "id": "mcd-hero-shared", "text": "One shared order.", "tone": "yellow", "rotation": -0.8 },
+    { "id": "mcd-hero-choice", "text": "Individual choices stay individual.", "tone": "cream", "rotation": 0.6 },
+    { "id": "mcd-hero-progress", "text": "Group progress stays visible.", "tone": "red", "rotation": -0.4 }
+  ],
+  "role": "User research · Journey design · Interaction architecture · Prototyping",
+  "metrics": [
+    { "value": "4", "label": "Site observations" },
+    { "value": "8", "label": "Qualitative interviews" },
+    { "value": "22", "label": "Survey responses" }
+  ],
+  "hero": {
+    "id": "mcd-live-progress",
+    "src": "/images/hcd/mcdonalds/mcd-live-progress.webp",
+    "fullSrc": "/images/hcd/mcdonalds/mcd-live-progress.webp",
+    "alt": "McDonald’s Squad Up interface showing live participant progress",
+    "caption": "Live bag states show who has joined, who is choosing, and when the group is ready.",
+    "treatment": "full",
+    "aspect": "16 / 9"
+  },
+  "sections": [
+    {
+      "key": "situation",
+      "title": "The order starts before checkout",
+      "intro": "Across 4 observations, 8 interviews, and 22 survey responses, we saw McDonald’s as a stop between other activities. The order had to preserve social momentum, not become a separate administrative task.",
+      "storyNotes": [
+        { "id": "mcd-situation-stop", "text": "McDonald’s is a stop between other activities.", "tone": "cream", "rotation": 0.7 },
+        { "id": "mcd-situation-hangout", "text": "The order is part of the hangout.", "tone": "yellow", "rotation": -1.1 },
+        { "id": "mcd-situation-momentum", "text": "Ordering should preserve social momentum.", "tone": "red", "rotation": 0.4 }
+      ],
+      "groups": [
+        {
+          "id": "mcd-research",
+          "layout": "pair",
+          "visuals": [
+            {
+              "id": "mcd-research-insight",
+              "src": "/images/hcd/mcdonalds/mcd-research-insight.webp",
+              "fullSrc": "/images/hcd/mcdonalds/mcd-research-insight.webp",
+              "alt": "Research quote about McDonald’s fitting into an after-class routine",
+              "caption": "An after-class routine showed how ordering competes with time, travel, and social momentum.",
+              "treatment": "full",
+              "aspect": "16 / 9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "learning",
+      "title": "One person becomes the coordinator",
+      "intro": "Existing paths create an awkward tradeoff: one person collects everyone’s choices and chases payment, or people pay separately and lose a shared view of the order.",
+      "storyNotes": [
+        { "id": "mcd-learning-choices", "text": "One person collects everyone’s choices.", "tone": "yellow", "rotation": -0.6 },
+        { "id": "mcd-learning-payment", "text": "Then they chase payment.", "tone": "red", "rotation": 0.8 },
+        { "id": "mcd-learning-view", "text": "Separate payments lose the shared view.", "tone": "cream", "rotation": -0.3 }
+      ],
+      "groups": [
+        {
+          "id": "mcd-coordination-gap",
+          "layout": "pair",
+          "visuals": [
+            {
+              "id": "mcd-capabilities-gap",
+              "src": "/images/hcd/mcdonalds/mcd-capabilities-gap.webp",
+              "fullSrc": "/images/hcd/mcdonalds/mcd-capabilities-gap.webp",
+              "alt": "Comparison of group ordering through one payer versus individual orders and payment chasing",
+              "caption": "Current options split coordination and payment instead of solving both for the group.",
+              "treatment": "full",
+              "aspect": "16 / 9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "idea",
+      "title": "One order, individual agency",
+      "intro": "We reframed the opportunity as synchronized participation: one shared order, while each person keeps ownership of their choices and payment.",
+      "storyNotes": [
+        { "id": "mcd-idea-participation", "text": "Synchronized participation reframed the opportunity.", "tone": "cream", "rotation": -0.5 }
+      ],
+      "notes": [
+        { "id": "mcd-idea-customize", "text": "Customize your own bag.", "tone": "yellow", "rotation": -1.0 },
+        { "id": "mcd-idea-payment", "text": "Keep payment responsibility clear.", "tone": "cream", "rotation": 0.7 },
+        { "id": "mcd-idea-pickup", "text": "Keep each bag visible through pickup.", "tone": "red", "rotation": -0.4 }
+      ],
+      "groups": [
+        {
+          "id": "mcd-shared-order-idea",
+          "layout": "pair",
+          "visuals": [
+            {
+              "id": "mcd-value-props",
+              "src": "/images/hcd/mcdonalds/mcd-value-props.webp",
+              "fullSrc": "/images/hcd/mcdonalds/mcd-value-props.webp",
+              "alt": "Squad Up value propositions for payment, pickup, and customization",
+              "caption": "Customization, payment, and pickup became the three value checks for the shared order.",
+              "treatment": "full",
+              "aspect": "16 / 9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "mechanics",
+      "title": "From invite to pickup",
+      "intro": "The concept connects invitation, joining, individual bags, payment, readiness, and pickup as one visible group state. Kiosk, app, web, and assisted entry points all converge on the same order.",
+      "storyNotes": [
+        { "id": "mcd-mechanics-entry", "text": "Invite through app, web, QR, or assisted entry.", "tone": "yellow", "rotation": -0.7 },
+        { "id": "mcd-mechanics-state", "text": "Keep every bag and payment state visible.", "tone": "cream", "rotation": 0.5 },
+        { "id": "mcd-mechanics-ready", "text": "Submit when every required state is ready.", "tone": "red", "rotation": -0.3 }
+      ],
+      "groups": [
+        {
+          "id": "mcd-interaction-sequence",
+          "title": "Ownership through fulfillment",
+          "layout": "sequence",
+          "visuals": [
+            {
+              "id": "mcd-squad-details",
+              "src": "/images/hcd/mcdonalds/mcd-squad-details.webp",
+              "fullSrc": "/images/hcd/mcdonalds/mcd-squad-details.webp",
+              "alt": "Squad details showing members, cart values, status, and guest addition",
+              "caption": "The squad view makes each participant, bag, and payment responsibility visible.",
+              "treatment": "full",
+              "aspect": "16 / 9"
+            },
+            {
+              "id": "mcd-order-complete",
+              "src": "/images/hcd/mcdonalds/mcd-order-complete.webp",
+              "fullSrc": "/images/hcd/mcdonalds/mcd-order-complete.webp",
+              "alt": "Squad Up order completion and pickup interface",
+              "caption": "Completion keeps individual bag identities visible through pickup and handoff.",
+              "treatment": "full",
+              "aspect": "16 / 9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "reflection",
+      "title": "What I took forward",
+      "intro": "Squad Up reinforced that group experiences need more than collaboration features. The product has to show ownership, progress, and intervention clearly enough that coordination feels lighter instead of merely moving into a new interface.",
+      "storyNotes": [
+        { "id": "mcd-reflection-ownership", "text": "Show who owns each choice.", "tone": "yellow", "rotation": -0.8 },
+        { "id": "mcd-reflection-progress", "text": "Show how the order is progressing.", "tone": "cream", "rotation": 0.6 },
+        { "id": "mcd-reflection-intervention", "text": "Make intervention clear when coordination stalls.", "tone": "red", "rotation": -0.4 }
+      ],
+      "groups": []
+    }
+  ],
+  "closingContext": "Student team project created at Northwestern EDI using McDonald’s ordering as the design context; not affiliated with or shipped by McDonald’s."
+}

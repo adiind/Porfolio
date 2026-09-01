@@ -10,6 +10,7 @@ export interface CaseStudy {
   title: string;
   summary: string;
   thumbnailUrl?: string; // Optional image URL
+  imageUrl?: string; // Optional main image URL
   linkUrl?: string;
   themeColor?: 'red' | 'orange' | 'blue' | 'green';
   slides?: CaseStudySlide[];
@@ -29,13 +30,38 @@ export interface Publication {
   link?: string;
 }
 
+export interface FeatureCardMedia {
+  url: string;
+  alt: string;
+  label: string;
+}
+
+export interface FeatureCard {
+  title: string;
+  subtitle: string;
+  summary: string; // Short summary for closed state
+  expandedSummary: string; // Longer summary for open state
+  pills: {
+    label: string;
+    description: string;
+  }[];
+  details: string[]; // Bullet points for open state
+  skills?: { label: string; description: string }[]; // Skills with descriptions for this project
+  imageUrl?: string; // Optional image for hover view and detail page
+  media?: FeatureCardMedia[]; // Labeled evidence shown without destructive crops
+  projectId?: string; // Existing rich portfolio project to open in context
+  projectLinks?: { label: string; url: string }[]; // Optional links
+}
+
 export interface TimelineItem {
   id: string;
   lane: 0 | 1 | 2;
   title: string;
   company: string;
-  type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project' | 'vignette';
-  subtype?: 'role' | 'post';
+  companyUrl?: string; // Optional URL for company/competition
+  headline?: string; // Brief one-liner visible before hover
+  type: 'corporate' | 'education' | 'personal' | 'foundational' | 'competition' | 'project';
+  subtype?: 'role' | 'post' | 'project';
   start: string; // YYYY-MM-DD
   end: string;   // YYYY-MM-DD
   summary: string;
@@ -43,14 +69,15 @@ export interface TimelineItem {
   caseStudy?: CaseStudy; // New Field for Case Studies
   award?: Award; // New Field for Awards
   publication?: Publication; // New Field for Publications
+  featureCards?: FeatureCard[]; // New Field for Special Feature Cards (e.g. Snapdeal Ads)
   videoUrl?: string; // New Field for Video Embeds
   imageUrl?: string; // New Field for Project Images
-  
+
   // New Fields for Redesign
   logoUrl?: string;
-  skills?: string[];
+  skills?: { label: string; description: string }[]; // Skills/toolkit with descriptions
   themeColor?: 'red' | 'orange' | 'blue' | 'green';
-  
+
   // Detailed Project View
   extendedDescription?: string;
   projectLinks?: { label: string; url: string }[];
@@ -60,6 +87,12 @@ export interface TimelineItem {
   caption?: string;
   likes?: number;
   comments?: number;
+
+  // Differentiator callout for company cards
+  differentiator?: string;
+
+  // TinkerVerse Projects
+  projects?: TinkerProject[];
 }
 
 export interface SocialPost {
@@ -72,9 +105,31 @@ export interface SocialPost {
   comments: number;
 }
 
+export interface JournalEntry {
+  id: string;
+  instagramUrl: string;
+  publishedAt: string;
+  caption: string;
+  mediaType: 'image' | 'video-thumbnail';
+  localMediaUrl: string;
+  alt: string;
+  statusLabel: string;
+  projectId?: string;
+}
+
 export interface TimelineConfig {
-  startDate: string; 
-  endDate: string;   
+  startDate: string;
+  endDate: string;
+}
+
+export interface TinkerProject {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  tags: string[];
+  link?: string;
 }
 
 export type TimelineMode = 'intro' | 'fit' | 'normal' | 'detail';
