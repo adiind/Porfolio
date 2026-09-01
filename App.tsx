@@ -17,7 +17,6 @@ import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
 import BlogSection from './components/BlogSection';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
-import PortfolioFooter from './components/PortfolioFooter';
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 import { Project } from './types/Project';
@@ -28,13 +27,12 @@ import { trackEvent } from './lib/analytics';
 import { INITIAL_WORK_PROJECT_ID } from './lib/workRoutes';
 
 type PublicNavSection = 'profile' | 'experiences' | 'projects';
-type ActiveSection = PublicNavSection | 'footer' | 'writings';
+type ActiveSection = PublicNavSection | 'writings';
 
 const SECTION_LABELS: Record<ActiveSection, string> = {
   profile: 'Profile',
   experiences: 'Experience',
   projects: 'Selected Work',
-  footer: 'Closing note',
   writings: 'Writings',
 };
 
@@ -504,17 +502,15 @@ const PortfolioApp: React.FC = () => {
   };
 
   // One scroll model: the hero hands off once to the inner portfolio flow;
-  // experience, work, and footer then use ordinary native scrolling in both
+  // experience and work then use ordinary native scrolling in both
   // directions. An upward boundary gesture returns to the hero.
   const SCROLL_THRESHOLD = 25; // Intentional scroll threshold
 
   const getSectionPositions = useCallback(() => {
     const projectsEl = document.getElementById('projects');
-    const footerEl = document.getElementById('footer');
     return {
       experiences: 0,
       projects: projectsEl ? projectsEl.offsetTop - 100 : 0,
-      footer: footerEl ? footerEl.offsetTop - 80 : 0,
     };
   }, []);
 
@@ -524,7 +520,6 @@ const PortfolioApp: React.FC = () => {
     const positions = getSectionPositions();
     const viewportBuffer = window.innerHeight * 0.3;
 
-    if (scrollTop >= positions.footer - viewportBuffer) return 'footer';
     if (scrollTop >= positions.projects - viewportBuffer) return 'projects';
     return 'experiences';
   }, [mode, getSectionPositions]);
@@ -694,18 +689,14 @@ const PortfolioApp: React.FC = () => {
     if (mode === 'intro') return;
 
     const projectsEl = document.getElementById('projects');
-    const footerEl = document.getElementById('footer');
     const writingsEl = document.getElementById('writings');
 
     let projectsIntersecting = false;
-    let footerIntersecting = false;
     let writingsIntersecting = false;
 
     const updateActiveSection = () => {
       if (writingsIntersecting) {
         setActiveSection('writings');
-      } else if (footerIntersecting) {
-        setActiveSection('footer');
       } else if (projectsIntersecting) {
         setActiveSection('projects');
       } else {
@@ -733,24 +724,12 @@ const PortfolioApp: React.FC = () => {
       { rootMargin: '-40% 0px -40% 0px' }
     );
 
-    const footerObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          footerIntersecting = entry.isIntersecting;
-          updateActiveSection();
-        });
-      },
-      { rootMargin: '-40% 0px -40% 0px' }
-    );
-
     if (projectsEl) projectsObserver.observe(projectsEl);
     if (writingsEl) writingsObserver.observe(writingsEl);
-    if (footerEl) footerObserver.observe(footerEl);
 
     return () => {
       projectsObserver.disconnect();
       writingsObserver.disconnect();
-      footerObserver.disconnect();
     };
   }, [mode, showDirectWritings]);
 
@@ -1418,7 +1397,6 @@ const PortfolioApp: React.FC = () => {
           {/* Writings remain available only through the retained direct hash. */}
           {showDirectWritings && <BlogSection />}
 
-          <PortfolioFooter />
         </div>
       </motion.div>
 

@@ -42,6 +42,8 @@ assert.match(wheel, /const showFallback = !webglRequested \|\| isCompact \|\| pr
 assert.doesNotMatch(fallback, /transition:\s*['"]none['"]/, 'fallback cards must not snap between states');
 assert.match(fallback, /data-project-wheel-links/, 'the public carousel must retain visible links between project cards');
 assert.match(fallback, /cubic-bezier\(0\.22, 1, 0\.36, 1\)/, 'the public carousel must use deliberate transform motion rather than a static stack');
+assert.doesNotMatch(fallback, /transition:\s*['"][^'"]*\bleft\b|transition:\s*['"][^'"]*\btop\b/, 'carousel clicks must not animate layout properties that repaint the full hero');
+assert.match(fallback, /willChange:\s*['"]transform, opacity['"]/, 'carousel cards must stay on compositor-friendly layers while moving');
 
 assert.doesNotMatch(hero, /data-discipline-option/, 'Hero must not retain discipline controls');
 assert.doesNotMatch(hero, /data-discipline-arcs/, 'Hero must not retain nested discipline arcs');

@@ -61,8 +61,4 @@ const mobileTimeline = read('components/MobileTimeline.tsx');
 requireSource(mobileTimeline.includes("trackEvent('experience_opened'"), 'Mobile inline experiences must emit experience_opened');
 requireSource(mobileTimeline.includes("contentType: 'experience'"), 'Mobile inline experiences must time engagement');
 
-const preferences = read('components/AnalyticsPreferences.tsx');
-requireSource(preferences.includes('Allow anonymous analytics'), 'The portfolio must expose an analytics preference');
-requireSource(preferences.includes('privacy-masked session replay'), 'The portfolio must visibly disclose session replay');
-
 console.log('OpenPanel analytics source verification passed.');

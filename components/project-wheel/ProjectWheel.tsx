@@ -127,7 +127,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
       aria-describedby={instructionId}
       tabIndex={0}
       onKeyDown={onKeyDown}
-      className="pointer-events-auto absolute inset-y-0 right-0 z-[40] w-[64%] min-w-[300px] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E5E55A] sm:w-[58%] lg:right-[70px] lg:w-[54%] xl:right-[96px]"
+      className="pointer-events-auto absolute right-[7.5rem] top-[34%] z-[40] hidden h-[430px] w-[380px] overflow-visible focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A] xl:block 2xl:right-[9rem]"
     >
       <p id={instructionId} className="sr-only">
         Rotate projects with the mouse wheel, trackpad, drag, or swipe. Use arrow keys to step between projects and Enter to open the current project.
@@ -148,7 +148,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
         </div>
       )}
 
-      <div className="absolute right-2 top-[58%] z-20 w-[min(220px,78%)] rounded-2xl border border-white/20 bg-[#04110f]/88 p-2.5 text-right shadow-[0_22px_65px_rgba(0,0,0,0.46)] backdrop-blur-xl sm:bottom-[4.6rem] sm:right-4 sm:top-auto sm:w-[min(250px,78%)] sm:p-4 lg:bottom-8">
+      {!showFallback && <div className="absolute bottom-0 right-0 z-20 w-[250px] rounded-2xl border border-white/20 bg-[#04110f]/88 p-4 text-right shadow-[0_22px_65px_rgba(0,0,0,0.46)] backdrop-blur-xl">
         <div className="flex items-center justify-between gap-3 font-mono text-[9px] uppercase tracking-[0.14em] text-white/55">
           <span>{String(frontIndex + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}</span>
           <span>{frontProject.status}</span>
@@ -182,7 +182,7 @@ const ProjectWheel: React.FC<Props> = ({ items, active, onOpen }) => {
             Open project <ExternalLink size={12} aria-hidden="true" />
           </button>
         </div>
-      </div>
+      </div>}
 
       <ul className="sr-only" aria-label="All projects in this carousel">
         {items.map((item, index) => (

@@ -49,6 +49,11 @@ async function main() {
       const wheelMode = await page.locator('[data-project-wheel]').getAttribute('data-project-wheel-mode');
 
       assert.ok(primaryCta, `${viewport.label}: primary CTA must render`);
+      assert.equal(
+        await page.locator('[data-portfolio-footer]').count(),
+        0,
+        `${viewport.label}: the public footer must not interrupt the portfolio scroll`,
+      );
       if (viewport.compact) {
         assert.equal(heroAvatar, null, `${viewport.label}: decorative avatar must stay out of the compact startup layout`);
       }
@@ -59,6 +64,30 @@ async function main() {
 
       if (viewport.label === 'desktop') {
         const heroMat = page.locator('#profile [data-cutting-mat-surface]');
+        const activeProjectCard = page.locator('[data-project-wheel-card="active"]');
+        const projectSummary = page.locator('[data-project-wheel-summary]');
+        const githubEvidence = page.locator('[data-github-evidence]');
+        const sectionNavigation = page.getByRole('navigation', { name: 'Sections' });
+        const visibleProjectCards = page.locator('[data-project-wheel-card][data-visible="true"]');
+        const [activeCardBox, projectSummaryBox, githubEvidenceBox, sectionNavigationBox] = await Promise.all([
+          activeProjectCard.boundingBox(),
+          projectSummary.boundingBox(),
+          githubEvidence.boundingBox(),
+          sectionNavigation.boundingBox(),
+        ]);
+
+        assert.equal(await visibleProjectCards.count(), 3, 'desktop: the carousel must show one project and two restrained neighbors');
+        assert.ok(activeCardBox, 'desktop: the active project card must render');
+        assert.ok(projectSummaryBox, 'desktop: the integrated project summary must render');
+        assert.ok(githubEvidenceBox, 'desktop: GitHub evidence must render');
+        assert.ok(sectionNavigationBox, 'desktop: section navigation must render');
+        assert.equal(overlaps(activeCardBox, primaryCta), false, 'desktop: project card must not overlap the primary CTA');
+        assert.equal(overlaps(activeCardBox, heroAvatar), false, 'desktop: project card must not overlap the avatar');
+        assert.equal(overlaps(activeCardBox, githubEvidenceBox), false, 'desktop: project card must not overlap GitHub evidence');
+        assert.equal(overlaps(projectSummaryBox, githubEvidenceBox), false, 'desktop: project summary must not overlap GitHub evidence');
+        assert.equal(overlaps(activeCardBox, sectionNavigationBox), false, 'desktop: project card must not overlap section navigation');
+        assert.equal(overlaps(projectSummaryBox, sectionNavigationBox), false, 'desktop: project summary must not overlap section navigation');
+
         const matTransformBeforeClick = await heroMat.evaluate((element) => getComputedStyle(element).transform);
         const focusedProjectBeforeClick = await page.locator('[data-project-wheel] h2').textContent();
         await page.locator('[data-project-wheel-fallback] button').nth(1).click();

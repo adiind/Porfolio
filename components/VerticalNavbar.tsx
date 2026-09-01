@@ -6,7 +6,7 @@ import { TimelineMode } from '../types';
 import GlassSurface from './ui/GlassSurface';
 
 type PublicNavSection = 'profile' | 'experiences' | 'projects';
-type ActiveSection = PublicNavSection | 'footer' | 'writings';
+type ActiveSection = PublicNavSection | 'writings';
 
 interface VerticalNavbarProps {
     activeSection: ActiveSection;
