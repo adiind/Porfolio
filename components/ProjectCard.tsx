@@ -217,7 +217,7 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
             <div className="absolute top-3 right-3 z-20">
                 <motion.span
                     layout
-                    className={`inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border backdrop-blur-sm ${colors.status}`}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${colors.status}`}
                 >
                     <Trophy size={10} />
                     {statusLabel}

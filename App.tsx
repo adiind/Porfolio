@@ -969,7 +969,8 @@ const PortfolioApp: React.FC = () => {
         />
       )}
 
-      {/* --- HEADER --- */}
+      {/* Keep fixed navigation opaque: backdrop filters here and inside the tilted
+          project grid caused Chrome to drop the mat, images, and dialog backing. */}
       <header
         data-scroll-header
         aria-hidden={mode === 'intro'}
@@ -980,7 +981,7 @@ const PortfolioApp: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: mode === 'intro' ? 0 : 1 }}
           transition={{ duration: 0.8 }}
-          className={`absolute inset-0 border-b border-white/15 bg-[#050d0c]/78 backdrop-blur-xl ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          className={`absolute inset-0 border-b border-white/15 bg-[#050d0c] ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         />
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -1024,7 +1025,7 @@ const PortfolioApp: React.FC = () => {
             </div>
 
             {/* Hover Tooltip */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-black/95 backdrop-blur-lg border border-white/20 rounded-lg text-xs text-white/90 font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none transform scale-95 group-hover:scale-100 shadow-xl z-50">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-black/95 border border-white/20 rounded-lg text-xs text-white/90 font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none transform scale-95 group-hover:scale-100 shadow-xl z-50">
               View profile
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[-8px]">
                 <div className="border-4 border-transparent border-b-black/95"></div>
@@ -1035,7 +1036,7 @@ const PortfolioApp: React.FC = () => {
           <div
             data-section-indicator
             aria-live="polite"
-            className="rounded-full border border-white/15 bg-[#07110f]/72 px-3.5 py-2 text-right shadow-[0_12px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+            className="rounded-full border border-white/15 bg-[#07110f] px-3.5 py-2 text-right shadow-[0_12px_32px_rgba(0,0,0,0.3)]"
           >
             <span className="block text-[9px] font-medium uppercase tracking-[0.18em] text-white/45">Viewing</span>
             <span className="block text-xs font-semibold text-white/86">{SECTION_LABELS[activeSection]}</span>

@@ -133,9 +133,10 @@ const ProjectsSection: React.FC = () => {
                     transition={{ duration: 0.6 }}
                 >
                     <div data-selected-work-frame style={{ height: `${matHeight}px` }}>
+                        {/* No backdrop filters inside this transformed surface; see verify-project-paint.mjs. */}
                         <CuttingMatSurface active density="comfortable" float={false}>
                         <div ref={matContentRef} data-selected-work-mat className="min-w-0 p-5 pt-8 sm:p-8 sm:pt-10 md:p-12 lg:p-14">
-                            <div className="rounded-2xl border border-white/[0.16] bg-[#04110f]/[0.88] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.38)] backdrop-blur-lg sm:p-6 md:p-7">
+                            <div className="rounded-2xl border border-white/[0.16] bg-[#04110f]/[0.88] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.38)] sm:p-6 md:p-7">
                                 <motion.h2
                                     initial={{ opacity: 0, y: 18 }}
                                     whileInView={{ opacity: 1, y: 0 }}

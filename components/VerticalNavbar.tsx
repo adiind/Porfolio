@@ -37,7 +37,8 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                     data-nav-glass
                     aria-label="Sections"
                     strength="strong"
-                    blur="strong"
+                    blur="none"
+                    style={{ backgroundColor: '#050d0c' }}
                     className="flex flex-col items-center gap-5 rounded-full px-3 py-5"
                 >
                     {navItems.map((item) => {
@@ -63,7 +64,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                                             animate={{ opacity: 1, x: -12, scale: 1 }}
                                             exit={{ opacity: 0, x: 12, scale: 0.96 }}
                                             transition={{ duration: 0.16 }}
-                                            className="absolute right-full mr-3 whitespace-nowrap rounded-lg border border-white/15 bg-[#06100e]/92 px-3 py-1.5 text-xs font-medium text-white/90 shadow-xl backdrop-blur-xl"
+                                            className="absolute right-full mr-3 whitespace-nowrap rounded-lg border border-white/15 bg-[#06100e] px-3 py-1.5 text-xs font-medium text-white/90 shadow-xl"
                                         >
                                             {item.label}
                                         </motion.span>
@@ -93,7 +94,8 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                     data-nav-glass
                     aria-label="Sections"
                     strength="strong"
-                    blur="strong"
+                    blur="none"
+                    style={{ backgroundColor: '#050d0c' }}
                     className="flex w-full items-center justify-between rounded-2xl px-1.5 py-1"
                 >
                     <button
