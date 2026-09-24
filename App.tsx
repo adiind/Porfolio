@@ -330,9 +330,6 @@ const PortfolioApp: React.FC = () => {
     };
   }, [hasBlockingOverlay]);
 
-  const modeRef = useRef<TimelineMode>(mode);
-  useEffect(() => { modeRef.current = mode; }, [mode]);
-
   const scrollMilestonesRef = useRef<Set<number>>(new Set());
 
   const trackScrollDepth = useCallback((container: HTMLDivElement, nextScrollTop: number) => {
@@ -400,22 +397,18 @@ const PortfolioApp: React.FC = () => {
   const canHover = mode !== 'intro' && !isAnimating && !isScrolling;
 
   const handleHover = useCallback((id: string | null) => {
-    if (modeRef.current === 'intro' || isAnimatingRef.current || isScrollingRef.current) return;
+    if (id !== null && (isAnimatingRef.current || isScrollingRef.current)) return;
     setHoveredId(id);
   }, []);
 
   const handleLaneHover = useCallback((lane: number | null) => {
-    if (modeRef.current === 'intro' || isAnimatingRef.current || isScrollingRef.current) return;
+    if (lane !== null && (isAnimatingRef.current || isScrollingRef.current)) return;
     setHoveredLane(lane);
   }, []);
-
-  // Track mouse position for hover detection after scroll (tracked globally)
-  const mousePositionRef = useRef<{ x: number; y: number } | null>(null);
 
   // Track mouse position globally for logic AND spotlight
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      mousePositionRef.current = { x: e.clientX, y: e.clientY };
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
     };
@@ -423,98 +416,13 @@ const PortfolioApp: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
   }, [mouseX, mouseY]);
 
-  // Clear hover during animation or intro mode only
-  // DO NOT clear during scroll - this causes jarring card collapse
+  // Scrolling only clears a border/bookmark highlight; it never opens a card.
   useEffect(() => {
-    if (isAnimating || mode === 'intro') {
-      // Debug logging removed
-
+    if (isAnimating || isScrolling) {
       setHoveredId(null);
       setHoveredLane(null);
     }
-  }, [isAnimating, mode]);
-
-  // Use all timeline data (no filtering)
-
-  // Helper function to detect and hover item under mouse
-  const detectAndHoverItemUnderMouse = useCallback(() => {
-    // Debug logging removed
-
-    if (!mousePositionRef.current || !scrollContainerRef.current) return;
-    if (mode === 'intro' || isAnimatingRef.current || isScrollingRef.current) {
-      // Debug logging removed
-
-      return;
-    }
-
-    const container = scrollContainerRef.current;
-    const { x, y } = mousePositionRef.current;
-
-    // Use requestAnimationFrame to ensure DOM is settled
-    requestAnimationFrame(() => {
-      // Double-check scrolling state after frame
-      if (isScrollingRef.current) {
-        // Debug logging removed
-
-        return;
-      }
-
-      // Get element at mouse position
-      const elementAtPoint = document.elementFromPoint(x, y);
-      if (!elementAtPoint) {
-        // Debug logging removed
-
-        return;
-      }
-
-      // Find the timeline item element (closest parent with data-item-id)
-      let current: HTMLElement | null = elementAtPoint as HTMLElement;
-      while (current && current !== container) {
-        const itemId = current.getAttribute('data-item-id');
-        if (itemId) {
-          const item = TIMELINE_DATA.find(i => i.id === itemId);
-          if (item) {
-            // Debug logging removed
-
-            handleHover(item.id);
-            handleLaneHover(item.lane);
-            return;
-          }
-        }
-        current = current.parentElement;
-      }
-    });
-  }, [mode, handleHover, handleLaneHover]);
-
-  // When scroll stops, check which item is under the mouse and hover it
-  useEffect(() => {
-    if (!isScrolling && mode !== 'intro' && !isAnimating) {
-      // Delay to ensure scroll momentum has fully settled, DOM is stable, and state updates are complete
-      const timer = setTimeout(() => {
-        // Double-check we're still not scrolling and not animating
-        if (!isScrollingRef.current && !isAnimatingRef.current) {
-          detectAndHoverItemUnderMouse();
-        }
-      }, 150); // Wait for scroll to fully settle and React state to stabilize
-      return () => clearTimeout(timer);
-    }
-  }, [isScrolling, mode, isAnimating, detectAndHoverItemUnderMouse]);
-
-  // When animation completes (isAnimating goes from true to false), check for item under mouse
-  const prevIsAnimatingRef = useRef(isAnimating);
-  useEffect(() => {
-    const wasAnimating = prevIsAnimatingRef.current;
-    prevIsAnimatingRef.current = isAnimating;
-
-    // Animation just completed
-    if (wasAnimating && !isAnimating && mode !== 'intro') {
-      // Give extra time for Framer Motion animations to fully settle
-      const timer = setTimeout(() => {
-        detectAndHoverItemUnderMouse();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isAnimating, mode, detectAndHoverItemUnderMouse]);
+  }, [isAnimating, isScrolling]);
 
   // Find currently hovered item object for bookmark logic
   const hoveredItem = useMemo(() => {
@@ -786,7 +694,7 @@ const PortfolioApp: React.FC = () => {
           <LayoutGroup>
             <div
               className="hidden md:block relative w-full max-w-7xl mx-auto pt-6"
-              style={{ height: mode === 'fit' ? 'auto' : `${totalContainerHeight}px` }}
+              style={{ height: mode === 'fit' ? 'auto' : `${totalContainerHeight + 40}px` }}
             >
               {mode === 'fit' ? (
                 /* --- GRID MODE (Collapsed) - Aligned with Timeline Rail --- */
@@ -895,16 +803,16 @@ const PortfolioApp: React.FC = () => {
                   <TimelineRail
                     pixelsPerMonth={pixelsPerMonth}
                     totalHeight={totalContainerHeight}
-                    onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, getSectionTop('resume') + top)}
-                    currentScrollTop={Math.max(0, scrollTop - getSectionTop('resume'))}
+                    onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, getSectionTop('resume') + 40 + top)}
+                    currentScrollTop={Math.max(0, scrollTop - getSectionTop('resume') - 40)}
                     hoveredItem={hoveredItem}
                   />
 
                   {/* Content & Background Wrapper */}
-                  <div className="absolute top-0 left-28 md:left-36 right-4 md:right-0 bottom-0">
+                  <div className="absolute top-10 left-28 md:left-36 right-4 md:right-0 bottom-0">
 
                     {/* Column Headers (Timeline Mode) */}
-                    <div className="absolute top-0 left-0 right-0 h-10 z-20 pointer-events-none flex">
+                    <div className="absolute -top-10 left-0 right-0 h-10 z-20 pointer-events-none flex">
                       {/* Education */}
                       <div className="absolute left-0 w-[33%] pl-2">
                         <h2 className="text-[10px] uppercase tracking-widest font-bold text-rose-400 flex items-center gap-2">
