@@ -108,13 +108,13 @@ const ProjectsSection: React.FC = () => {
     }, [activeProject]);
 
     // CuttingMatSurface intentionally fills its parent. Measure this variable-
-    // height section locally so the grid can grow/shrink without clipping the
-    // mat, its lower ruler, or the final project row.
+    // height section from its flow layout, not preview overflow. Hover previews
+    // have fixed grid slots; only filters, content, and viewport changes resize it.
     useEffect(() => {
         const content = matContentRef.current;
         if (!content) return;
         const syncHeight = () => {
-            const nextHeight = Math.max(720, Math.ceil(content.scrollHeight));
+            const nextHeight = Math.max(720, Math.ceil(content.offsetHeight));
             setMatHeight((current) => current === nextHeight ? current : nextHeight);
         };
         const observer = new ResizeObserver(syncHeight);
@@ -135,7 +135,8 @@ const ProjectsSection: React.FC = () => {
                     <div data-selected-work-frame style={{ height: `${matHeight}px` }}>
                         {/* No backdrop filters inside this transformed surface; see verify-project-paint.mjs. */}
                         <CuttingMatSurface active density="comfortable" float={false}>
-                        <div ref={matContentRef} data-selected-work-mat className="min-w-0 p-5 pt-8 sm:p-8 sm:pt-10 md:p-12 lg:p-14">
+                        {/* Reserve the preview overhang below the final row once. */}
+                        <div ref={matContentRef} data-selected-work-mat style={{ paddingBottom: 112 }} className="min-w-0 p-5 pt-8 sm:p-8 sm:pt-10 md:p-12 lg:p-14">
                             <div className="rounded-2xl border border-white/[0.16] bg-[#04110f]/[0.88] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.38)] sm:p-6 md:p-7">
                                 <motion.h2
                                     initial={{ opacity: 0, y: 18 }}
@@ -203,18 +204,17 @@ const ProjectsSection: React.FC = () => {
                                 <AnimatePresence mode="popLayout" initial={false}>
                                     {visibleProjects.map((project, index) => (
                                         <motion.div
-                                            layout
+                                            layout="position"
                                             key={project.id}
                                             data-project-id={project.id}
                                             initial={{ opacity: 0, y: 18, scale: 0.98 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: -12, scale: 0.98 }}
                                             transition={{ duration: 0.24, delay: Math.min(index * 0.035, 0.14) }}
-                                            className={`min-w-0 ${activeIntent === 'all' && visibleProjects.length === 10 && index === 9 ? 'lg:col-start-2' : ''}`}
+                                            className={`relative min-w-0 hover:z-20 focus-within:z-20 ${activeIntent === 'all' && visibleProjects.length === 10 && index === 9 ? 'lg:col-start-2' : ''}`}
                                         >
                                             <ProjectCard
                                                 project={project}
-                                                index={index}
                                                 onClick={() => openProject(project)}
                                             />
                                         </motion.div>

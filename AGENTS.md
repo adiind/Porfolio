@@ -1,5 +1,7 @@
 ## Codex
 
+- 2026-09-24: Removed competing nested layout/auto-height animations from Selected Work cards; hover now uses one 192-to-280px tween in a fixed grid slot, with space below the last row and flow-only mat measurement. In real Chrome, the prior first hover overshot to 372px then shrank to 268px and regenerated the mat; the repair stayed monotonic to 280px with constant grid/mat dimensions and unchanged SVG across sampled frames. Checked desktop, 390px, filters, and final-row previews; production build and existing paint/project-wheel guards passed.
+
 - 2026-09-23: Reproduced the recorded Chrome paint dropout with real wheel scrolling (loaded card images and the mat disappeared while badges remained); isolated it with identical local builds, removed backdrop filtering from Selected Work cards/plaque and fixed header/navigation, and gave navigation opaque backing. Production build, project-wheel and new paint-contract guards passed; visually checked repeated desktop/mobile forward/reverse scrolling, hover expansion, and opaque Jarvis detail at Key Decisions. The earlier float-only change did not fix this; the mat animation was not perpetual.
 
 - 2026-09-23: Disabled float/tilt on the Selected Work cutting mat; build and computed-style checks passed, but the user recording subsequently demonstrated the paint dropout remained. The original claim of perpetual animation and sufficient visual verification was incorrect.

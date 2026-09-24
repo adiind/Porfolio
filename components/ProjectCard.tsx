@@ -1,11 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { ChevronDown, Trophy } from 'lucide-react';
 import { Project } from '../types/Project';
 
 interface Props {
     project: Project;
-    index: number;
     onClick: () => void;
 }
 
@@ -82,7 +81,7 @@ const splashColors = [
     'bg-purple-500/10 border-purple-500/30 text-purple-200',
 ];
 
-const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
+const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     const shouldReduceMotion = useReducedMotion();
@@ -132,200 +131,148 @@ const ProjectCard: React.FC<Props> = ({ project, index, onClick }) => {
         ? ['Glyph', 'A Body for AI']
         : project.hero.title.split('–').map((part) => part.trim());
 
+    // The preview grows over the grid rather than changing its row height.
+    // One explicit height tween owns the expansion; nested layout projection and
+    // height:auto previously overshot on first hover and resized the whole mat.
     return (
-        <motion.div
-            ref={cardRef}
-            layout
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{
-                duration: 0.5,
-                delay: index * 0.08,
-                ease: [0.32, 0.72, 0, 1],
-                layout: { duration: 0.4, ease: [0.32, 0.72, 0, 1] }
-            }}
-            style={{
-                rotateX: isHovered ? rotateX : 0,
-                rotateY: isHovered ? rotateY : 0,
-                transformStyle: 'preserve-3d',
-                perspective: 1000,
-            }}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={handleMouseLeave}
-            onFocus={() => setIsHovered(true)}
-            onBlur={handleMouseLeave}
-            onClick={onClick}
-            onKeyDown={handleKeyDown}
-            role="button"
-            tabIndex={0}
-            aria-label={`Open project ${project.hero.title}`}
-            data-project-card
-            className={`
-                group relative cursor-pointer overflow-hidden
-                border ${isHovered ? colors.borderHover : colors.border}
-                rounded-xl
-                transition-all duration-500 touch-manipulation
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]
-                ${isHovered ? `shadow-[0_0_40px_rgba(255,255,255,0.1)] ${colors.glow}` : 'shadow-lg'}
-            `}
-        >
-            {/* Solid Black Backing for Expanded State */}
-            {isHovered && <div className="absolute inset-0 bg-[#0a0a0a] z-0" />}
-
-            {/* Background Image */}
-            {hasImage && (
-                <>
-                    <div className="absolute inset-0 overflow-hidden z-0 rounded-xl">
-                        <motion.img
-                            src={project.heroImage}
-                            alt={project.hero.title}
-                            loading="lazy"
-                            decoding="async"
-                            className="absolute inset-0 w-full h-full object-cover origin-center"
-                            initial={{ scale: 1, opacity: 0.85 }}
-                            animate={{
-                                scale: isHovered ? 1.05 : 1,
-                                opacity: isHovered ? 0.6 : 0.85
-                            }}
-                            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                        />
-                        {/* Gradient overlays */}
-                        <div
-                            className="absolute inset-0 pointer-events-none transition-opacity duration-500"
-                            style={{ opacity: isHovered ? 0 : 0.5 }}
-                        >
-                            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/60 to-transparent" />
-                        </div>
-                        <div
-                            className="absolute inset-0 pointer-events-none transition-opacity duration-500"
-                            style={{ opacity: isHovered ? 1 : 0 }}
-                        >
-                            <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent translate-y-1/4 group-hover:translate-y-0 transition-transform duration-700 ease-out" />
-                        </div>
-                    </div>
-                </>
-            )}
-
-            {/* Fallback gradient background for cards without images */}
-            {!hasImage && (
-                <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} via-black to-black opacity-80`} />
-            )}
-
-            {/* Status Badge (Top Right) */}
-            <div className="absolute top-3 right-3 z-20">
-                <motion.span
-                    layout
-                    className={`inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${colors.status}`}
-                >
-                    <Trophy size={10} />
-                    {statusLabel}
-                </motion.span>
-            </div>
-
-            {/* Content Container */}
+        <div data-project-card-slot className="relative h-48">
             <motion.div
-                layout
+                ref={cardRef}
                 initial={false}
-                className="relative z-10 flex flex-col p-4 min-h-[192px]"
-                animate={{
-                    minHeight: isHovered ? 280 : 192,
+                animate={{ height: isHovered ? 280 : 192 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                    rotateX: isHovered ? rotateX : 0,
+                    rotateY: isHovered ? rotateY : 0,
+                    transformStyle: 'preserve-3d',
+                    perspective: 1000,
                 }}
-                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+                onMouseMove={handleMouseMove}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={handleMouseLeave}
+                onFocus={() => setIsHovered(true)}
+                onBlur={handleMouseLeave}
+                onClick={onClick}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
+                aria-label={`Open project ${project.hero.title}`}
+                data-project-card
+                className={`
+                    group absolute inset-x-0 top-0 cursor-pointer overflow-hidden bg-[#0a0a0a]
+                    border ${isHovered ? colors.borderHover : colors.border}
+                    rounded-xl
+                    transition-colors duration-200 touch-manipulation
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]
+                    ${isHovered ? `shadow-[0_0_40px_rgba(255,255,255,0.1)] ${colors.glow}` : 'shadow-lg'}
+                `}
             >
-                {/* Spacer to push content down when collapsed, align top when expanded */}
+                {/* Background Image */}
+                {hasImage && (
+                    <>
+                        <div className="absolute inset-0 overflow-hidden z-0 rounded-xl">
+                            <motion.img
+                                src={project.heroImage}
+                                alt={project.hero.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="absolute inset-0 w-full h-full object-cover origin-center"
+                                initial={{ scale: 1, opacity: 0.85 }}
+                                animate={{
+                                    scale: isHovered ? 1.05 : 1,
+                                    opacity: isHovered ? 0.6 : 0.85
+                                }}
+                                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                            />
+                            {/* Gradient overlays */}
+                            <div
+                                className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+                                style={{ opacity: isHovered ? 0 : 0.5 }}
+                            >
+                                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                            </div>
+                            <div
+                                className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+                                style={{ opacity: isHovered ? 1 : 0 }}
+                            >
+                                <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent translate-y-1/4 group-hover:translate-y-0 transition-transform duration-700 ease-out" />
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* Fallback gradient background for cards without images */}
+                {!hasImage && (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} via-black to-black opacity-80`} />
+                )}
+
+                {/* Status Badge (Top Right) */}
+                <div className="absolute top-3 right-3 z-20">
+                    <span
+                        className={`inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${colors.status}`}
+                    >
+                        <Trophy size={10} />
+                        {statusLabel}
+                    </span>
+                </div>
+
+                {/* Title and preview stay mounted, so first and repeat hover use the
+                    same geometry. Neither participates in the card's height. */}
                 <motion.div
                     initial={false}
-                    className="flex-1 min-h-[100px]"
-                    animate={{ minHeight: isHovered ? 0 : 100 }}
-                    transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-                />
-
-                {/* Title Section - Always at bottom when collapsed, top when expanded */}
-                <motion.div
-                    layout="position"
-                    className={isHovered ? 'mt-10' : 'mt-auto'}
+                    animate={{ y: isHovered ? 40 : 140 }}
+                    transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-x-4 top-0 z-10"
                 >
-                    <h3 data-project-card-title className={`break-words text-sm font-bold text-white leading-tight mb-0.5 transition-colors duration-300 ${isHovered ? colors.text : ''}`}>
+                    <h3 data-project-card-title className={`truncate text-sm font-bold text-white leading-tight mb-0.5 transition-colors duration-200 ${isHovered ? colors.text : ''}`}>
                         {titleParts[0]}
                     </h3>
                     {titleParts[1] && (
-                        <p data-project-card-title className="break-words text-[10px] font-medium uppercase leading-snug tracking-wide text-white/60">
+                        <p data-project-card-title className="truncate text-[10px] font-medium uppercase leading-snug tracking-wide text-white/60">
                             {titleParts[1]}
                         </p>
                     )}
                 </motion.div>
 
-                {/* Expanded Content - Only visible on hover */}
-                <AnimatePresence>
-                    {isHovered && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-                            className="overflow-hidden"
-                        >
-                            {/* One-liner description */}
-                            <motion.p
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                transition={{ delay: 0.05, duration: 0.25 }}
-                                className="mt-3 text-sm text-white/70 leading-relaxed line-clamp-2"
-                            >
-                                {project.hero.oneLiner}
-                            </motion.p>
-
-                            {/* Skills Pills */}
-                            {project.skills && project.skills.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ delay: 0.1, duration: 0.25 }}
-                                    className="mt-4 flex flex-wrap gap-1.5"
-                                >
-                                    {project.skills.slice(0, 4).map((skill, i) => (
-                                        <span
-                                            key={i}
-                                            className={`px-2 py-1 text-[10px] font-medium rounded-full border ${splashColors[i % splashColors.length]}`}
-                                        >
-                                            {skill.label}
-                                        </span>
-                                    ))}
-                                    {project.skills.length > 4 && (
-                                        <span className="px-2 py-1 text-[10px] font-medium rounded-full border border-white/20 text-white/60">
-                                            +{project.skills.length - 4}
-                                        </span>
-                                    )}
-                                </motion.div>
+                <motion.div
+                    data-project-card-preview
+                    aria-hidden={!isHovered}
+                    initial={false}
+                    animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 8 }}
+                    transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+                    className="pointer-events-none absolute inset-x-4 top-[82px] z-10"
+                >
+                    <p className="text-sm text-white/70 leading-relaxed line-clamp-2">
+                        {project.hero.oneLiner}
+                    </p>
+                    {project.skills && project.skills.length > 0 && (
+                        <div className="mt-3 flex max-h-14 flex-wrap gap-1.5 overflow-hidden">
+                            {project.skills.slice(0, 4).map((skill, i) => (
+                                <span key={skill.label} className={`max-w-full truncate px-2 py-1 text-[10px] font-medium rounded-full border ${splashColors[i % splashColors.length]}`}>
+                                    {skill.label}
+                                </span>
+                            ))}
+                            {project.skills.length > 4 && (
+                                <span className="px-2 py-1 text-[10px] font-medium rounded-full border border-white/20 text-white/60">
+                                    +{project.skills.length - 4}
+                                </span>
                             )}
-
-                            {/* Click indicator */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ delay: 0.15, duration: 0.2 }}
-                                className="mt-4 flex items-center gap-2 text-white/55"
-                            >
-                                <ChevronDown size={14} className={shouldReduceMotion ? '' : 'animate-bounce'} />
-                                <span className="text-[10px] uppercase tracking-widest">Click to explore</span>
-                            </motion.div>
-                        </motion.div>
+                        </div>
                     )}
-                </AnimatePresence>
-            </motion.div>
+                    <div className="mt-3 flex items-center gap-2 text-white/55">
+                        <ChevronDown size={14} />
+                        <span className="text-[10px] uppercase tracking-widest">Click to explore</span>
+                    </div>
+                </motion.div>
 
-            {/* 3D depth shadow */}
-            <motion.div
-                className="absolute inset-0 rounded-xl bg-black/20 blur-xl -z-10"
-                style={{ transform: 'translateZ(-50px) scale(0.95)' }}
-                animate={{ opacity: isHovered ? 0.8 : 0.3 }}
-            />
-        </motion.div>
+                {/* 3D depth shadow */}
+                <motion.div
+                    className="absolute inset-0 rounded-xl bg-black/20 blur-xl -z-10"
+                    style={{ transform: 'translateZ(-50px) scale(0.95)' }}
+                    animate={{ opacity: isHovered ? 0.8 : 0.3 }}
+                />
+            </motion.div>
+        </div>
     );
 };
 
