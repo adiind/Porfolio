@@ -1,7 +1,7 @@
 
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, LayoutGroup } from 'framer-motion';
+import { motion, useMotionValue, useTransform, LayoutGroup } from 'framer-motion';
 import { TIMELINE_DATA, CONFIG, SOCIAL_POSTS, REAL_USER_IMAGE } from './constants';
 import { getMonthDiff, parseDate, smoothScrollTo } from './utils';
 import TimelineEvent from './components/TimelineEvent';
@@ -9,8 +9,6 @@ import TimelineRail from './components/TimelineRail';
 import Hero from './components/Hero';
 import CaseStudyModal from './components/CaseStudyModal';
 import ProfileModal from './components/ProfileModal';
-import ProjectDetail from './components/ProjectDetail';
-import ProjectModal from './components/ProjectModal';
 import ExperienceDetail from './components/ExperienceDetail';
 import TinkerVerseModal from './components/TinkerVerseModal';
 import MobileTimeline from './components/MobileTimeline';
@@ -19,7 +17,6 @@ import BlogSection from './components/BlogSection';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
 import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
-import { Project } from './types/Project';
 import { ProjectsProvider, useProjects } from './context/ProjectsContext';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
@@ -57,11 +54,15 @@ const PortfolioApp: React.FC = () => {
 
   // Timeline Logic
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  // Deep link (/work/<id>) skips the intro hero so the project detail opens
-  // over the timeline/fit view instead of the intro flow.
-  const [mode, setMode] = useState<TimelineMode>(
-    INITIAL_WORK_PROJECT_ID || (typeof window !== 'undefined' && window.location.hash === '#writings') ? 'fit' : 'intro'
-  );
+  // Scrolling never changes the timeline layout. Zoom is an explicit control.
+  const [mode, setMode] = useState<TimelineMode>('fit');
+
+  const getSectionTop = useCallback((id: string) => {
+    const container = scrollContainerRef.current;
+    const section = document.getElementById(id);
+    if (!container || !section) return 0;
+    return section.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+  }, []);
   const [pixelsPerMonth, setPixelsPerMonth] = useState<number>(35);
   const [isAnimating, setIsAnimating] = useState(false);
   const isAnimatingRef = useRef(false);
@@ -115,9 +116,9 @@ const PortfolioApp: React.FC = () => {
     if (!INITIAL_WORK_PROJECT_ID) return;
     const projectsEl = document.getElementById('projects');
     if (projectsEl && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = Math.max(0, projectsEl.offsetTop - 50);
+      scrollContainerRef.current.scrollTop = Math.max(0, getSectionTop('projects') - 80);
     }
-  }, []);
+  }, [getSectionTop]);
 
   // Listen for future blog detail modal open/close from BlogSection
   useEffect(() => {
@@ -140,12 +141,12 @@ const PortfolioApp: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!showDirectWritings || mode === 'intro') return;
+    if (!showDirectWritings) return;
     const writingsEl = document.getElementById('writings');
     if (writingsEl && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = Math.max(0, writingsEl.offsetTop - 50);
+      scrollContainerRef.current.scrollTop = Math.max(0, getSectionTop('writings') - 80);
     }
-  }, [mode, showDirectWritings]);
+  }, [getSectionTop, showDirectWritings]);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   const handleCardExpand = useCallback((cardId: string | null) => {
@@ -230,17 +231,11 @@ const PortfolioApp: React.FC = () => {
     // Debug logging removed
 
 
-    // Reset scroll when going to intro
-    if (targetMode === 'intro' && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0;
-    }
-
     setMode(targetMode);
 
     if (targetMode === 'fit') {
       const totalMonths = getMonthDiff(parseDate(CONFIG.startDate), parseDate(CONFIG.endDate));
       setPixelsPerMonth(Math.max((window.innerHeight - 200) / totalMonths, 2));
-      if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
     } else if (targetMode === 'normal') {
       setPixelsPerMonth(35);
     } else if (targetMode === 'detail') {
@@ -249,187 +244,6 @@ const PortfolioApp: React.FC = () => {
 
     finishModeTransition();
   }, [finishModeTransition, mode]);
-
-  const dismissIntroForTouchScroll = useCallback((source = 'touch_scroll') => {
-    if (mode !== 'intro' || isAnimatingRef.current) return;
-
-    trackEvent('timeline_mode_changed', {
-      from: 'intro',
-      to: 'fit',
-      source,
-    });
-
-    isAnimatingRef.current = true;
-    setIsAnimating(true);
-    setMode('fit');
-
-    const totalMonths = getMonthDiff(parseDate(CONFIG.startDate), parseDate(CONFIG.endDate));
-    setPixelsPerMonth(Math.max((window.innerHeight - 200) / totalMonths, 2));
-
-    finishModeTransition();
-  }, [finishModeTransition, mode]);
-
-  useEffect(() => {
-    const handleIntroKeyDown = (e: KeyboardEvent) => {
-      if (mode !== 'intro' || hasBlockingOverlay) return;
-
-      const target = e.target as HTMLElement | null;
-      if (e.defaultPrevented || target?.closest('[data-project-wheel]')) return;
-      const isFormField = target && ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'].includes(target.tagName);
-      if (isFormField) return;
-
-      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
-        e.preventDefault();
-        dismissIntroForTouchScroll('keyboard');
-      }
-    };
-    window.addEventListener('keydown', handleIntroKeyDown);
-    return () => window.removeEventListener('keydown', handleIntroKeyDown);
-  }, [mode, hasBlockingOverlay, dismissIntroForTouchScroll]);
-
-  const scrollTimelineBy = useCallback((deltaY: number, baseScrollTop?: number) => {
-    const container = scrollContainerRef.current;
-    if (!container || deltaY === 0) return 0;
-
-    const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
-    const startScrollTop = baseScrollTop ?? container.scrollTop;
-    const nextScrollTop = Math.min(maxScrollTop, Math.max(0, startScrollTop + deltaY));
-    container.scrollTop = nextScrollTop;
-    return nextScrollTop - startScrollTop;
-  }, []);
-
-  const introTouchRef = useRef<{
-    startX: number;
-    startY: number;
-    scrollTop: number;
-    dismissedIntro: boolean;
-  } | null>(null);
-  const timelinePointerRef = useRef<{
-    startY: number;
-    scrollTop: number;
-    hasDragged: boolean;
-  } | null>(null);
-  const introPointerRef = useRef<{
-    startX: number;
-    startY: number;
-    scrollTop: number;
-    dismissedIntro: boolean;
-  } | null>(null);
-
-  const handleIntroTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (mode !== 'intro' || isAnimatingRef.current || hasBlockingOverlay) {
-      introTouchRef.current = null;
-      return;
-    }
-
-    const touch = e.touches[0];
-    if (!touch) return;
-
-    introTouchRef.current = {
-      startX: touch.clientX,
-      startY: touch.clientY,
-      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
-      dismissedIntro: false,
-    };
-  }, [hasBlockingOverlay, mode]);
-
-  const handleIntroTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    const gesture = introTouchRef.current;
-    if (!gesture || mode !== 'intro' || hasBlockingOverlay) return;
-
-    const touch = e.touches[0];
-    if (!touch) return;
-
-    const deltaY = gesture.startY - touch.clientY;
-    const deltaX = Math.abs(touch.clientX - gesture.startX);
-    const isIntentionalVerticalSwipe = deltaY > SCROLL_THRESHOLD && deltaY > deltaX * 1.1;
-    if (!isIntentionalVerticalSwipe) return;
-
-    if (!gesture.dismissedIntro) {
-      gesture.dismissedIntro = true;
-      dismissIntroForTouchScroll('touch_swipe');
-    }
-
-    scrollTimelineBy(deltaY, gesture.scrollTop);
-  }, [dismissIntroForTouchScroll, scrollTimelineBy, hasBlockingOverlay, mode]);
-
-
-  const handleIntroTouchEnd = useCallback(() => {
-    introTouchRef.current = null;
-  }, []);
-
-  const handleIntroPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType !== 'mouse' || mode !== 'intro' || isAnimatingRef.current || hasBlockingOverlay) {
-      introPointerRef.current = null;
-      return;
-    }
-
-    introPointerRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
-      dismissedIntro: false,
-    };
-  }, [hasBlockingOverlay, mode]);
-
-  const handleIntroPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const gesture = introPointerRef.current;
-    if (!gesture || mode !== 'intro' || hasBlockingOverlay) return;
-
-    const deltaY = gesture.startY - e.clientY;
-    const deltaX = Math.abs(e.clientX - gesture.startX);
-    const isIntentionalVerticalDrag = deltaY > SCROLL_THRESHOLD && deltaY > deltaX * 1.1;
-    if (!isIntentionalVerticalDrag) return;
-
-    e.preventDefault();
-
-    if (!gesture.dismissedIntro) {
-      gesture.dismissedIntro = true;
-      dismissIntroForTouchScroll('pointer_drag');
-    }
-
-    scrollTimelineBy(deltaY, gesture.scrollTop);
-  }, [dismissIntroForTouchScroll, scrollTimelineBy, hasBlockingOverlay, mode]);
-
-  const handleIntroPointerEnd = useCallback(() => {
-    introPointerRef.current = null;
-  }, []);
-
-  const handleTimelinePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const isMobileScrollViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
-    if (!isMobileScrollViewport || e.pointerType !== 'mouse' || mode === 'intro' || hasBlockingOverlay || isAnimatingRef.current) {
-      timelinePointerRef.current = null;
-      return;
-    }
-
-    timelinePointerRef.current = {
-      startY: e.clientY,
-      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
-      hasDragged: false,
-    };
-  }, [hasBlockingOverlay, mode]);
-
-  const handleTimelinePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const gesture = timelinePointerRef.current;
-    if (!gesture || mode === 'intro' || hasBlockingOverlay) return;
-
-    const deltaY = gesture.startY - e.clientY;
-    if (Math.abs(deltaY) <= SCROLL_THRESHOLD && !gesture.hasDragged) return;
-
-    e.preventDefault();
-    gesture.hasDragged = true;
-
-    if (deltaY < -SCROLL_THRESHOLD && gesture.scrollTop <= 10) {
-      handleZoom('intro', 'mobile_pointer_drag');
-      return;
-    }
-
-    scrollTimelineBy(deltaY, gesture.scrollTop);
-  }, [handleZoom, hasBlockingOverlay, mode, scrollTimelineBy]);
-
-  const handleTimelinePointerEnd = useCallback(() => {
-    timelinePointerRef.current = null;
-  }, []);
 
   // Listen for openProject events from the Hero project wheel.
   useEffect(() => {
@@ -446,46 +260,18 @@ const PortfolioApp: React.FC = () => {
         return;
       }
 
-      // For projects, scroll to the Selected Work section and click the project card
-      // First ensure we're in fit mode so the projects section is visible
-      if (mode === 'intro') {
-        handleZoom('fit', 'hero_project_link');
+      // The grid is already mounted; opening a project needs no timed handoff.
+      const projectCard = document.querySelector(`[data-project-id="${id}"]`);
+      if (projectCard && scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = Math.max(0, getSectionTop('projects') - 80);
+        const clickableCard = projectCard.querySelector<HTMLElement>('[class*="cursor-pointer"]');
+        clickableCard?.click();
       }
-
-      // Wait for mode transition and scroll to the project
-      setTimeout(() => {
-        const projectCard = document.querySelector(`[data-project-id="${id}"]`);
-        const projectsSection = document.getElementById('projects');
-
-        if (projectCard && scrollContainerRef.current) {
-          // Scroll to the projects section first
-          const container = scrollContainerRef.current;
-          if (projectsSection) {
-            container.scrollTo({
-              top: projectsSection.offsetTop - 100,
-              behavior: 'smooth'
-            });
-          }
-
-          // After scroll completes, highlight and click the card
-          setTimeout(() => {
-            projectCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            // Add a brief highlight effect and then click
-            setTimeout(() => {
-              const clickableCard = projectCard.querySelector('[class*="cursor-pointer"]') as HTMLElement;
-              if (clickableCard) {
-                clickableCard.click();
-              }
-            }, 400);
-          }, 500);
-        }
-      }, mode === 'intro' ? 600 : 100);
     };
 
     window.addEventListener('openProject', handleOpenProject as EventListener);
     return () => window.removeEventListener('openProject', handleOpenProject as EventListener);
-  }, [handleOpenTimelineProject, handleZoom, mode]);
+  }, [getSectionTop, handleOpenTimelineProject]);
 
   const handleManualZoom = (direction: 'in' | 'out') => {
     trackEvent('timeline_zoom_clicked', {
@@ -501,121 +287,51 @@ const PortfolioApp: React.FC = () => {
     });
   };
 
-  // One scroll model: the hero hands off once to the inner portfolio flow;
-  // experience and work then use ordinary native scrolling in both
-  // directions. An upward boundary gesture returns to the hero.
-  const SCROLL_THRESHOLD = 25; // Intentional scroll threshold
-
-  const getSectionPositions = useCallback(() => {
-    const projectsEl = document.getElementById('projects');
-    return {
-      experiences: 0,
-      projects: projectsEl ? projectsEl.offsetTop - 100 : 0,
-    };
-  }, []);
-
-  const getCurrentSection = useCallback((scrollTop: number): ActiveSection => {
-    if (mode === 'intro') return 'profile';
-
-    const positions = getSectionPositions();
-    const viewportBuffer = window.innerHeight * 0.3;
-
-    if (scrollTop >= positions.projects - viewportBuffer) return 'projects';
-    return 'experiences';
-  }, [mode, getSectionPositions]);
+  const getCurrentSection = useCallback((position: number): ActiveSection => {
+    const threshold = position + (scrollContainerRef.current?.clientHeight ?? window.innerHeight) * 0.3;
+    if (showDirectWritings && threshold >= getSectionTop('writings')) return 'writings';
+    if (threshold >= getSectionTop('projects')) return 'projects';
+    if (threshold >= getSectionTop('resume')) return 'experiences';
+    return 'profile';
+  }, [getSectionTop, showDirectWritings]);
 
   useEffect(() => {
-    const handleGlobalWheel = (e: WheelEvent) => {
-      if (hasBlockingOverlay) return;
-
-      if (isAnimatingRef.current) {
-        e.preventDefault();
-        return;
-      }
-
-      const isScrollingDown = e.deltaY > SCROLL_THRESHOLD;
+    const handleShellWheel = (event: WheelEvent) => {
       const container = scrollContainerRef.current;
+      const target = event.target as HTMLElement | null;
+      if (!container || hasBlockingOverlay || event.defaultPrevented || event.ctrlKey || event.deltaY === 0
+        || container.contains(target) || target?.closest('[data-project-wheel]')) return;
 
-      if (mode === 'intro' && isScrollingDown) {
-        e.preventDefault();
-        dismissIntroForTouchScroll('wheel');
-        return;
-      }
-
-      if (mode !== 'intro' && container && e.deltaY < -SCROLL_THRESHOLD && container.scrollTop <= 1) {
-        e.preventDefault();
-        handleZoom('intro', 'wheel_boundary');
-        return;
-      }
-
-      if (
-        mode !== 'intro'
-        && container
-        && !container.contains(e.target as Node)
-        && !e.defaultPrevented
-      ) {
-        // Fixed shell chrome (header/sidebar) sits outside the scroll
-        // container. Forward its wheel deltas into the exact same flow so the
-        // page never stalls simply because the pointer followed a nav click.
-        e.preventDefault();
-        if (e.deltaY < -SCROLL_THRESHOLD && container.scrollTop <= 1) {
-          handleZoom('intro', 'wheel_boundary');
-        } else {
-          scrollTimelineBy(e.deltaY);
-        }
-      }
+      // Only fixed shell controls need forwarding. Within the page, the browser
+      // owns wheel/touch momentum and every section boundary is ordinary flow.
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? container.clientHeight : 1;
+      event.preventDefault();
+      container.scrollTop += event.deltaY * unit;
     };
-
-    window.addEventListener('wheel', handleGlobalWheel, { passive: false });
-
+    const handleShellKey = (event: KeyboardEvent) => {
+      const container = scrollContainerRef.current;
+      const target = event.target as HTMLElement | null;
+      if (!container || hasBlockingOverlay || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey
+        || container.contains(target) || target?.closest('input, textarea, select, [contenteditable="true"], [data-project-wheel]')) return;
+      const page = container.clientHeight * 0.875;
+      const delta = event.key === 'ArrowDown' ? 40 : event.key === 'ArrowUp' ? -40
+        : event.key === 'PageDown' ? page : event.key === 'PageUp' ? -page
+        : event.key === ' ' && !target?.closest('button, a') ? (event.shiftKey ? -page : page) : 0;
+      const destination = event.key === 'Home' ? 0 : event.key === 'End' ? container.scrollHeight : container.scrollTop + delta;
+      if (!delta && event.key !== 'Home' && event.key !== 'End') return;
+      event.preventDefault();
+      smoothScrollTo(container, destination);
+    };
+    window.addEventListener('wheel', handleShellWheel, { passive: false });
+    window.addEventListener('keydown', handleShellKey);
     return () => {
-      window.removeEventListener('wheel', handleGlobalWheel);
+      window.removeEventListener('wheel', handleShellWheel);
+      window.removeEventListener('keydown', handleShellKey);
     };
-  }, [mode, hasBlockingOverlay, handleZoom, dismissIntroForTouchScroll, scrollTimelineBy]);
+  }, [hasBlockingOverlay]);
 
-
-  // Scroll-back logic - Keeping enabled for normal->fit manual feel if at top, 
-  // but strictly checking boundaries to avoid annoyance.
-  const scrollBackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastScrollTopRef = useRef<number>(0);
-  const scrollStartTimeRef = useRef<number>(0);
   const modeRef = useRef<TimelineMode>(mode);
-
-  // Keep mode ref in sync
-  useEffect(() => {
-    modeRef.current = mode;
-  }, [mode]);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    // Initialize lastScrollTop to current position
-    lastScrollTopRef.current = container.scrollTop;
-
-    const handleScrollBack = () => {
-      const currentScrollTop = container.scrollTop;
-      const wasScrollingUp = currentScrollTop < lastScrollTopRef.current;
-      lastScrollTopRef.current = currentScrollTop;
-
-      // Reset scroll start time if scrolling down
-      if (!wasScrollingUp) {
-        scrollStartTimeRef.current = 0;
-        if (scrollBackTimeoutRef.current) clearTimeout(scrollBackTimeoutRef.current);
-        return;
-      }
-
-      // If we are in 'fit' mode, we might want to go back to 'intro' if we keep scrolling up? 
-      // Handled by global wheel listener mostly, but let's ensure we don't trap.
-    };
-
-    // We only restore the basic listeners if needed, but for now the global wheel matches user request best.
-    // Leaving this simplified/empty to avoid conflicting logic.
-    container.addEventListener('scroll', handleScrollBack, { passive: true });
-    return () => container.removeEventListener('scroll', handleScrollBack);
-  }, []);
-
-
+  useEffect(() => { modeRef.current = mode; }, [mode]);
 
   const scrollMilestonesRef = useRef<Set<number>>(new Set());
 
@@ -655,13 +371,8 @@ const PortfolioApp: React.FC = () => {
     }
     trackScrollDepth(e.currentTarget, nextScrollTop);
 
-    // On touch devices, let a deliberate scroll dismiss the intro hero
-    // without snapping the user back to the top of the timeline.
-    const isTouchViewport = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
-    if (isTouchViewport && mode === 'intro' && nextScrollTop > SCROLL_THRESHOLD) {
-      dismissIntroForTouchScroll('touch_scroll');
-    }
-  }, [dismissIntroForTouchScroll, mode, trackScrollDepth]);
+    setActiveSection(getCurrentSection(nextScrollTop));
+  }, [getCurrentSection, mode, trackScrollDepth]);
 
   useEffect(() => () => {
     if (scrollRafRef.current !== null) cancelAnimationFrame(scrollRafRef.current);
@@ -674,64 +385,14 @@ const PortfolioApp: React.FC = () => {
     }
   }, [mode]);
 
-  // Sync activeSection with mode
   useEffect(() => {
-    if (mode === 'intro') {
-      setActiveSection('profile');
-    } else {
-      // When switching to timeline from profile, default to experiences
-      setActiveSection((prev) => prev === 'profile' ? 'experiences' : prev);
-    }
-  }, [mode]);
-
-  // Intersection Observer for all sections
-  useEffect(() => {
-    if (mode === 'intro') return;
-
-    const projectsEl = document.getElementById('projects');
-    const writingsEl = document.getElementById('writings');
-
-    let projectsIntersecting = false;
-    let writingsIntersecting = false;
-
-    const updateActiveSection = () => {
-      if (writingsIntersecting) {
-        setActiveSection('writings');
-      } else if (projectsIntersecting) {
-        setActiveSection('projects');
-      } else {
-        setActiveSection('experiences');
-      }
+    const updateSection = () => {
+      if (scrollContainerRef.current) setActiveSection(getCurrentSection(scrollContainerRef.current.scrollTop));
     };
-
-    const projectsObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          projectsIntersecting = entry.isIntersecting;
-          updateActiveSection();
-        });
-      },
-      { rootMargin: '-40% 0px -40% 0px' }
-    );
-
-    const writingsObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          writingsIntersecting = entry.isIntersecting;
-          updateActiveSection();
-        });
-      },
-      { rootMargin: '-40% 0px -40% 0px' }
-    );
-
-    if (projectsEl) projectsObserver.observe(projectsEl);
-    if (writingsEl) writingsObserver.observe(writingsEl);
-
-    return () => {
-      projectsObserver.disconnect();
-      writingsObserver.disconnect();
-    };
-  }, [mode, showDirectWritings]);
+    updateSection();
+    window.addEventListener('resize', updateSection);
+    return () => window.removeEventListener('resize', updateSection);
+  }, [getCurrentSection]);
 
   // Simple hover handlers - block during animation, intro, or scrolling.
   // Read gating state from refs so these callbacks stay referentially stable
@@ -882,35 +543,10 @@ const PortfolioApp: React.FC = () => {
       mode,
     });
 
-    if (section === 'profile') {
-      handleZoom('intro', 'section_nav');
-    } else {
-      // If currently in intro, switch to fit mode first
-      if (mode === 'intro') {
-        handleZoom('fit', 'section_nav');
-        // Small delay to allow state to settle before scrolling request
-        setTimeout(() => {
-          if (section === 'experiences') {
-            if (scrollContainerRef.current) smoothScrollTo(scrollContainerRef.current, 0);
-          } else if (section === 'projects') {
-            const projectsEl = document.getElementById('projects');
-            if (projectsEl && scrollContainerRef.current) {
-              smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50); // Small buffer
-            }
-          }
-        }, 100);
-      } else {
-        // Already in timeline mode, just scroll
-        if (section === 'experiences') {
-          if (scrollContainerRef.current) smoothScrollTo(scrollContainerRef.current, 0);
-        } else if (section === 'projects') {
-          const projectsEl = document.getElementById('projects');
-          if (projectsEl && scrollContainerRef.current) {
-            smoothScrollTo(scrollContainerRef.current, projectsEl.offsetTop - 50);
-          }
-        }
-      }
-    }
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const id = section === 'experiences' ? 'resume' : section;
+    smoothScrollTo(container, Math.max(0, getSectionTop(id) - (section === 'profile' ? 0 : 80)));
   };
 
   return (
@@ -973,24 +609,24 @@ const PortfolioApp: React.FC = () => {
           project grid caused Chrome to drop the mat, images, and dialog backing. */}
       <header
         data-scroll-header
-        aria-hidden={mode === 'intro'}
-        inert={mode === 'intro' ? true : undefined}
-        className={`fixed left-0 right-0 top-0 z-50 hidden px-6 py-3 pointer-events-none md:block ${mode === 'intro' ? 'invisible' : 'visible'}`}
+        aria-hidden={activeSection === 'profile'}
+        inert={activeSection === 'profile' ? true : undefined}
+        className={`fixed left-0 right-0 top-0 z-50 hidden px-6 py-3 pointer-events-none md:block ${activeSection === 'profile' ? 'invisible' : 'visible'}`}
       >
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: mode === 'intro' ? 0 : 1 }}
-          transition={{ duration: 0.8 }}
-          className={`absolute inset-0 border-b border-white/15 bg-[#050d0c] ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          animate={{ opacity: activeSection === 'profile' ? 0 : 1 }}
+          transition={pageTransition}
+          className={`absolute inset-0 border-b border-white/15 bg-[#050d0c] ${activeSection === 'profile' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         />
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{
-            opacity: mode === 'intro' ? 0 : 1,
-            y: mode === 'intro' ? -20 : 0
+            opacity: activeSection === 'profile' ? 0 : 1,
+            y: activeSection === 'profile' ? -20 : 0
           }}
           transition={pageTransition}
-          className={`relative mx-auto flex max-w-6xl items-center justify-between gap-6 ${mode === 'intro' ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          className={`relative mx-auto flex max-w-6xl items-center justify-between gap-6 ${activeSection === 'profile' ? 'pointer-events-none' : 'pointer-events-auto'}`}
         >
           {/* Status Badge Header */}
           <button
@@ -1049,70 +685,10 @@ const PortfolioApp: React.FC = () => {
       {/* --- SECTION NAVIGATION RAIL --- */}
 
 
-      {/* --- HERO SECTION (Parallax Exit) --- */}
-      <motion.div
-        id="profile"
-        className="absolute inset-0 z-40 will-change-transform"
-        onTouchStart={handleIntroTouchStart}
-        onTouchMove={handleIntroTouchMove}
-        onTouchEnd={handleIntroTouchEnd}
-        onTouchCancel={handleIntroTouchEnd}
-        onPointerDown={handleIntroPointerDown}
-        onPointerMove={handleIntroPointerMove}
-        onPointerUp={handleIntroPointerEnd}
-        onPointerCancel={handleIntroPointerEnd}
-        aria-hidden={mode !== 'intro'}
-        inert={mode !== 'intro' ? true : undefined}
-        style={{ touchAction: mode === 'intro' ? 'pan-y' : 'auto' }}
-        animate={{
-          opacity: mode === 'intro' ? 1 : 0,
-          y: mode === 'intro' ? 0 : -150,
-          scale: mode === 'intro' ? 1 : 0.95,
-          pointerEvents: mode === 'intro' ? 'auto' : 'none',
-          zIndex: mode === 'intro' ? 40 : -1
-        }}
-        transition={pageTransition}
-      >
-        <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} onViewWork={() => handleNavigate('projects')} active={mode === 'intro' && !hasBlockingOverlay} />
-
-        {/* Plain conditional (no exit) so a frozen exit frame can never leave a
-            ghost hint with its pointer-events-auto button over the timeline. */}
-        {mode === 'intro' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="absolute bottom-8 left-0 right-0 z-[80] flex justify-center text-white/60 pointer-events-none"
-            >
-              <button
-                type="button"
-                onClick={() => dismissIntroForTouchScroll('keyboard')}
-                className="flex flex-col items-center gap-2 animate-bounce pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
-                style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
-                aria-label="Explore timeline"
-              >
-                <MousePointer2 size={16} />
-                <span className="text-[10px] uppercase tracking-widest">Scroll to Explore</span>
-              </button>
-            </motion.div>
-          )}
-      </motion.div>
-
-      {/* --- TIMELINE SECTION (Slide Up Entrance) --- */}
-      <motion.div
-        id="resume"
-        aria-hidden={mode === 'intro'}
-        inert={mode === 'intro' ? true : undefined}
-        className={`flex-1 relative w-full h-full will-change-transform ${mode === 'intro' ? 'hidden pointer-events-none' : 'block'}`}
-        animate={{
-          opacity: mode === 'intro' ? 0 : 1,
-          y: mode === 'intro' ? '80vh' : 0,
-          scale: mode === 'intro' ? 0.98 : 1
-        }}
-        transition={pageTransition}
-      >
+      {/* Hero, experience, and work share one native scroll viewport. */}
+      <div className="flex-1 min-h-0 relative w-full">
         {/* Zoom Controls - Desktop only */}
-        <div className="hidden md:flex absolute top-24 right-6 flex-col gap-2 z-40">
+        <div className={`${activeSection === 'experiences' && !hasBlockingOverlay ? 'hidden md:flex' : 'hidden'} fixed top-24 right-6 flex-col gap-2 z-40`}>
           <button
             onClick={() => handleManualZoom('in')}
             className="p-2 rounded-full border transition-all bg-black/40 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
@@ -1157,15 +733,28 @@ const PortfolioApp: React.FC = () => {
           role="main"
           tabIndex={-1}
           onScroll={handleScroll}
-          onPointerDown={handleTimelinePointerDown}
-          onPointerMove={handleTimelinePointerMove}
-          onPointerUp={handleTimelinePointerEnd}
-          onPointerCancel={handleTimelinePointerEnd}
           className={`relative h-full overflow-x-hidden no-scrollbar ${hasBlockingOverlay ? 'overflow-y-hidden' : 'overflow-y-auto'}`}
           style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorY: 'contain', touchAction: 'pan-y' }}
         >
+          <section id="profile" className="relative isolate h-[100svh] min-h-[580px] w-full">
+            <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} onViewWork={() => handleNavigate('projects')} active={activeSection === 'profile' && !hasBlockingOverlay} />
+            <div className="absolute bottom-8 left-0 right-0 z-40 flex justify-center text-white/60 pointer-events-none">
+              <button
+                type="button"
+                onClick={() => handleNavigate('experiences')}
+                className="flex flex-col items-center gap-2 pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+                style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
+                aria-label="Explore timeline"
+              >
+                <MousePointer2 size={16} />
+                <span className="text-[10px] uppercase tracking-widest">Scroll to Explore</span>
+              </button>
+            </div>
+          </section>
+
+          <section id="resume" className="relative flow-root pt-20">
           {/* Mobile Layout - Stacked Sections */}
-          <div className="block md:hidden mt-[150px] pb-6">
+          <div className="block md:hidden pt-6 pb-6">
             <MobileTimeline
               items={TIMELINE_DATA}
               analyticsActive={!hasBlockingOverlay}
@@ -1178,17 +767,12 @@ const PortfolioApp: React.FC = () => {
                 while the imagery-heavy Selected Work section is in view so it
                 never obscures project media. */}
             <div
-              className={`fixed bottom-4 right-4 z-50 transition-opacity duration-300 ${mode !== 'intro' && activeSection !== 'projects' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-              aria-hidden={mode === 'intro' || activeSection === 'projects'}
+              className={`fixed bottom-4 right-4 z-50 transition-opacity duration-300 ${activeSection === 'experiences' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              aria-hidden={activeSection !== 'experiences'}
             >
               <button
-                onClick={() => {
-                  if (scrollContainerRef.current) {
-                    scrollContainerRef.current.scrollTop = 0;
-                  }
-                  handleZoom('intro', 'mobile_home');
-                }}
-                tabIndex={mode !== 'intro' && activeSection !== 'projects' ? 0 : -1}
+                onClick={() => handleNavigate('profile')}
+                tabIndex={activeSection === 'experiences' ? 0 : -1}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white/90 shadow-lg shadow-black/40 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
                 aria-label="Back to top"
               >
@@ -1201,7 +785,7 @@ const PortfolioApp: React.FC = () => {
           {/* Desktop Layout */}
           <LayoutGroup>
             <div
-              className="hidden md:block relative w-full max-w-7xl mx-auto mt-[160px]"
+              className="hidden md:block relative w-full max-w-7xl mx-auto pt-6"
               style={{ height: mode === 'fit' ? 'auto' : `${totalContainerHeight}px` }}
             >
               {mode === 'fit' ? (
@@ -1311,8 +895,8 @@ const PortfolioApp: React.FC = () => {
                   <TimelineRail
                     pixelsPerMonth={pixelsPerMonth}
                     totalHeight={totalContainerHeight}
-                    onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, top)}
-                    currentScrollTop={scrollTop}
+                    onYearClick={(top) => smoothScrollTo(scrollContainerRef.current!, getSectionTop('resume') + top)}
+                    currentScrollTop={Math.max(0, scrollTop - getSectionTop('resume'))}
                     hoveredItem={hoveredItem}
                   />
 
@@ -1391,6 +975,7 @@ const PortfolioApp: React.FC = () => {
               )}
             </div>
           </LayoutGroup>
+          </section>
 
           {/* --- PROJECTS SECTION --- */}
           <ProjectsSection />
@@ -1399,13 +984,13 @@ const PortfolioApp: React.FC = () => {
           {showDirectWritings && <BlogSection />}
 
         </div>
-      </motion.div>
+      </div>
 
       {/* --- VERTICAL NAVIGATION --- */}
       <VerticalNavbar
-        activeSection={mode === 'intro' ? 'profile' : activeSection}
+        activeSection={activeSection}
         onNavigate={handleNavigate}
-        mode={mode}
+        mode={activeSection === 'profile' ? 'intro' : mode}
         isHidden={hasBlockingOverlay}
       />
     </div>

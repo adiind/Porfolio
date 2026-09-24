@@ -51,23 +51,6 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
   const handleViewWork = () => {
     trackEvent('hero_cta_clicked', { cta: 'selected_work' });
     onViewWork?.();
-    // Rescue hatch: App drives intro→projects with a smooth scroll that can
-    // stall on mobile (the app's own section nav hits the same path). If the
-    // Selected Work section hasn't moved shortly after the handoff and is
-    // still below the fold, jump there instantly instead of leaving the
-    // visitor stranded at the top of the timeline.
-    window.setTimeout(() => {
-      const projects = document.getElementById('projects');
-      if (!projects) return;
-      const firstTop = projects.getBoundingClientRect().top;
-      window.setTimeout(() => {
-        const secondTop = projects.getBoundingClientRect().top;
-        const stalled = Math.abs(secondTop - firstTop) < 4;
-        if (stalled && secondTop > window.innerHeight) {
-          projects.scrollIntoView({ block: 'start' });
-        }
-      }, 350);
-    }, 900);
   };
 
   return (
