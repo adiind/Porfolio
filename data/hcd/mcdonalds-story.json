@@ -1,9 +1,9 @@
 {
   "projectId": "mcdonalds-interaction-design",
   "accent": "mcdonalds",
-  "label": "Northwestern EDI · Team project",
+  "label": "Northwestern EDI · Project with McDonald's",
   "title": "Squad Up",
-  "proposition": "A shared ordering concept that lets a group join, choose, pay, and get ready without one person managing everyone.",
+  "proposition": "A group-ordering experience designed with McDonald's through human-centered research, journey mapping, and prototyping.",
   "context": "A group order starts before checkout. People are still arriving, changing plans, choosing food, and figuring out who owes what.",
   "heroNotes": [
     { "id": "mcd-hero-shared", "text": "One shared order.", "tone": "yellow", "rotation": -0.8 },
@@ -159,5 +159,5 @@
       "groups": []
     }
   ],
-  "closingContext": "Student team project created at Northwestern EDI using McDonald’s ordering as the design context; not affiliated with or shipped by McDonald’s."
+  "closingContext": "Human-centered design project developed with McDonald's through Northwestern EDI. The team designed and prototyped a group-ordering experience."
 }

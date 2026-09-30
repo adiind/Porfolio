@@ -15,7 +15,7 @@ import MobileTimeline from './components/MobileTimeline';
 import ProjectsSection from './components/ProjectsSection';
 import BlogSection from './components/BlogSection';
 import VerticalNavbar from './components/VerticalNavbar'; // Added
-import { Maximize, Minimize, MousePointer2, Plus, Minus, Home } from 'lucide-react';
+import { Maximize, Minimize, ChevronDown, Plus, Minus, Home } from 'lucide-react';
 import { TimelineMode, CaseStudy, TimelineItem } from './types';
 import { ProjectsProvider, useProjects } from './context/ProjectsContext';
 // Background removed for performance
@@ -646,15 +646,15 @@ const PortfolioApp: React.FC = () => {
         >
           <section id="profile" className="relative isolate h-[100svh] min-h-[580px] w-full">
             <Hero onOpenProfile={() => handleOpenProfile('hero_avatar')} onViewWork={() => handleNavigate('projects')} active={activeSection === 'profile' && !hasBlockingOverlay} />
-            <div className="absolute bottom-8 left-0 right-0 z-40 flex justify-center text-white/60 pointer-events-none">
+            <div className="absolute bottom-5 left-0 right-0 z-40 flex justify-center text-white/75 pointer-events-none lg:bottom-8 lg:text-white/60">
               <button
                 type="button"
                 onClick={() => handleNavigate('experiences')}
-                className="flex flex-col items-center gap-2 pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+                className="flex min-h-11 flex-row items-center gap-2 rounded-full border border-white/15 bg-[#04110f]/85 px-4 py-2 text-[10px] uppercase tracking-[0.16em] shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-sm pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 lg:flex-col lg:gap-2 lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:text-white/60 lg:shadow-none lg:backdrop-blur-0"
                 style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
                 aria-label="Explore timeline"
               >
-                <MousePointer2 size={16} />
+                <ChevronDown size={16} />
                 <span className="text-[10px] uppercase tracking-widest">Scroll to Explore</span>
               </button>
             </div>

@@ -173,7 +173,7 @@ const TimelineEvent: React.FC<Props> = ({
           {item.logoUrl && (
             <img
               src={item.logoUrl}
-              className="absolute top-3 left-3 w-6 h-6 object-contain opacity-80"
+              className={`absolute top-3 left-3 w-6 h-6 object-contain ${item.id === 'self-xyz' ? 'rounded bg-white p-0.5' : 'opacity-80'}`}
               alt={`${item.company ?? item.title} logo`}
             />
           )}
@@ -207,6 +207,15 @@ const TimelineEvent: React.FC<Props> = ({
   const height = getLogarithmicHeight(monthsFromTop, durationMonths, totalMonths, totalHeight, isZoomedOut ? 80 : 100);
 
   const getStyles = () => {
+    if (item.themeColor === 'green') {
+      return {
+        glass: 'bg-[#00ffb6]/10 border-t-[#00ffb6]/30 border-[#00ffb6]/10 shadow-[0_4px_30px_rgba(0,255,182,0.05)]',
+        hoverGlass: 'hover:bg-[#00ffb6]/15 hover:border-[#00ffb6]/35 hover:shadow-[0_0_30px_rgba(0,255,182,0.12)]',
+        text: 'text-[#d5fff2]',
+        subtext: 'text-[#00ffb6]/80',
+        icon: 'text-[#00ffb6]'
+      };
+    }
     if (item.type === 'foundational') {
       return {
         glass: 'bg-emerald-500/20 border-t-emerald-400/30 border-emerald-500/10 shadow-[0_4px_30px_rgba(16,185,129,0.05)]',

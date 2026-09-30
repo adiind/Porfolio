@@ -75,6 +75,7 @@ export interface TimelineItem {
 
   // New Fields for Redesign
   logoUrl?: string;
+  detailLogoUrl?: string;
   skills?: { label: string; description: string }[]; // Skills/toolkit with descriptions
   themeColor?: 'red' | 'orange' | 'blue' | 'green';
 

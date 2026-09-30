@@ -1,5 +1,5 @@
 {
-  "lastSync": "2026-06-11T06:58:25.550Z",
+  "lastSync": "2026-09-04T07:12:57.971Z",
   "sprintName": "Sprint 1",
   "sprintId": "2e249d45-669f-812b-8063-d55959e2a423",
   "tasks": [
@@ -189,7 +189,7 @@
     {
       "id": "37c49d45-669f-814b-84c8-d27f84be1352",
       "name": "Setup 7.5 Inch Monochrome eInk Display Support",
-      "status": "In Progress",
+      "status": "Testing",
       "priority": null,
       "assignee": null,
       "dueDate": null,
@@ -198,6 +198,25 @@
       "url": "https://app.notion.com/p/Setup-7-5-Inch-Monochrome-eInk-Display-Support-37c49d45669f814b84c8d27f84be1352",
       "createdTime": "2026-06-11T06:57:00.000Z",
       "lastModified": "2026-06-11T06:57:00.000Z",
+      "_original": {
+        "status": "In Progress"
+      }
+    },
+    {
+      "id": "3d149d45-author-about-me-milestone",
+      "name": "Direct slide authoring: About me milestone",
+      "status": "Testing",
+      "priority": "High",
+      "assignee": "Antigravity",
+      "dueDate": null,
+      "tags": [
+        "Slide Islands",
+        "Direct Authoring"
+      ],
+      "content": "Implement direct slide authoring with Blank and About me starters, element geometry manipulation, durable image uploads, SSRF protection, AI composition proposals, and offline presentation export.",
+      "url": null,
+      "createdTime": "2026-09-04T08:00:10.062Z",
+      "lastModified": "2026-09-04T08:00:10.063Z",
       "_original": {
         "status": "In Progress"
       }

@@ -4,6 +4,33 @@ import { TINKERVERSE_LOGO } from '../assets';
 
 export const TIMELINE_DATA: TimelineItem[] = [
   {
+    id: "self-xyz",
+    lane: 1,
+    title: "AI Product Manager (Intern)",
+    company: "Self",
+    companyUrl: "https://self.xyz",
+    headline: "Shaping agentic products around trust, clarity, and human control.",
+    type: "corporate",
+    subtype: 'role',
+    start: "2026-06-01",
+    end: "2026-08-31",
+    summary: "Worked across product thinking and hands-on development with engineers on multi-step agentic products, exploring how capable AI workflows can stay understandable and user-directed.",
+    bullets: [
+      "Partnered with developers to shape and build multiple agentic product experiences.",
+      "Contributed code to multi-step AI pipelines connecting tasks across product workflows.",
+      "Explored how autonomy, evaluation, and human checkpoints affect user trust and control."
+    ],
+    logoUrl: "/images/self-mark.svg",
+    detailLogoUrl: "/images/self-logo.svg",
+    themeColor: "green",
+    skills: [
+      { label: "AI Product Management", description: "Framing product direction for multi-step agentic experiences." },
+      { label: "Agentic Systems", description: "Connecting tasks through multi-step agent workflows." },
+      { label: "AI Evaluation", description: "Thinking through quality, reliability, and human checkpoints." },
+      { label: "Hands-on Development", description: "Contributing code alongside developers." }
+    ]
+  },
+  {
     id: "portfolio-website",
     lane: 2,
     title: "Portfolio V2",
@@ -87,10 +114,10 @@ export const TIMELINE_DATA: TimelineItem[] = [
         ]
       },
       {
-        title: "P&G Design Project",
-        subtitle: "Innovation Strategy",
-        summary: "Innovation strategy for a mature hair-care category.",
-        expandedSummary: "Exploring innovation in a mature, habit-driven hair-care category. Under NDA. Worked in a category where users already had strong preferences, making meaningful change difficult to introduce.",
+        title: "P&G Sponsored Design Project",
+        subtitle: "Human-Centered Product Innovation",
+        summary: "From field research and consumer insights to iteratively tested product concepts.",
+        expandedSummary: "Worked in a five-person Northwestern EDI team on a P&G-sponsored human-centered design project. Conducted 8 in-home and 16 central-site visits, synthesized consumer behaviors and unmet needs into opportunity areas, and developed and tested concepts and prototypes with consumer and stakeholder feedback.",
         pills: [
           { label: "Design Strategy", description: "Strategic innovation in mature markets." },
           { label: "User Research", description: "In-home and on-site user behavior analysis." },
@@ -98,10 +125,10 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Consumer Insights", description: "Understanding deep-rooted user habits." }
         ],
         details: [
-          "Worked in a highly saturated hair-care space where users are deeply conditioned to existing formats.",
-          "Studied why meaningful innovation is difficult in categories shaped by routine, expectation, and legacy design.",
-          "Conducted in-home and on-site user research to understand behavior beyond stated needs.",
-          "Built and iterated physical–digital prototypes within real-world brand and manufacturing constraints."
+          "Conducted 8 in-home and 16 central-site visits in a five-person graduate team.",
+          "Synthesized observed behaviors, routines, and unmet needs into opportunity areas and design requirements.",
+          "Developed concepts and physical-digital prototypes to explore product and experience possibilities.",
+          "Iteratively tested prototypes and incorporated consumer and stakeholder feedback."
         ],
         imageUrl: "/images/pg-design-project.jpg",
         skills: [
@@ -113,9 +140,9 @@ export const TIMELINE_DATA: TimelineItem[] = [
       },
       {
         title: "FamilySync – JPMorgan Chase Service Design Concept",
-        subtitle: "Service Design · Agentic Coordination",
-        summary: "A caregiver coordination concept exploring visible, consent-based autonomy across family logistics and shared payments.",
-        expandedSummary: "This Northwestern EDI service design project with JPMorgan Chase explored where agentic systems could take on real coordination work across care, money, logistics, and trust without hiding decisions from families.",
+        subtitle: "Human-Centered Service Design · Agentic Payments",
+        summary: "An agentic payments service for caregivers, developed with JPMorgan Chase through human-centered research and service design.",
+        expandedSummary: "This Northwestern EDI project with JPMorgan Chase used human-centered research and service blueprinting to design an agentic payments service for caregivers. We mapped family care, shared spending, payment handoffs, and consent, then tested autonomy settings through caregiving scenarios.",
         imageUrl: "/images/familysync_jpmorgan_chase.webp",
         projectId: "familysync-jpmorgan",
         pills: [
@@ -131,9 +158,9 @@ export const TIMELINE_DATA: TimelineItem[] = [
       },
       {
         title: "McDonald's – Group Ordering Interaction Design",
-        subtitle: "Interaction Design · Shared Ordering",
-        summary: "A shared-cart concept that lets a group coordinate one McDonald's order without one person managing every choice.",
-        expandedSummary: "This Northwestern EDI interaction design project explored how friends could join from a link, add their own items, see who added what, review the group order, and coordinate checkout without turning the experience into a busy social app.",
+        subtitle: "Human-Centered Interaction Design · Group Ordering",
+        summary: "A group-ordering experience designed with McDonald's through research, journey mapping, and prototyping.",
+        expandedSummary: "Developed with McDonald's through Northwestern EDI, this human-centered design project synthesized 4 site observations, 8 interviews, and 22 survey responses into a group-ordering experience. We designed and prototyped invitations, individual choices, shared carts, payment, and pickup as one connected journey.",
         imageUrl: "/images/mcdonalds_order.webp",
         projectId: "mcdonalds-interaction-design",
         pills: [

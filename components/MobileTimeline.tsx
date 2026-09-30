@@ -75,7 +75,8 @@ const MobileTimeline: React.FC<Props> = ({
         return new Date(b.start).getTime() - new Date(a.start).getTime();
     };
 
-    const getIcon = (type: string) => {
+    const getIcon = (type: string, themeColor?: string) => {
+        if (themeColor === 'green') return <Briefcase size={14} className="text-[#00ffb6]" />;
         switch (type) {
             case 'education': return <GraduationCap size={14} className="text-rose-400" />;
             case 'foundational': return <Sparkles size={14} className="text-emerald-400" />;
@@ -83,9 +84,10 @@ const MobileTimeline: React.FC<Props> = ({
         }
     };
 
-    const getCardStyle = (type: string) => {
+    const getCardStyle = (type: string, isSelf: boolean) => {
         // Added backdrop-blur for frosted glass effect
         const glassBase = "backdrop-blur-md bg-opacity-10";
+        if (isSelf) return `${glassBase} bg-[#00ffb6]/10 border-[#00ffb6]/25 hover:border-[#00ffb6]/45 hover:bg-[#00ffb6]/15`;
         switch (type) {
             case 'education':
                 return `${glassBase} bg-rose-900/40 border-rose-500/30 hover:border-rose-500/50`;
@@ -132,7 +134,7 @@ const MobileTimeline: React.FC<Props> = ({
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`w-full rounded-2xl border ${getCardStyle(item.type)} shadow-lg cursor-pointer active:scale-[0.99] transition-all relative overflow-hidden group mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80`}
+                className={`w-full rounded-2xl border ${getCardStyle(item.type, item.themeColor === 'green')} shadow-lg cursor-pointer active:scale-[0.99] transition-all relative overflow-hidden group mb-4 focus-visible:outline-none focus-visible:ring-2 ${item.themeColor === 'green' ? 'focus-visible:ring-[#00ffb6]/80' : 'focus-visible:ring-indigo-400/80'}`}
                 onClick={() => handleCardTap(item)}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -163,7 +165,7 @@ const MobileTimeline: React.FC<Props> = ({
                     <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex items-center gap-2">
                             <div className={`p-1.5 rounded-lg bg-black/60 border border-white/10 ${isExpanded ? 'scale-110 text-white' : 'text-white/70'} transition-all`}>
-                                {getIcon(item.type)}
+                                {getIcon(item.type, item.themeColor)}
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[10px] uppercase tracking-wider font-bold text-white/50">
@@ -187,7 +189,7 @@ const MobileTimeline: React.FC<Props> = ({
                             <h3 data-full-timeline-title className="font-bold text-white text-lg leading-tight">{item.title}</h3>
                             {/* Logo */}
                             {item.logoUrl && (
-                                <div className={`shrink-0 flex items-center justify-center ${item.id === 'ms-edi' ? 'min-w-[56px] pl-2' : 'w-8 h-8 rounded bg-white/5 p-0.5'}`}>
+                                <div className={`shrink-0 flex items-center justify-center ${item.id === 'ms-edi' ? 'min-w-[56px] pl-2' : `w-8 h-8 rounded p-0.5 ${item.id === 'self-xyz' ? 'bg-white' : 'bg-white/5'}`}`}>
                                     <img
                                         src={item.logoUrl}
                                         alt={`${item.company} logo`}

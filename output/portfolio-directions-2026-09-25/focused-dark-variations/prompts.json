@@ -1,0 +1,27 @@
+{
+  "tool": "Built-in image_gen",
+  "reference_image": "/Users/adi/Portfolio/Porfolio/output/portfolio-directions-2026-09-25/original-based/09-focused-dark.png",
+  "shared_prompt": "Create a revised website design image from the supplied image. This is one of five visual variations of direction 09, not a new portfolio concept. Preserve the exact identity of the image: dark green cutting mat on black; fine original ruler/grid; lime accents; same Adi multi-armed illustrated avatar; exact portfolio headline and true navigation/CTAs; the same large Glyph wearable photo with the dark caption plaque; compact project strip and narrow right-side controls. Keep the same overall screenshot framing, sophisticated deep-dark treatment, and direct visual relationship. Do not invent copy. No unrelated art, material, logo, metrics, dates or claim. Change only the specific composition element described below; everything else should closely follow the reference.",
+  "variations": [
+    {
+      "file": "01-bold-type.png",
+      "change": "Variation: increase typographic distinction and reduce competition. Place the real headline in two lines at upper-left with precise large/small scale contrast. Decrease the cutting mat grid contrast and show grid guides primarily at the outer edges. Give the actual Glyph image a larger and more immersive crop across most of the right two-thirds, leaving the existing avatar in the lower-left quadrant at same identity, a little smaller. Keep the lower three-item project strip and current actions, improve spacing and contrast only. Preserve the recognizable composition and keep navigation clear."
+    },
+    {
+      "file": "02-immersive-glyph.png",
+      "change": "Variation: make the actual Glyph hero photograph the clear focal point. Enlarge its image area to nearly 60% of the page, vertically extending within the mat, with a restrained cropped frame and a crisp dark caption bar. Retain headline, actions and original avatar together as a balanced compact identity cluster on the left; keep both visible. Keep dark green field, subtle grid and lime markers. Keep the lower project strip visible. Composition should resemble the same site with more dramatic art direction and deliberate photographic crop."
+    },
+    {
+      "file": "03-project-filmstrip.png",
+      "change": "Variation: emphasize selected-work navigation while retaining the original. Keep the left text and avatar arrangement close to reference. Make the Glyph feature panel slightly shorter and wider at upper-right, and transform the bottom project strip into a larger cinematic horizontal filmstrip with three actual project image crops, Glyph / Zero / FamilySync, linked by one thin lime baseline. Ensure the filmstrip remains below the main stage and does not intrude on headline. Preserve muted grid, black-green palette and narrow right rail."
+    },
+    {
+      "file": "04-open-mat.png",
+      "change": "Variation: create more breathing room. Increase the black margin around the rounded dark green mat so it feels framed and premium. Reduce grid density/contrast inside mat, retaining ruler edge and accurate drafting motif. Use broad negative space between upper-left headline/actions, the original avatar below, and the Glyph hero image at right. Preserve exact content, right rail and lower project strip, but with finer hairlines and less UI chrome. Do not use bright gradients; keep the material nearly matte and subtle."
+    },
+    {
+      "file": "05-stronger-lime.png",
+      "change": "Variation: refine lime into a more purposeful editorial signal color. Keep the exact reference composition, but use lime only to mark the selected Glyph thumbnail, the feature-image corner registration, and the primary 'View selected work' button. Let all secondary controls become neutral gray-white. Make featured Glyph photo slightly more luminous against the dark field, reduce mat line contrast in its center, preserve grid/rulers clearly at the perimeter, keep the maker avatar and all existing original project labels."
+    }
+  ]
+}

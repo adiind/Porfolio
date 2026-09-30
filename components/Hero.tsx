@@ -54,7 +54,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-full w-full pointer-events-none pt-20 pb-12 md:py-16">
+    <div className="relative flex h-full w-full flex-col items-center justify-between pointer-events-none px-5 pt-24 pb-12 sm:px-6 md:py-16 lg:px-0">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[#030504]" />
         <div
@@ -73,39 +73,39 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
 
       {/* HERO HEADLINE BLOCK — name + positioning statement + primary actions.
           This is deliberately the loudest thing in the first viewport. */}
-      <div className="relative z-50 w-full max-w-[820px] px-4 pointer-events-none sm:px-6">
+      <div className="relative z-50 w-full max-w-[820px] pointer-events-none">
         <div className="absolute inset-x-2 -top-12 -bottom-8 rounded-[3rem] bg-black/55 blur-3xl -z-10" />
 
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="max-w-[224px] text-left sm:max-w-[245px] lg:max-w-none lg:text-center"
+          className="w-full text-left lg:text-center"
         >
           <h1
-            className="text-2xl md:text-3xl font-normal tracking-tight text-white/95 mb-2 md:mb-3"
+            className="mb-2 text-xl font-normal tracking-tight text-white/95 sm:text-2xl md:mb-3 md:text-3xl"
             style={{ textShadow: '0 10px 26px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.55)' }}
           >
             Adi Agarwal
           </h1>
           <p
-            className="text-[2.35rem] leading-[1.04] sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white"
+            className="text-[clamp(2.2rem,6.5vw,4.5rem)] leading-[1.02] font-light tracking-tight text-white"
             style={{ textShadow: '0 18px 42px rgba(0,0,0,0.62), 0 3px 10px rgba(0,0,0,0.6)' }}
           >
             I make AI <span className="font-normal">tangible</span>.
           </p>
           <p
-            className="mt-3 max-w-[36rem] text-xs leading-relaxed text-white/72 sm:text-sm md:mt-4 md:text-base lg:mx-auto"
+            className="mt-3 max-w-[36rem] text-sm leading-relaxed text-white/72 sm:text-base md:mt-4 lg:mx-auto"
             style={{ textShadow: '0 6px 18px rgba(0,0,0,0.55)' }}
           >
             Product designer &amp; engineer — I turn invisible models into interfaces, devices, and services people can see, feel, and trust.
           </p>
 
-          <div className="pointer-events-auto mt-4 flex max-w-[224px] flex-wrap items-center justify-start gap-2 sm:max-w-[245px] md:mt-7 md:gap-3 lg:max-w-none lg:justify-center">
+          <div className="pointer-events-auto mt-5 flex w-full flex-wrap items-center justify-start gap-2 md:mt-7 md:gap-3 lg:justify-center">
             <button
               type="button"
               onClick={handleViewWork}
-              className="group inline-flex items-center gap-2 rounded-full bg-[#E5E55A] px-4 py-2.5 md:px-6 md:py-3 text-sm md:text-base font-semibold text-[#141600] shadow-[0_14px_40px_rgba(229,229,90,0.26)] transition-all duration-300 hover:bg-[#f0f570] hover:shadow-[0_18px_48px_rgba(229,229,90,0.38)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+              className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E5E55A] px-5 py-3 text-sm font-semibold text-[#141600] shadow-[0_14px_40px_rgba(229,229,90,0.26)] transition-all duration-300 hover:bg-[#f0f570] hover:shadow-[0_18px_48px_rgba(229,229,90,0.38)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 sm:w-auto sm:px-6 sm:text-base"
             >
               View selected work
               <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -115,7 +115,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackEvent('hero_cta_clicked', { cta: 'resume' })}
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-4 py-2.5 md:px-5 md:py-3 text-sm md:text-base font-medium text-white/90 backdrop-blur-md transition-all duration-300 hover:border-white/55 hover:bg-black/65 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-white/25 bg-black/55 px-3 py-2.5 text-sm font-medium text-white/90 backdrop-blur-md transition-all duration-300 hover:border-white/55 hover:bg-black/65 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 sm:flex-none sm:px-5 sm:py-3 sm:text-base"
             >
               <FileText size={15} aria-hidden="true" />
               Resume
@@ -125,11 +125,15 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackEvent('hero_cta_clicked', { cta: 'linkedin' })}
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-4 py-2.5 md:px-5 md:py-3 text-sm md:text-base font-medium text-white/90 backdrop-blur-md transition-all duration-300 hover:border-white/55 hover:bg-black/65 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-white/25 bg-black/55 px-3 py-2.5 text-sm font-medium text-white/90 backdrop-blur-md transition-all duration-300 hover:border-white/55 hover:bg-black/65 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 sm:flex-none sm:px-5 sm:py-3 sm:text-base"
             >
               <Linkedin size={15} aria-hidden="true" />
               LinkedIn
             </a>
+          </div>
+
+          <div className="pointer-events-auto mt-4 lg:hidden">
+            <GitHubActivity variant="inline" />
           </div>
         </motion.div>
       </div>
@@ -140,7 +144,7 @@ const Hero: React.FC<Props> = ({ onOpenProfile, onViewWork, active = true }) => 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.1, duration: 0.6, ease: "easeOut" }}
-        className="absolute bottom-[6.5rem] left-[10px] z-[70] flex pointer-events-auto sm:bottom-[4.5rem] sm:left-5 lg:bottom-9 lg:left-8 xl:left-12"
+        className="absolute bottom-[6.5rem] left-[10px] z-[70] hidden pointer-events-auto sm:bottom-[4.5rem] sm:left-5 lg:bottom-9 lg:left-8 lg:flex xl:left-12"
       >
         <GitHubActivity variant="compact" />
       </motion.div>

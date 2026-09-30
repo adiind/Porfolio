@@ -1,10 +1,10 @@
 {
   "projectId": "familysync-jpmorgan",
   "accent": "care",
-  "label": "Northwestern EDI · Team project",
+  "label": "Northwestern EDI · Project with JPMorgan Chase",
   "title": "FamilySync",
-  "proposition": "A family-care service concept that coordinates urgent handoffs without hiding consent or responsibility.",
-  "context": "When a child needs help, care is only part of the work. Families also juggle calendars, permissions, pickup, medical context, and constant updates.",
+  "proposition": "An agentic payments service for caregivers, designed with JPMorgan Chase through human-centered research and service design.",
+  "context": "Family care brings shared spending, payment approvals, and logistics into the same moment. FamilySync explores how an agentic service could coordinate those responsibilities while keeping families in control.",
   "role": "Service design · Research synthesis · Agentic interaction design",
   "heroNotes": [
     {

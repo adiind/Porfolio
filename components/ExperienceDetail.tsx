@@ -72,6 +72,7 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, ana
 
     // Theme colors based on item type
     const getAccentColor = () => {
+        if (item.themeColor === 'green') return 'emerald';
         if (item.themeColor === 'red') return 'rose';
         if (item.type === 'education') return 'rose';
         if (item.type === 'foundational') return 'emerald';
@@ -179,11 +180,11 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, ana
                                     className="flex-1 min-w-0"
                                 >
                                     <div className="flex items-center gap-3 mb-3">
-                                        {item.logoUrl && (
+                                        {(item.detailLogoUrl || item.logoUrl) && (
                                             <img
-                                                src={item.logoUrl}
+                                                src={item.detailLogoUrl || item.logoUrl}
                                                 alt={item.company}
-                                                className="w-8 h-8 object-contain"
+                                                className={`object-contain ${item.detailLogoUrl ? 'h-9 w-24 rounded-md bg-white px-2 py-1' : 'w-8 h-8'}`}
                                             />
                                         )}
                                         <div className="flex items-center gap-2 text-white/60 text-sm">

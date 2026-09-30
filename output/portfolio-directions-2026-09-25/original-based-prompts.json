@@ -1,0 +1,65 @@
+{
+  "base": "Use the provided ORIGINAL PORTFOLIO SCREENSHOT as the primary edit reference. This is an EVOLUTION OF THAT EXACT WEBSITE, not a replacement brand. Preserve its recognizable identity: deep green rounded cutting mat, thin drafting grid/ruler geometry, black surround, warm-white sans-serif typography, acid-lime accent, dark contained project plaques, the same multi-armed maker avatar and actual project imagery visible in the screenshot. Preserve the character's identity; reduce its prominence if the direction calls for it but do not invent a new portrait. Preserve the Glyph image content; do not substitute a ring, alien object, stock photo or abstract art. Only use original portfolio content and motifs. Output one polished landscape desktop website design image, 1536x1024, frontal screenshot with no browser or laptop frame. Exact main copy: 'Adi Agarwal', 'I make AI tangible.' Small role label may read 'AI Product Manager'. Actions: 'View selected work', 'Resume', 'LinkedIn'. Do not insert any new slogan or copy from the art-direction brief. Projects may be labelled Glyph / Prototype, Zero / Prototype, FamilySync / Concept. No invented dates, statistics, quotes or accomplishments. Refine visual hierarchy, scale, composition, interaction cues and craft to feel confident and considered. Retain direct visual ancestry to the supplied screenshot, not merely its colors. Do not print the direction name or instructions in the website. Specific variation: ",
+  "directions": [
+    {
+      "n": 1,
+      "slug": "refined-original",
+      "name": "Refined original",
+      "direction": "Keep the original centered composition and large rounded green cutting mat. Make it feel meticulously finished: reduce the density and brightness of grid marks, enlarge the existing heading modestly, align the primary actions precisely, and reduce the avatar to a compact personal signature in the lower left. Let the actual Glyph project image occupy a much larger clean right-hand area, with two restrained neighboring image previews and a beautiful narrow integrated caption. Rebalance the hero so the real work is the visual lead. Move the commit counter out of this first view. Retain the original right-side navigation rail. Composition should unmistakably be the same website refined by an excellent designer."
+    },
+    {
+      "n": 2,
+      "slug": "asymmetric-mat",
+      "name": "Asymmetric mat",
+      "direction": "Recompose the existing homepage as one deeply green cutting-mat surface with a bold asymmetric editorial arrangement, still the same brand. Left 40 percent: left-align the existing name, headline and actions, with large high-contrast sans typography and generous vertical spacing. Below those include the existing avatar at small scale and a quiet single-line experience strip self.xyz / Zomato / Udaan. Right 60 percent: a beautifully integrated large frameless crop of the ACTUAL Glyph wrist photograph from the reference, floating above the mat with two partially visible actual project images behind it. Fine lime drafting guides align the typography to the image corners. Keep the right navigation rail, do not turn this into a magazine or new brand."
+    },
+    {
+      "n": 3,
+      "slug": "project-orbit",
+      "name": "Project orbit",
+      "direction": "Evolve the original connected project carousel into the main sophisticated interaction. Preserve the dark-green cutting mat, existing headline at upper left, lime controls, and exact existing avatar small at lower center. On the right and across the middle compose three large image cards from the original portfolio along one broad shallow elliptical drafting arc: Glyph dominant, adjacent projects secondary. The arc echoes the circular construction geometry already printed on the mat, so the carousel feels native to the identity. Only three cards, beautiful optical perspective, calm coherent hierarchy, controlled shadows. Bottom-left a compact selected-project plaque with actual Glyph title, Prototype and Open project. Never overlap text or avatar. This is a refined version of the site's own project wheel, not a sci-fi orbit."
+    },
+    {
+      "n": 4,
+      "slug": "continuous-workbench",
+      "name": "Continuous workbench",
+      "direction": "Show a more continuous scrolling composition, within the same dark workshop visual system. Upper half retains the existing headline, actions, small avatar and green mat but with beautifully aligned typography. A luminous hairline lime path extends from the mat's ruler edge down into a compact horizontal experience band and then into three large project photographs visible at the bottom. Use actual section labels 'Experience' and 'Selected work', experience names self.xyz / Zomato / Udaan with no dates or metrics. The whole view is one intentional flow with a hierarchy from identity to experience to work. Thin rulers and grid extend seamlessly across the sections. Keep black exterior and right-side navigation rail. No new tagline, dashboard or decorative sculpture."
+    },
+    {
+      "n": 5,
+      "slug": "precision-drafting",
+      "name": "Precision drafting",
+      "direction": "Push the existing cutting-mat geometry toward an incredibly precise contemporary industrial-design portfolio. Rich black-green matte canvas with only a few meticulously placed ruler ticks, thin lime registration guides and circles. Existing heading large upper left, restrained existing avatar at bottom left. Main right-side project image is Glyph, elegantly cropped inside a thin rectangular drawing frame with one magnified detail inset of the SAME device from the reference, connected by one delicate guide. Two quiet annotation captions 'Glyph' and 'Prototype', no invented specifications. Lower edge contains aligned project tabs Glyph / Zero / FamilySync. This should feel beautifully engineered and typographically composed while visibly descending from the original cutting mat. Avoid instruction manual density or arbitrary wireframes."
+    },
+    {
+      "n": 6,
+      "slug": "layered-project-stage",
+      "name": "Layered project stage",
+      "direction": "Preserve the original black exterior, green mat, lime accents and dark translucent plaques, but compose them with extraordinary depth discipline. One large green mat sits almost frontal behind a clean floating image stage that features the original Glyph photo. Only three layers: mat, image stage, compact dark caption. Fine specular edge treatments, restrained material depth, a slight offset edge revealing the next actual project. Existing title stays upper left, actions below; existing avatar remains visible but smaller toward lower left. One narrow frosted dark green shelf across bottom carries Experience / Selected work / Profile navigation text and small project previews; retain the original vertical rail at right as well. Beautifully controlled lighting and hierarchy, no opaque chrome ribbons, no generic glass dashboard tiles."
+    },
+    {
+      "n": 7,
+      "slug": "curated-project-wall",
+      "name": "Curated project wall",
+      "direction": "Turn the existing green mat into a highly composed curated project wall, keeping the original identity. Left quarter is a calm personal column with existing name, headline, actions and small unchanged avatar. Right three-quarters contains a deliberately asymmetrical THREE-project arrangement: one large Glyph image above, two smaller companion project images below for Zero and FamilySync, each with just a short label and truthful Prototype or Concept status. Fine green mat ruler marks frame the composition rather than running over the images. Bold image scale, gorgeous margins, lime active-project underline, black paper-like caption backing. Strong personal portfolio rather than card-grid SaaS. Keep the original right navigation rail. No new photography or fictitious replacement projects."
+    },
+    {
+      "n": 8,
+      "slug": "daylight-workshop",
+      "name": "Daylight workshop",
+      "direction": "A LIGHT variant that still unmistakably belongs to the same original portfolio. Keep a large deep-green cutting mat as the central and dominant object covering at least 70 percent of the page, with a warm pale-gray outer page margin and sophisticated charcoal top navigation. Existing headline in warm white sits on the upper-left green mat, existing lime actions below. Actual Glyph image anchors right half and the original avatar remains a small signature near the lower left. Subtle soft daylight across the flat mat material, crisp cream ruler ticks, almost invisible grid, generous negative space. Bottom mat edge includes a slim project index with real names. No photographed desk, no stationery, no magazine serif type, no generic white SaaS landing page."
+    },
+    {
+      "n": 9,
+      "slug": "focused-dark",
+      "name": "Focused dark",
+      "direction": "Create a dramatically focused nocturnal version of the SAME workshop homepage. Green cutting mat emerges softly out of the black background, its edge and a few true drafting lines visible in desaturated forest green. Existing white headline is elegantly isolated in upper left. Lime CTA and right-side rail preserve identity. Main real Glyph photo is much larger, with precise contrast and a fine lime active-corner marker. Other real projects appear in a quiet horizontal filmstrip along the bottom, not orbiting. Original avatar is small but clearly identifiable at lower left. Make typography exceptionally crisp, flat and legible; dark planes rich rather than murky. Technical sophistication through careful reveal, cropping, depth and negative space. No neon glow, HUD, starfield, fabricated terminal or slogans."
+    },
+    {
+      "n": 10,
+      "slug": "spatial-workshop",
+      "name": "Spatial workshop",
+      "direction": "Evolve the existing mat into a subtle spatial portfolio canvas viewed almost straight on, NOT a tabletop scene. The same rounded green cutting mat has barely perceptible perspective and precise square grid guides. Three actual portfolio image planes rise a small controlled distance above it: Glyph largest, two restrained companions. Their corner registration marks align to the grid and a tiny pan cursor makes the spatial interaction understandable. Existing headline and actions remain perfectly flat in screen space at upper left, with the existing avatar smaller at lower left. Keep the original lime accent and dark right-side navigation rail. Exceptional real-time-web material craft, clean sophisticated composition and genuine portfolio content, without an app toolbar, unrelated abstract sculpture, blank huge initials or new visual identity."
+    }
+  ]
+}

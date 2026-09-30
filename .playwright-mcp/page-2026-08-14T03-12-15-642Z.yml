@@ -1,0 +1,281 @@
+- generic [ref=e3]:
+  - link "Skip to content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner:
+    - generic:
+      - button "View profile":
+        - generic:
+          - img "Adi Agarwal"
+        - generic:
+          - generic: Adi Agarwal
+          - generic: Tangible AI + product systems
+  - generic [ref=e5]:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img:
+              - generic:
+                - generic: "0"
+                - generic: "0"
+                - generic: "5"
+                - generic: "5"
+                - generic: "10"
+                - generic: "10"
+                - generic: "15"
+                - generic: "15"
+                - generic: "20"
+                - generic: "20"
+                - generic: "25"
+                - generic: "25"
+                - generic: "30"
+                - generic: "30"
+                - generic: "35"
+                - generic: "35"
+                - generic: "40"
+                - generic: "40"
+                - generic: "0"
+                - generic: "0"
+                - generic: "5"
+                - generic: "5"
+                - generic: "10"
+                - generic: "10"
+                - generic: "15"
+                - generic: "15"
+                - generic: "20"
+                - generic: "20"
+                - generic: "25"
+                - generic: "25"
+              - generic:
+                - generic: 15°
+                - generic: 30°
+                - generic: 45°
+                - generic: 60°
+              - generic:
+                - generic: SELF-HEALING CUTTING MAT
+                - generic: A2 GRID / 10 MM / 15-60 DEGREE GUIDES
+                - generic: ADI AGARWAL / WORKSHOP GRID
+      - generic [ref=e8]:
+        - heading "Adi Agarwal" [level=1] [ref=e9]
+        - paragraph [ref=e10]: I make AI tangible.
+        - paragraph [ref=e11]: Product designer & engineer — I turn invisible models into interfaces, devices, and services people can see, feel, and trust.
+        - generic [ref=e12]:
+          - button "View selected work" [ref=e13] [cursor=pointer]
+          - link "Resume" [ref=e16] [cursor=pointer]:
+            - /url: /Adi_Agarwal_Resume_2025.pdf
+          - link "LinkedIn" [ref=e20] [cursor=pointer]:
+            - /url: https://linkedin.com/in/adiind
+      - generic [ref=e25]:
+        - button "Analytics" [ref=e27] [cursor=pointer]
+        - button "Development" [ref=e33] [cursor=pointer]
+        - button "Design" [ref=e40] [cursor=pointer]
+        - button "Electronics" [ref=e50] [cursor=pointer]
+        - button "3D Printing" [ref=e57] [cursor=pointer]
+        - button "Analytics" [ref=e65] [cursor=pointer]
+        - button "Development" [ref=e71] [cursor=pointer]
+        - button "Design" [ref=e78] [cursor=pointer]
+        - button "Electronics" [ref=e88] [cursor=pointer]
+        - button "3D Printing" [ref=e95] [cursor=pointer]
+      - generic:
+        - generic:
+          - generic: Double diamond enthusiast
+          - button "View profile" [ref=e102] [cursor=pointer]:
+            - img "Adi Agarwal" [ref=e108]
+            - generic [ref=e109]: View Profile
+    - button "Explore timeline" [ref=e114] [cursor=pointer]:
+      - generic [ref=e117]: Scroll to Explore
+  - generic [ref=e118]:
+    - generic [ref=e119]:
+      - button "Zoom In" [ref=e120] [cursor=pointer]
+      - button "Zoom Out" [ref=e122] [cursor=pointer]
+      - button "Fit to Screen" [ref=e125] [cursor=pointer]
+    - main [ref=e131]:
+      - generic [ref=e132]:
+        - generic:
+          - generic [ref=e133] [cursor=pointer]: "2026"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e138] [cursor=pointer]: "2025"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e143] [cursor=pointer]: "2024"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e148] [cursor=pointer]: "2023"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e153] [cursor=pointer]: "2022"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e158] [cursor=pointer]: "2021"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e163] [cursor=pointer]: "2020"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e168] [cursor=pointer]: "2019"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e173] [cursor=pointer]: "2018"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e178] [cursor=pointer]: "2017"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+          - generic [ref=e183] [cursor=pointer]: "2016"
+          - generic: JUN
+          - generic: APR
+          - generic: OCT
+        - generic [ref=e188]:
+          - generic:
+            - generic:
+              - heading "Education" [level=2]
+            - generic:
+              - heading "Experience" [level=2]
+            - generic:
+              - heading "TinkerVerse" [level=2]
+          - button "Open MS Engineering Design Innovation" [ref=e189] [cursor=pointer]:
+            - img "MS Engineering Design Innovation" [ref=e191]
+            - generic [ref=e194]:
+              - heading "MS Engineering Design Innovation" [level=3] [ref=e195]
+              - paragraph [ref=e196]: Northwestern University | Segal Design Institute
+          - button "Open Senior Product Analyst" [ref=e197] [cursor=pointer]:
+            - img "Senior Product Analyst" [ref=e199]
+            - generic [ref=e202]:
+              - heading "Senior Product Analyst" [level=3] [ref=e203]
+              - paragraph [ref=e204]: Zomato
+          - generic "Open Jarvis Assistant" [ref=e205]:
+            - generic [ref=e206] [cursor=pointer]
+          - button "Open Product Analyst" [ref=e213] [cursor=pointer]:
+            - img "Product Analyst" [ref=e215]
+            - generic [ref=e218]:
+              - heading "Product Analyst" [level=3] [ref=e219]
+              - paragraph [ref=e220]: Udaan
+          - button "Open Product and Growth Analyst" [ref=e221] [cursor=pointer]:
+            - img "Product and Growth Analyst" [ref=e223]
+            - generic [ref=e226]:
+              - heading "Product and Growth Analyst" [level=3] [ref=e227]
+              - paragraph [ref=e228]: Schmooze
+          - button "Open Data Analyst · Ads & Supply Infrastructure" [ref=e229] [cursor=pointer]:
+            - img "Data Analyst · Ads & Supply Infrastructure" [ref=e231]
+            - generic [ref=e234]:
+              - heading "Data Analyst · Ads & Supply Infrastructure" [level=3] [ref=e235]
+              - paragraph [ref=e236]: Snapdeal
+          - button "Open TinkerVerse" [ref=e238] [cursor=pointer]:
+            - generic [ref=e239]:
+              - generic [ref=e240]:
+                - img "Zero - Second Brain AI Assistant" [ref=e241]
+                - generic [ref=e243]: Zero - Second Brain AI Assistant
+              - generic [ref=e245]:
+                - img "Jarvis – Voice-Controlled Smart Home Assistant" [ref=e246]
+                - generic [ref=e248]: Jarvis
+              - generic [ref=e250]:
+                - img "Plotter – Speech-to-Draw Machine" [ref=e251]
+                - generic [ref=e253]: Plotter
+            - generic [ref=e255]:
+              - generic [ref=e256]: 3 Projects
+              - heading "Founder & Creator" [level=3] [ref=e258]
+              - paragraph [ref=e259]: Tinker Verse
+          - button "Open B.Tech Civil Engineering + M.Sc. Biological Sciences" [ref=e260] [cursor=pointer]:
+            - img "B.Tech Civil Engineering + M.Sc. Biological Sciences" [ref=e262]
+            - generic [ref=e265]:
+              - heading "B.Tech Civil Engineering + M.Sc. Biological Sciences" [level=3] [ref=e266]
+              - paragraph [ref=e267]: BITS Pilani, Hyderabad Campus
+      - generic [ref=e269]:
+        - generic [ref=e270]:
+          - heading "Selected Work" [level=2] [ref=e271]
+          - paragraph [ref=e272]: Start with the capability you need to see.
+        - generic [ref=e273]:
+          - paragraph [ref=e274]: I want to see how Adi…
+          - group "Choose what you want to evaluate" [ref=e276]:
+            - button "Works across disciplines" [pressed] [ref=e277] [cursor=pointer]
+            - button "Makes AI tangible" [ref=e280] [cursor=pointer]
+            - button "Shapes the product" [ref=e282] [cursor=pointer]
+            - button "Builds the system" [ref=e284] [cursor=pointer]
+          - generic [ref=e286]:
+            - paragraph [ref=e287]: One person connecting research, interfaces, code, hardware, and physical craft.
+            - generic [ref=e288]: 10 projects
+        - generic [ref=e289]:
+          - 'button "Open project Glyph: A Body for AI" [ref=e291] [cursor=pointer]':
+            - 'img "Glyph: A Body for AI" [ref=e293]'
+            - generic [ref=e294]: Prototype
+            - generic [ref=e304]:
+              - heading "Glyph" [level=3] [ref=e305]
+              - paragraph [ref=e306]: A Body for AI
+          - button "Open project Zero - Second Brain AI Assistant" [ref=e309] [cursor=pointer]:
+            - img "Zero - Second Brain AI Assistant" [ref=e311]
+            - generic [ref=e312]: In Progress
+            - heading "Zero - Second Brain AI Assistant" [level=3] [ref=e323]
+          - button "Open project FamilySync – JPMorgan Chase Service Design Concept" [ref=e326] [cursor=pointer]:
+            - img "FamilySync – JPMorgan Chase Service Design Concept" [ref=e328]
+            - generic [ref=e329]: Concept
+            - generic [ref=e339]:
+              - heading "FamilySync" [level=3] [ref=e340]
+              - paragraph [ref=e341]: JPMorgan Chase Service Design Concept
+          - button "Open project McDonald's – Group Ordering Interaction Design" [ref=e344] [cursor=pointer]:
+            - img "McDonald's – Group Ordering Interaction Design" [ref=e346]
+            - generic [ref=e347]: Concept
+            - generic [ref=e357]:
+              - heading "McDonald's" [level=3] [ref=e358]
+              - paragraph [ref=e359]: Group Ordering Interaction Design
+          - button "Open project Surya – Kinetic Wall Timepiece" [ref=e362] [cursor=pointer]:
+            - img "Surya – Kinetic Wall Timepiece" [ref=e364]
+            - generic [ref=e365]: Shipped
+            - generic [ref=e375]:
+              - heading "Surya" [level=3] [ref=e376]
+              - paragraph [ref=e377]: Kinetic Wall Timepiece
+          - button "Open project SoloPump – One-Handed Liquid Dispenser" [ref=e380] [cursor=pointer]:
+            - img "SoloPump – One-Handed Liquid Dispenser" [ref=e382]
+            - generic [ref=e383]: Shipped
+            - generic [ref=e393]:
+              - heading "SoloPump" [level=3] [ref=e394]
+              - paragraph [ref=e395]: One-Handed Liquid Dispenser
+          - button "Open project Helios – Mechanical Kinetic Lamp" [ref=e398] [cursor=pointer]:
+            - img "Helios – Mechanical Kinetic Lamp" [ref=e400]
+            - generic [ref=e401]: Shipped
+            - generic [ref=e411]:
+              - heading "Helios" [level=3] [ref=e412]
+              - paragraph [ref=e413]: Mechanical Kinetic Lamp
+          - button "Open project Jarvis – Voice-Controlled Smart Home Assistant" [ref=e416] [cursor=pointer]:
+            - img "Jarvis – Voice-Controlled Smart Home Assistant" [ref=e418]
+            - generic [ref=e419]: Shipped
+            - generic [ref=e429]:
+              - heading "Jarvis" [level=3] [ref=e430]
+              - paragraph [ref=e431]: Voice-Controlled Smart Home Assistant
+          - button "Open project Plotter – Speech-to-Draw Machine" [ref=e434] [cursor=pointer]:
+            - img "Plotter – Speech-to-Draw Machine" [ref=e436]
+            - generic [ref=e437]: Shipped
+            - generic [ref=e447]:
+              - heading "Plotter" [level=3] [ref=e448]
+              - paragraph [ref=e449]: Speech-to-Draw Machine
+          - button "Open project Portfolio Website" [ref=e452] [cursor=pointer]:
+            - img "Portfolio Website" [ref=e454]
+            - generic [ref=e455]: Shipped
+            - heading "Portfolio Website" [level=3] [ref=e466]
+      - generic [ref=e469]:
+        - generic [ref=e470]:
+          - heading "Writings" [level=2] [ref=e471]
+          - paragraph [ref=e472]: Thoughts on making, design, and technology.
+        - 'button "Open writing The Origin Story: How Data is Born" [ref=e475] [cursor=pointer]':
+          - 'img "The Origin Story: How Data is Born" [ref=e477]'
+          - generic [ref=e478]: Published
+          - generic [ref=e488]:
+            - 'heading "The Origin Story: How Data is Born" [level=3] [ref=e489]'
+            - paragraph [ref=e490]:
+              - text: Feb 1, 2026
+              - generic [ref=e493]: · Course
+  - navigation "Sections" [ref=e497]:
+    - button "Navigate to Profile" [ref=e498] [cursor=pointer]
+    - button "Navigate to Experiences" [ref=e504] [cursor=pointer]
+    - button "Navigate to Projects" [ref=e509] [cursor=pointer]
+    - button "Navigate to Writings" [ref=e514] [cursor=pointer]

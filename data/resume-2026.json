@@ -1,0 +1,130 @@
+{
+  "name": "Aditya Agarwal",
+  "headline": "Product Management · AI Product Development · Product Analytics",
+  "contact": [
+    {
+      "text": "+1 (253) 421 7650",
+      "url": "tel:+12534217650"
+    },
+    {
+      "text": "kriitya@gmail.com",
+      "url": "mailto:kriitya@gmail.com"
+    },
+    {
+      "text": "linkedin.com/in/adiind",
+      "url": "https://linkedin.com/in/adiind"
+    },
+    {
+      "text": "adidesign.org",
+      "url": "https://adidesign.org"
+    }
+  ],
+  "experience": [
+    {
+      "title": "AI Product Manager (Intern) · self.xyz",
+      "meta": "Jun 2026 - Aug 2026",
+      "bullets": [
+        "Co-prototyped agent-native products in privacy and payments with engineers.",
+        "Designed agent workflows, context management, evaluations, and human-in-the-loop checkpoints; built dashboards to track product progress.",
+        "Built a journey-mapping and clickstream reporting system that defined events for developer handoff and automatically generated dashboards via MCP."
+      ]
+    },
+    {
+      "title": "Senior Product Analyst · Zomato",
+      "meta": "Gurgaon, India | Oct 2024 - Jul 2025",
+      "bullets": [
+        "Shaped Homepage and Search for millions of daily visitors using clickstream analytics.",
+        "Led Friends' Recommendations, using clickstream and a social graph spanning <b>one billion contacts</b>.",
+        "Supported Food Rescue, helping reduce food waste by approximately <b>50%</b> across India."
+      ]
+    },
+    {
+      "title": "Product Analyst · Udaan",
+      "meta": "Bangalore, India | Feb 2023 - Sep 2024",
+      "bullets": [
+        "Built real-time supply-chain reporting for <b>1,000+ stakeholders</b>.",
+        "As Wondermart's sole analyst, optimized listing and pricing through national expansion; implemented clickstream analytics and helped create Percept Insights."
+      ]
+    },
+    {
+      "title": "Data Analyst · Snapdeal",
+      "meta": "Gurgaon, India | Jun 2020 - Sep 2022",
+      "bullets": [
+        "Automated warehouse forecasting and purchasing; managed seller ad analytics and reconciliations.",
+        "Supported A/B experiments and ad optimization that increased seller ad revenue by <b>14%</b>."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "JPMorgan Chase · FamilySync",
+      "meta": "Northwestern EDI | Service Design",
+      "url": "https://adidesign.org/work/familysync-jpmorgan",
+      "bullets": [
+        "Designed an agentic caregiver payments service with JPMorgan Chase; mapped payment handoffs and tested delegated approvals through caregiving scenarios."
+      ]
+    },
+    {
+      "title": "McDonald's · Squad Up",
+      "meta": "Northwestern EDI | Interaction Design",
+      "url": "https://adidesign.org/work/mcdonalds-interaction-design",
+      "bullets": [
+        "Designed a group-ordering experience with McDonald's, grounding journey maps and prototypes in 4 site observations, 8 interviews, and 22 survey responses."
+      ]
+    },
+    {
+      "title": "Procter & Gamble · Sponsored Product Innovation",
+      "meta": "Northwestern EDI | 2025",
+      "bullets": [
+        "On a five-person P&amp;G-sponsored design team, synthesized 8 in-home and 16 central-site visits into requirements, then developed and iteratively tested prototypes."
+      ]
+    },
+    {
+      "title": "TinkerVerse · @tinker_verse",
+      "meta": "Feb 2024 - Present",
+      "url": "https://www.instagram.com/tinker_verse/",
+      "bullets": [
+        "Build and document <b>IoT, robotics, and 3D-printed prototypes</b>, including a voice-controlled home assistant, drawing plotter, and lighting sculptures."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "title": "Northwestern University",
+      "degree": "MS Engineering Design Innovation",
+      "meta": "Evanston, US | 2025 - Present"
+    },
+    {
+      "title": "BITS Pilani",
+      "degree": "MSc Biological Science; BE Civil Engineering",
+      "meta": "Hyderabad, India | 2016 - 2021"
+    }
+  ],
+  "achievements": [
+    {
+      "title": "Top 10 · ASEAN-wide Edge AI & IoT Challenge (2024)",
+      "meta": "Circuit Digest / DigiKey"
+    },
+    {
+      "title": "TEDx BITS Hyderabad (2019)",
+      "meta": "Stage Design Head"
+    }
+  ],
+  "skills": "<b>AI &amp; Engineering:</b> Claude Code, Codex, RAG (retrieval-augmented generation), Python, SQL, C/C++, Arduino, IoT.<br/><b>Design:</b> Human-centered design, user research, synthesis, prototyping, Adobe Suite, CAD, data visualization.",
+  "leadership": [
+    {
+      "title": "Camp Lead · Camp EDI, Northwestern",
+      "meta": "2026",
+      "bullets": [
+        "Developed hands-on workshops combining electronics, fabrication, and physical prototyping."
+      ]
+    },
+    {
+      "title": "School Ambassador · Bambu Lab",
+      "meta": "Northwestern",
+      "bullets": [
+        "Supported campus printer labs and student training in 3D printing and prototyping."
+      ]
+    }
+  ]
+}

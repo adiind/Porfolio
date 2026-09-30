@@ -2,10 +2,10 @@
     "id": "mcdonalds-interaction-design",
     "hero": {
         "title": "McDonald's – Group Ordering Interaction Design",
-        "oneLiner": "A Winter Quarter interaction design concept for letting friends build one shared McDonald's order without losing track of who picked what."
+        "oneLiner": "A group-ordering experience designed with McDonald's through human-centered research, journey mapping, and prototyping."
     },
     "context": {
-        "text": "This Northwestern EDI project focused on group ordering: the messy moment where several people want McDonald's together, but one person usually ends up collecting texts, remembering edits, checking totals, and fixing the order. The concept explored how a shared cart could let people join from a link, add their own items, see who added what, review the group order, and split or coordinate checkout without turning the experience into a busy social app."
+        "text": "Developed with McDonald's through Northwestern EDI, this human-centered design project focused on group ordering: the messy moment where several people want food together, but one person usually ends up collecting texts, remembering edits, checking totals, and fixing the order. We synthesized observations, interviews, and survey responses into journey maps and interaction prototypes. The resulting experience lets people join from a link, add their own items, see who added what, review the group order, and coordinate payment and pickup."
     },
     "build": {
         "bullets": [

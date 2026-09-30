@@ -8,7 +8,7 @@ export { TIMELINE_DATA, USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO };
 
 export const SOCIAL_LINKS = {
   linkedin: "https://linkedin.com/in/adiind",
-  resume: "/Adi_Agarwal_Resume_2025.pdf",
+  resume: "/Adi_Agarwal_Resume_2026.pdf",
   email: "mailto:kriitya@gmail.com"
 };
 
@@ -21,13 +21,14 @@ My work now spans agentic assistants, embedded intelligence, service design, hea
 export const PROFILE_SKILLS = [
   "Tangible AI", "Interaction Design", "Product Strategy",
   "Agentic Systems", "Embedded Systems", "Rapid Prototyping",
-  "Product Analytics", "Service Design", "Technical Storytelling"
+  "Product Analytics", "Service Design", "Technical Storytelling",
+  "Claude Code", "Codex", "RAG"
 ];
 
 // Visual Configuration
 export const CONFIG: TimelineConfig = {
   startDate: '2016-01-01',
-  endDate: '2026-03-31'
+  endDate: '2026-08-31'
 };
 
 export const TINKERVERSE_JOURNAL: JournalEntry[] = RAW_TINKERVERSE_JOURNAL as JournalEntry[];

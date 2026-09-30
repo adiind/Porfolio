@@ -1,0 +1,41 @@
+- generic [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#skip-to-content"
+  - main [ref=e5]:
+    - generic [ref=e10]:
+      - combobox "Select language" [ref=e11] [cursor=pointer]:
+        - status: English (US)
+      - combobox "en-US":
+        - option "en-US" [selected]
+        - option "en-GB"
+        - option "de-DE"
+        - option "fr-FR"
+    - generic [ref=e14]:
+      - generic [ref=e19]:
+        - heading "Log in or sign up" [active] [level=1] [ref=e21]
+        - iframe [ref=e26]:
+          - button "Continue with Google. Opens in new tab" [ref=f2e3] [cursor=pointer]:
+            - generic [ref=f2e5]: Continue with Google
+        - generic [ref=e27]:
+          - separator [ref=e28]
+          - generic [ref=e29]: or
+          - separator [ref=e30]
+        - generic [ref=e32]:
+          - textbox "Email" [ref=e35]
+          - button "Continue with email" [ref=e36] [cursor=pointer]
+        - generic [ref=e37]:
+          - text: Hiring? Sign up as an
+          - link "Log in as an employer user" [ref=e38] [cursor=pointer]:
+            - /url: /employer_registrations/new
+            - text: employer
+      - generic [ref=e40]:
+        - text: By continuing, you agree to our
+        - link "Terms of Service" [ref=e41] [cursor=pointer]:
+          - /url: https://joinhandshake.com/tos/
+        - text: and
+        - link "Privacy Policy" [ref=e42] [cursor=pointer]:
+          - /url: https://joinhandshake.com/privacy-policy/
+        - text: . We send marketing emails about updates and promotions. To opt out, use the unsubscribe link.Career Services advisors, ask your admin for an invite to sign up.
+  - generic:
+    - generic:
+      - list
