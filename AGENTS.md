@@ -1,5 +1,7 @@
 ## Codex
 
+- 2026-09-30: Deployed GitHub `main` revision `86c321d` to Cloudflare Worker `portfolio` (version `8318b236-a809-4bb1-b0e7-78dcb9d59e04`); fresh build and Wrangler dry-run passed, and both `adidesign.org` and the Worker host serve the same main bundle and 2026 resume; production verified.
+
 - 2026-09-30: Reworked the compact first-screen hero for mobile/tablet: widened the headline and CTA layout, replaced the large overlapping source-history card with a compact inline link, and gave the explore control a clear backing; production build passed, local only.
 
 - 2026-09-30: Loosened the visual resume's circular headshot framing to include the full head, neck, and more shoulders, retaining the smaller header; rebuilt and visually inspected the PDF.
