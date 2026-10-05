@@ -1,4 +1,4 @@
-# Accessibility Audit: adiagarwal.com portfolio
+# Accessibility Audit: adidesign.org portfolio
 
 **Standard:** WCAG 2.1 AA | **Date:** 2026-07-06 | **Scope:** full site (desktop 1280×800, mobile 375×812, reflow 640px) + uncommitted Portfolio Studio
 
