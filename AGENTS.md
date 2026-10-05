@@ -1,6 +1,8 @@
 ## Codex
 
-- 2026-10-05: Documented Cloud Agent setup: install with `npm ci`, start Vite with `npx vite` on port 3000 (skip `npm run dev`, which exits without `NOTION_TOKEN`); `npm run build` and `npm run test:analytics` (31 tests) passed, and Chrome opened the hero, Selected Work, and the Glyph case study.
+- 2026-10-05: Pointed `npm run dev` at Vite only and removed the external task-sync step from the local run instructions; `npm run build` passed.
+
+- 2026-10-05: Documented Cloud Agent setup: install with `npm ci` and start Vite on port 3000; `npm run build` and `npm run test:analytics` (31 tests) passed, and Chrome opened the hero, Selected Work, and the Glyph case study.
 
 - 2026-10-05: Stopped the legacy GitHub Pages Jekyll job from failing by excluding the source tree in `_config.yml` (local Jekyll 3.10.0 writes only the adidesign.org note) and added Cursor, Grok, and Muse marks to the homepage tool row; `npm run build` passed, and headless Chrome showed six 32px marks with no overflow on the desktop hero (the row stays desktop-only, as before).
 
@@ -156,6 +158,6 @@
 
 ## Cursor Cloud specific instructions
 
-- The dev server is `npx vite` on port 3000 (`host` is already `0.0.0.0` in `vite.config.ts`). Do not use `npm run dev` here: that runs Notion sync first and exits if `NOTION_TOKEN` is missing. The site runs from local data without it.
-- `NOTION_TOKEN` and `GEMINI_API_KEY` are optional. Cached Notion tasks already live in `data/notion-tasks.json`.
+- Dev server: `npm run dev` (Vite on port 3000; `host` is already `0.0.0.0` in `vite.config.ts`).
+- `GEMINI_API_KEY` is optional and currently unset.
 - Verify with `npm run build` and `npm run test:analytics`, then check http://localhost:3000 in the browser.
