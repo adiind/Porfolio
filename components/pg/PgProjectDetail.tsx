@@ -41,21 +41,28 @@ const PgProjectDetail: React.FC<Props> = ({ project, onClose }) => {
     useEffect(() => {
         const root = dialogRef.current;
         if (!root) return;
-        const nodes = pgSections
-            .map((section) => root.querySelector<HTMLElement>(`#${section.id}`))
-            .filter((node): node is HTMLElement => Boolean(node));
-        if (!nodes.length) return;
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const visible = entries
-                    .filter((entry) => entry.isIntersecting)
-                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-                if (visible?.target.id) setActiveId(visible.target.id);
-            },
-            { root, rootMargin: '-18% 0px -62% 0px', threshold: [0.15, 0.4, 0.7] },
-        );
-        nodes.forEach((node) => observer.observe(node));
-        return () => observer.disconnect();
+        let frame = 0;
+        const update = () => {
+            frame = 0;
+            const rootTop = root.getBoundingClientRect().top;
+            let current: string = pgSections[0].id;
+            for (const section of pgSections) {
+                const node = root.querySelector<HTMLElement>(`#${section.id}`);
+                if (!node) continue;
+                if (node.getBoundingClientRect().top - rootTop <= 140) current = section.id;
+            }
+            setActiveId(current);
+        };
+        const onScroll = () => {
+            if (frame) return;
+            frame = window.requestAnimationFrame(update);
+        };
+        root.addEventListener('scroll', onScroll, { passive: true });
+        update();
+        return () => {
+            root.removeEventListener('scroll', onScroll);
+            if (frame) window.cancelAnimationFrame(frame);
+        };
     }, [dialogRef]);
 
     const scrollTo = (id: string) => {
