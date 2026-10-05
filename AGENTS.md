@@ -1,5 +1,7 @@
 ## Codex
 
+- 2026-10-05: Pointed canonical, Open Graph, Twitter, JSON-LD, sitemap, and robots URLs from adiagarwal.com to adidesign.org, and changed the Northwestern MS EDI education end date from Mar 2026 to Mar 2027; production build passed, and a headless Chrome check of the preview confirmed the rendered head uses adidesign.org and the education card plus detail dialog show Aug 2025 — Mar 2027.
+
 - 2026-09-30: Deployed GitHub `main` revision `86c321d` to Cloudflare Worker `portfolio` (version `8318b236-a809-4bb1-b0e7-78dcb9d59e04`); fresh build and Wrangler dry-run passed, and both `adidesign.org` and the Worker host serve the same main bundle and 2026 resume; production verified.
 
 - 2026-09-30: Reworked the compact first-screen hero for mobile/tablet: widened the headline and CTA layout, replaced the large overlapping source-history card with a compact inline link, and gave the explore control a clear backing; production build passed, local only.
