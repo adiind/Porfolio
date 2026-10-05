@@ -1,5 +1,7 @@
 ## Codex
 
+- 2026-10-05: Replaced the README LinkedIn URL with https://www.linkedin.com/in/adiind and removed three stray `.claude/worktrees/` gitlinks that had no `.gitmodules` entry, then ignored that directory; JSON-LD already used the adiind profile. Workers Builds is re-triggered on this push.
+
 - 2026-10-05: Pointed canonical, Open Graph, Twitter, JSON-LD, sitemap, and robots URLs from adiagarwal.com to adidesign.org, and changed the Northwestern MS EDI education end date from Mar 2026 to Mar 2027; production build passed, and a headless Chrome check of the preview confirmed the rendered head uses adidesign.org and the education card plus detail dialog show Aug 2025 — Mar 2027.
 
 - 2026-09-30: Deployed GitHub `main` revision `86c321d` to Cloudflare Worker `portfolio` (version `8318b236-a809-4bb1-b0e7-78dcb9d59e04`); fresh build and Wrangler dry-run passed, and both `adidesign.org` and the Worker host serve the same main bundle and 2026 resume; production verified.

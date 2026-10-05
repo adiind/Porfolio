@@ -63,4 +63,4 @@ Useful commands:
 ## Contact
 
 - Website: [adidesign.org](https://adidesign.org)
-- LinkedIn: [linkedin.com/in/adiagarwal](https://linkedin.com/in/adiagarwal)
+- LinkedIn: [linkedin.com/in/adiind](https://www.linkedin.com/in/adiind)
