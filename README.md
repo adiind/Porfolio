@@ -30,16 +30,15 @@ I designed and built this site to show my technical range across product analyti
 - Interaction systems: Responsive timeline layouts, project detail modals, writing modals, keyboard-accessible cards, hover previews, scroll-state hooks, and mobile gesture handling.
 - Content model: JSON-driven project, timeline, writing, and Instagram data that keeps case studies structured and easy to update.
 - Analytics: A vendor-neutral tracking wrapper for Zaraz, PostHog, Plausible, and Umami.
-- Workflow tooling: Notion sync scripts, Vite build/preview commands, local browser checks, and an agent-maintained session log in `AGENTS.md`.
+- Workflow tooling: Vite build/preview commands, local browser checks, and an agent-maintained session log in `AGENTS.md`.
 
 ## Repository Map
 
 - `App.tsx` - Main application shell, section state, intro flow, and global modal coordination.
 - `components/` - Portfolio UI, including hero, timeline, project cards, project details, writings, profile, navigation, and shared UI primitives.
-- `data/` - Structured portfolio content for timeline items, selected work, posts, project case studies, and synced external data.
+- `data/` - Structured portfolio content for timeline items, selected work, posts, and project case studies.
 - `writing/posts/` - Long-form writing shown in the Writings section.
 - `lib/analytics.ts` - Custom analytics event helper.
-- `scripts/notion-sync.cjs` - Notion task/content sync workflow used during development.
 - `public/images/` - Portfolio imagery, case-study assets, screenshots, and prototype visuals.
 
 ## Running Locally
@@ -49,16 +48,12 @@ npm install
 npm run dev
 ```
 
-`npm run dev` pulls fresh Notion data first, then starts the Vite dev server on `localhost:3000`.
+`npm run dev` starts the Vite dev server on `localhost:3000`.
 
 Useful commands:
 
 - `npm run build` - Create a production build.
 - `npm run preview` - Preview the production build locally.
-- `npm run sync:pull` - Pull fresh Notion data.
-- `npm run sync:push` - Push local task changes back to Notion.
-- `npm run sync:list` - List cached Notion tasks.
-- `npm run sync:status` - Check pending Notion sync state.
 
 ## Contact
 

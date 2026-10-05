@@ -5,7 +5,7 @@ Implements the P0 items from `ACCESSIBILITY_AUDIT.md` (2026-07-06): keyboard ope
 **Ground rules for the implementer**
 - Match existing code style (Tailwind classes, framer-motion usage, arrow components). No explanatory comments about the change itself.
 - Do not restructure layouts or alter visuals except where a focus ring is specified.
-- After each workstream: `npm run build` must pass. Do not run `npm run dev` (Notion pull can fail); use `npx vite` if a dev server is needed.
+- After each workstream: `npm run build` must pass. Use `npm run dev` if a dev server is needed.
 - The shared keyboard-activation snippet used across Workstream 1:
 
 ```tsx

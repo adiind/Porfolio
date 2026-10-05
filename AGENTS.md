@@ -1,5 +1,11 @@
 ## Codex
 
+- 2026-10-05: Replaced the homepage Muse tool mark with Meta's blue infinity symbol; the previous white tile and broken black glyph are gone. Production build passed, and a desktop Chrome check of the hero tool row showed six marks ending in the blue infinity, with no overflow.
+
+- 2026-10-05: Pointed `npm run dev` at Vite only and removed the external task-sync step from the local run instructions; `npm run build` passed.
+
+- 2026-10-05: Documented Cloud Agent setup: install with `npm ci` and start Vite on port 3000; `npm run build` and `npm run test:analytics` (31 tests) passed, and Chrome opened the hero, Selected Work, and the Glyph case study.
+
 - 2026-10-05: Stopped the legacy GitHub Pages Jekyll job from failing by excluding the source tree in `_config.yml` (local Jekyll 3.10.0 writes only the adidesign.org note) and added Cursor, Grok, and Muse marks to the homepage tool row; `npm run build` passed, and headless Chrome showed six 32px marks with no overflow on the desktop hero (the row stays desktop-only, as before).
 
 - 2026-10-05: Replaced the README LinkedIn URL with https://www.linkedin.com/in/adiind and removed three stray `.claude/worktrees/` gitlinks that had no `.gitmodules` entry, then ignored that directory; JSON-LD already used the adiind profile. Workers Builds is re-triggered on this push.
@@ -151,3 +157,9 @@
 - 2026-04-18: Added a quirky green cutting-board hero background to the landing homepage in `components/Hero.tsx`, verified desktop/mobile screenshots in `/tmp/portfolio-ui-pass-20260418`, and brought the dev server up on `localhost:3000`.
 - 2026-04-18: Fixed the mobile intro overlay so touch scrolling dismisses it without resetting scroll, added keyboard-accessible project cards with focus states, and re-captured verification screenshots in `/tmp/portfolio-ui-pass-20260418`.
 - 2026-04-18: Ran a desktop and mobile UI pass, captured screenshots in `/tmp/portfolio-ui-pass-20260418`, and documented the mobile intro overlay/scroll regression plus related interaction findings.
+
+## Cursor Cloud specific instructions
+
+- Dev server: `npm run dev` (Vite on port 3000; `host` is already `0.0.0.0` in `vite.config.ts`).
+- `GEMINI_API_KEY` is optional and currently unset.
+- Verify with `npm run build` and `npm run test:analytics`, then check http://localhost:3000 in the browser.
