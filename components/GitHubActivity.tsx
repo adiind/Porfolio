@@ -30,34 +30,32 @@ const revisionCopy = commitCount === null
     ? 'View source history'
     : `${commitCount} commits in this revision`;
 
+const TOOL_MARKS = [
+    { src: '/images/antigravity_mark.png', title: 'Google Antigravity' },
+    { src: '/images/tool-marks/codex.svg', title: 'OpenAI Codex' },
+    { src: '/images/tool-marks/claude.svg', title: 'Anthropic Claude' },
+    { src: '/images/tool-marks/cursor.svg', title: 'Cursor' },
+    { src: '/images/tool-marks/grok.svg', title: 'Grok' },
+    { src: '/images/tool-marks/muse.svg', title: 'Muse' },
+] as const;
+
 const ToolMarks: React.FC<{ inline?: boolean; className?: string }> = ({ inline = false, className = '' }) => (
     <div
         data-tool-marks
         role="group"
-        aria-label="Built with Google Antigravity, OpenAI Codex, and Anthropic Claude"
+        aria-label={`Built with ${TOOL_MARKS.map((mark) => mark.title).join(', ')}`}
         className={`${inline ? 'flex items-center gap-1' : 'flex items-center gap-3 px-1 sm:gap-4 sm:px-2'} ${className}`}
     >
-        <img
-            data-tool-mark
-            src="/images/antigravity_mark.png"
-            alt=""
-            title="Google Antigravity"
-            className={`${inline ? 'h-3.5 w-3.5' : 'h-6 w-6 sm:h-8 sm:w-8'} object-contain drop-shadow-[0_7px_12px_rgba(0,0,0,0.5)]`}
-        />
-        <img
-            data-tool-mark
-            src="/images/tool-marks/codex.svg"
-            alt=""
-            title="OpenAI Codex"
-            className={`${inline ? 'h-3.5 w-3.5' : 'h-6 w-6 sm:h-8 sm:w-8'} object-contain drop-shadow-[0_7px_12px_rgba(0,0,0,0.5)]`}
-        />
-        <img
-            data-tool-mark
-            src="/images/tool-marks/claude.svg"
-            alt=""
-            title="Anthropic Claude"
-            className={`${inline ? 'h-3.5 w-3.5' : 'h-6 w-6 sm:h-8 sm:w-8'} object-contain drop-shadow-[0_7px_12px_rgba(0,0,0,0.5)]`}
-        />
+        {TOOL_MARKS.map((mark) => (
+            <img
+                key={mark.src}
+                data-tool-mark
+                src={mark.src}
+                alt=""
+                title={mark.title}
+                className={`${inline ? 'h-3.5 w-3.5' : 'h-6 w-6 sm:h-8 sm:w-8'} shrink-0 object-contain drop-shadow-[0_7px_12px_rgba(0,0,0,0.5)]`}
+            />
+        ))}
     </div>
 );
 
