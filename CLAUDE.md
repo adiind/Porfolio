@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Personal portfolio site for adiagarwal.com — a React 19 + TypeScript + Vite SPA with no backend. All content is data-driven from local TS/JSON files; content changes are data edits, not component edits.
+Personal portfolio site for adidesign.org — a React 19 + TypeScript + Vite SPA with no backend. All content is data-driven from local TS/JSON files; content changes are data edits, not component edits.
 
 ## Commands
 

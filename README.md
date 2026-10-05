@@ -1,6 +1,6 @@
 # Adi Agarwal - Portfolio
 
-This is the source for my personal portfolio: [adiagarwal.com](https://adiagarwal.com).
+This is the source for my personal portfolio: [adidesign.org](https://adidesign.org).
 
 I designed and built this site to show my technical range across product analytics, frontend engineering, AI systems, interaction design, service design, embedded systems, and physical prototyping. It is not a starter template or a generic project README. The portfolio itself is part of the work: a live, interactive proof of how I think, build, test, and explain complex systems.
 
@@ -62,5 +62,5 @@ Useful commands:
 
 ## Contact
 
-- Website: [adiagarwal.com](https://adiagarwal.com)
+- Website: [adidesign.org](https://adidesign.org)
 - LinkedIn: [linkedin.com/in/adiagarwal](https://linkedin.com/in/adiagarwal)
