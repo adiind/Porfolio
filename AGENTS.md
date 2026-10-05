@@ -1,5 +1,7 @@
 ## Codex
 
+- 2026-10-05: Replaced the homepage Muse tool mark with Meta's blue infinity symbol; the previous white tile and broken black glyph are gone. `npm run build` was not required for an SVG swap; a desktop Chrome check of the hero tool row showed six marks ending in the blue infinity, with no overflow.
+
 - 2026-10-05: Pointed `npm run dev` at Vite only and removed the external task-sync step from the local run instructions; `npm run build` passed.
 
 - 2026-10-05: Documented Cloud Agent setup: install with `npm ci` and start Vite on port 3000; `npm run build` and `npm run test:analytics` (31 tests) passed, and Chrome opened the hero, Selected Work, and the Glyph case study.
