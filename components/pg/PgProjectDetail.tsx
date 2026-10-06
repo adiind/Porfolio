@@ -103,17 +103,21 @@ const PgProjectDetail: React.FC<Props> = ({ project, onClose }) => {
         const update = () => {
             frame = 0;
             const rootTop = root.getBoundingClientRect().top;
-            // Activate from the headline once it is on screen, not only after
-            // it reaches the top. A tight top line left Methods active while
-            // the Prototypes headline was already visible.
-            const line = Math.max(180, root.clientHeight - 88);
-            let current: string = pgSections[0].id;
-            for (const section of pgSections) {
-                const headingId = section.id === 'pg-glance' ? 'pg-title' : `${section.id}-title`;
-                const node = root.querySelector<HTMLElement>(`#${headingId}`)
-                    ?? root.querySelector<HTMLElement>(`#${section.id}`);
+            // One line, the middle of the case. 03 is tied to the Research
+            // plate so the sprint does not stay lit through the three rooms.
+            const line = root.clientHeight * 0.5;
+            const points: Array<[string, string]> = [
+                ['pg-glance', '#pg-glance'],
+                ['pg-sprint', '#pg-sprint'],
+                ['pg-phases', '#pg-room-research'],
+                ['pg-methods', '#pg-methods'],
+                ['pg-ladder', '#pg-ladder'],
+            ];
+            let current = points[0][0];
+            for (const [id, selector] of points) {
+                const node = root.querySelector<HTMLElement>(selector);
                 if (!node) continue;
-                if (node.getBoundingClientRect().top - rootTop <= line) current = section.id;
+                if (node.getBoundingClientRect().top - rootTop <= line) current = id;
             }
             setActiveId(current);
         };
@@ -244,7 +248,7 @@ const PgProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                         </div>
 
                         {pgRooms.map((room) => (
-                            <article className="pg-plate pg-room" key={room.id}>
+                            <article className="pg-plate pg-room" id={`pg-room-${room.id}`} key={room.id}>
                                 <p className="pg-kicker">{room.phase}</p>
                                 <h3 className="pg-display">{room.title}</h3>
                                 <p className="pg-lead">{room.body}</p>

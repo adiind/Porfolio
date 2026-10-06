@@ -78,6 +78,17 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.pg-top::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--pg-shell), rgba(5, 5, 5, 0));
+    pointer-events: none;
+}
+
 .pg-back,
 .pg-close {
     appearance: none;
@@ -146,7 +157,7 @@
 
 .pg-hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 55%);
     gap: 2.5rem 3rem;
     align-items: end;
 }
@@ -279,7 +290,7 @@
 
 .pg-meta p.pg-meta-label {
     margin: 0;
-    color: rgba(255, 255, 255, 0.58);
+    color: #d6cfc6;
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -288,8 +299,8 @@
 
 .pg-meta p {
     margin: 0.45rem 0 0;
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 1.05rem;
     line-height: 1.45;
 }
 
@@ -338,7 +349,7 @@
     font-variant-numeric: tabular-nums;
     font-size: 0.72rem;
     letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.4);
+    color: #d6cfc6;
 }
 
 .pg-toc button[aria-current="true"] .pg-toc-n {
@@ -449,9 +460,17 @@
     padding: 1.15rem 1.45rem 1.25rem;
 }
 
-.pg-nda-note .pg-kicker { margin-bottom: 0.35rem; }
+.pg-nda-note .pg-kicker {
+    margin-bottom: 0.35rem;
+    color: var(--pg-coral);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
 
-.pg-nda-note p {
+.pg-nda-note p:not(.pg-kicker) {
     margin: 0;
     max-width: 40rem;
     color: #4e433e;
@@ -668,7 +687,25 @@
     }
 
     .pg-body > nav {
+        position: sticky;
+        top: 4rem;
+        z-index: 20;
         min-width: 0;
+        margin: 0 -1.25rem;
+        background: var(--pg-shell);
+    }
+
+    .pg-top::after { display: none; }
+
+    .pg-body > nav::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        height: 24px;
+        background: linear-gradient(to bottom, var(--pg-shell), rgba(5, 5, 5, 0));
+        pointer-events: none;
     }
 
     .pg-crumb { display: none; }
@@ -676,15 +713,14 @@
     .pg-top { grid-template-columns: 1fr auto; }
 
     .pg-toc {
-        position: sticky;
-        top: 4rem;
-        z-index: 20;
+        position: static;
+        top: auto;
         flex-direction: row;
         gap: 0.25rem;
-        margin: 0 -1.25rem;
+        margin: 0;
         padding: 0.35rem 1.25rem;
         overflow-x: auto;
-        background: var(--pg-shell);
+        background: transparent;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -701,7 +737,8 @@
     .pg-body { width: min(1180px, calc(100% - 1.5rem)); }
     .pg-plate { border-radius: 1.25rem; padding: 1.35rem 1.15rem 1.25rem; }
     .pg-hero { margin-top: 0.85rem; }
-    .pg-toc { margin-left: -0.75rem; margin-right: -0.75rem; padding-left: 0.75rem; padding-right: 0.75rem; }
+    .pg-body > nav { margin-left: -0.75rem; margin-right: -0.75rem; }
+    .pg-toc { padding-left: 0.75rem; padding-right: 0.75rem; }
     .pg-title { font-size: clamp(2.7rem, 12vw, 3.6rem); }
     .pg-pair,
     .pg-methods,
