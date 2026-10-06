@@ -1,0 +1,56 @@
+{
+    "id": "pg-haircare",
+    "hero": {
+        "title": "P&G – Conditioning product packaging",
+        "oneLiner": "A sponsored studio on how a conditioning bottle is held, dispensed, and kept in a haircare routine."
+    },
+    "context": {
+        "text": "Five of us at Northwestern EDI worked with P&G on conditioning product packaging. We ran 8 in-home visits and 2 central-site rounds, synthesized what we saw, and tested 10 bottle form studies. The public page is the process. Pack artwork and mechanisms stay under NDA."
+    },
+    "build": {
+        "bullets": [
+            "Ran in-home visits focused on hold, storage, and the routine around the bottle",
+            "Wrote the CSV2 research synthesis the team used to set requirements",
+            "Modeled and printed bottle form studies for hands-on comparison",
+            "Tested those forms across two central-site rounds"
+        ]
+    },
+    "decisions": [
+        {
+            "decision": "Study the routine, not a finished pack",
+            "why": "The useful questions were how the bottle is held, where it lives, and how it is dispensed.",
+            "tradeoff": "The public case cannot show the final artwork or the mechanism."
+        },
+        {
+            "decision": "Ten form studies instead of one polished concept",
+            "why": "A difference in proportion or grip had to be something a person could hold.",
+            "tradeoff": "Early forms are diagrams of the question, not the sponsor's pack."
+        }
+    ],
+    "review": {
+        "worked": [
+            "In-home visits made the bathroom routine visible in a way a survey would not.",
+            "Printed forms gave the central-site rounds something specific to handle."
+        ],
+        "didnt": [
+            "Final packs and the detailed findings stay confidential, so this page stops at the process."
+        ]
+    },
+    "outcome": {
+        "status": "concept",
+        "text": "The team presented a packaging direction. This page keeps the research, the form studies, and the testing rounds, and leaves the sponsor's packs off the public site.",
+        "blocker": ""
+    },
+    "reflection": {
+        "text": "The bottle was never just an object in the hand. It sat inside a routine, and the routine is what the visits were for."
+    },
+    "themeColor": "rose",
+    "icon": "box",
+    "skills": [
+        { "label": "In-home research", "description": "Watching hold, storage, and routine where the product already lives." },
+        { "label": "Research synthesis", "description": "Turning visits into requirements the team could design from." },
+        { "label": "Form studies", "description": "CAD and 3D-printed bottles for hands-on comparison." },
+        { "label": "Prototype testing", "description": "Central-site rounds with the same forms and tasks." }
+    ],
+    "heroImage": "/images/pg/process-overview.webp"
+}
