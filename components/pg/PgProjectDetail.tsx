@@ -103,10 +103,10 @@ const PgProjectDetail: React.FC<Props> = ({ project, onClose }) => {
         const update = () => {
             frame = 0;
             const rootTop = root.getBoundingClientRect().top;
-            // The headline, not the section box, has to clear this line. A line
-            // near the top left "04 Methods" active while the prototypes
-            // headline was already on screen.
-            const line = Math.max(220, root.clientHeight * 0.62);
+            // Activate from the headline once it is on screen, not only after
+            // it reaches the top. A tight top line left Methods active while
+            // the Prototypes headline was already visible.
+            const line = Math.max(180, root.clientHeight - 88);
             let current: string = pgSections[0].id;
             for (const section of pgSections) {
                 const headingId = section.id === 'pg-glance' ? 'pg-title' : `${section.id}-title`;

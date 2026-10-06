@@ -1,5 +1,7 @@
 ## Codex
 
+- 2026-10-06: Framed `/work/pg-haircare` in the site's black maker chrome, with the warm story on cream plates and lime only on the active table of contents, links, and focus; replaced the three withheld field boxes with one NDA note, varied the prototype-ladder silhouettes, matched the project card title to "Conditioning product packaging", removed the unverified 16-visit count, and activated the table of contents from the headline in view. `npm run build` passed, and headless Chrome checked the desktop hero, a 390px layout with no horizontal overflow, and the TOC showing 05 Prototypes while that headline was on screen.
+
 - 2026-10-05: Restored `/work/pg-haircare` to the cream, aubergine, and dusty-rose editorial case with connected miniature rooms, keeping the numbered TOC, 8/2/10 chips, meta row, phase map, method cards, and NDA-blurred prototype ladder; `npm run build` and the HCD integration guard passed, and headless Chrome checked the desktop hero, diagram/field pairs, TOC jump, Escape close, and 390px layout.
 - 2026-10-05: Stopped the legacy GitHub Pages Jekyll job from failing by excluding the source tree in `_config.yml` (local Jekyll 3.10.0 writes only the adidesign.org note) and added Cursor, Grok, and Muse marks to the homepage tool row; `npm run build` passed, and headless Chrome showed six 32px marks with no overflow on the desktop hero (the row stays desktop-only, as before).
 
