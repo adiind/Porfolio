@@ -1,4 +1,5 @@
 """Print-first visual resume. Separate from the ATS resume; uses approved source claims."""
+import os
 from pathlib import Path
 from io import BytesIO
 from PIL import Image
@@ -16,7 +17,7 @@ from reportlab.graphics import renderPDF
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'output/pdf/visual-resume'
 OUT.mkdir(parents=True,exist_ok=True)
-FONT=Path('/System/Library/Fonts/Supplemental')
+FONT=Path(os.environ.get('RESUME_FONT_DIR', '/System/Library/Fonts/Supplemental'))
 for n,f in [('Body','Arial.ttf'),('Bold','Arial Bold.ttf'),('Display','Georgia Bold.ttf')]:
     pdfmetrics.registerFont(TTFont(n,str(FONT/f)))
 pdfmetrics.registerFontFamily('Body',normal='Body',bold='Bold')
@@ -93,7 +94,7 @@ left=label('SELECTED DESIGN PROJECTS',32,left+2,331)
 for title,body,url in [
 ('FamilySync · JPMorgan Chase','Designed agentic caregiver payments; mapped handoffs and tested delegated approvals through caregiving scenarios.','https://adidesign.org/work/familysync-jpmorgan'),
 ('Squad Up · McDonald’s','Designed group ordering from 4 site observations, 8 interviews, and 22 survey responses, through journey maps and prototypes.','https://adidesign.org/work/mcdonalds-interaction-design'),
-('Product innovation · P&amp;G','On a five-person team, translated 8 in-home and 16 central-site visits into requirements and iteratively tested prototypes.',None)]:
+('Product innovation · P&amp;G','On a five-person team, translated 8 in-home visits and 2 central-site rounds into requirements, then tested 10 form studies.',None)]:
     y=left
     left=para(title,32,left,331,10.1,13,font='Bold')+3
     left=para(body,32,left,331,9.3,12.3)+10

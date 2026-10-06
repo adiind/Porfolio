@@ -117,7 +117,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
         title: "P&G Sponsored Design Project",
         subtitle: "Human-Centered Product Innovation",
         summary: "From field research and consumer insights to iteratively tested product concepts.",
-        expandedSummary: "Worked in a five-person Northwestern EDI team on a P&G-sponsored human-centered design project. Conducted 8 in-home and 16 central-site visits, synthesized consumer behaviors and unmet needs into opportunity areas, and developed and tested concepts and prototypes with consumer and stakeholder feedback.",
+        expandedSummary: "Worked in a five-person Northwestern EDI team on a P&G-sponsored human-centered design project. Conducted 8 in-home visits and 2 central-site rounds, synthesized what we saw into requirements, and tested 10 bottle form studies.",
         pills: [
           { label: "Design Strategy", description: "Strategic innovation in mature markets." },
           { label: "User Research", description: "In-home and on-site user behavior analysis." },
@@ -125,7 +125,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
           { label: "Consumer Insights", description: "Understanding deep-rooted user habits." }
         ],
         details: [
-          "Conducted 8 in-home and 16 central-site visits in a five-person graduate team.",
+          "Conducted 8 in-home visits and 2 central-site rounds, and tested 10 bottle form studies, in a five-person graduate team.",
           "Synthesized observed behaviors, routines, and unmet needs into opportunity areas and design requirements.",
           "Developed concepts and physical-digital prototypes to explore product and experience possibilities.",
           "Iteratively tested prototypes and incorporated consumer and stakeholder feedback."
