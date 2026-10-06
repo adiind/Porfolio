@@ -1,5 +1,4 @@
 """Print-first visual resume. Separate from the ATS resume; uses approved source claims."""
-import os
 from pathlib import Path
 from io import BytesIO
 from PIL import Image
@@ -17,7 +16,7 @@ from reportlab.graphics import renderPDF
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'output/pdf/visual-resume'
 OUT.mkdir(parents=True,exist_ok=True)
-FONT=Path(os.environ.get('RESUME_FONT_DIR', '/System/Library/Fonts/Supplemental'))
+FONT=Path('/System/Library/Fonts/Supplemental')
 for n,f in [('Body','Arial.ttf'),('Bold','Arial Bold.ttf'),('Display','Georgia Bold.ttf')]:
     pdfmetrics.registerFont(TTFont(n,str(FONT/f)))
 pdfmetrics.registerFontFamily('Body',normal='Body',bold='Bold')
