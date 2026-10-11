@@ -406,7 +406,7 @@ html.no-motion .static-end { display: block; }
   html.no-motion .static, html.no-motion .static-end { margin-right: 180px; }
   html.no-motion .static { padding-left: 140px; }
 }
-.dmap { position: fixed; z-index: 28; top: 14px; right: 16px; width: 148px; color: var(--navy); }
+.dmap { position: fixed; z-index: 28; top: 68px; right: 16px; width: 148px; color: var(--navy); }
 .dmap svg { display: block; width: 100%; height: auto; overflow: visible; }
 .dmap-outline { fill: none; stroke: currentColor; stroke-width: 1.15; opacity: .34; pointer-events: none; }
 .dmap-seg { fill: transparent; stroke: transparent; cursor: pointer; }
