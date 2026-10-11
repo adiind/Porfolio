@@ -206,6 +206,13 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
                     <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} via-black to-black opacity-80`} />
                 )}
 
+                {project.id === 'pg-haircare' && (
+                    <div className="absolute top-3 left-3 z-20 inline-flex items-center gap-2 rounded-full border border-[#162b4a]/10 bg-[#fffdf9]/96 py-1.5 pl-1.5 pr-3 text-[#162b4a] shadow-[0_5px_16px_rgba(12,22,40,0.2)]">
+                        <img src="/images/pg/pg-logo-official.svg" alt="" className="h-9 w-9 shrink-0" />
+                        <span className="text-[11px] font-extrabold uppercase leading-tight tracking-[0.08em]">P&amp;G sponsored</span>
+                    </div>
+                )}
+
                 {/* Status Badge (Top Right) */}
                 <div className="absolute top-3 right-3 z-20">
                     <span
