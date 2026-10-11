@@ -16,6 +16,7 @@ import jarvisData from './projects/jarvis.json';
 import plotterData from './projects/plotter.json';
 import portfolioWebsiteData from './projects/portfolio-website.json';
 import glyphData from './projects/glyph.json';
+import pgHaircareData from './projects/pg-haircare.json';
 
 // Projects shown in Selected Work section
 export const PROJECTS: Project[] = [
@@ -23,6 +24,7 @@ export const PROJECTS: Project[] = [
     zeroMyAIData as Project,
     familySyncData as Project,
     mcdonaldsInteractionData as Project,
+    pgHaircareData as Project,
     suryaData as Project,
     solopumpData as Project,
     heliosData as Project,
@@ -37,6 +39,7 @@ const ALL_PROJECTS: Project[] = [
     zeroMyAIData as Project,
     familySyncData as Project,
     mcdonaldsInteractionData as Project,
+    pgHaircareData as Project,
     suryaData as Project,
     solopumpData as Project,
     heliosData as Project,
