@@ -1,6 +1,7 @@
 - 2026-10-11: Selected thumbnail direction 02 for the existing P&G portfolio card; replaced `public/images/pg-design-project.jpg` with the 1024×682 routine-detail concept and the official P&G-sponsored badge; published this one-asset update through GitHub `main`, with no case-study or unrelated work included.
 ## Codex
 
+- 2026-10-05: Restored `/work/pg-haircare` to the cream, aubergine, and dusty-rose editorial case with connected miniature rooms, keeping the numbered TOC, 8/2/10 chips, meta row, phase map, method cards, and NDA-blurred prototype ladder; `npm run build` and the HCD integration guard passed, and headless Chrome checked the desktop hero, diagram/field pairs, TOC jump, Escape close, and 390px layout.
 - 2026-10-05: Stopped the legacy GitHub Pages Jekyll job from failing by excluding the source tree in `_config.yml` (local Jekyll 3.10.0 writes only the adidesign.org note) and added Cursor, Grok, and Muse marks to the homepage tool row; `npm run build` passed, and headless Chrome showed six 32px marks with no overflow on the desktop hero (the row stays desktop-only, as before).
 
 - 2026-10-05: Replaced the README LinkedIn URL with https://www.linkedin.com/in/adiind and removed three stray `.claude/worktrees/` gitlinks that had no `.gitmodules` entry, then ignored that directory; JSON-LD already used the adiind profile. Workers Builds is re-triggered on this push.

@@ -37,7 +37,7 @@ const PROJECT_INTENTS: Array<{
         label: 'Shapes the product',
         shortLabel: 'Product',
         cue: 'Finding the right problem, mapping the system, and making clear product decisions.',
-        projectIds: ['familysync-jpmorgan', 'mcdonalds-interaction-design', 'zero-my-ai', 'glyph', 'portfolio-website'],
+        projectIds: ['familysync-jpmorgan', 'mcdonalds-interaction-design', 'pg-haircare', 'zero-my-ai', 'glyph', 'portfolio-website'],
     },
     {
         id: 'physical-craft',

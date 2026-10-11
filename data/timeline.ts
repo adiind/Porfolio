@@ -130,7 +130,8 @@ export const TIMELINE_DATA: TimelineItem[] = [
           "Developed concepts and physical-digital prototypes to explore product and experience possibilities.",
           "Iteratively tested prototypes and incorporated consumer and stakeholder feedback."
         ],
-        imageUrl: "/images/pg-design-project.jpg",
+        imageUrl: "/images/pg/process-overview.webp",
+        projectId: "pg-haircare",
         skills: [
           { label: "Design Strategy", description: "Strategic innovation within market constraints." },
           { label: "User Research", description: "Ethnographic research and behavior analysis." },

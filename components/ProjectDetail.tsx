@@ -14,6 +14,7 @@ import { projectPath } from '../lib/workRoutes';
 import GlyphProjectDetail from './GlyphProjectDetail';
 import FamilySyncProjectDetail from './hcd/FamilySyncProjectDetail';
 import McDonaldsProjectDetail from './hcd/McDonaldsProjectDetail';
+import PgProjectDetail from './pg/PgProjectDetail';
 import { trackEvent } from '../lib/analytics';
 import { useContentEngagement } from '../hooks/useContentEngagement';
 
@@ -474,6 +475,7 @@ const ProjectDetail: React.FC<Props> = (props) => {
     if (props.project.id === 'glyph') return <GlyphProjectDetail {...props} />;
     if (props.project.id === 'familysync-jpmorgan') return <FamilySyncProjectDetail {...props} />;
     if (props.project.id === 'mcdonalds-interaction-design') return <McDonaldsProjectDetail {...props} />;
+    if (props.project.id === 'pg-haircare') return <PgProjectDetail {...props} />;
     return <DefaultProjectDetail {...props} />;
 };
 

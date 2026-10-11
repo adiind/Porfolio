@@ -1,5 +1,9 @@
 # Third-party notices
 
+## Instrument Serif
+
+The conditioning-packaging case study uses Instrument Serif by Rodrigo Fuenzalida, licensed under the SIL Open Font License. The license text is `public/fonts/InstrumentSerif-OFL.txt`.
+
 ## Viscose carousel source
 
 The project-wheel WebGL renderer, texture-atlas approach, and signed-distance shader in this portfolio are adapted from **Viscose** by Yousuf Soomro.
