@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Grok Bot" data-grok-bot-mark="official-app-inspired">
+  <title>Grok Bot</title>
+  <defs>
+    <linearGradient id="bot-bg" x1="12" y1="8" x2="88" y2="92" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#343434"/>
+      <stop offset="1" stop-color="#090909"/>
+    </linearGradient>
+    <linearGradient id="bot-face" x1="31" y1="23" x2="72" y2="79" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#e7e7e7"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#bot-bg)"/>
+  <path fill="url(#bot-face)" d="M50 17c-21 0-36 15-36 37v9c0 19 14 30 34 30h20c17 0 27-12 27-29V42c0-16-11-25-27-25H50Z"/>
+  <path fill="#141414" d="M40 41c-6 0-10 5-10 11v7c0 7 4 11 10 11s10-4 10-11v-7c0-6-4-11-10-11Zm25-9c-5 0-8 4-8 9v7c0 6 4 10 9 10s9-4 9-10v-6c0-6-4-10-10-10Z"/>
+</svg>
