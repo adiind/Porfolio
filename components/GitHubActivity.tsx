@@ -35,7 +35,7 @@ const TOOL_MARKS = [
     { src: '/images/tool-marks/codex.svg', title: 'OpenAI Codex' },
     { src: '/images/tool-marks/claude.svg', title: 'Anthropic Claude' },
     { src: '/images/tool-marks/cursor.svg', title: 'Cursor' },
-    { src: '/images/tool-marks/grok.svg', title: 'Grok' },
+    { src: '/images/tool-marks/grok-bot.svg', title: 'Grok Bot' },
     { src: '/images/tool-marks/muse.svg', title: 'Muse' },
 ] as const;
 
