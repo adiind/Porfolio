@@ -1,0 +1,88 @@
+/* One continuous clay road replaces the fixed dot rail and the phase diamonds. */
+.tracker, .case-map, #caseMap, .toc, .case-thread, .ph-head .stop, .journey-face { display: none !important; }
+.case { isolation: isolate; }
+.case > :not(.journey) { position: relative; z-index: 1; }
+.journey { position: absolute; inset: 0; z-index: 0; display: block; pointer-events: none; overflow: visible; }
+.journey svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.journey path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.journey-shadow { stroke: rgba(85, 63, 39, .22); stroke-width: 63px; transform: translateY(8px); }
+.journey-base { stroke: #bba47d; stroke-width: 55px; }
+.journey-surface { stroke: #decaab; stroke-width: 49px; }
+.journey-grain { stroke: #c5af8b; stroke-width: 50px; stroke-dasharray: 1 13 2 19; opacity: .28; }
+.journey-progress { stroke: #c3a575; stroke-width: 46px; opacity: .67; }
+.journey-centre { stroke: #f6efe3; stroke-width: 2.7px; stroke-dasharray: 8 12; }
+.journey-fork-base { stroke: #bba47d; stroke-width: 40px; }
+.journey-branch { stroke: #decaab; stroke-width: 34px; }
+.journey-branch-dash { stroke: #f6efe3; stroke-width: 2px; stroke-dasharray: 7 11; }
+.journey-rough { stroke: #ac9270; stroke-width: 45px; stroke-dasharray: 1 15; opacity: .42; }
+.journey-end { stroke: #c5ad84; stroke-width: 12px; stroke-dasharray: 3 7; }
+.journey-car { position: absolute; z-index: 3; top: 0; left: 0; width: 120px; line-height: 0; transform-origin: 50% 50%; will-change: transform; }
+.journey-car img { display: block; width: 100%; height: auto; }
+.no-motion .journey-car { display: block; }
+.road-signs { position: absolute; inset: 0; }
+.road-sign { position: absolute; z-index: 4; width: 132px; display: flex; align-items: center; flex-direction: column; color: #38291b; text-decoration: none; transform: translateY(-50%); pointer-events: auto; }
+.road-sign-face { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 38px; padding: 5px 9px; border: 3px solid #b99d70; border-radius: 13px 6px 13px 6px; background: #f1dfbd; box-shadow: inset 0 -3px 0 rgba(126, 95, 55, .15), 0 4px 0 #a78b61, 0 7px 10px rgba(62, 43, 22, .12); font-size: 14px; font-weight: 650; line-height: 1.05; white-space: nowrap; }
+.road-sign-face b { color: #8b4b2e; font-size: 11px; font-weight: 750; }
+.road-sign-pole { width: 7px; height: 12px; background: linear-gradient(90deg, #a98c5f, #d1b58a 55%, #9d8055); border-radius: 0 0 4px 4px; box-shadow: 2px 2px 0 rgba(85, 63, 39, .16); }
+.road-sign:hover .road-sign-face, .road-sign:focus-visible .road-sign-face, .road-sign.on .road-sign-face { background: #f6cf7e; }
+.road-sign:focus-visible { outline: 3px solid #a12f22; outline-offset: 4px; border-radius: 10px; }
+.drive-thru { position: absolute; z-index: 2; display: block; width: 44px; height: 42px; transform: translate(-50%, -50%); color: #855d38; }
+.drive-thru svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.drive-thru path { fill: #f4e5c7; stroke: currentColor; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+/* Road exits the case into a small drive-through pictogram at the final stop. */
+.phase-numbers { display: flex; flex-wrap: wrap; gap: 24px 56px; margin: 24px 0; }
+.phase-numbers li { display: block; border: 0; padding: 0; }
+.phase-numbers b { display: block; min-width: 0; font-size: 96px; }
+.phase-numbers span { display: block; margin-top: 8px; font-size: 24px; }
+.count-row .bignums li { border: 0; }
+.case .vis-row > .scene, .case .synthesis-main, .case .vis-row-b > .scene.sq { width: min(100%, 660px); max-width: 660px; margin-left: auto; margin-right: auto; }
+.count-row { grid-template-columns: minmax(0, .3fr) minmax(0, .7fr); }
+.count-row .count-scene { max-width: 660px; }
+.out-grid .vis-row-o { position: relative; }
+.outcome-arrival { grid-area: 1 / 1; align-self: end; justify-self: start; position: relative; width: 210px; margin: 0 0 55px max(0px, calc((100% - 660px) / 2 - 36px)); transform-origin: 50% 90%; }
+.outcome-arrival img { width: 100%; height: auto; }
+.case-close { margin-top: 64px; }
+.case-close h3 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -.045em; margin: 0 0 28px; }
+.case-close .lab { margin: 24px 0 8px; }
+.close-team { max-width: 34em; }
+.case-close a:focus-visible { outline: 3px solid var(--red); outline-offset: 5px; }
+.next-project { margin: 34px 0 0; }
+@media (max-width: 859px) {
+  .journey-shadow { stroke-width: 34px; transform: translateY(5px); }
+  .journey-base { stroke-width: 30px; }
+  .journey-surface { stroke-width: 26px; }
+  .journey-grain { stroke-width: 27px; stroke-dasharray: 1 11 1 7; }
+  .journey-progress { stroke-width: 24px; }
+  .journey-centre { stroke-width: 1.6px; stroke-dasharray: 5 8; }
+  .journey-fork-base { stroke-width: 24px; }
+  .journey-branch { stroke-width: 18px; }
+  .journey-branch-dash { stroke-width: 1.5px; stroke-dasharray: 5 8; }
+  .journey-rough { stroke-width: 28px; }
+  .journey-car { width: 64px; }
+  .road-sign { width: 120px; }
+  .road-sign-face { min-height: 33px; padding: 4px 6px; gap: 5px; font-size: 12px; }
+  .road-sign-face b { font-size: 10px; }
+  .road-sign-pole { height: 9px; width: 6px; }
+  .drive-thru { width: 36px; height: 34px; }
+  .road-sign { transform: translateY(-50%); }
+  .phase-numbers { gap: 20px 36px; margin: 22px 0; }
+  .phase-numbers b { font-size: 62px; }
+  .phase-numbers span { font-size: 18px; }
+  .count-row { grid-template-columns: minmax(0, 1fr); }
+  .outcome-arrival { width: 120px; margin: 0 0 66px -5px; }
+  .case-close { margin-top: 48px; }
+  .case-close .body-l { font-size: 20px; line-height: 1.5; }
+  .next-project .btn { width: 100%; font-size: 18px; padding: 18px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .journey-car { will-change: auto; } }
+/* The case reveal uses the same winding road motif as the full walkthrough. */
+.unlock-map { top: 45%; width: min(88vw, 720px); }
+.unlock-map .um-base { fill: none; stroke: #c5ad84; stroke-width: 46; stroke-linecap: round; opacity: .9; }
+.unlock-map .um-thread { fill: none; stroke: #f6efe3; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.journey-end { stroke: #decaab; stroke-width: 49px; stroke-dasharray: none; opacity: 1; }
+@media (max-width: 859px) { .journey-end { stroke-width: 26px; } }
+@media (max-width: 859px) {
+  body { padding-top: 0; }
+  .case { padding-left: 76px; }
+}
+@media (max-width: 859px) { .case { padding-left: 84px; } }

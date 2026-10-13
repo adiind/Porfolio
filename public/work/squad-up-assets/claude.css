@@ -1,0 +1,64 @@
+/* Claude pass: audit fixes + motion support. Loaded last. */
+
+/* ---------- Lenis (desktop smooth scroll) ---------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: clip; }
+
+/* ---------- Road: draws with scroll; one small car; signs pop in ---------- */
+.journey-reveal { stroke: #fff; stroke-width: 72px; }
+.journey-fork-reveal { stroke: #fff; stroke-width: 56px; }
+.journey-car { position: absolute; z-index: 3; top: 0; left: 0; width: 84px; aspect-ratio: 1; line-height: 0; pointer-events: none; will-change: transform; }
+.no-motion .journey-car { display: block; will-change: auto; }
+.journey-car img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; transition: opacity .45s ease; }
+.journey-car img.on { opacity: 1; }
+.journey-car i { position: absolute; left: 10%; right: 6%; bottom: 3%; height: 20%; border-radius: 50%; background: radial-gradient(closest-side, rgba(70, 48, 24, .36), rgba(70, 48, 24, 0)); }
+.road-sign { width: 132px; }
+.road-sign-in { display: flex; flex-direction: column; align-items: center; width: 100%; transform-origin: 50% 100%; }
+html:not(.no-motion) .road-sign:not(.in) .road-sign-in { opacity: 0; transform: scale(.3, .2); }
+html:not(.no-motion) .road-sign.in .road-sign-in { animation: sign-pop .72s cubic-bezier(.3, 1.2, .5, 1) both; }
+@keyframes sign-pop {
+  0% { opacity: 0; transform: scale(.3, .2); }
+  42% { opacity: 1; transform: scale(1.14, .84); }
+  66% { transform: scale(.95, 1.07); }
+  84% { transform: scale(1.03, .98); }
+  100% { opacity: 1; transform: none; }
+}
+.road-sign-face { transition: background-color .25s ease; }
+
+/* ---------- Audit fixes ---------- */
+/* Synthesis insight was falling back to unstyled body text. It now matches the other statements and the left edge. */
+.synthesis-compare, .synthesis-insight { margin-left: 0; margin-right: 0; }
+.synthesis-insight { margin-top: 40px; }
+.synthesis-insight .kick { margin: 0 0 10px; font-size: 16px; font-weight: 600; letter-spacing: -.015em; }
+.synthesis-insight .big { margin: 0; max-width: 17em; font-size: clamp(28px, 4vw, 54px); font-weight: 600; line-height: 1.04; letter-spacing: -.045em; text-wrap: balance; }
+/* Exploration: the concept line was touching the scene. */
+.concept-line { margin-bottom: 34px; }
+.app-moment h4 { margin: 4px 0 0; }
+.app-intro { margin: 12px 0 0; }
+/* Outcome: one car (the road car arrives here); the ask button stays on one line. */
+.askrow .btn { white-space: nowrap; }
+/* Storyboard frames keep their real size; captions wrap to the frame instead of widening it. */
+.storyboard-window { min-width: 0; }
+.storyboard-strip { grid-auto-columns: max-content; scroll-padding-inline: 0; }
+.storyboard-strip li { max-width: min(440px, 76vw); overflow: hidden; }
+.storyboard-strip img { width: 440px; }
+.storyboard-strip figcaption { width: 0; min-width: 100%; }
+.story-stage.pinned .storyboard-window { overflow: hidden; }
+.story-stage.pinned .storyboard-strip { width: max-content; overflow: visible; scroll-snap-type: none; padding-bottom: 6px; will-change: transform; }
+
+@media (min-width: 860px) {
+  /* Hero fills the first screen, so the overview's own skip link starts below the fold. */
+  .hero { min-height: 100svh; align-content: center; }
+  /* Overview headlines were breaking into five short lines. */
+  html.pin .beat:not(.beat-flow) .beat-copy { width: min(440px, calc((100% - 276px) * .43)); }
+}
+@media (max-width: 859px) {
+  .journey-car { width: 54px; }
+  .road-sign { width: 120px; }
+  /* Hero counts: 4 / 8 / 22 sit on one row instead of orphaning 22. */
+  .hero-foot .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 12px; }
+  .synthesis-insight { margin-top: 32px; }
+  .concept-line { margin-bottom: 26px; }
+  .askrow .btn.big { padding: 16px 22px; font-size: 17px; }
+}
+@media (max-width: 379px) { .askrow .btn { white-space: normal; } }

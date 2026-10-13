@@ -1,0 +1,58 @@
+/* R10: the road is a quiet map. The approved phase visuals carry the case. */
+.journey-key { max-width: 54em; margin: 26px 0 60px; font-size: 16px; line-height: 1.5; }
+.journey-car { width: 34px; }
+.journey-car-skin { display: block; position: relative; transform-origin: 50% 85%; }
+.journey-car-skin > img { width: 100%; }
+.journey-car-skin::after { content: ''; position: absolute; left: 67%; top: 79%; width: 3px; height: 2px; border-radius: 50%; background: #f8d998; box-shadow: 0 0 4px 2px #f3c86e55, -8px 2px 4px 1px #f3c86e44; opacity: 0; }
+.journey-car-skin.headlights-warm::after { opacity: .75; }
+.journey-roof-bag { display: none; position: absolute; left: 39%; top: 11%; width: 12px; }
+.journey-roof-bag img { width: 100%; height: auto; }
+.journey-car-skin.at-outcome .journey-roof-bag { display: block; }
+.journey-parked { width: 30px; }
+.journey-branch { stroke: #d2bd99; stroke-width: 12px; }
+.journey-rough { stroke: #8e9c9e; stroke-width: 4px; stroke-dasharray: 2 11; opacity: .7; }
+.journey-face { position: absolute; width: 23px; height: 23px; transform: translate(-50%, -50%); }
+.journey-face svg { width: 100%; height: 100%; }
+.journey-face circle { fill: #f1d596; stroke: #b19462; stroke-width: 1.5; }
+.journey-face path { fill: none; stroke: #6b4930; stroke-width: 2.2; stroke-linecap: round; }
+.ambient::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 40% 20%, var(--journey-sky, transparent), transparent 85%); opacity: 0; }
+html.journey-in-view .ambient::after { opacity: .45; }
+html.journey-in-view .ambient i { opacity: .4; }
+/* Keep actual source dimensions as the ceiling; source caps from squad.js still apply. */
+.synthesis-main { width: min(100%, 640px); margin: 36px auto; }
+.synthesis-main img { width: 100%; border-radius: 24px; }
+.vis-row-b { grid-template-columns: minmax(0, 1fr); }
+.vis-row-b > .scene.sq { width: min(100%, 640px); max-width: 640px; margin: auto; }
+.vis-row-b > .explore-copy { grid-column: 1; grid-row: auto; }
+.test-grid, .out-grid { grid-template-columns: minmax(0, 1fr); }
+.test-grid .scene.sq, .out-grid .scene.sq { width: min(100%, 640px); max-width: 640px; margin: auto; }
+.count-row { grid-template-columns: minmax(0, .32fr) minmax(0, .68fr); gap: 32px; }
+.count-row .count-scene { max-width: 640px; width: 100%; margin: auto; }
+@media (max-width: 859px) {
+  .journey-car { width: 16px; }
+  .journey-parked { width: 15px; }
+  .journey-roof-bag { width: 6px; }
+  .journey-car-skin::after { width: 2px; height: 1px; box-shadow: 0 0 3px 1px #f3c86e44; }
+  .journey-branch { stroke-width: 6px; }
+  .journey-rough { stroke-width: 2px; stroke-dasharray: 1 8; }
+  .journey-face { width: 18px; height: 18px; }
+  .journey-key { margin: 22px 0 38px; font-size: 15px; }
+  .count-row { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .count-scene { order: -1; }
+  .count-row .bignums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .count-row .bignums li { display: block; padding: 10px 0; border: 0; }
+  .count-row .bignums b { display: block; font-size: 54px; line-height: 1; }
+  .count-row .bignums span { display: block; margin-top: 8px; font-size: 16px; line-height: 1.25; }
+}
+@media (min-width: 860px) {
+  .count-row .bignums li { display: block; padding: 14px 0; }
+  .count-row .bignums b { display: block; min-width: 0; font-size: 96px; }
+  .count-row .bignums span { display: block; margin-top: 8px; font-size: 24px; }
+}
+@media (max-width: 859px) {
+  .count-row > .scene { grid-area: 1 / 1; }
+  .count-row > .bignums { grid-area: 2 / 1; }
+}
+/* The shared-bag accent sits within the artwork, clear of its evidence caption. */
+.out-grid .vis-row-o .c-five { bottom: 54px; }
+@media (max-width: 859px) { .out-grid .vis-row-o .c-five { bottom: 96px; width: 110px; right: 0; } }
