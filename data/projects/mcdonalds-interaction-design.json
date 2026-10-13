@@ -1,8 +1,8 @@
 {
     "id": "mcdonalds-interaction-design",
     "hero": {
-        "title": "McDonald's – Group Ordering Interaction Design",
-        "oneLiner": "A group-ordering experience designed with McDonald's through human-centered research, journey mapping, and prototyping."
+        "title": "Squad Up — group ordering for McDonald’s",
+        "oneLiner": "Group ordering across shared digital touchpoints"
     },
     "context": {
         "text": "Developed with McDonald's through Northwestern EDI, this human-centered design project focused on group ordering: the messy moment where several people want food together, but one person usually ends up collecting texts, remembering edits, checking totals, and fixing the order. We synthesized observations, interviews, and survey responses into journey maps and interaction prototypes. The resulting experience lets people join from a link, add their own items, see who added what, review the group order, and coordinate payment and pickup."
@@ -72,7 +72,7 @@
             "description": "Balancing quick ordering with group readiness and payment handoffs."
         }
     ],
-    "heroImage": "/images/mcdonalds_order.webp",
+    "heroImage": "/images/mcd/squad-up/scenes/mcd-01-hero-drive-thru.webp",
     "sourceUrl": "https://www.figma.com/slides/slvKGHm9wwaVspF7TEGs8T",
     "sourceLabel": "View Figma Slides"
 }

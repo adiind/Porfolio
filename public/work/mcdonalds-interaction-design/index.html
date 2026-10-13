@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squad Up — group ordering for McDonald’s — Adi Agarwal</title>
+<link rel="icon" href="data:,">
+<link rel="preload" as="image" href="/images/mcd/squad-up/scenes/mcd-01-hero-drive-thru.webp" fetchpriority="high">
+<link rel="preload" as="font" href="/work/squad-up-assets/Geist-Variable.ttf" type="font/ttf" crossorigin>
+<script>
+// motion: reveals armed. pin: the overview is a pinned camera. gated: the full case waits until the reader asks for it.
+// ?static and reduced motion get none of these, so the whole story is on the page at once.
+(() => {
+  const root = document.documentElement;
+  if (new URLSearchParams(location.search).get('title') === 'flat') root.classList.add('flat-title');
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("static")) { root.classList.add("no-motion"); return; }
+  root.classList.add("motion", "pin");
+  let open = false;
+  try { open = sessionStorage.getItem("squad-case-open") === "1"; } catch {}
+  if (!open && !/^#(case|p-)/.test(location.hash)) root.classList.add("gated");
+  setTimeout(() => { if (!window.__squadReady) root.classList.remove("motion", "pin", "gated"); }, 2500);
+})();
+</script>
+<link rel="stylesheet" href="/work/squad-up-assets/squad.css?v=30">
+<link rel="stylesheet" href="/work/squad-up-assets/r8.css?v=5">
+<link rel="stylesheet" href="/work/squad-up-assets/r10.css?v=3">
+<link rel="stylesheet" href="/work/squad-up-assets/final2.css?v=7">
+<link rel="stylesheet" href="/work/squad-up-assets/content-cut.css?v=1">
+<link rel="stylesheet" href="/work/squad-up-assets/claude.css?v=3">
+<link rel="stylesheet" href="/work/squad-up-assets/claude-r4.css?v=1">
+</head>
+<body>
+<a class="skip-main" href="#case">Skip to the full case study</a>
+<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<main id="main">
+<!-- ============================== Hero ============================== -->
+<header class="hero" id="start" data-track="Start" data-short="Start">
+  <div class="hero-copy">
+    <p class="cobrand" data-rv><b>McDonald’s</b><span aria-hidden="true">×</span><b>Northwestern EDI</b><small>Sponsored project</small></p>
+    <p class="eyebrow" data-rv>DSGN 401-2 · Winter 2026</p>
+    <h1 class="logo-h"><span class="logo" id="logo"><span class="lg-in"><span class="lg-l"><img decoding="async" src="/images/mcd/squad-up/cutouts/logo-c.webp" alt="Squad Up" width="2171" height="724" fetchpriority="high"></span><span class="lg-r" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/logo-c.webp" alt="" width="2171" height="724"></span><span class="lg-c" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/logo-c.webp" alt="" width="2171" height="724"></span></span><img decoding="async" class="flat-logo" src="/images/mcd/squad-up/figma/squad-up-logo-original.webp" alt="" aria-hidden="true" width="2026" height="401"></span></h1>
+    <p class="sub" data-rv>Group ordering across shared digital touchpoints</p>
+    <p class="sum" data-rv>A sponsored course concept from Northwestern University · MS Engineering Design Innovation. It connects individual choices and payments to one visible group order.</p>
+
+    <div class="instructors" data-rv>
+      <p>Instructors</p>
+      <ul>
+        <li><a href="https://design.northwestern.edu/people/profiles/wilbur-jesse.html" target="_blank" rel="noopener noreferrer"><img decoding="async" src="/images/mcd/squad-up/instructors/wilbur-jesse.webp" alt="" width="265" height="265"><span><b>Jesse Wilbur</b><small>Adjunct Lecturer</small></span></a></li>
+        <li><a href="https://design.northwestern.edu/people/profiles/quish-tom.html" target="_blank" rel="noopener noreferrer"><img decoding="async" src="/images/mcd/squad-up/instructors/quish-tom.webp" alt="" width="265" height="265"><span><b>Tom Quish</b><small>Adjunct Lecturer</small></span></a></li>
+      </ul>
+    </div>
+    <p class="hero-actions" data-rv><a class="btn ghost" href="#case">Skip to the full case study ↓</a></p>
+  </div>
+  <div class="hero-right">
+    <figure class="hero-scene scene">
+      <span class="glow" aria-hidden="true"></span>
+      <img decoding="async" src="/images/mcd/squad-up/scenes/mcd-01-hero-drive-thru.webp" alt="Clay miniature scene: five friends in a sage-green car at a lit McDonald’s drive-through, sharing one order." width="2400" height="1600" fetchpriority="high">
+
+    </figure>
+    <div class="hero-foot">
+      <ul class="stats" data-rv aria-label="Research counts reported by the team">
+        <li><b>4</b>site observations</li><li><b>8</b>qualitative interviews</li><li><b>22</b>survey responses</li>
+      </ul>
+
+      <ul class="crew" data-rv aria-label="Team McLovin’">
+        <li><img decoding="async" src="/images/mcd/squad-up/figma/crew-adam-kanowitz.webp" alt="" width="649" height="649"><span>Adam Kanowitz</span></li>
+        <li><img decoding="async" src="/images/mcd/squad-up/figma/crew-adi-agarwal.webp" alt="" width="649" height="649"><span>Adi Agarwal</span></li>
+        <li><img decoding="async" src="/images/mcd/squad-up/figma/crew-anastazja-branski.webp" alt="" width="647" height="649"><span>Anastazja Branski</span></li>
+        <li><img decoding="async" src="/images/mcd/squad-up/figma/crew-ethan-torain.webp" alt="" width="649" height="649"><span>Ethan Torain</span></li>
+        <li><img decoding="async" src="/images/mcd/squad-up/figma/crew-william-ryan.webp" alt="" width="649" height="649"><span>William Ryan</span></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- ============================== Short version ============================== -->
+<section class="short" id="overview" data-track="The short version" data-short="Overview" aria-labelledby="overview-title">
+  <!-- One stage, four match-cuts. The same semantic sequence becomes a plain illustrated story without motion. -->
+  <div class="intro" id="intro">
+    <h2 id="overview-title" class="sr-only">From the outing to a shared order</h2>
+    <a class="skip-link intro-skip" href="#case">Full case study ↓</a>
+    <div class="intro-view" id="introView">
+      <div class="stage-light" aria-hidden="true"></div>
+      <ol class="story">
+        <li class="beat" data-beat="1 · The outing" data-beat-short="1 The outing">
+          <div class="stage-art art-car" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/cutout-car-squad.webp" alt="" width="1000" height="1000"></div>
+          <div class="beat-copy">
+            <p class="beat-n">01 · The outing</p>
+            <h3 class="beat-t">A group visit can be one stop in a larger outing.</h3>
+            <p class="beat-d">The team described teen visits as happening before or after other activities, as part of a group outing.</p>
+
+          </div>
+        </li>
+        <li class="beat" data-beat="2 · The coordination problem" data-beat-short="2 The problem">
+          <div class="stage-art art-chaos" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/cutout-coordinator-chaos.webp" alt="" width="1000" height="1000"></div>
+          <div class="stage-prop art-receipts" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/cutout-receipts.webp" alt="" width="1000" height="1000"></div>
+          <div class="beat-copy">
+            <p class="beat-n">02 · The coordination problem</p>
+            <h3 class="beat-t">One organizer gathers the order and tracks payment.</h3>
+            <p class="beat-d">The team compared single-organizer ordering with separate individual orders; each approach creates coordination work in different places.</p>
+
+          </div>
+        </li>
+        <li class="beat" data-beat="3 · One shared order" data-beat-short="3 Shared order">
+          <div class="stage-art art-shared" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/cutout-shared-bag.webp" alt="" width="1000" height="1000"></div>
+          <div class="stage-prop art-five" aria-hidden="true"><img decoding="async" src="/images/mcd/squad-up/cutouts/cutout-five-bags.webp" alt="" width="1000" height="1000"></div>
+          <div class="beat-copy">
+            <p class="beat-n">03 · One shared order</p>
+            <h3 class="beat-t">Individual choices within one shared order.</h3>
+            <p class="beat-d">Each person builds their own bag. A member can pay for themselves, or another member can pay for them.</p>
+
+          </div>
+        </li>
+        <li class="beat beat-flow" data-beat="4 · The flow" data-beat-short="4 The flow">
+          <figure class="flow-road" id="introRoad"><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-06-flow-invite-to-pickup.webp" alt="A winding road links the group invite, order, payment, and pickup." width="2400" height="800"></figure>
+          <div class="stage-art art-phone" aria-hidden="true"><span class="clay-phone "><img decoding="async" class="clay-shell" id="flowPhone" src="/images/mcd/squad-up/cutouts/phone-front-r8.webp" alt="" width="823" height="1544"><span class="clay-display"><img decoding="async" class="clay-ui" id="flowScreen" src="/images/mcd/squad-up/figma/screens-r8/invite-screen.webp" alt="" width="615" height="1242"></span></span><span class="phone-label" id="phoneLabel">Invite</span></div>
+          <div class="beat-copy flow-copy">
+            <p class="beat-n">04 · The core flow</p>
+            <ol class="flow-sequence" aria-label="Six steps in the concept">
+              <li class="flow-state"><h3><span>01 / 06</span>Invite</h3><p>The host invites the squad by QR code or tap.</p></li>
+              <li class="flow-state"><h3><span>02 / 06</span>Join</h3><p>A guest joins through the app, mobile web, or an assisted path.</p></li>
+              <li class="flow-state"><h3><span>03 / 06</span>Choose</h3><p>Each person builds a personal bag within the shared order.</p></li>
+              <li class="flow-state"><h3><span>04 / 06</span>Pay</h3><p>A member can pay for themselves or for someone else.</p></li>
+              <li class="flow-state"><h3><span>05 / 06</span>Readiness</h3><p>The squad sees whose order is still being built and who is ready.</p></li>
+              <li class="flow-state"><h3><span>06 / 06</span>Pickup</h3><p>The submitted order has a shared confirmation and pickup details.</p></li>
+            </ol>
+          </div>
+          <ol class="road-steps" aria-label="Follow the core flow"><li><button type="button" data-flow="0"><span>01</span> Invite</button></li><li><button type="button" data-flow="1"><span>02</span> Join</button></li><li><button type="button" data-flow="2"><span>03</span> Choose</button></li><li><button type="button" data-flow="3"><span>04</span> Pay</button></li><li><button type="button" data-flow="4"><span>05</span> Readiness</button></li><li><button type="button" data-flow="5"><span>06</span> Pickup</button></li></ol>
+        </li>
+      </ol>
+      <p class="stage-foot">Each person builds a bag, then follows the shared order. <span class="stage-cue">Scroll to follow the order ↓</span></p>
+    </div>
+  </div>
+  <p class="case-entry" id="endCard"><a href="#p-context" data-unlock aria-controls="case"><span class="entry-label">Explore more · the full case study</span><span aria-hidden="true">↓</span></a></p>
+</section>
+
+<!-- ============================== Full case ============================== -->
+<article class="case" id="case" tabindex="-1" aria-labelledby="case-title">
+  <nav class="journey" id="journey" aria-label="Road through the case study phases"><svg id="journeySvg" aria-hidden="true"><defs><mask id="roadReveal" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><path class="journey-reveal"/><path class="journey-fork-reveal"/></mask></defs><path class="journey-shadow"/><path class="journey-base"/><path class="journey-surface"/><g mask="url(#roadReveal)"><path class="journey-fork-base"/><path class="journey-branch"/><path class="journey-branch-dash"/><path class="journey-grain"/><path class="journey-centre"/></g></svg><div class="journey-car" id="journeyCar" aria-hidden="true"><b></b><span class="journey-car-in"><i></i><img src="/images/mcd/squad-up/journey/sm/01-context.webp" alt="" width="336" height="336" decoding="async" class="on"><img src="/images/mcd/squad-up/journey/sm/02-research.webp" alt="" width="336" height="336" decoding="async"><img src="/images/mcd/squad-up/journey/sm/03-synthesis.webp" alt="" width="336" height="336" decoding="async"><img src="/images/mcd/squad-up/journey/sm/04-exploration.webp" alt="" width="336" height="336" decoding="async"><img src="/images/mcd/squad-up/journey/sm/05-testing.webp" alt="" width="336" height="336" decoding="async"><img src="/images/mcd/squad-up/journey/sm/06-outcome.webp" alt="" width="336" height="336" decoding="async"></span></div><div class="road-signs" id="roadSigns"></div></nav>
+  <header class="case-head"><h2 id="case-title" data-rv>Squad Up’s design process</h2></header>
+
+
+  <!-- 01 Context -->
+  <section class="ph" id="p-context" data-journey-label="Context" data-dm="start" data-track="01 · Context" data-short="01 Context" tabindex="-1" aria-labelledby="h-context">
+    <header class="ph-head" data-rv><p class="num">01 · Context</p><h3 id="h-context">Ordering as one stop in a group outing</h3></header>
+    <ul class="bignums phase-numbers" data-rv><li><b>14–19</b><span>target age range · teenagers</span></li></ul>
+    <figure class="scene vis-scene context-scene" data-rv><span class="glow" aria-hidden="true"></span><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-02-context-between-stops.webp" alt="Friends gather by a parked car during an outing." width="2400" height="1600" loading="lazy"></figure>
+    <blockquote class="statement" data-rv><p>Teens go to McDonald’s when they are coming from another event or on their way to something else.</p><footer>Team insight</footer></blockquote>
+    <p class="body-l context-summary" data-rv>Group outings make ordering and payment harder to coordinate.</p>
+  </section>
+
+  <!-- 02 Research -->
+  <section class="ph" id="p-research" data-journey-label="Research" data-dm="a" data-track="02 · Research" data-short="02 Research" tabindex="-1" aria-labelledby="h-research">
+    <header class="ph-head" data-rv><p class="num">02 · Research</p><h3 id="h-research">Observations, interviews and a survey</h3></header>
+    <p class="method" data-rv><b>Method</b> Site observations, qualitative interviews and a survey.</p>
+    <div class="count-row">
+      <ol class="bignums" id="counts" data-rv><li><b data-count="4">4</b><span>site observations</span></li><li><b data-count="8">8</b><span>qualitative interviews</span></li><li><b data-count="22">22</b><span>survey responses</span></li></ol>
+      <figure class="scene count-scene" data-rv><span class="glow" aria-hidden="true"></span><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-03-research-observation.webp" alt="Friends consider an order at a drive-through counter." width="1600" height="1600" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- 03 Synthesis -->
+  <section class="ph" id="p-synthesis" data-journey-label="Synthesis" data-dm="b" data-track="03 · Synthesis" data-short="03 Synthesis" tabindex="-1" aria-labelledby="h-synthesis">
+    <header class="ph-head" data-rv><p class="num">03 · Synthesis</p><h3 id="h-synthesis">Two ways groups order, and what each costs</h3></header>
+    <ul class="bignums phase-numbers" data-rv><li><b>2</b><span>ways groups order</span></li></ul>
+    <figure class="scene synthesis-main" data-rv><span class="glow" aria-hidden="true"></span><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-04-problem-coordinator.webp" alt="Friends compare group-order options around a table." width="1600" height="1600" loading="lazy"></figure>
+    <p class="method synthesis-compare" data-rv>One person can consolidate an order but must chase payments. Separate orders clarify payment but make coordination harder.</p>
+    <div class="finding-t synthesis-insight" data-rv><p class="kick">Team insight</p><p class="big">Current offerings leave gaps in collection, payment tracking and timing.</p></div>
+  </section>
+
+  <!-- 04 Exploration -->
+  <section class="ph" id="p-exploration" data-journey-label="Exploration" data-dm="c" data-track="04 · Exploration" data-short="04 Exploration" tabindex="-1" aria-labelledby="h-exploration">
+    <header class="ph-head" data-rv><p class="num">04 · Exploration</p><h3 id="h-exploration">Exploring the group-order idea</h3></header>
+    <p class="concept-line" data-rv>We explored five concepts across ordering, rewards, play and family; the group-ordering idea (Multi-Cart) became Squad Up.</p>
+    <div class="story-stage" id="storyStage">
+    <figure class="scene vis-scene exploration-scene" data-rv><span class="glow" aria-hidden="true"></span><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-05-idea-shared-bag.webp" alt="Individual orders join one shared bag." width="1600" height="1600" loading="lazy"></figure>
+    <div class="storyboard" id="storyboard">
+      <h4 data-rv>App storyboard</h4>
+      <div class="storyboard-window" data-rv>
+      <ol class="storyboard-strip" tabindex="0" aria-label="Eight illustrated frames from the app storyboard">
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-01.webp" alt="Friends travel together in a car." width="440" height="322" loading="lazy"><figcaption>Friends travel between events</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-02.webp" alt="A host starts a group order on a phone." width="440" height="322" loading="lazy"><figcaption>Host starts a group order</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-03.webp" alt="A host sends the order invitation." width="440" height="322" loading="lazy"><figcaption>Invite sent to friends</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-04.webp" alt="A friend opens the group-order invitation." width="440" height="322" loading="lazy"><figcaption>Friend opens the invite</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-05.webp" alt="Each person builds a personal cart." width="440" height="323" loading="lazy"><figcaption>Everyone builds a cart</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-06.webp" alt="The group order enters the queue." width="440" height="323" loading="lazy"><figcaption>Shared order enters queue</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-07.webp" alt="The group collects its order at a drive-through." width="440" height="323" loading="lazy"><figcaption>Squad collects the order</figcaption></figure></li>
+        <li><figure><img decoding="async" src="/images/mcd/squad-up/storyboard/app-08.webp" alt="Friends share a meal in the car." width="440" height="323" loading="lazy"><figcaption>One meal, shared ride</figcaption></figure></li>
+      </ol>
+      </div>
+    </div>
+    </div>
+    <section class="app-moment" id="appMoment" aria-labelledby="app-title">
+      <p class="app-kicker" data-rv>The app</p>
+      <h4 id="app-title" data-rv>Four screens from the prototype</h4>
+      <p class="app-intro" data-rv>Invite → join → choose → pay → readiness → pickup.</p>
+      <ol class="app-screens" data-rv="phones"><li><figure><button class="app-preview" type="button" data-screen="invite" aria-label="Enlarge Invite screen"><span class="clay-phone"><img decoding="async" class="clay-shell" src="/images/mcd/squad-up/cutouts/phone-front-r8.webp" alt="" width="823" height="1544" loading="lazy"><span class="clay-display"><img decoding="async" class="clay-ui" src="/images/mcd/squad-up/figma/screens-r8/invite-screen.webp" alt="" width="615" height="1242" loading="lazy"></span></span></button><figcaption><b>Invite</b></figcaption></figure></li><li><figure><button class="app-preview" type="button" data-screen="choose" aria-label="Enlarge Choose screen"><span class="clay-phone"><img decoding="async" class="clay-shell" src="/images/mcd/squad-up/cutouts/phone-front-r8.webp" alt="" width="823" height="1544" loading="lazy"><span class="clay-display"><img decoding="async" class="clay-ui" src="/images/mcd/squad-up/figma/screens-r8/choose-screen.webp" alt="" width="828" height="1664" loading="lazy"></span></span></button><figcaption><b>Choose</b></figcaption></figure></li><li><figure><button class="app-preview" type="button" data-screen="pay" aria-label="Enlarge Pay screen"><span class="clay-phone"><img decoding="async" class="clay-shell" src="/images/mcd/squad-up/cutouts/phone-front-r8.webp" alt="" width="823" height="1544" loading="lazy"><span class="clay-display"><img decoding="async" class="clay-ui" src="/images/mcd/squad-up/figma/screens-r8/pay-screen.webp" alt="" width="469" height="633" loading="lazy"></span></span></button><figcaption><b>Pay</b></figcaption></figure></li><li><figure><button class="app-preview" type="button" data-screen="pickup" aria-label="Enlarge Pickup screen"><span class="clay-phone"><img decoding="async" class="clay-shell" src="/images/mcd/squad-up/cutouts/phone-front-r8.webp" alt="" width="823" height="1544" loading="lazy"><span class="clay-display"><img decoding="async" class="clay-ui" src="/images/mcd/squad-up/figma/screens-r8/pickup-screen.webp" alt="" width="930" height="1900" loading="lazy"></span></span></button><figcaption><b>Pickup</b></figcaption></figure></li></ol>
+    </section>
+  </section>
+
+  <!-- 05 Testing -->
+  <section class="ph" id="p-testing" data-journey-label="Testing" data-dm="d" data-track="05 · Testing" data-short="05 Testing" tabindex="-1" aria-labelledby="h-testing">
+    <header class="ph-head" data-rv><p class="num">05 · Testing</p><h3 id="h-testing">Testing the flow with paper prototypes</h3></header>
+    <div class="test-grid">
+      <div class="vis-row vis-row-t"><figure class="scene vis-scene sq" data-rv><span class="glow" aria-hidden="true"></span><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-07-testing.webp" alt="A team reviews paper screens and a laptop prototype together." width="1600" height="1600" loading="lazy"></figure></div>
+      <div class="test-copy" data-rv><p class="lab">Planned evaluation</p><p class="statement-s">Paper prototypes, surveys and interviews.</p><p class="lab">Key risk</p><p class="body-l">Each person adds steps before checkout.</p></div>
+    </div>
+  </section>
+
+  <!-- 06 Outcome -->
+  <section class="ph" id="p-outcome" data-journey-label="Outcome" data-dm="end" data-track="06 · Outcome" data-short="06 Outcome" tabindex="-1" aria-labelledby="h-outcome">
+    <header class="ph-head" data-rv><p class="num">06 · Outcome</p><h3 id="h-outcome">A shared-order concept and its next steps</h3></header>
+    <div class="out-grid">
+      <div class="vis-row vis-row-o"><figure class="scene vis-scene sq" data-rv><span class="glow" aria-hidden="true"></span><img decoding="async" src="/images/mcd/squad-up/scenes/mcd-08-outcome-pickup.webp" alt="Friends collect one shared order at a drive-through." width="1600" height="1600" loading="lazy"></figure></div>
+      <p class="statement" data-rv="calm"><span class="stp">One shared order connects each person’s choice and payment.</span></p>
+      <div class="out-copy"><div data-rv="calm"><p class="lab">Next steps</p><ul class="open"><li>Multi-bagging</li><li>Group receipts</li><li>Catering</li></ul></div></div>
+    </div>
+    <p class="askrow" data-rv="calm"><a class="btn red big" href="mailto:kriitya@gmail.com?subject=Squad%20Up%20group%20ordering">Ask me about this project</a></p>
+  </section>
+
+  <section class="case-close" id="case-close" aria-labelledby="credits-title" data-rv="calm">
+    <h3 id="credits-title">Credits</h3>
+    <p class="lab">Team McLovin’</p>
+    <p class="body-l close-team">Adam Kanowitz, Adi Agarwal, Anastazja Branski, Ethan Torain, William Ryan</p>
+    <p class="lab">Instructors · Adjunct Lecturers</p>
+    <p class="body-l"><a href="https://design.northwestern.edu/people/profiles/wilbur-jesse.html" target="_blank" rel="noopener noreferrer">Jesse Wilbur ↗</a> · <a href="https://design.northwestern.edu/people/profiles/quish-tom.html" target="_blank" rel="noopener noreferrer">Tom Quish ↗</a></p>
+    <p class="next-project"><a class="btn red big" href="/work/pg-haircare">Next project · P&amp;G haircare <span aria-hidden="true">↗</span></a></p>
+  </section>
+
+</article>
+</main>
+
+<dialog class="screen-dialog" id="screenDialog" aria-labelledby="screenDialogTitle"><div class="screen-dialog-bar"><h2 id="screenDialogTitle">The app</h2><button type="button" id="screenDialogClose">Close ×</button></div><span class="clay-phone "><img decoding="async" class="clay-shell" id="detailPhone" src="/images/mcd/squad-up/cutouts/phone-front-r8.webp" alt="" width="823" height="1544" loading="lazy"><span class="clay-display"><img decoding="async" class="clay-ui" id="detailScreen" src="/images/mcd/squad-up/figma/screens-r8/invite-screen.webp" alt="" width="615" height="1242" loading="lazy"></span></span></dialog>
+
+<!-- One-shot visual transition into the detail. Not a lock: every route to the case also works without it. -->
+<dialog class="unlock-stage" id="unlockStage" aria-labelledby="unlockTitle">
+  <p id="unlockTitle" class="sr-only">Opening the full case study</p>
+  <div class="unlock-dim" aria-hidden="true"></div>
+  <button class="unlock-skip" type="button">Skip animation ↓</button>
+  <div class="unlock-card" aria-hidden="true"><div class="split left"></div><div class="split right"></div></div>
+  <div class="unlock-map" aria-hidden="true"></div>
+  <div class="transition-assets" aria-hidden="true"></div>
+</dialog>
+
+<script src="/work/squad-up-assets/gsap.min.js"></script>
+<script src="/work/squad-up-assets/ScrollTrigger.min.js"></script>
+<script src="/work/squad-up-assets/MotionPathPlugin.min.js"></script>
+<script src="/work/squad-up-assets/lenis.min.js"></script>
+<script src="/work/squad-up-assets/squad.js?v=37"></script>
+<script src="/work/squad-up-assets/road-claude.js?v=3"></script>
+<script src="/work/squad-up-assets/motion-claude.js?v=3"></script>
+<script src="/work/squad-up-assets/phone-r8.js?v=3"></script>
+<script src="/work/squad-up-assets/unlock.js?v=9"></script>
+
+
+</body>
+</html>
