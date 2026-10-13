@@ -1,4 +1,5 @@
 ## Codex
+- 2026-10-13: Replaced the live McDonald’s project at `/work/mcdonalds-interaction-design` with Squad Up via PR #52; updated the homepage card, removed stale Figma source fields, optimized 49 WebP assets, and verified the local build plus live card handoff, six-stop road navigation, and reduced-motion mode. Publish record: `review/mcd-squad-up-2026-10-11/PUBLISH-REPORT.md`.
 
 - 2026-09-30: Deployed GitHub `main` revision `86c321d` to Cloudflare Worker `portfolio` (version `8318b236-a809-4bb1-b0e7-78dcb9d59e04`); fresh build and Wrangler dry-run passed, and both `adidesign.org` and the Worker host serve the same main bundle and 2026 resume; production verified.
 
