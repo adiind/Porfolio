@@ -1,5 +1,6 @@
 - 2026-10-11: Selected thumbnail direction 02 for the existing P&G portfolio card; replaced `public/images/pg-design-project.jpg` with the 1024×682 routine-detail concept and the official P&G-sponsored badge; published this one-asset update through GitHub `main`, with no case-study or unrelated work included.
 ## Codex
+- 2026-10-13: Replaced the live McDonald’s project at `/work/mcdonalds-interaction-design` with Squad Up via PR #52; updated the homepage card, removed stale Figma source fields, optimized 49 WebP assets, and verified the local build plus live card handoff, six-stop road navigation, and reduced-motion mode. Publish record: `review/mcd-squad-up-2026-10-11/PUBLISH-REPORT.md`.
 
 - 2026-10-11: Integrated the approved round-39 P&G scroll story into the existing project detail, including the four-sprint light, float, and hover effects; added the top-left sponsored badge/top-right Concept thumbnail layout, preserved the Muse mark, and confirmed production build plus 1440px/390px browser views.
 
