@@ -2,6 +2,13 @@
 
 Status: published and verified on 2026-10-13.
 
+## Corrective update — 2026-10-14
+
+- Restored a left-side six-phase tracker and changed the project dialog control to “Back to portfolio.” Tracker clicks open the full case when needed, jump to the chosen phase, and follow the active phase as the story scrolls.
+- Moved the story document to `public/work/squad-up-assets/story.html`; `/work/mcdonalds-interaction-design` now resolves through the portfolio’s SPA route and opens the story within the native project dialog. The story remains isolated, so its approved page background and styling are unchanged.
+- Local production build passed. Verified direct-link and homepage-card entry, back-to-portfolio closing, tracker phase jumps and active state, six road stops, reduced motion, and 1440×1000/390×844 layouts. No horizontal overflow or browser errors; the existing Tailwind CDN warning remains.
+- Publish is blocked: `npx wrangler whoami` reported “You are not authenticated.” Per the deployment instructions, no deployment workaround was attempted. The live site still serves the 2026-10-13 deployment until Wrangler authentication is available.
+
 ## Changes made
 
 - Replaced the existing McDonald’s project detail at `/work/mcdonalds-interaction-design` with the approved Squad Up page while keeping that public route.
