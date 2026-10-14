@@ -1,4 +1,5 @@
 ## Codex
+- 2026-10-14: Restored Squad Up’s cream/red R1-style left progress rail over the current story, tracking Start, Overview, and all six phases; reserved desktop clearance without changing story content or background. Production build and 1440/390 preview passed.
 - 2026-10-14: Restored the left six-phase tracker and a clear Back to portfolio control for Squad Up, moved the story document off the public route so the portfolio handles its canonical URL, and verified direct-link/card entry, phase jumps, reduced motion, and 1440/390 layouts locally; build passed, but stopped before publishing because `wrangler whoami` reports no authentication.
 - 2026-10-13: Replaced the live McDonald’s project at `/work/mcdonalds-interaction-design` with Squad Up via PR #52; updated the homepage card, removed stale Figma source fields, optimized 49 WebP assets, and verified the local build plus live card handoff, six-stop road navigation, and reduced-motion mode. Publish record: `review/mcd-squad-up-2026-10-11/PUBLISH-REPORT.md`.
 
