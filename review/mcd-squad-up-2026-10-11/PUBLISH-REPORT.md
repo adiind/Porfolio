@@ -1,20 +1,28 @@
 # Squad Up publish report
 
-Status: published and verified on 2026-10-13.
+Status: original Squad Up page published and verified on 2026-10-13; tracker correction published and verified on 2026-10-14.
 
 ## Corrective update — 2026-10-14
 
 - Restored the R1-style cream/red left progress rail over the current story, tracking Start, Overview, and all six process phases. Its stops jump to current content and its active label follows scroll. Reserved a desktop gutter without changing story copy, images, background, or motion. Kept the “Back to portfolio” control.
 - Kept `/work/mcdonalds-interaction-design` as the public route. The story document is served from `public/work/squad-up-assets/story.html` inside the portfolio project dialog.
-- `npm run build` passed on commit `212d055`. Verified direct-link and homepage-card entry, return to portfolio, tracker phase jumps and active state, six road stops, reduced motion, and 1440×1000/390×844 layouts. No horizontal overflow, broken images, or browser errors; the existing Tailwind CDN warning remains.
-- Published the corrective change to branch `mcd-squad-up-final`; PR [#55](https://github.com/adiind/Porfolio/pull/55) targets `main`. GitHub reports the PR mergeable. Workflow/status checks have not reported any runs yet; merge and live verification are pending.
+- `npm run build` passed on code commit `212d055`. The report-only follow-up commit did not change page code.
+- GitHub PR [#55](https://github.com/adiind/Porfolio/pull/55) merged to `main` on 2026-10-14 as `5ecf9c2`. Cloudflare auto-deployed from `main`.
 
-### Corrective files in PR #55
+### Shipped corrective files
 
 - `components/hcd/McDonaldsProjectDetail.tsx`
 - `public/work/squad-up-assets/story.html` (moved from the former route file)
 - `review/mcd-squad-up-2026-10-11/PUBLISH-REPORT.md`
 - `AGENTS.md` Codex session log
+
+### Live verification
+
+- Live URL: [https://adidesign.org/work/mcdonalds-interaction-design](https://adidesign.org/work/mcdonalds-interaction-design)
+- Direct route and homepage card both open Squad Up inside the portfolio shell; “Back to portfolio” returns to the homepage.
+- At 1440px, the left tracker and back control are visible, all eight tracker landmarks render, and selecting Research updates the story fragment to `#p-research`. The story retains all six road stops.
+- At 390px, the existing responsive layout hides the left rail and keeps the back control visible. No horizontal overflow.
+- Reduced motion sets the story’s `no-motion` mode. 30 story images loaded and none were broken; no 404s or browser console errors were observed. The existing Tailwind CDN and font preload warnings remain.
 
 ## Changes made
 
