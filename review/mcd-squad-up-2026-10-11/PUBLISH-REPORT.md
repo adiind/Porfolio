@@ -4,11 +4,17 @@ Status: published and verified on 2026-10-13.
 
 ## Corrective update — 2026-10-14
 
-- Restored the R1-style cream/red left progress rail over the current story, tracking Start, Overview, and all six process phases; its stops jump to current content and its active label follows scroll. Reserved a desktop gutter for the rail without changing story copy, images, or background. The project dialog keeps the “Back to portfolio” control.
-- Moved the story document to `public/work/squad-up-assets/story.html`; `/work/mcdonalds-interaction-design` now resolves through the portfolio’s SPA route and opens the story within the native project dialog. The story remains isolated, so its approved page background and styling are unchanged.
-- Local production build passed. Verified direct-link and homepage-card entry, back-to-portfolio closing, tracker phase jumps and active state, six road stops, reduced motion, and 1440×1000/390×844 layouts. No horizontal overflow or browser errors; the existing Tailwind CDN warning remains.
-- Publish is blocked: `npx wrangler whoami` reported “You are not authenticated.” Per the deployment instructions, no deployment workaround was attempted. The live site still serves the 2026-10-13 deployment until Wrangler authentication is available.
-- Corrective commit: `d02ce54` on `mcd-squad-up-final` (local only; not pushed or deployed). No PR was opened because this repository’s existing release path is a direct Wrangler deployment.
+- Restored the R1-style cream/red left progress rail over the current story, tracking Start, Overview, and all six process phases. Its stops jump to current content and its active label follows scroll. Reserved a desktop gutter without changing story copy, images, background, or motion. Kept the “Back to portfolio” control.
+- Kept `/work/mcdonalds-interaction-design` as the public route. The story document is served from `public/work/squad-up-assets/story.html` inside the portfolio project dialog.
+- `npm run build` passed on commit `212d055`. Verified direct-link and homepage-card entry, return to portfolio, tracker phase jumps and active state, six road stops, reduced motion, and 1440×1000/390×844 layouts. No horizontal overflow, broken images, or browser errors; the existing Tailwind CDN warning remains.
+- Published the corrective change to branch `mcd-squad-up-final`; PR [#55](https://github.com/adiind/Porfolio/pull/55) targets `main`. GitHub reports the PR mergeable. Workflow/status checks have not reported any runs yet; merge and live verification are pending.
+
+### Corrective files in PR #55
+
+- `components/hcd/McDonaldsProjectDetail.tsx`
+- `public/work/squad-up-assets/story.html` (moved from the former route file)
+- `review/mcd-squad-up-2026-10-11/PUBLISH-REPORT.md`
+- `AGENTS.md` Codex session log
 
 ## Changes made
 
