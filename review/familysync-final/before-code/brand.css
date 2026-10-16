@@ -1,0 +1,177 @@
+/* FamilySync brand pass: the services the agent reaches, in their own marks and colours.
+   Marks are the original Figma files (assets/brand, see review/familysync-brand/brand-manifest.json).
+   Warm neutrals are sampled from the four scene illustrations. Layout is unchanged from r2. */
+:root{
+  --paper:#fbf6ee; --paper-2:#f5ebde; --amber:#dea66f; --clay:#a46a41; --cocoa:#3a2a22;
+  --school:#e3a42c; --school-bg:#fdf1d6; --school-ink:#7a4f05;
+  --calendar:#3e76c2; --calendar-bg:#e6effb; --calendar-ink:#173b79;
+  --pin:#d03834; --pin-bg:#fbe7e5;
+  --cart:#0aad0a; --cart-deep:#003d29; --carrot:#ff7009; --cart-bg:#e5f4e8;
+  --pay:#c9962e; --pay-bg:#fbf2dc; --pay-ink:#7b5a12;
+}
+
+/* ── service marks ── */
+.svc-tile{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px #0d1b3312}
+.svc-tile img{display:block;width:78%;height:78%;object-fit:contain}
+.svc-school{background:var(--school-bg);box-shadow:inset 0 0 0 1px #e3a42c55}
+.svc-calendar{background:var(--calendar);box-shadow:none}
+.svc-calendar img{width:66%;height:66%}
+.svc-pinterest{background:#fff}
+.svc-instacart{background:none;box-shadow:none;border-radius:11px}
+.svc-instacart img{width:100%;height:100%}
+
+/* opening: the school agent is the sender */
+.receive{display:flex;align-items:center;gap:10px;margin-top:18px}
+.receive .listening{margin:0}
+.receive-line{flex:0 0 22px;height:2px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--school) 0 4px,transparent 4px 8px)}
+.moving .receive-line{background-size:16px 2px;animation:flow .9s linear infinite}
+@keyframes flow{to{background-position:16px 0}}
+.agent-slot .receive{display:none}
+
+/* 01: which service the agent is using, and the time on Stacy's phone */
+.scene{--svc-bg:var(--school-bg);background:linear-gradient(#fff,var(--svc-bg) 26%,var(--svc-bg) 82%,#fff);transition:--svc-bg .6s}
+.scene[data-svc="calendar"]{--svc-bg:var(--calendar-bg)}
+.scene-stage{transition:box-shadow .6s}
+.scene[data-svc="school"] .scene-stage{box-shadow:inset 0 0 0 1.5px #e3a42c66,0 24px 64px -44px #7a4f0580}
+.scene[data-svc="calendar"] .scene-stage{box-shadow:inset 0 0 0 1.5px #3e76c266,0 24px 64px -44px #173b7980}
+.svc-swap{display:grid;flex:none}
+.svc-swap>.svc-tile{grid-area:1/1;transition:opacity .4s,transform .5s var(--spring)}
+.svc-swap .svc-calendar{opacity:0;transform:scale(.6)}
+.closed .svc-swap .svc-school{opacity:0;transform:scale(.6)}
+.closed .svc-swap .svc-calendar{opacity:1;transform:none}
+.scene-clock{margin-left:auto;padding:5px 10px;border-radius:99px;background:#fff;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:#14233b;box-shadow:inset 0 0 0 1px #0d1b331a}
+.closed .scene-clock{color:#9d2924}
+.moving .scene-clock{transition:color .4s}
+.scene .kicker{color:var(--school-ink)}
+.scene.closed .kicker{color:var(--calendar-ink)}
+.worries li{box-shadow:0 1px 0 #e3a42c40,0 12px 30px -18px #7a4f0566}
+
+/* warm sections carry the scenes' palette */
+.research,.explore{box-shadow:0 0 0 100vmax var(--paper);clip-path:inset(0 -100vmax);background:var(--paper)}
+.research .kicker,.explore .kicker,.synth .kicker,.outcome .kicker{color:var(--clay)}
+.findings li::before,.moving .findings li::before{background:var(--clay)}
+.findings .tag{color:var(--clay)}
+.synth{background:var(--paper)}
+.relay{background:#fff;box-shadow:0 0 0 1px #a46a4122,0 40px 90px -50px #3a2a2255}
+.handoff{color:var(--clay)}.handoff b{background:var(--clay)}
+.tension{background:var(--paper-2)}
+.tension .tag{color:var(--clay)}
+.f-b li{border-color:var(--clay);color:#6b3f22}
+.f-join path{stroke:#d4b394}
+.outcome{background:var(--paper)}
+.limits{background:#fff;box-shadow:inset 0 0 0 1px #a46a4122}
+
+/* 03: the calendar search that comes before contacting caregivers */
+.relay-status{display:flex;align-items:center;gap:10px;align-self:stretch;margin:-10px 0 0;padding:8px 12px 8px 8px;border-radius:16px;background:#ffffffd9;font-size:13px;font-weight:600;color:var(--calendar-ink)}
+.relay-status .svc-tile{width:30px;height:30px;border-radius:9px}
+
+/* ── 05 My part: colour says which service the sub-agent is in ── */
+.climax-inner{isolation:isolate}
+.svc-glow{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .9s var(--ease)}
+.glow-fs{background:radial-gradient(60% 55% at 75% 55%,#3e76c233,transparent 70%)}
+.glow-pin{background:radial-gradient(55% 50% at 72% 50%,#d0383430,transparent 70%),radial-gradient(40% 40% at 70% 18%,#dea66f2a,transparent 70%)}
+.glow-cart{background:radial-gradient(60% 55% at 72% 60%,#0aad0a2e,transparent 70%),radial-gradient(40% 40% at 70% 18%,#dea66f2a,transparent 70%)}
+.s0 .glow-fs,.s1 .glow-fs,.s2 .glow-pin,.s3 .glow-cart,.s4 .glow-cart{opacity:1}
+.beat-scenes .story-art{box-shadow:0 0 0 1px #dea66f33}
+.scene-time{position:absolute;z-index:1;left:12px;top:12px;padding:5px 10px;border-radius:99px;background:#1a120ccc;color:#fbe2c2;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.stack{min-height:430px}
+.c-soup{top:108px}.c-cart{top:216px}
+.c-confirm{left:12%;top:324px;width:76%;z-index:0}
+.stack .card{position:absolute}
+.c-soup{box-shadow:inset 4px 0 0 var(--pin),0 16px 40px -28px #000b!important}
+.c-cart{box-shadow:inset 4px 0 0 var(--cart),0 16px 40px -28px #000b!important}
+.c-confirm{box-shadow:inset 4px 0 0 var(--calendar),0 16px 40px -28px #000b!important}
+.svc-photo{position:relative;flex:none;width:48px;height:48px}
+.svc-photo>img:first-child{width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px #fff,0 0 0 3px #d0383455}
+.svc-badge{position:absolute;right:-6px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #fff}
+.stack .svc-instacart{width:48px;height:48px;border-radius:13px}
+.c-confirm .task-indicator{background:var(--calendar)}
+.moving .sc .c-confirm .task-indicator{animation:nextdot 1s ease-in-out infinite}
+.moving .c-cart .fill{background:linear-gradient(90deg,var(--cart),var(--cart-deep))}
+.moving .stack .thread{background:linear-gradient(#b9d5ff 0 30%,var(--pin) 36% 63%,var(--cart) 69% 92%,#b9d5ff)}
+.moving .c-cart.filled .svc-instacart{animation:pop .5s var(--spring)}
+.task-check{color:var(--cart)!important}
+.c-soup .task-check{color:var(--pin)!important}
+
+/* recipe and payment carry the Instacart mark, as in frames 59–61 */
+.ui-card .card-mark{position:absolute;right:24px;top:70px;width:52px;height:52px;border-radius:14px}
+.c-recipe h4,.c-recipe .ui-card>p,.pay h4{padding-right:66px}
+.recipe-back{display:flex;align-items:center;gap:14px}
+.recipe-photo{width:72px;height:48px;border-radius:10px;object-fit:cover;flex:none}
+.recipe-back>span{display:grid;gap:4px}
+.recipe-back small{display:flex;align-items:center;gap:6px;font-size:12px;color:#7d2a27}
+.recipe-back small img{width:14px;height:14px}
+.c-recipe .ui-card{box-shadow:inset 0 3px 0 var(--cart),0 16px 40px -24px #000a}
+.c-recipe .ui-button.primary{background:var(--cart-deep)}
+.exits .pill.solid{background:#cdebd2;border-color:#cdebd2;color:var(--cart-deep)}
+
+/* ── 06 payment: gold while it waits on Stacy, then the card is charged ── */
+.gate .kicker{color:#e7c27a}
+.hold{box-shadow:inset 0 0 0 1px #c9962e40}
+.pay .ui-card{box-shadow:inset 0 3px 0 var(--pay),0 16px 40px -24px #000a}
+.pay .ui-time{color:#e7c27a}
+.moving .pay::before{border-color:#e7c27a}
+.hold-panel .status{border-color:#c9962e88;background:#2a2414}
+.hold-panel .status .avatar{background:radial-gradient(circle at 35% 30%,#e7c27a,#c9962e 66%,#7b5a12)}
+.hold-timer i::after{background:var(--pay)}
+.payment-method{position:relative;overflow:hidden}
+.payment-method>*{position:relative}
+.charge{position:absolute!important;inset:0;background:linear-gradient(90deg,transparent,#c9962e38 40%,#c9962e55 50%,transparent 62%);transform:translateX(-100%);pointer-events:none}
+.moving[data-approval="confirmed"] .charge{animation:charge 1s var(--ease) .1s 2}
+@keyframes charge{to{transform:translateX(100%)}}
+.moving[data-approval="confirmed"] .method-check{animation:pop .5s var(--spring) .9s both;color:var(--cart)}
+.moving[data-approval="confirmed"] .pay .card-mark{animation:pop .6s var(--spring) .7s both}
+[data-approval="confirmed"] .hold-panel .status{border-color:#5fbf6f;background:#15281c}
+[data-approval="declined"] .hold-panel .status{border-color:#f08b83;background:#2a1618}
+.why .risk dd{color:#ffb3ad}
+
+/* ── 07 the run shows which service each step touched ── */
+.run li{position:relative}
+.run-marks{position:absolute;left:50%;top:-46px;display:flex;gap:4px;transform:translateX(-50%)}
+.run-marks .svc-tile{width:30px;height:30px;border-radius:9px}
+.run{margin-top:110px}
+.answers span .svc-tile{width:24px;height:24px;border-radius:7px;margin-right:10px;vertical-align:-5px}
+.answers b{font-weight:inherit}
+.answers span::before{border-color:var(--cart)}
+
+/* ── the rail ink takes the active service's colour ── */
+.moving .rail[data-svc="school"] .ink{background:var(--school)}
+.moving .rail[data-svc="instacart"] .ink{background:var(--cart)}
+.moving .rail[data-svc="pay"] .ink{background:#e7c27a}
+.moving .rail[data-svc="school"]::after{background:var(--school)}
+.moving .rail[data-svc="instacart"]::after{background:var(--cart)}
+.moving .rail[data-svc="pay"]::after{background:#e7c27a}
+
+@media (max-width:860px){
+  .svc-tile{width:32px;height:32px;border-radius:10px}
+  .scene-clock{font-size:11px;padding:4px 8px}
+  .stack{min-height:360px}
+  .stack .card{min-height:84px;padding:16px 14px}
+  .c-soup{top:92px}.c-cart{top:184px}.c-confirm{top:276px;left:10%;width:80%}
+  .svc-photo,.svc-photo>img:first-child,.stack .svc-instacart{width:40px;height:40px}
+  .ui-card .card-mark{right:18px;top:62px;width:42px;height:42px}
+  .c-recipe h4,.c-recipe .ui-card>p,.pay h4{padding-right:52px}
+  .run{margin-top:44px}
+  .run li{grid-template-columns:36px 1fr auto}
+  .run-marks{position:static;transform:none}
+  .run-marks .svc-tile{width:26px;height:26px}
+  .relay-status{font-size:12px}
+}
+.still .stack{min-height:440px}
+@media (max-width:860px){.still .stack{min-height:370px}}
+.sc .c-confirm{opacity:1;transform:none}
+/* r1 phone rules stretch every .sheet/.pay img; the marks keep their own size */
+.sheet .card-mark img,.pay .card-mark img{width:100%;max-width:100%;margin:0}
+.sheet .recipe-photo{width:72px;max-width:none;margin:0}
+.sheet .recipe-back small img{width:14px;max-width:none;margin:0}
+.recipe-back>span{min-width:0}
+/* the answers' check-mark rule targets every span; keep it off the service tile */
+.answers span.svc-tile{padding:0;font-weight:400;letter-spacing:0;font-size:0}
+.answers span.svc-tile::before{content:none}
+.answers span.svc-tile img{width:78%;height:78%}
+.answers span.svc-instacart img{width:100%;height:100%}
+.still .climax-inner,html:not(.js) .climax-inner{position:relative}
+/* cart card: the deck's own words (frame 59); no item names or count exist in the deck */
+.cart-text{display:grid;gap:3px}
+.cart-text small{font-size:13px;font-weight:500;letter-spacing:0;color:var(--cart-deep)}

@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FamilySync — Adi Agarwal</title>
+<link rel="icon" href="data:,">
+<meta name="description" content="FamilySync: an agentic family coordinator that keeps a person in every handoff.">
+<script>document.documentElement.classList.add('js')</script>
+<!--
+  UI wording: FINAL - TEAM CARE, Figma Slides 1QewB1TAZ1vx7sdz3wiwqg.
+  Notifications and devices rebuilt in HTML/CSS. The original FS SVG path is unchanged.
+  Source nodes: school 382:3793, request 94:3367, expired 382:6150,
+  contacting 94:3362, slide acceptance 164:2060 / 164:2000, accepted 94:3551,
+  update 406:1707, spawning 433:3051, soup 31:4871, cart 31:4877,
+  recipe 58:1331, payment 58:1130. Scenario and rules remain source-backed.
+  Four fresh independent ImageGen illustrations use the same original editorial
+  style reference; provenance and source text are in review/familysync-polish/.
+-->
+<link rel="stylesheet" href="familysync.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="fs-mark" viewBox="0 0 106.953 136.365"><path fill="currentColor" d="M49.7016 24.1826C37.702 28.9771 42.251 19.2227 39.6062 13.0154C37.3847 7.80009 31.9138 6.76304 28.1356 11.0014C20.8966 19.1326 25.5816 45.9607 25.6269 56.6018C29.1633 55.7301 33.6065 55.9405 36.9615 54.7381C41.8883 52.9646 44.6086 44.1421 49.082 52.5137C46.7848 61.9975 35.5862 63.6658 27.1382 64.1318L29.0122 82.1675C29.9945 83.43 29.8434 82.5132 30.5386 82.1675C40.649 77.2828 50.7746 66.9123 60.0236 60.3593C61.278 57.5938 59.0111 58.0898 58.1043 56.7972C56.8197 54.9486 53.6762 49.5829 53.1926 47.599C51.0617 38.8667 57.0464 29.9991 66.1896 29.8338C81.4384 29.5482 83.9925 48.3204 74.003 56.9625C75.5898 59.187 78.2496 60.2841 80.0632 62.1929C88.2543 70.7599 92.501 79.883 90.4306 92.1172C89.6296 96.8366 86.063 100.609 84.5668 105.028C90.4457 108.981 96.2792 106.756 98.6972 100.339C99.7702 97.4678 99.6342 89.8628 105.256 93.5C108.173 95.3937 106.616 98.7003 105.755 101.346C102.566 111.07 94.103 116.992 83.6751 113.49C81.8767 112.888 80.2143 110.829 78.1741 110.799C75.7863 110.754 71.464 113.79 68.1392 114.286C54.719 116.24 40.2107 107.883 45.1073 92.8837C50.0341 77.8389 72.4766 81.4461 76.9651 95.2284L79.2773 95.6943C81.2269 84.6023 81.0757 78.6205 73.2926 70.5044C65.1166 61.9975 67.308 65.289 60.5526 70.8801C51.5756 78.3199 41.0571 85.3839 31.0524 91.3056C30.6141 103.69 34.5283 122.628 24.6143 132.247C15.5013 141.084 2.89727 134.712 1.53712 123.034C-0.0346143 109.432 10.7861 98.4147 19.9596 89.7726L17.3149 65.6197C11.3453 65.7399 8.489 70.9853 5.48155 75.2989L0.675687 74.2769C-2.98161 63.8612 9.21441 61.1408 15.728 56.8423C14.0203 43.1051 10.8466 11.783 24.3121 3.08074C39.6214 -6.8239 52.5277 9.04757 49.7016 24.1826ZM68.6681 51.3264C69.4993 47.9898 72.3708 45.9307 71.5849 42.1281C70.2096 35.3948 60.8246 37.018 62.0034 44.0219C62.3056 45.7804 66.5826 52.7392 68.653 51.3414L68.6681 51.3264ZM66.7337 95.3637C65.6758 94.2665 65.6154 93.4398 63.9378 92.508C54.447 87.2626 47.2382 100.789 58.7239 105.208C63.8169 107.177 66.8848 105.554 71.6302 103.855C73.0508 102.172 68.0334 96.7013 66.7337 95.3486V95.3637ZM21.8487 117.848C22.6043 112.678 21.2895 105.945 21.8487 100.564L20.3374 99.7975C14.4434 105.779 7.7787 114.587 10.1212 123.499C11.3302 128.114 16.4534 130.188 19.1586 125.679C19.5365 125.048 21.758 118.51 21.8638 117.848H21.8487Z"/></symbol>
+</svg>
+
+<!-- The one navigation: the run rail -->
+<header class="case-top"><button type="button" class="back-link" data-back aria-label="Back to portfolio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back to portfolio</span></button></header>
+<nav class="rail" aria-label="Case study progress">
+ <p class="rail-title">FamilySync</p>
+ <div class="rail-track"><div class="reading-line" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+ <p class="rail-now"><b data-rail-n>01</b><span data-rail-label>Context</span></p>
+<ol>
+    <li><a href="#context"><i></i><span>Context</span></a></li>
+    <li><a href="#research"><i></i><span>Research</span></a></li>
+    <li><a href="#synthesis"><i></i><span>Synthesis</span></a></li>
+    <li><a href="#exploration"><i></i><span>Exploration</span></a></li>
+    <li><a href="#sub-agent"><i></i><span>My part</span></a></li>
+    <li><a href="#approval"><i></i><span>Testing</span></a></li>
+    <li><a href="#outcome" data-rail-outcome><i></i><span>Outcome</span></a></li>
+  </ol></div></nav>
+<main>
+
+<!-- ───────── Opening: the agent is already receiving ───────── -->
+<header class="hero wrap">
+  <div class="hero-copy">
+    <p class="eyebrow">Service design · Northwestern EDI with JPMorgan Chase · Winter 2026</p>
+    <h1>FamilySync</h1>
+    <p class="lede">An agent that coordinates a family when a child's day changes. It does the legwork. A person approves every handoff.</p>
+    <dl class="meta">
+      <div><dt>My part</dt><dd>The sub-agent, recipe, grocery cart and payment approval</dd></div>
+      <div><dt>Team Care</dt><dd>Adi Agarwal, Michelle Behshid, Anastazja Branski, Simon Rhode, Jason Tothy, Lyn Zheng</dd></div>
+      <div><dt>Course</dt><dd>DSGN 401-3 · Human-Centered Design Studio 3<br><span class="faculty">Dan Butt &amp; Amy O’Keefe</span></dd></div>
+    </dl>
+  </div>
+  <figure class="hero-agent phone-frame"><div class="phone-island" aria-hidden="true"></div>
+    <p class="clock"><b>11<i>:</i>00</b> Wednesday</p>
+    <div class="agent-card" data-agent>
+<div class="school-ui"><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care escalation</span></div></div><p>Receiving Communication<br>from School Agent</p><div class="receive"><span class="svc-tile svc-school" aria-hidden="true"><img src="assets/brand/school.svg" alt=""></span><span class="receive-line" aria-hidden="true"></span><div class="listening" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+    </div>
+    <figcaption class="agent-next"><span class="next-dot"></span>Next: notify Stacy</figcaption>
+  <div class="phone-home" aria-hidden="true"></div></figure>
+</header>
+
+<!-- ───────── 01 Context: the response window ───────── -->
+<section class="scene" id="context" data-step data-label="Context" aria-labelledby="h-context">
+  <div class="scene-inner wrap">
+    <div class="scene-stage">
+      <div class="slot-row">
+        <div class="agent-card agent-slot" data-slot aria-hidden="true">
+<div class="school-ui"><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care escalation</span></div></div><p>Receiving Communication<br>from School Agent</p><div class="receive"><span class="svc-tile svc-school" aria-hidden="true"><img src="assets/brand/school.svg" alt=""></span><span class="receive-line" aria-hidden="true"></span><div class="listening" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+        </div>
+        <span class="svc-swap" aria-hidden="true"><span class="svc-tile svc-school" aria-hidden="true"><img src="assets/brand/school.svg" alt=""></span><span class="svc-tile svc-calendar" aria-hidden="true"><img src="assets/brand/calendar.svg" alt=""></span></span><p class="status-text" data-status>Notify Stacy</p><time class="scene-clock" data-clock>11:00</time>
+      </div>
+      <div class="swap">
+<article class="ui-card swap-a"><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Pickup request for Leo</h4><p>Leo is throwing up at school. Can you pick him up now?</p><div class="ui-actions"><span class="ui-button primary ui-sample">Accept</span><span class="ui-button secondary ui-sample">More options</span></div></article><article class="ui-card swap-b"><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Pickup Request Expired</h4><p>Leo is throwing up at school. Can you pick him up now?</p><div class="ui-actions" aria-disabled="true"><span class="ui-button secondary ui-sample">Accept</span><span class="ui-button secondary ui-sample">More options</span></div><div class="expired-label"><span>Response window closed</span><b>00:00</b></div></article>
+      </div>
+      <div class="meter" aria-hidden="true">
+        <span class="meter-label">Response window</span>
+        <span class="meter-time" data-time>03:00</span>
+        <span class="meter-bar"><i data-bar></i></span>
+      </div>
+    </div>
+    <div class="scene-copy">
+      <p class="kicker">01 · Context</p>
+      <h2 id="h-context">The school calls. Stacy is in a meeting.</h2>
+      <div class="phase">
+        <p class="phase-a">Leo is sick and someone has to get him. The request is one notification. The coordination behind it is six questions at once.</p>
+        <p class="phase-b">The window closes at 11:03. FamilySync doesn't wait for Stacy to find the time. It queues what she was carrying and starts on the first one.</p>
+      </div>
+      <!-- frame 14 -->
+      <ul class="worries">
+        <li>Who should I call first? Who will be available?</li>
+        <li>But I’m in the middle of an important meeting...</li>
+        <li>When should I let Robert know? He will be worried!</li>
+        <li>I’m running out of time! I need to figure this out!</li>
+        <li>How am I going to plan dinner and take care of Leo?</li>
+        <li>Is there any food left in the fridge?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── 02 Research ───────── -->
+<section class="research wrap" id="research" data-step data-label="Research" aria-labelledby="h-research">
+  <div class="research-lead reveal">
+    <p class="kicker">02 · Research</p>
+    <h2 id="h-research">We started with the afternoons that went wrong.</h2>
+    <p>Interviews with caregivers about recent child-health emergencies. Two findings set the rules for everything after.</p>
+  </div><figure class="section-atmosphere atmosphere-research"><img src="assets/scenes/research-pass3.webp" alt="" loading="lazy"></figure>
+<figure class="story-art art-pickup"><img loading="lazy" src="assets/scenes/pickup.webp" alt="Illustrated school pickup: a grandmother meets Leo at the school entrance."></figure>
+  <!-- frame 85 -->
+  <ol class="findings">
+    <li class="reveal"><span class="tag">Care vs control</span><p>People want an agent that feels caring and proactive, but still keeps them in control.</p></li>
+    <li class="reveal"><span class="tag">Trust vs privacy</span><p>The line between helpful and creepy is clarity, permission, and user approval.</p></li>
+  </ol>
+</section>
+
+<!-- ───────── 03 Synthesis: one relay, three handoffs ───────── -->
+<section class="synth" id="synthesis" data-step data-label="Synthesis" aria-labelledby="h-synth">
+  <div class="wrap">
+    <div class="synth-lead reveal">
+      <p class="kicker">03 · Synthesis</p>
+      <h2 id="h-synth">Three principles. Each one is a handoff.</h2>
+    </div>    <div class="relay">
+      <figure class="relay-item r1 reveal">
+        <figcaption>
+          <p class="handoff"><b>1</b>Stacy <i></i> FamilySync</p>
+          <h3>Coordination</h3>
+          <p>Stacy's window closed, so the agent searches calendars and contacts secondary caregivers. Interrupt stays on screen.</p>
+        </figcaption>
+        <!-- frame 34, node 94:3362 -->
+<div class="relay-phone phone-frame"><div class="phone-island" aria-hidden="true"></div><p class="phone-time">11:03</p><p class="relay-status"><span class="svc-tile svc-calendar" aria-hidden="true"><img src="assets/brand/calendar.svg" alt=""></span><span>Search calendars</span></p><article class="ui-card "><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Contacting Secondary Caregivers</h4><p>Leo is throwing up at school. Can you pick him up now?</p><div class="ui-actions"><span class="ui-supplement">Response window</span><span class="ui-button secondary ui-sample">Interrupt</span></div></article><div class="phone-home" aria-hidden="true"></div></div>
+      </figure>
+      <figure class="relay-item r2 reveal">
+        <figcaption>
+          <p class="handoff"><b>2</b>FamilySync <i></i> Cynthia</p>
+          <h3>Communication</h3>
+          <p>Leo's grandmother gets the request through the family's trusted circle and accepts with one slide.</p>
+        </figcaption>
+        <!-- frame 43, node 94:3551 -->
+<article class="ui-card "><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Pickup request for Leo</h4><label class="slide-accept"><span>Slide left to accept the request</span><input type="range" min="0" max="100" value="100" aria-label="Slide left to accept the request" data-slide-accept></label><p class="accept-result" hidden>Pickup request for Leo accepted</p></article>
+      </figure>
+      <figure class="relay-item r3 reveal">
+        <figcaption>
+          <p class="handoff"><b>3</b>Cynthia <i></i> Stacy and Robert</p>
+          <h3>Connection</h3>
+          <p>Both parents are updated automatically. Caregivers may be absent, but they still want to feel present.</p>
+        </figcaption>
+        <!-- frame 50, node 406:1707 -->
+<article class="ui-card "><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Thanks for picking up Leo</h4><p>Robert and Stacy have been updated.</p></article>
+      </figure>
+    </div>
+  </div>
+
+  <div class="tension reveal">
+    <div class="wrap">
+      <p class="tag">The tension</p>
+      <p class="tension-line">Automation can create checking work.</p>
+      <p class="tension-sub">If a parent has to verify everything the agent did, it has handed them a second job. So each handoff ends in one clear ask that a person answers.</p><figure class="story-art art-work"><img loading="lazy" src="assets/scenes/work.webp" alt="Illustrated parent at work receiving a nudge during a meeting."></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── 04 Exploration ───────── -->
+<section class="explore wrap" id="exploration" data-step data-label="Exploration" aria-labelledby="h-explore">
+  <div class="explore-lead reveal">
+    <p class="kicker">04 · Exploration</p>
+    <h2 id="h-explore">Three directions, two concepts, one service.</h2>
+  </div>  <div class="funnel reveal">
+    <p class="tag f-h1">3 directions</p>
+    <ul class="f-list f-a">
+      <li>Wait-time updates</li>
+      <li>Monitoring</li>
+      <li>Calendar support</li>
+    </ul>
+    <svg class="f-join f-j1" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 16.7 C 50 16.7, 50 25, 100 25"/><path d="M0 50 C 50 50, 50 25, 100 25"/>
+      <path d="M0 50 C 50 50, 50 75, 100 75"/><path d="M0 83.3 C 50 83.3, 50 75, 100 75"/>
+    </svg>
+    <p class="tag f-h2">2 concepts</p>
+    <ul class="f-list f-b">
+      <li>Concept one</li>
+      <li>Concept two</li>
+    </ul>
+    <svg class="f-join f-j2" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 25 C 50 25, 50 50, 100 50"/><path d="M0 75 C 50 75, 50 50, 100 50"/>
+    </svg>
+    <p class="tag f-h3">1 service</p>
+    <p class="funnel-1"><span class="avatar"><svg><use href="#fs-mark"/></svg></span><b>FamilySync</b>One coordinator that carries a single event from the school's alert to dinner.</p>
+  </div>
+</section>
+
+<div class="night">
+<!-- ───────── 05 My part: the sub-agent builds the answer ───────── -->
+<section class="climax" id="sub-agent" data-step data-label="My part" aria-labelledby="h-sub" data-climax>
+  <div class="climax-inner wrap"><i class="svc-glow glow-fs" aria-hidden="true"></i><i class="svc-glow glow-pin" aria-hidden="true"></i><i class="svc-glow glow-cart" aria-hidden="true"></i>
+    <div class="climax-copy">
+      <p class="kicker">05 · My part</p>
+      <h2 id="h-sub">Leo is home. The agent keeps going.</h2>
+      <p class="climax-lede">This segment is mine. Two of Stacy's questions are still open: dinner, and what's in the fridge.</p>
+      <div class="beats" aria-live="polite">
+        <p class="beat" data-beat="0">It spawns a sub-agent for them.</p>
+        <p class="beat" data-beat="2">The sub-agent finds a soup recipe.</p>
+        <p class="beat" data-beat="3">It turns the recipe into an Instacart cart.</p>
+        <div class="beat" data-beat="4">
+          <p>Then it stops and asks Stacy, with three ways out.</p>
+          <ul class="exits">
+            <li><b class="pill solid">Confirm order</b>Take it as it stands</li>
+            <li><b class="pill">Manage cart</b>Keep the help, change the contents</li>
+            <li><b class="pill red">Decline task</b>Stop, no explanation owed</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="climax-stage"><div class="beat-scenes"><figure class="story-art art-home"><img loading="lazy" src="assets/scenes/home.webp" alt="Illustrated Leo arriving home with his grandmother."></figure><figure class="story-art art-kitchen"><time class="scene-time">15:00</time><img loading="lazy" src="assets/scenes/kitchen.webp" alt="Illustrated family kitchen with an open fridge and a pot of soup for dinner."></figure></div><div class="climax-cards">
+      <!-- stack geometry: frame 57 slide coordinates, origin (0, 24.5), 721 × 716 -->
+      <div class="stack" data-stack>
+<div class="card c-spawn"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><span class="spawn-before">Spawning Sub Agent...</span><span class="spawn-after">Spawned Sub Agent</span></div><span class="task-indicator" aria-hidden="true"></span></div>
+<div class="card c-soup"><span class="svc-photo" aria-hidden="true"><img src="assets/brand/soup.jpg" alt=""><img class="svc-badge" src="assets/brand/pinterest.svg" alt=""></span><span>Soup Recipe retrieved!</span><span class="task-check" aria-hidden="true">✓</span></div>
+<div class="card c-cart"><span class="svc-tile svc-instacart" aria-hidden="true"><img src="assets/brand/instacart.png" alt=""></span><span class="cart-text">Cart created!<small>Instacart ingredient list</small></span><span class="task-check" aria-hidden="true">✓</span></div>
+<div class="card c-confirm"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><span>Confirming cart with Stacy!</span><span class="task-indicator" aria-hidden="true"></span></div>
+      </div>
+      <!-- frame 60, node 58:1331 -->
+      <figure class="sheet c-recipe"><article class="ui-card "><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Soup Recipe for Leo</h4><span class="svc-tile svc-instacart card-mark" aria-hidden="true"><img src="assets/brand/instacart.png" alt=""></span><p>I have found a soup recipe for Leo and created an Instacart ingredient list. Would you like to review the recipe?</p><div class="recipe-back"><img class="recipe-photo" src="assets/brand/soup.jpg" alt="The soup from the recipe the sub-agent found"><span>Soup Recipe Options for Leo<small><img src="assets/brand/pinterest.svg" alt="">Pinterest</small></span></div><div class="ui-actions"><span class="ui-button primary ui-sample">Confirm order</span><span class="ui-button secondary ui-sample">Manage cart</span><span class="ui-button danger ui-sample">Decline task</span></div></article></figure>
+    </div></div>
+  </div>
+</section>
+
+<!-- ───────── 06 Testing → the approval ───────── -->
+<section class="gate wrap" id="approval" data-step data-label="Testing" aria-labelledby="h-gate">
+  <div class="gate-head reveal">
+    <p class="kicker">06 · Testing</p>
+    <h2 id="h-gate">One card carries the whole payment.</h2>
+    <p>After testing feedback, payment became one integrated step: what it's for, how it's paid, and Stacy's answer, together.</p>
+  </div>
+
+  <!-- frames 64-66 -->
+  <dl class="why reveal">
+    <div><dt>House rule</dt><dd>Auto-approve under $50</dd></div>
+    <div><dt>Assumption</dt><dd>These rules still reflect parent intent</dd></div>
+    <div class="risk"><dt>Risk</dt><dd>Old rules get treated like permission</dd></div>
+  </dl>
+
+  <div class="hold" data-hold>
+    <!-- frame 61, node 58:1130 -->
+    <figure class="sheet pay" data-hold-actions>
+<time class="ui-time">15:00</time><article class="ui-card "><div class="ui-head"><span class="ui-logo"><svg viewBox="0 0 106.953 136.365" aria-hidden="true"><use href="#fs-mark"/></svg></span><div><b>FAMILYSYNC</b><span>Care Request</span></div><time>now</time></div><h4>Instacart Payment</h4><span class="svc-tile svc-instacart card-mark" aria-hidden="true"><img src="assets/brand/instacart.png" alt=""></span><div class="payment-method"><i class="charge" aria-hidden="true"></i><div><span>Default Payment:</span><b>Visa ending 1234</b></div><span class="method-check" aria-hidden="true">✓</span></div><div class="ui-actions"><button type="button" class="ui-button primary" data-answer="confirmed">Confirm payment</button><button type="button" class="ui-button danger" data-answer="declined">Decline payment</button></div></article>
+    </figure>
+    <div class="hold-panel" role="group" aria-labelledby="hold-title">
+      <ol class="parts">
+        <li><span>What it's for</span>Instacart payment</li>
+        <li><span>How it's paid</span>Default card, Visa ending 1234</li>
+        <li><span>Her answer</span>Confirm or decline</li>
+      </ol>
+      <p class="status on-night"><span class="avatar pulse"><svg><use href="#fs-mark"/></svg></span><span id="hold-title" data-hold-title>Waiting on you</span></p>
+      <p class="hold-line" data-hold-line>FamilySync does not pay without a person.</p>
+
+      <div class="hold-timer" data-hold-timer aria-hidden="true"><i></i><span>No answer, and the agent holds the cart</span></div>
+      <button type="button" class="undo" data-undo hidden>Change my answer</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ───────── 07 Outcome ───────── -->
+<section class="outcome" id="outcome" data-step data-label="Outcome" data-outcome aria-labelledby="h-outcome" tabindex="-1">
+  <div class="wrap outcome-body">
+    <p class="kicker">07 · Outcome</p>
+    <h2 id="h-outcome">One event, carried end to end.</h2>
+    <p class="outcome-lede" data-outcome-lede>From the school's alert to dinner, in one thread. The agent did the legwork; a person answered at every handoff.</p>
+
+    <!-- frames 14, 26-61 and 92: Stacy, the agent and the services, 11:00 to 15:00 -->
+<section class="journey" aria-labelledby="journey-title" data-journey>
+<div class="journey-sticky">
+<div class="journey-heading"><div><p class="tag">A Wednesday, in seven stages</p><h3 id="journey-title">Stacy’s afternoon, lane by lane</h3></div>
+<p class="journey-clock" aria-hidden="true"><time data-journey-clock>11:00</time><span data-journey-now>01 · Leo needs pick up</span></p></div>
+<div class="journey-board" data-journey-board>
+<div class="lane-labels" aria-hidden="true"><span>Stage</span><span>Stacy</span><span>How she feels</span><span>FamilySync</span><span>Services</span></div>
+<ol class="journey-stages">
+<li class="journey-stage" data-checkpoint="0" data-clock="11:00" data-feel="0.18" style="--c:var(--school);--c-ink:var(--school-ink)">
+<header><button type="button" data-journey-go="0" aria-label="Stage 1: Leo needs pick up, 11:00"><span class="journey-dot">01</span><time>11:00</time></button><h4>Leo needs pick up</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>In an important meeting</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:18%"></b></i><b class="feel-word">Pressure</b><q>Who should I call first?</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Receives the school’s alert</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-school"><img src="assets/brand/school.svg" alt=""></span></div><span class="touch-label">School agent</span></div>
+</li>
+<li class="journey-stage" data-checkpoint="1" data-clock="11:00 → 11:03" data-feel="0.06" data-peak="low" style="--c:var(--school);--c-ink:var(--school-ink)">
+<header><button type="button" data-journey-go="1" aria-label="Stage 2: Notify Stacy, 11:00 → 11:03"><span class="journey-dot">02</span><time>11:00 → 11:03</time></button><h4>Notify Stacy</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>Cannot answer in the response window</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:6%"></b></i><b class="feel-word">Pressure</b><q>I’m running out of time!</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Sends a care request; waits three minutes</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-fs"><svg viewBox="0 0 106.953 136.365"><use href="#fs-mark"/></svg></span></div><span class="touch-label">Care request</span></div>
+</li>
+<li class="journey-stage" data-checkpoint="2" data-clock="11:03" data-feel="0.18" style="--c:var(--calendar);--c-ink:var(--calendar-ink)">
+<header><button type="button" data-journey-go="2" aria-label="Stage 3: Search calendars, 11:03"><span class="journey-dot">03</span><time>11:03</time></button><h4>Search calendars</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>Can interrupt the search</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:18%"></b></i><b class="feel-word">Uncertainty</b><q>Who will be available?</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Checks calendars for a secondary caregiver</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-calendar"><img src="assets/brand/calendar.svg" alt=""></span></div><span class="touch-label">Calendar search</span></div>
+</li>
+<li class="journey-stage" data-checkpoint="3" data-clock="11:03 – 15:00" data-feel="0.52" style="--c:var(--calendar);--c-ink:var(--calendar-ink)">
+<header><button type="button" data-journey-go="3" aria-label="Stage 4: Cynthia contacted, Then"><span class="journey-dot">04</span><time>Then</time></button><h4>Cynthia contacted</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>Is notified that Cynthia is picking up Leo</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:52%"></b></i><b class="feel-word">Connection</b><q>Caregivers may be absent, but they still want to feel present.</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Contacts Cynthia; she accepts</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-fs"><svg viewBox="0 0 106.953 136.365"><use href="#fs-mark"/></svg></span></div><span class="touch-label">Trusted circle</span></div>
+</li>
+<li class="journey-stage" data-checkpoint="4" data-clock="11:03 – 15:00" data-feel="0.72" style="--c:var(--fs);--c-ink:var(--fs-ink)">
+<header><button type="button" data-journey-go="4" aria-label="Stage 5: Leo picked up, Then"><span class="journey-dot">05</span><time>Then</time></button><h4>Leo picked up</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>Receives the pickup update</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:72%"></b></i><b class="feel-word">Connection</b><q>Visibility helps them stay connected to care.</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Updates Robert and Stacy</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-fs"><svg viewBox="0 0 106.953 136.365"><use href="#fs-mark"/></svg></span></div><span class="touch-label">Pickup update</span></div>
+</li>
+<li class="journey-stage" data-checkpoint="5" data-clock="11:03 – 15:00" data-feel="0.36" style="--c:var(--fs);--c-ink:var(--fs-ink)">
+<header><button type="button" data-journey-go="5" aria-label="Stage 6: Location updated, Then"><span class="journey-dot">06</span><time>Then</time></button><h4>Location updated</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>Learns Cynthia is home with Leo</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:36%"></b></i><b class="feel-word">Next concern</b><q>How am I going to plan dinner and take care of Leo?</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Sends both parents a live update</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-fs"><svg viewBox="0 0 106.953 136.365"><use href="#fs-mark"/></svg></span></div><span class="touch-label">Location update</span></div>
+</li>
+<li class="journey-stage" data-checkpoint="6" data-clock="15:00" data-feel="0.76" data-peak="high" style="--c:var(--cart);--c-ink:var(--cart-ink)">
+<header><button type="button" data-journey-go="6" aria-label="Stage 7: Sub agent activated, 15:00"><span class="journey-dot">07</span><time>15:00</time></button><h4>Sub agent activated</h4></header>
+<p class="lane stacy"><span class="lane-name">Stacy</span>Reviews the cart; confirms or declines payment</p>
+<div class="lane feel"><span class="lane-name">How she feels</span><i class="feel-meter" aria-hidden="true"><b style="width:76%"></b></i><b class="feel-word">Control</b><q>Confirm order · Manage cart · Decline task</q></div>
+<p class="lane agent"><span class="lane-name">FamilySync</span>Finds soup, creates a cart and asks Stacy</p>
+<div class="lane services"><span class="lane-name">Services</span><div class="touchpoint" aria-hidden="true"><span class="svc-tile svc-pinterest"><img src="assets/brand/pinterest.svg" alt=""></span><span class="svc-tile svc-instacart"><img src="assets/brand/instacart.png" alt=""></span></div><span class="touch-label">Pinterest · Instacart</span></div>
+</li>
+</ol>
+<svg class="journey-curve" data-journey-curve aria-hidden="true"></svg>
+<i class="journey-playhead" aria-hidden="true"></i>
+</div>
+</div></section>
+
+    <div class="answers">
+      <h3>The six questions, answered</h3>
+      <ul>
+        <li><q>Who should I call first? Who will be available?</q><span><span class="svc-tile svc-calendar" aria-hidden="true"><img src="assets/brand/calendar.svg" alt=""></span>Calendars searched, Cynthia contacted</span></li>
+        <li><q>But I’m in the middle of an important meeting...</q><span><span class="svc-tile svc-school" aria-hidden="true"><img src="assets/brand/school.svg" alt=""></span>The window closed and the agent escalated</span></li>
+        <li><q>When should I let Robert know? He will be worried!</q><span>Robert and Stacy updated automatically</span></li>
+        <li><q>I’m running out of time! I need to figure this out!</q><span>Leo picked up, location updated</span></li>
+        <li><q>How am I going to plan dinner and take care of Leo?</q><span><span class="svc-tile svc-pinterest" aria-hidden="true"><img src="assets/brand/pinterest.svg" alt=""></span>Sub-agent found a soup recipe</span></li>
+        <li><q>Is there any food left in the fridge?</q><span><span class="svc-tile svc-instacart" aria-hidden="true"><img src="assets/brand/instacart.png" alt=""></span><b data-cart-answer>Cart created, waiting on a yes</b></span></li>
+      </ul>
+    </div>
+
+    <div class="limits">
+      <p><b>Humans approve every handoff.</b> Accept, interrupt, manage, decline and confirm are always a person's call.</p>
+      <p><b>It never makes clinical decisions.</b> FamilySync moves logistics: who, when, where, and what's for dinner.</p>
+    </div>
+
+    <footer class="credits">
+      <p><span class="avatar"><svg><use href="#fs-mark"/></svg></span>Team Care · DSGN 401-3 · Winter 2026 · Northwestern University, with JPMorgan Chase</p>
+    </footer>
+  </div>
+</section>
+
+</main>
+
+
+
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="journey.js"></script>
+<script src="cc.js"></script>
+<script src="motion.js"></script>
+</body>
+</html>
