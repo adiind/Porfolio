@@ -379,6 +379,39 @@
   addEventListener('load', retrack);
   retrack();
 
+
+  // ---------- Auto-complete: a scroll that loses steam mid-scene is carried on to the nearest finished scene ----------
+  // Engine lives in /shared/scroll-settle.js (shared with the other case studies and the home page).
+  const REST = [0, 0.72, 1.85, ARRIVE[0], ARRIVE[1], ARRIVE[2], ARRIVE[3], 6.0, END];   // screen heights where the picture is fully settled
+  const settle = window.ScrollSettle && animated ? window.ScrollSettle.init({
+    rests: () => {
+      const per = (track.offsetHeight - stage.clientHeight) / END;
+      const list = REST.map((r) => ({ y: Math.round(r * per), strong: true }));
+      // Below the story, the full case: settle on a phase heading only when it is already close.
+      if (!caseEl.hidden) phaseEls.forEach((el) => list.push({ y: Math.round(el.getBoundingClientRect().top + scrollY - 24) }));
+      return list;
+    },
+  }) : null;
+  const advance = () => (settle ? settle.advance() : scrollBy({ top: Math.round(innerHeight * 0.9), behavior: 'instant' }));
+
+  // ---------- "Keep scrolling" pill: the story is one long scroll, so say so, and show how far along it is ----------
+  const more = $('more');
+  if (more && animated) {
+    const fill = more.querySelector('i');
+    let nudge = 0;
+    const sync = () => {
+      const per = (track.offsetHeight - stage.clientHeight) / END, u = clamp(scrollY / per / END) * END;
+      more.classList.toggle('on', u > 0.3 && u < END - 0.5);   // the hero has its own cue; the closing page has the Explore button
+      fill.style.transform = `scaleX(${(u / END).toFixed(3)})`;
+      more.classList.remove('nudge');
+      clearTimeout(nudge);
+      nudge = setTimeout(() => more.classList.add('nudge'), 1400);   // bob the arrow once the reader has paused
+    };
+    more.addEventListener('click', advance);
+    addEventListener('scroll', sync, { passive: true });
+    addEventListener('resize', sync);
+    sync();
+  }
   if (!caseEl.hidden) openCase(false);
   addEventListener('scroll', render, { passive: true });
   addEventListener('resize', render);

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Fraunces:ital,opsz,wght,SOFT,WONK@1,9..144,300,100,1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./bottle.css?v=63">
+<link rel="stylesheet" href="./bottle.css?v=963">
 </head>
 <body>
 <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -102,6 +102,7 @@
       <button type="button" class="explore" data-open-case aria-controls="case" aria-expanded="false">Explore more <span aria-hidden="true">↓</span></button>
     </div>
 
+    <button type="button" class="more" id="more" aria-label="Keep scrolling to the next scene"><span>Keep scrolling</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><path d="M7 2v9m0 0L3 7m4 4l4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><b aria-hidden="true"><i></i></b></button>
     <div class="cue" id="cue" aria-hidden="true"><b>Scroll to follow the process</b><span></span></div>
   </div>
 </main>
@@ -142,7 +143,7 @@
 
   <section class="ph ph-context" id="p-context" data-name="Context">
     <header class="ph-head"><span class="stop" style="background-image:url(/images/pg/rooms/room-hero.webp);background-position:42% 40%" aria-hidden="true"></span><p class="num">01 · Context</p><h3>The brief, and how the work was organised</h3></header>
-    <div class="context-brief"><figure class="anchor"><img src="/images/pg/artifacts/context-brief.webp" alt="Illustration: project folder, blank bottle, sticky notes and calendar." width="1000" height="800" loading="lazy"></figure><div class="brief-copy"><p class="pull">P&amp;G sponsored a Northwestern EDI team to explore packaging for a conditioning product.</p><p>We connected consumer research with product handling, dispensing, and everyday haircare routines.</p><p>The project ran as four sprints across two settings. The first two were in people’s homes and set the questions. The second two were at a central test site, where people tried early studies.</p><p>The final design, the brand, and the product name are not shown on this page.</p></div></div>
+    <div class="context-brief"><figure class="anchor"><img src="/images/pg/artifacts/context-brief.webp" alt="Illustration: project folder, blank bottle, sticky notes and calendar." width="1000" height="800" loading="lazy"></figure><div class="brief-copy"><p class="pull">P&amp;G sponsored a Northwestern EDI team to explore packaging for a hair care product.</p><p>We connected consumer research with product handling, dispensing, and everyday haircare routines.</p><p>The project ran as four sprints across two settings. The first two were in people’s homes and set the questions. The second two were at a central test site, where people tried early studies.</p><p>The final design, the brand, and the product name are not shown on this page.</p></div></div>
     <figure class="map ctx-map"><svg viewBox="0 0 1000 400" role="img" aria-label="Two diamonds in a row with the thread drawn all the way through. Sprints 1 and 2, in people’s homes: discover, then define. Sprints 3 and 4, at a central test site: develop, then deliver.">
         <path d="M20 215 255 70 490 215 255 360Z M510 215 745 70 980 215 745 360Z" fill="#fbf7ef" stroke="#d9694a" stroke-width="4" stroke-linejoin="round"/>
         <path d="M490 215H510" stroke="#d9694a" stroke-width="4"/>
@@ -288,7 +289,8 @@
   <div class="clay-burst" aria-hidden="true"></div>
 </dialog>
 <script src="./gsap.min.js"></script>
-<script src="./bottle.js?v=43"></script>
+<script src="/shared/scroll-settle.js?v=3"></script>
+<script src="./bottle.js?v=57"></script>
 <script src="./unlock.js?v=48"></script>
 <script src="./idle.js?v=39"></script>
 <script>

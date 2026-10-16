@@ -3,6 +3,7 @@
 /* ---------- Lenis (desktop smooth scroll) ---------- */
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: clip; }
+html.lenis, .lenis.lenis-smooth { scroll-behavior: auto !important; }
 
 /* ---------- Road: draws with scroll; one small car; signs pop in ---------- */
 .journey-reveal { stroke: #fff; stroke-width: 72px; }
@@ -62,3 +63,15 @@ html:not(.no-motion) .road-sign.in .road-sign-in { animation: sign-pop .72s cubi
   .askrow .btn.big { padding: 16px 22px; font-size: 17px; }
 }
 @media (max-width: 379px) { .askrow .btn { white-space: normal; } }
+
+/* ---------- Scroll cue: the first screen looks finished, so say there is more ---------- */
+.scroll-cue { position: fixed; left: 50%; bottom: 22px; z-index: 30; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--cream); color: var(--ink); font: 600 14px/1 'Geist', system-ui, sans-serif; cursor: pointer; transition: opacity .3s, visibility .3s; }
+.scroll-cue svg { animation: cue-bob 1.6s ease-in-out infinite; }
+.scroll-cue.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+.scroll-cue:focus-visible { outline: 2px solid #c23b2c; outline-offset: 3px; }
+@keyframes cue-bob { 50% { transform: translateY(3px); } }
+@media (prefers-reduced-motion: reduce) { .scroll-cue svg { animation: none; } }
+@media (max-width: 600px) { .scroll-cue { bottom: 10px; min-height: 38px; padding: 0 14px; font-size: 13px; } }
+
+/* shared scroll-settle pill */
+:root { --ss-bg: #2b2119; --ss-fg: #f6efe3; --ss-accent: #c23b2c; --ss-font: 'Geist', system-ui, sans-serif; }

@@ -176,7 +176,8 @@
     introTween = gsap.fromTo(proxy, { u: 0 }, {
       u: END, ease: 'none', onUpdate: () => render(proxy.u),
       scrollTrigger: {
-        id: 'squad-intro', trigger: intro, pin: true, scrub: 0.35,
+        id: 'squad-intro', trigger: intro, pin: true, scrub: matchMedia('(hover: hover) and (pointer: fine)').matches ? true : 0.15,
+        // Lenis already smooths the wheel; a scrub tail on top of it made the pin lag.
         start: () => `top ${barH()}px`, end: () => `+=${Math.round(END * intro.clientHeight)}`,
         onRefresh: () => { layout(); render(proxy.u); schedule(); },
       },

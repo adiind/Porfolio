@@ -21,12 +21,12 @@
   setTimeout(() => { if (!window.__squadReady) root.classList.remove("motion", "pin", "gated"); }, 2500);
 })();
 </script>
-<link rel="stylesheet" href="/work/squad-up-assets/squad.css?v=30">
+<link rel="stylesheet" href="/work/squad-up-assets/squad.css?v=31">
 <link rel="stylesheet" href="/work/squad-up-assets/r8.css?v=5">
 <link rel="stylesheet" href="/work/squad-up-assets/r10.css?v=3">
 <link rel="stylesheet" href="/work/squad-up-assets/final2.css?v=7">
 <link rel="stylesheet" href="/work/squad-up-assets/content-cut.css?v=1">
-<link rel="stylesheet" href="/work/squad-up-assets/claude.css?v=3">
+<link rel="stylesheet" href="/work/squad-up-assets/claude.css?v=7">
 <link rel="stylesheet" href="/work/squad-up-assets/claude-r4.css?v=1">
 </head>
 <body>
@@ -243,15 +243,32 @@
   <div class="transition-assets" aria-hidden="true"></div>
 </dialog>
 
+<button class="scroll-cue" type="button" aria-label="Scroll down to explore the story"><span>Scroll to explore</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><path d="M7 2v9m0 0L3 7m4 4l4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<script>
+(() => {
+  const cue = document.querySelector(".scroll-cue");
+  if (!cue) return;
+  const sync = () => cue.classList.toggle("gone", scrollY > 60);
+  addEventListener("scroll", sync, { passive: true });
+  cue.addEventListener("click", () => {
+    const top = Math.round(innerHeight * 0.85);
+    if (window.lenis) window.lenis.scrollTo(scrollY + top, { duration: 1, force: true });
+    else scrollBy({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  });
+  sync();
+})();
+</script>
 <script src="/work/squad-up-assets/gsap.min.js"></script>
 <script src="/work/squad-up-assets/ScrollTrigger.min.js"></script>
 <script src="/work/squad-up-assets/MotionPathPlugin.min.js"></script>
 <script src="/work/squad-up-assets/lenis.min.js"></script>
-<script src="/work/squad-up-assets/squad.js?v=37"></script>
+<script src="/work/squad-up-assets/squad.js?v=38"></script>
 <script src="/work/squad-up-assets/road-claude.js?v=3"></script>
-<script src="/work/squad-up-assets/motion-claude.js?v=3"></script>
+<script src="/work/squad-up-assets/motion-claude.js?v=4"></script>
 <script src="/work/squad-up-assets/phone-r8.js?v=3"></script>
 <script src="/work/squad-up-assets/unlock.js?v=9"></script>
+<script src="/shared/scroll-settle.js?v=3"></script>
+<script src="/work/squad-up-assets/settle-init.js?v=1"></script>
 
 
 </body>

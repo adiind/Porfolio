@@ -295,6 +295,26 @@ const PortfolioApp: React.FC = () => {
     return 'profile';
   }, [getSectionTop, showDirectWritings]);
 
+  // A scroll that stops just short of a section is carried the rest of the way (engine: /shared/scroll-settle.js).
+  const blockingRef = useRef(false);
+  blockingRef.current = hasBlockingOverlay;
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const settle = (window as unknown as { ScrollSettle?: { init: (o: unknown) => { destroy: () => void } } }).ScrollSettle;
+    if (!container || !settle) return;
+    const engine = settle.init({
+      scroller: container,
+      enabled: () => !blockingRef.current,
+      rests: () => [
+        { y: 0 },
+        { y: getSectionTop('resume') },
+        ...(document.getElementById('projects') ? [{ y: Math.max(0, getSectionTop('projects') - 80) }] : []),
+        ...(document.getElementById('writings') ? [{ y: Math.max(0, getSectionTop('writings') - 80) }] : []),
+      ],
+    });
+    return () => engine.destroy();
+  }, [getSectionTop]);
+
   useEffect(() => {
     const handleShellWheel = (event: WheelEvent) => {
       const container = scrollContainerRef.current;

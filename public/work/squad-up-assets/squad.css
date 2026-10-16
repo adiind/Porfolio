@@ -7,7 +7,8 @@
 }
 * { box-sizing: border-box; }
 html { background: var(--cream); color: var(--ink); scrollbar-gutter: stable; }
-html.motion { scroll-behavior: smooth; }
+/* Scroll is native or Lenis-driven; every JS jump passes its own behavior. CSS smooth scrolling would animate ScrollTrigger refreshes and fight Lenis. */
+html { scroll-behavior: auto; }
 body { margin: 0; background: transparent; font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 18px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: clip; }
 p, figure, blockquote { margin: 0; }
 img { display: block; max-width: 100%; height: auto; }

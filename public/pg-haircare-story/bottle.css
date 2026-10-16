@@ -597,3 +597,14 @@ body { background: transparent; }
   .stage .instructors img { width: 80px; height: 80px; border-width: 4px; }
   .stage .instructors b { font-size: 13px; }
 }
+
+/* ---------- Keep-scrolling pill ---------- */
+.more { position: fixed; left: 50%; bottom: 20px; z-index: 40; transform: translate(-50%, 12px); display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 8px; row-gap: 6px; min-height: 44px; padding: 10px 18px 8px; border: 0; border-radius: 22px; background: #1b2a4a; color: #f4eee3; font: 600 13px/1 'Geist', system-ui, sans-serif; cursor: pointer; opacity: 0; visibility: hidden; transition: opacity .35s, transform .35s, visibility .35s; box-shadow: 0 0 0 1px rgba(244, 238, 227, .22); }
+.more.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.more b { grid-column: 1 / -1; display: block; height: 2px; border-radius: 2px; background: rgba(244, 238, 227, .25); overflow: hidden; }
+.more i { display: block; height: 100%; background: #e0684a; transform-origin: left; transform: scaleX(0); }
+.more.nudge svg { animation: more-bob 1.3s ease-in-out infinite; }
+.more:focus-visible { outline: 2px solid #e0684a; outline-offset: 3px; }
+@keyframes more-bob { 50% { transform: translateY(3px); } }
+@media (max-width: 600px) { .more { bottom: 12px; min-height: 40px; padding: 9px 14px 7px; font-size: 12px; } }
+@media (prefers-reduced-motion: reduce) { .more.nudge svg { animation: none; } .more { transition: none; } }
