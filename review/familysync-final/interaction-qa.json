@@ -1,0 +1,35 @@
+{
+  "390": {
+    "journeyActive": 3,
+    "clock": "",
+    "approval": "confirmed",
+    "cartAnswer": "Cart created and paid, with your yes",
+    "visaText": "Default Payment:Visa ending 1234✓",
+    "overflow": 0,
+    "closed": true,
+    "url": "http://127.0.0.1:3000/",
+    "errs": []
+  },
+  "1440": {
+    "journeyActive": 3,
+    "clock": "",
+    "approval": "confirmed",
+    "cartAnswer": "Cart created and paid, with your yes",
+    "visaText": "Default Payment:Visa ending 1234✓",
+    "overflow": 0,
+    "closed": true,
+    "url": "http://127.0.0.1:3000/",
+    "errs": []
+  },
+  "1440-reduced": {
+    "journeyActive": 6,
+    "clock": "15:00",
+    "approval": "confirmed",
+    "cartAnswer": "Cart created and paid, with your yes",
+    "visaText": "Default Payment:Visa ending 1234✓",
+    "overflow": 0,
+    "closed": true,
+    "url": "http://127.0.0.1:3000/",
+    "errs": []
+  }
+}

@@ -1,0 +1,162 @@
+/* FamilySync motion layer: "the page is the agent".
+   Every rule is scoped to .moving, which motion.js sets only when motion is allowed
+   and its libraries loaded. Reduced motion and no-JS keep the static r2 frames. */
+
+html.lenis,html.lenis body{height:auto}
+.moving,.moving body{scroll-behavior:auto!important}
+
+/* ── Opening: the agent is listening ── */
+.moving .hero-agent{will-change:transform;transform-style:preserve-3d}
+.moving .hero [data-agent] .school-ui{box-shadow:0 3px 5px #293e5310,0 calc(12px + var(--lift,0)*30px) calc(26px + var(--lift,0)*40px) -16px #172c4c66}
+.moving .listening i{transform-origin:50% 50%;animation:listen 1.15s ease-in-out infinite}
+.moving .listening i:nth-child(2){animation-delay:-.15s}.moving .listening i:nth-child(3){animation-delay:-.3s}
+.moving .listening i:nth-child(4){animation-delay:-.45s}.moving .listening i:nth-child(5){animation-delay:-.6s}
+.moving .listening i:nth-child(6){animation-delay:-.75s}.moving .listening i:nth-child(7){animation-delay:-.9s}
+@keyframes listen{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.15)}}
+.moving .handed .hero .listening i{animation:none}
+.moving .next-dot{animation:nextdot 1.6s ease-in-out infinite}
+@keyframes nextdot{50%{opacity:.25;transform:scale(.7)}}
+
+/* ── 01 the response window ── */
+.moving .swap{perspective:1400px}
+.moving .swap>.ui-card{backface-visibility:hidden;transform-origin:50% 0;transition:opacity .45s var(--ease),transform .95s var(--spring),visibility 0s linear 0s}
+.moving .swap-b{opacity:0;transform:rotateX(-75deg) translateY(-14px)}
+.moving .closed .swap-a{opacity:0;transform:rotateX(70deg) translateY(18px);transform-origin:50% 100%}
+.moving .closed .swap-b{opacity:1;transform:none}
+.moving .closed .swap-a,.moving .scene:not(.closed) .swap-b{transition:opacity .45s var(--ease),transform .95s var(--spring),visibility 0s linear .5s}
+.moving .closed .expired-label b{display:inline-block;animation:stamp .7s var(--spring) .35s both}
+@keyframes stamp{0%{opacity:0;transform:scale(1.9)}100%{opacity:1;transform:none}}
+.moving .meter-bar i{will-change:transform;transition:background-color .6s}
+.moving .meter.urgent .meter-time{animation:urgent 1s ease-in-out infinite;color:#9a5d0b}
+@keyframes urgent{50%{opacity:.45}}
+.moving .status-text.tick{animation:statusIn .55s var(--ease)}
+@keyframes statusIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:none}}
+.moving .worries li{transition:opacity .4s var(--ease),transform .8s var(--spring),background .5s,color .5s,box-shadow .5s,padding .5s}
+
+/* ── reveals get a longer, softer arrival ── */
+.moving .reveal{transform:translateY(36px);transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
+.moving .reveal.in{transform:none}
+.moving .relay-item.r2{transition-delay:.12s}.moving .relay-item.r3{transition-delay:.24s}
+.moving .reveal .handoff i{transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease) .35s}
+.moving .reveal.in .handoff i{transform:none}
+.moving .reveal .handoff b{transform:scale(0);transition:transform .6s var(--spring) .2s}
+.moving .reveal.in .handoff b{transform:none}
+.moving .findings li{border-top-color:transparent;position:relative}
+.moving .findings li::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease) .15s}
+.moving .findings li.in::before{transform:none}
+.moving .story-art{will-change:clip-path}
+.moving .story-art img{will-change:transform}
+.moving .relay-phone{transform-style:preserve-3d;will-change:transform}
+
+/* the slide-to-accept answer lands */
+.moving .ui-card.accepted h4{animation:statusIn .6s var(--ease)}
+.moving .ui-card.accepted::after{content:"";position:absolute;top:20px;right:20px;width:30px;height:30px;border-radius:50%;background:#24613a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 12.5l3.5 3.5 7.5-8' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px no-repeat;animation:pop .6s var(--spring) both}
+@keyframes pop{0%{transform:scale(0)}100%{transform:none}}
+
+/* the tension line reads itself */
+.moving .tension-line .w{display:inline-block;opacity:.14}
+
+/* exploration: the funnel narrows */
+.moving .f-join{will-change:clip-path}
+
+/* ── light to dark and back ── */
+.moving .night{will-change:clip-path}
+
+/* ── 05 My part: the sub-agent works ── */
+@media (min-width:861px),(min-height:761px){
+  .moving .beat-scenes .story-art{display:block;transition:opacity .8s var(--ease),clip-path 1.1s var(--ease)}
+  .moving .beat-scenes .art-kitchen{opacity:0;clip-path:inset(100% 0 0 0 round 20px)}
+  .moving .s2 .beat-scenes .art-home,.moving .s3 .beat-scenes .art-home,.moving .s4 .beat-scenes .art-home{display:block;opacity:0}
+  .moving .s2 .beat-scenes .art-kitchen,.moving .s3 .beat-scenes .art-kitchen,.moving .s4 .beat-scenes .art-kitchen{opacity:1;clip-path:inset(0 0 0 0 round 20px)}
+  .moving .beat-scenes img{will-change:transform}
+
+  /* children slide out from under the card that spawned them */
+  .moving .stack{--gap:108px}
+  .moving .stack .card{transition:opacity .5s var(--ease),transform .95s var(--spring)}
+  .moving .stack .c-spawn{transform:translateY(36px) scale(.9)}
+  .moving .stack .c-soup,.moving .stack .c-cart,.moving .stack .c-confirm{transform:translateY(calc(var(--gap)*-1)) scale(.9)}
+  .moving .s0 .c-spawn,.moving .s1 .c-spawn{transform:none}
+  .moving .s2 .c-spawn,.moving .s3 .c-spawn{transform:scale(.98)}
+  .moving .s2 .c-soup{transform:none}.moving .s3 .c-soup{transform:scale(.99)}
+  .moving .s3 .c-cart{transform:none}
+  .moving .sc .c-confirm{opacity:1;transform:none}.moving .sc .c-cart{transform:scale(.99)}
+  .moving .stack .thread{position:absolute;left:47px;top:52px;width:2px;height:calc(var(--gap)*3);z-index:0;border-radius:2px;background:linear-gradient(#b9d5ff,#5f8fd0);transform-origin:50% 0;transform:scaleY(0);transition:transform .9s var(--ease)}
+  .moving .s1 .thread,.moving .s2 .thread{transform:scaleY(.333)}
+  .moving .s3 .thread{transform:scaleY(.667)}
+  .moving .sc .thread{transform:scaleY(1)}
+  .moving .stack .ui-logo{position:relative}
+  .moving .c-spawn .ui-logo::after{content:"";position:absolute;inset:-6px;border-radius:19px;border:2px solid transparent;border-top-color:#5f8fd0;border-right-color:#5f8fd0;opacity:0;transition:opacity .3s}
+  .moving .s0 .c-spawn .ui-logo::after{opacity:1;animation:spin 1s linear infinite}
+  .moving .s1 .c-spawn .ui-logo{animation:pop .5s var(--spring)}
+  .moving .s0 .task-indicator{animation:nextdot 1s ease-in-out infinite}
+  .moving .stack .task-check{display:inline-block;transform:scale(0);transition:transform .55s var(--spring) .45s}
+  .moving .s2 .c-soup .task-check,.moving .s3 .c-soup .task-check{transform:none}
+  .moving .c-cart.filled .task-check{transform:none;transition-delay:.05s}
+  .moving .c-cart{overflow:hidden}
+  .moving .c-cart .fill{position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#5f8fd0,#24613a);transform-origin:left;transform:scaleX(var(--fill,0))}
+
+  /* the recipe card swings up to face Stacy */
+  .moving .climax-cards{perspective:1600px}
+  .moving .c-recipe{transform-origin:50% 100%;transform:translate(0,-34%) rotateX(24deg) scale(.92);transition:opacity .6s var(--ease),transform 1.15s var(--spring)}
+  .moving .s4 .c-recipe{transform:translate(0,-50%)}
+  .moving .c-recipe .ui-button{transition:transform .35s var(--spring),box-shadow .35s var(--ease),background .2s}
+  .moving .c-recipe .ui-button.hint{transform:translateY(-2px) scale(1.04);box-shadow:0 0 0 3px #b9d5ff,0 12px 24px -12px #173b7999}
+  .moving .c-recipe .ui-button.danger.hint{box-shadow:0 0 0 3px #f2cfcb}
+  .moving .exits li{transition:color .3s;cursor:default}
+  .moving .exits li.hint{color:#fff}
+  .moving .exits li .pill{transition:transform .35s var(--spring),box-shadow .35s}
+  .moving .exits li.hint .pill{transform:scale(1.05);box-shadow:0 0 0 3px #ffffff22}
+  .moving .beat{transition:opacity .5s var(--ease),transform .8s var(--spring)}
+  .moving .beat:not(.on){transform:translateY(16px)}
+}
+@media (max-width:860px) and (min-height:761px){
+  .moving .stack{--gap:92px}
+  .moving .stack .thread{left:35px;top:48px}
+  .moving .c-recipe{transform:translateY(40px) rotateX(22deg) scale(.94)}
+  .moving .s4 .c-recipe{transform:none}
+}
+
+/* ── 06 the payment waits on Stacy ── */
+.moving .pay{transform-style:preserve-3d;will-change:transform}
+.moving .pay .ui-card{transition:box-shadow .5s var(--ease)}
+.moving .pay::before{content:"";position:absolute;inset:-7px;border-radius:33px;border:1.5px solid #b9d5ff;opacity:0;pointer-events:none}
+.moving .counting .pay::before{animation:breathe 2.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.15;transform:scale(.995)}50%{opacity:.75;transform:scale(1.008)}}
+.moving[data-approval="holding"] .pay::before{opacity:.8;border-color:#d6a24a;animation:none}
+.moving[data-approval="confirmed"] .pay::before{opacity:1;border-color:#5fbf6f;animation:ring .9s var(--ease) both}
+.moving[data-approval="declined"] .pay::before{opacity:.8;border-color:#f08b83;animation:none}
+@keyframes ring{0%{transform:scale(.96);opacity:0}40%{opacity:1}100%{transform:none;opacity:1}}
+.moving .pay .ui-button{position:relative;overflow:hidden;transition:transform .18s var(--ease),background .2s}
+.moving .pay .ui-button:active,.moving .pay .ui-button.pressed{transform:scale(.96)}
+.moving .ripple{position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:#fff;opacity:.4;pointer-events:none;animation:ripple .6s var(--ease) forwards}
+.moving .danger .ripple{background:#d5433a}
+@keyframes ripple{to{transform:scale(14);opacity:0}}
+.moving .pay .stamp{position:absolute;right:-22px;top:-24px;z-index:2;width:60px;height:60px;padding:8px;border-radius:50%;background:#fff;box-shadow:0 14px 30px -12px #000c;pointer-events:none;opacity:0;transform:scale(.4) rotate(-20deg)}
+.moving .pay .stamp circle,.moving .pay .stamp path{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.moving .pay .stamp circle{stroke-dasharray:1;stroke-dashoffset:1}
+.moving .pay .stamp path{stroke-dasharray:1;stroke-dashoffset:1;opacity:0}
+.moving[data-approval="confirmed"] .pay .stamp,.moving[data-approval="declined"] .pay .stamp{opacity:1;transform:none;transition:transform .7s var(--spring),opacity .2s}
+.moving[data-approval="confirmed"] .stamp circle,.moving[data-approval="declined"] .stamp circle{stroke-dashoffset:0;transition:stroke-dashoffset .6s var(--ease) .05s}
+.moving[data-approval="confirmed"] .stamp{color:#24613a}
+.moving[data-approval="declined"] .stamp{color:#9d2924}
+.moving[data-approval="confirmed"] .stamp .yes,.moving[data-approval="declined"] .stamp .no{opacity:1;stroke-dashoffset:0;transition:stroke-dashoffset .45s var(--ease) .45s}
+.moving[data-approval="declined"] .pay .ui-card{box-shadow:0 2px 4px #0d1b3308}
+.moving [data-hold-title].tick,.moving [data-hold-line].tick{animation:statusIn .55s var(--ease)}
+.moving .undo:not([hidden]){animation:statusIn .5s var(--ease) .5s both}
+.moving .why div{position:relative}
+
+/* ── 07 the run resolves ── */
+.moving .run::before{transform-origin:left;transform:scaleX(var(--draw,0))}
+.moving .run li::before{transform:scale(0);transition:transform .55s var(--spring)}
+.moving .run li.on::before{transform:none}
+@media (max-width:860px){.moving .run::before{transform-origin:top;transform:scaleY(var(--draw,0))}}
+
+/* ── the rail tracks the run ── */
+.moving .rail::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#173b79;transform-origin:left;transform:scaleX(var(--page,0));opacity:.35}
+.moving .rail.on-dark::after{background:#b9d5ff}
+@media (min-width:861px){
+  .moving .rail a,.moving .rail .now{border-bottom-color:transparent}
+  .moving .rail .ink{position:absolute;left:0;bottom:0;width:1px;height:2px;background:#173b79;transform-origin:left;transition:transform .55s var(--spring),background .3s;pointer-events:none}
+  .moving .rail.on-dark .ink{background:#b9d5ff}
+}
+@media (max-width:860px){.moving .rail .ink{display:none}}

@@ -5,7 +5,9 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 export function useDialogA11y(onClose: () => void, options?: {
   historyTag?: string;
   historyPath?: string;
+  historyBasePath?: string;
   childHistoryTags?: string[];
+  escapePassthroughSelector?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -18,6 +20,9 @@ export function useDialogA11y(onClose: () => void, options?: {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        // Let a focused inline control consume Escape before closing its dialog.
+        if (options?.escapePassthroughSelector && e.target instanceof Element
+          && e.target.closest(options.escapePassthroughSelector)) return;
         e.stopPropagation();
         onCloseRef.current();               // state-based close — never via history
         return;
@@ -67,6 +72,17 @@ export function useDialogA11y(onClose: () => void, options?: {
       // same entry the tag mechanism owns; back()/popstate restore the prior URL.
       pushTimer = window.setTimeout(() => {
         pushed = true;
+        // Reopened by browser Forward onto the entry this dialog pushed earlier:
+        // adopt it instead of stacking a duplicate that would need two Backs.
+        if (options?.historyPath && window.history.state?.modal === tag
+          && window.location.pathname === options.historyPath) return;
+        // Seed a deep link's Back destination only after its dialog is mounted.
+        // Replace + push run together, so the boot path is never stranded at /.
+        if (options?.historyBasePath && options.historyPath
+          && window.location.pathname.replace(/\/$/, '') === options.historyPath
+          && window.history.state?.modal !== tag) {
+          window.history.replaceState(null, '', options.historyBasePath);
+        }
         window.history.pushState({ modal: tag }, '', options?.historyPath ?? window.location.href);
       }, 0);
     }

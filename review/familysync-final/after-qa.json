@@ -1,0 +1,230 @@
+{
+  "390": {
+    "errors": [],
+    "checks": [
+      {
+        "name": "01-hero",
+        "overflow": 0
+      },
+      {
+        "name": "02-context",
+        "overflow": 0
+      },
+      {
+        "name": "03-research",
+        "overflow": 0
+      },
+      {
+        "name": "04-synthesis",
+        "overflow": 0
+      },
+      {
+        "name": "05-tension",
+        "overflow": 0
+      },
+      {
+        "name": "06-exploration",
+        "overflow": 0
+      },
+      {
+        "name": "07-mypart",
+        "overflow": 0
+      },
+      {
+        "name": "08-testing",
+        "overflow": 0
+      },
+      {
+        "name": "09-outcome",
+        "overflow": 0
+      },
+      {
+        "name": "10-journey",
+        "overflow": 0
+      },
+      {
+        "name": "11-answers",
+        "overflow": 0
+      },
+      {
+        "name": "12-end",
+        "overflow": 0
+      }
+    ],
+    "broken": [],
+    "filters": 0,
+    "lenis": true,
+    "scrollTriggers": 25
+  },
+  "1440": {
+    "errors": [],
+    "checks": [
+      {
+        "name": "01-hero",
+        "overflow": 0
+      },
+      {
+        "name": "02-context",
+        "overflow": 0
+      },
+      {
+        "name": "03-research",
+        "overflow": 0
+      },
+      {
+        "name": "04-synthesis",
+        "overflow": 0
+      },
+      {
+        "name": "05-tension",
+        "overflow": 0
+      },
+      {
+        "name": "06-exploration",
+        "overflow": 0
+      },
+      {
+        "name": "07-mypart",
+        "overflow": 0
+      },
+      {
+        "name": "08-testing",
+        "overflow": 0
+      },
+      {
+        "name": "09-outcome",
+        "overflow": 0
+      },
+      {
+        "name": "10-journey",
+        "overflow": 0
+      },
+      {
+        "name": "11-answers",
+        "overflow": 0
+      },
+      {
+        "name": "12-end",
+        "overflow": 0
+      }
+    ],
+    "broken": [],
+    "filters": 0,
+    "lenis": true,
+    "scrollTriggers": 27
+  },
+  "1440-reduced": {
+    "errors": [],
+    "checks": [
+      {
+        "name": "01-hero",
+        "overflow": 0
+      },
+      {
+        "name": "02-context",
+        "overflow": 0
+      },
+      {
+        "name": "03-research",
+        "overflow": 0
+      },
+      {
+        "name": "04-synthesis",
+        "overflow": 0
+      },
+      {
+        "name": "05-tension",
+        "overflow": 0
+      },
+      {
+        "name": "06-exploration",
+        "overflow": 0
+      },
+      {
+        "name": "07-mypart",
+        "overflow": 0
+      },
+      {
+        "name": "08-testing",
+        "overflow": 0
+      },
+      {
+        "name": "09-outcome",
+        "overflow": 0
+      },
+      {
+        "name": "10-journey",
+        "overflow": 0
+      },
+      {
+        "name": "11-answers",
+        "overflow": 0
+      },
+      {
+        "name": "12-end",
+        "overflow": 0
+      }
+    ],
+    "broken": [],
+    "filters": 0,
+    "lenis": false,
+    "scrollTriggers": 0
+  },
+  "390-reduced": {
+    "errors": [],
+    "checks": [
+      {
+        "name": "01-hero",
+        "overflow": 0
+      },
+      {
+        "name": "02-context",
+        "overflow": 0
+      },
+      {
+        "name": "03-research",
+        "overflow": 0
+      },
+      {
+        "name": "04-synthesis",
+        "overflow": 0
+      },
+      {
+        "name": "05-tension",
+        "overflow": 0
+      },
+      {
+        "name": "06-exploration",
+        "overflow": 0
+      },
+      {
+        "name": "07-mypart",
+        "overflow": 0
+      },
+      {
+        "name": "08-testing",
+        "overflow": 0
+      },
+      {
+        "name": "09-outcome",
+        "overflow": 0
+      },
+      {
+        "name": "10-journey",
+        "overflow": 0
+      },
+      {
+        "name": "11-answers",
+        "overflow": 0
+      },
+      {
+        "name": "12-end",
+        "overflow": 0
+      }
+    ],
+    "broken": [],
+    "filters": 0,
+    "lenis": false,
+    "scrollTriggers": 0
+  }
+}

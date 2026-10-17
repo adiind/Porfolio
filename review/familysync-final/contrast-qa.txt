@@ -1,0 +1,31 @@
+ 6.20  OK   feel school-ink on active school tint
+ 6.65  OK   feel calendar-ink on active tint
+ 8.45  OK   feel fs-ink on active tint
+ 5.52  OK   feel cart-ink on active tint
+ 4.59  OK   dot white on calendar
+10.84  OK   dot white on fs
+ 7.87  OK   dot ink on school
+ 5.73  OK   dot ink on cart
+ 5.76  OK   lane label mute on paper
+ 8.28  OK   quote #33445d on cart tint
+ 5.70  OK   kicker clay-ink on paper
+ 6.12  OK   kicker cart-ink on paper
+ 6.35  OK   kicker school-ink on school-bg
+ 6.97  OK   kicker calendar-ink on calendar-bg
+10.93  OK   kicker #ffb4a8 on night
+10.98  OK   kicker #e7c27a on night
+16.09  OK   mobile feel quote ink on school tint
+ 6.62  OK   peak label school-ink on paper
+ 5.52  OK   peak label cart-ink on cart tint
+
+Round 2
+ 4.89  OK   dot ink on coral window
+ 5.20  OK   dot white on teal circle
+ 5.59  OK   dot white on violet location
+ 5.66  OK   window-ink label on green wash
+ 6.67  OK   circle-ink label on green wash
+ 7.53  OK   location-ink label on green wash
+ 5.65  OK   feel low ink on green wash
+ 6.22  OK   feel mid ink on green wash
+ 5.36  OK   feel high ink on green wash
+ 5.41  OK   mute on green wash
