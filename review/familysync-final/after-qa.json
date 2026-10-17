@@ -54,7 +54,7 @@
     "broken": [],
     "filters": 0,
     "lenis": true,
-    "scrollTriggers": 17
+    "scrollTriggers": 25
   },
   "1440": {
     "errors": [],
@@ -111,7 +111,7 @@
     "broken": [],
     "filters": 0,
     "lenis": true,
-    "scrollTriggers": 19
+    "scrollTriggers": 27
   },
   "1440-reduced": {
     "errors": [],

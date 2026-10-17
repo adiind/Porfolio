@@ -1,7 +1,7 @@
 import sys,glob,os
 from PIL import Image
 src,out,cols,w=sys.argv[1],sys.argv[2],int(sys.argv[3]),int(sys.argv[4])
-fs=sorted(glob.glob(src+'/*.png'))
+fs=sorted(glob.glob(src+'/*.png')+glob.glob(src+'/*.jpg'))
 ims=[Image.open(f).convert('RGB') for f in fs]
 ims=[i.resize((w,int(i.height*w/i.width))) for i in ims]
 h=max(i.height for i in ims);rows=(len(ims)+cols-1)//cols

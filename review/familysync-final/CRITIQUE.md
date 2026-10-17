@@ -34,3 +34,7 @@ What already works and stays: the hero phone handoff, the 11:00 → 11:03 respon
 ## Illustrations: replace, not regenerate
 
 None of the nine images is off-style; all share the gouache, amber + navy look of the style reference. The problem is purpose, not style. So the empty banners are **removed** rather than regenerated: the page keeps the five pictures that carry the story (research interview, pickup, parent at work, home, kitchen). This also avoids chaining new generations from old ones. If Adi wants a new picture in Exploration later, it should come fresh from `public/images/familysync/tests/styles/03-editorial-a-hero.png` with a scene that shows real work (sketches of the three directions), not an empty desk.
+
+## Round 2 correction
+
+Removing the empty rooms was the wrong call. The page lost colour and atmosphere in three sections, and Adi had asked for more colour, not less. They are restored, paired with their headings and framed in section colour. The journey map still read as a table, so it was rebuilt: a solid feeling line, a travelling thread, a lit column, and coloured marks for every stage.
