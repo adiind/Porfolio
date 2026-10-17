@@ -103,9 +103,14 @@
   const actions = $('.pay .ui-actions'), undo = $('[data-undo]');
   const lede = $('[data-outcome-lede]'), cartAnswer = $('[data-cart-answer]');
   const WAIT = 8000;
-  const go = el => window.fsLenis
-    ? window.fsLenis.scrollTo(el, { offset: -64, duration: 1.2 })
-    : el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+  // Phone overlay: the strip sticks below the Close band, so the landing
+  // offset has to clear that band. Desktop and a direct visit stay at -64.
+  const go = el => {
+    const underClose = innerWidth < 1024 && root.classList.contains('fs-embedded');
+    return window.fsLenis
+      ? window.fsLenis.scrollTo(el, { offset: underClose ? -116 : -64, duration: 1.2 })
+      : el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+  };
   const copy = {
     waiting: ['Waiting on you', holdLine.textContent, lede.textContent, cartAnswer.textContent],
     holding: ['Holding the cart', 'No answer yet. FamilySync holds the cart and charges nothing without a yes.', lede.textContent, 'Cart created, held until someone says yes'],
@@ -195,7 +200,10 @@
   }));
   $('[data-rail-outcome]').addEventListener('click', () => { if (!root.dataset.approval) autoHold(); reveal(); });
 
-  $$('[data-back]').forEach(b => b.addEventListener('click', () => parent.postMessage({type:'familysync-close'},location.origin)));
+  $$('[data-back]').forEach(b => b.addEventListener('click', () => {
+    if (parent === window) location.assign('/');
+    else parent.postMessage({type:'familysync-close'}, location.origin);
+  }));
   const slider = $('[data-slide-accept]');
   function acceptPickup() {
     slider.closest('.ui-card').querySelector('h4').textContent = 'Pickup request for Leo accepted';
@@ -205,7 +213,10 @@
   slider.addEventListener('input', () => { if (+slider.value <= 5) acceptPickup(); });
   // Escape must also work after focus enters the standalone document.
   addEventListener('keydown', e => {
-    if (e.key === 'Escape') parent.postMessage({type:'familysync-close'},location.origin);
+    if (e.key === 'Escape') {
+      if (parent === window) location.assign('/');
+      else parent.postMessage({type:'familysync-close'}, location.origin);
+    }
     if (e.key !== 'Tab' || parent === window) return;
     const focusable = $$('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])')
       .filter(el => el.getClientRects().length && !el.closest('[inert]'));

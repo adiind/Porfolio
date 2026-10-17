@@ -1336,15 +1336,20 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
   :root{--rail:44px}
   body{padding-top:0}
   .hero{min-height:0;padding-top:84px}
-  .case-top{position:absolute;inset:0 0 auto;z-index:25;height:60px;background:none;border-bottom:1px solid #ded8ce}
+  .case-top{position:absolute;inset:0 0 auto;z-index:36;height:60px;background:none;border-bottom:1px solid #ded8ce}
   .back-link{height:60px;margin-left:20px;font-size:13px}
   .case-close{position:fixed;top:10px;right:12px;z-index:40;display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:1px solid #ded8ce;border-radius:99px;background:var(--paper);font:500 12px var(--ui-font);color:var(--ink);cursor:pointer}
   .case-close:focus-visible{outline:2px solid #285ca0;outline-offset:2px}
-  .rail,.rail.on-dark{position:sticky;inset:auto;top:0;z-index:30;width:auto;height:auto;background:var(--paper);border:0;border-block:1px solid #ded8ce}
+  /* A direct visit keeps Back to portfolio. Close belongs to the overlay. */
+  html:not(.fs-embedded) .case-close{display:none!important}
+  /* Close sits in a fixed paper band (10px + 36px pill, band ends at 56px).
+     The strip sticks under that band at full width, so 01–04 stay on screen
+     and the pill never covers a tab. */
+  html.fs-embedded body::before{content:"";position:fixed;z-index:35;top:0;left:0;right:0;height:56px;background:var(--paper)}
+  .rail,.rail.on-dark{position:sticky;inset:auto;top:0;z-index:30;width:auto;height:auto;background:var(--paper);border:0;border-block:1px solid #ded8ce;padding-right:12px}
+  html.fs-embedded .rail,html.fs-embedded .rail.on-dark{top:56px}
+  html.fs-embedded section[id]{scroll-margin-top:116px}
   .rail-track{height:auto}
-  /* The strip scrolls only in the space left of the Close pill (12px inset + 36px-high pill ≈ 80px + 12px gap),
-     so no tab ever sits under it and the active tab always scrolls fully into view. */
-  .rail,.rail.on-dark{padding-right:104px}
   .rail ol{position:relative;display:flex;gap:20px;height:auto;padding:0 20px;overflow-x:auto;scrollbar-width:none}
   .rail ol::-webkit-scrollbar{display:none}
   .rail ol li{height:auto}
