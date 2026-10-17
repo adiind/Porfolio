@@ -1342,7 +1342,10 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
   .case-close:focus-visible{outline:2px solid #285ca0;outline-offset:2px}
   .rail,.rail.on-dark{position:sticky;inset:auto;top:0;z-index:30;width:auto;height:auto;background:var(--paper);border:0;border-block:1px solid #ded8ce}
   .rail-track{height:auto}
-  .rail ol{position:relative;display:flex;gap:20px;height:auto;padding:0 65px 0 20px;overflow-x:auto;scrollbar-width:none}
+  /* The strip scrolls only in the space left of the Close pill (12px inset + 36px-high pill ≈ 80px + 12px gap),
+     so no tab ever sits under it and the active tab always scrolls fully into view. */
+  .rail,.rail.on-dark{padding-right:104px}
+  .rail ol{position:relative;display:flex;gap:20px;height:auto;padding:0 20px;overflow-x:auto;scrollbar-width:none}
   .rail ol::-webkit-scrollbar{display:none}
   .rail ol li{height:auto}
   .rail a,.rail.on-dark a{height:auto;padding:16px 0 13px;border-bottom:2px solid transparent!important;font-size:12px;color:var(--mute)}

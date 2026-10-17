@@ -4,6 +4,10 @@ Branch `familysync-final`. Local only: not pushed, merged or deployed.
 
 Built on the local working tree (brand pass + Codex pass 3), not on `main` or the live site. Critique and direction: `CRITIQUE.md`. Before/after: `index.html` (open via the dev server at `/review/familysync-final/index.html`, or as a file).
 
+## Round 4 (one fix on 7a1f89f)
+
+At 390, the fixed Close pill sat on top of the sticky contents strip and covered "07 Outcome". The strip now keeps 104px clear on its right for the pill and scrolls only in the space to its left (it ends at x=286; the pill starts at x=292). Measured at Context, My part, Testing and Outcome, with and without reduced motion: the active tab is always fully visible, no tab sits under Close, and there is 0 sideways scrolling. 390 and 390-reduced were re-captured with 0 errors.
+
 ## Round 3 (small fixes on 3a1674c)
 
 1. **No time on stages 04–06.** The "Time unknown" labels are gone from the stage headers and the big clock. When one of those stages is active, the clock is blank and the 11:00–15:00 ruler keeps advancing.
