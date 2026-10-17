@@ -1201,14 +1201,13 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
 .journey-heading .tag{margin-bottom:8px;color:var(--mute)}
 .journey-heading h3{font-size:clamp(28px,2.6vw,38px);letter-spacing:-.035em}
 .journey-clock{display:grid;justify-items:end;gap:4px;min-width:280px;text-align:right}
-.journey-clock time{font-size:clamp(40px,4vw,60px);font-weight:500;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums;color:var(--now-ink,var(--ink));transition:color .4s}
-.journey-clock time.unknown{color:var(--mute);font-size:clamp(26px,2.4vw,34px);font-style:italic;letter-spacing:-.02em;line-height:1.75}
+.journey-clock time{min-height:1em;font-size:clamp(40px,4vw,60px);font-weight:500;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums;color:var(--now-ink,var(--ink));transition:color .4s}
 .journey-clock>span{font-size:13px;font-weight:600;color:var(--mute)}
 .clock-ruler{display:flex;align-items:center;gap:8px;width:100%;margin-top:4px;font-size:11px;font-weight:600;color:var(--mute);font-variant-numeric:tabular-nums}
 .clock-ruler i{position:relative;flex:1;height:4px;border-radius:2px;background:#0d1b331a;overflow:hidden}
 .clock-ruler b{position:absolute;inset:0;border-radius:2px;background:var(--now-c,var(--fs));transform-origin:left;transform:scaleX(var(--ruler,1));transition:background .4s}
 .journey-board{position:relative;display:grid;grid-template-columns:112px minmax(0,1fr);
-  --r1:96px;--r2:82px;--r3:212px;--r4:82px;--r5:104px}
+  --r1:104px;--r2:82px;--r3:212px;--r4:82px;--r5:136px}
 .lane-labels{display:grid;grid-template-rows:var(--r1) var(--r2) var(--r3) var(--r4) var(--r5);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
 .lane-labels>span{padding:16px 10px 0 14px;border:0}
 .lane-labels>span:nth-child(2),.lane-labels>span:nth-child(4){background:#ffffff8c;border-radius:14px 0 0 14px}
@@ -1220,7 +1219,6 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
 .journey-stage .stacy,.journey-stage .agent{background:#ffffff8c}
 .journey-stage:last-child .stacy,.journey-stage:last-child .agent{border-radius:0 14px 14px 0}
 .journey-stage header button{display:flex;align-items:center;gap:8px;min-height:28px;padding:0;border:0;background:none;font:600 11px var(--ui-font);color:var(--mute);cursor:pointer;font-variant-numeric:tabular-nums;text-align:left}
-.journey-stage header time.unknown{font-style:italic;font-weight:500}
 .journey-dot{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--c);background:var(--paper);color:var(--c-ink);font-size:10.5px;font-weight:700;transition:background .3s,color .3s,transform .4s var(--ease),box-shadow .4s}
 .journey-stage.reached .journey-dot{background:var(--c);color:#fff}
 .journey-stage[style*="--school"].reached .journey-dot,.journey-stage[style*="--cart"].reached .journey-dot,.journey-stage[style*="--window"].reached .journey-dot{color:var(--ink)}
@@ -1232,7 +1230,8 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
 .feel-word{font-size:13px;font-weight:700;color:var(--feel-ink,var(--ink))}
 .feel q{quotes:"“" "”";font-size:11.5px;line-height:1.38;color:#33445d}
 .feel-meter{display:none}
-.touchpoint{display:flex;gap:6px;margin-bottom:7px}
+.touchpoint{display:flex;gap:10px;margin-bottom:7px}
+.touchpoint>.svc-tile{flex:none;width:40px}
 .touchpoint .svc-tile{width:40px;height:40px;border-radius:12px;box-shadow:0 8px 18px -10px color-mix(in srgb,var(--c) 70%,#000);transition:transform .5s var(--spring)}
 .touchpoint .svc-glyph{background:var(--c);color:#fff;box-shadow:0 8px 18px -10px var(--c-ink)}
 .svc-glyph svg{width:58%;height:58%}
@@ -1253,7 +1252,7 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
 .journey-curve .c-dot{stroke:var(--paper);stroke-width:3}
 .journey-curve .c-here{fill:none;stroke-width:3;transition:transform .5s var(--ease)}
 .journey-curve .c-peak{font:700 10px var(--ui-font);letter-spacing:.08em;text-transform:uppercase}
-.journey-thread .t-seg{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.journey-thread .t-line{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .journey-thread .t-node{stroke:var(--paper);stroke-width:2;transition:r .35s var(--spring)}
 @media(min-width:1024px) and (min-height:740px){
   .moving .journey{height:300vh}
@@ -1274,7 +1273,7 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
   .journey-stage{display:block;margin-bottom:20px;padding:12px 14px 16px;border-radius:18px;background:#ffffffa6;box-shadow:inset 0 0 0 1px var(--hair);scroll-margin-top:110px;transition:background .4s,box-shadow .4s}
   .journey-stage.active{background:color-mix(in srgb,var(--c) 12%,#fff);box-shadow:inset 0 0 0 1.5px var(--c)}
   .journey-stage header,.journey-stage .lane{padding:6px 0;font-size:15px;line-height:1.45;background:none!important}
-  .journey-stage header button{font-size:12px}
+  .journey-stage header button{font-size:12px;min-width:44px;min-height:28px}
   .journey-dot{position:absolute;left:var(--dot-x,-46px);width:28px;height:28px;font-size:11px}
   .journey-stage header{position:relative}
   .journey-stage h4{font-size:21px;margin-top:6px}
@@ -1327,4 +1326,27 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
   .lead-row{grid-template-columns:minmax(0,1fr);gap:28px;margin-bottom:40px}
   .scene-plate{border-radius:20px;box-shadow:0 0 0 6px color-mix(in srgb,var(--k) 16%,transparent)}
   .tension .plate-tension{height:200px;margin-top:32px}
+}
+
+/* ═══════════ Phones: the same contents strip and Close pill as the P&G case study ═══════════
+   The strip sits under the opening and sticks to the top once reached; numbered tabs; the
+   active tab is underlined and scrolled into view; Close stays fixed at the top right. */
+.tab-n,.case-close{display:none}
+@media(max-width:1023px){
+  :root{--rail:44px}
+  body{padding-top:0}
+  .hero{min-height:0;padding-top:84px}
+  .case-top{position:absolute;inset:0 0 auto;z-index:25;height:60px;background:none;border-bottom:1px solid #ded8ce}
+  .back-link{height:60px;margin-left:20px;font-size:13px}
+  .case-close{position:fixed;top:10px;right:12px;z-index:40;display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:1px solid #ded8ce;border-radius:99px;background:var(--paper);font:500 12px var(--ui-font);color:var(--ink);cursor:pointer}
+  .case-close:focus-visible{outline:2px solid #285ca0;outline-offset:2px}
+  .rail,.rail.on-dark{position:sticky;inset:auto;top:0;z-index:30;width:auto;height:auto;background:var(--paper);border:0;border-block:1px solid #ded8ce}
+  .rail-track{height:auto}
+  .rail ol{position:relative;display:flex;gap:20px;height:auto;padding:0 65px 0 20px;overflow-x:auto;scrollbar-width:none}
+  .rail ol::-webkit-scrollbar{display:none}
+  .rail ol li{height:auto}
+  .rail a,.rail.on-dark a{height:auto;padding:16px 0 13px;border-bottom:2px solid transparent!important;font-size:12px;color:var(--mute)}
+  .rail a span{display:flex;align-items:center;gap:7px}
+  .rail a .tab-n{display:inline;font-size:10px;font-weight:400}
+  .rail a.now,.rail.on-dark a.now{color:var(--fs);border-bottom-color:var(--fs)!important}
 }

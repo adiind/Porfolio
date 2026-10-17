@@ -179,7 +179,7 @@
     if (innerWidth < 1024) {
       const current = links[now];
       if (current.parentElement.offsetLeft < railList.scrollLeft || current.parentElement.offsetLeft + current.offsetWidth > railList.scrollLeft + railList.clientWidth)
-        railList.scrollTo({left: Math.max(0, current.parentElement.offsetLeft - 20), behavior: 'instant'});
+        railList.scrollTo({left: Math.max(0, current.parentElement.offsetLeft - 22), behavior: 'instant'});
     }
     railN.textContent = String(now + 1).padStart(2, '0');
     railLabel.textContent = steps[now].dataset.label;
@@ -195,7 +195,7 @@
   }));
   $('[data-rail-outcome]').addEventListener('click', () => { if (!root.dataset.approval) autoHold(); reveal(); });
 
-  $('[data-back]').addEventListener('click', () => parent.postMessage({type:'familysync-close'},location.origin));
+  $$('[data-back]').forEach(b => b.addEventListener('click', () => parent.postMessage({type:'familysync-close'},location.origin)));
   const slider = $('[data-slide-accept]');
   function acceptPickup() {
     slider.closest('.ui-card').querySelector('h4').textContent = 'Pickup request for Leo accepted';

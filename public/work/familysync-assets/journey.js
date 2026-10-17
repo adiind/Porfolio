@@ -84,29 +84,45 @@
     }
     const here = vertical ? null : el(curve, 'circle', { class: 'c-here', cx: 0, cy: 0, r: 12 });
 
-    // The thread: lane by lane, down through one stage and up through the next.
-    const segs = [], nodes = [];
+    // The thread: one smooth line, lane by lane, down through one stage and up through the next.
+    // It turns in wide curves below the service labels and above the Stacy lane, never over text,
+    // and its colour shifts to each stage's service colour where it passes that column.
+    const nodes = [];
+    let line2 = null, marks = [];
     if (!vertical) {
       const at = (s, sel) => $(sel, s).getBoundingClientRect().top - B.top;
-      let prev = null;
+      // Straight runs through the lanes; each turn is one wide cubic, deep below the service
+      // labels and shallow above the Stacy lane.
+      let d = '';
+      const ends = [];
       stages.forEach((s, i) => {
         const x = cols[i].x + 18;
         const tile = $('.svc-tile', s).getBoundingClientRect();
         const lanes = [[x, at(s, '.stacy') + 21], [x, at(s, '.agent') + 21], [x, tile.top + tile.height / 2 - B.top]];
-        // Turns happen in the gaps above the Stacy lane and below the service labels, never over text.
-        const top = at(s, '.stacy') - 9, bottom = B.height - 6;
-        const down = !(i % 2), path = down ? lanes : lanes.reverse();
-        const ends = down ? [[x, top], [x, bottom]] : [[x, bottom], [x, top]];
-        const route = [ends[0], ...path, ends[1]];
-        const d = (prev ? `M${prev} L${route[0]}` : `M${route[0]}`) + route.slice(1).map((p) => ` L${p}`).join('');
-        const colour = css(s, '--c');
-        segs.push(el(thread, 'path', { class: 't-seg', d, stroke: colour, pathLength: 1, 'stroke-dasharray': 1 }));
-        nodes.push(path.map((p) => el(thread, 'circle', { class: 't-node', cx: p[0], cy: p[1], r: 0, fill: colour })));
-        prev = route[route.length - 1];
+        const path = i % 2 ? lanes.reverse() : lanes;
+        nodes.push(path);
+        if (!i) d = `M${path[0]}`;
+        else {
+          const from = nodes[i - 1][2], turn = i % 2 ? B.height - 10 : at(s, '.stacy') - 14;
+          d += ` C${from[0]} ${turn} ${path[0][0]} ${turn} ${path[0]}`;
+        }
+        d += ` L${path[1]} L${path[2]}`;
+        ends.push(d);
       });
+      const tgrad = el(el(thread, 'defs'), 'linearGradient', { id: 'fs-thread', gradientUnits: 'userSpaceOnUse', x1: cols[0].x + 18, y1: 0, x2: cols[6].x + 18, y2: 0 });
+      stages.forEach((s, i) => el(tgrad, 'stop', { offset: i / 6, 'stop-color': css(s, '--c') }));
+      line2 = el(thread, 'path', { class: 't-line', d, stroke: 'url(#fs-thread)' });
+      // Length along the line at the end of each stage's lanes, so drawing can stop exactly there.
+      const probe = el(thread, 'path', { d: '' });
+      marks = ends.map((p) => { probe.setAttribute('d', p); return probe.getTotalLength(); });
+      probe.remove();
+      const total = line2.getTotalLength();
+      line2.setAttribute('stroke-dasharray', `${total} ${total}`);
+      line2.dataset.total = total;
+      nodes.forEach((path, i) => { nodes[i] = path.map((p) => el(thread, 'circle', { class: 't-node', cx: p[0], cy: p[1], r: 0, fill: css(stages[i], '--c') })); });
     }
     thread.setAttribute('viewBox', `0 0 ${Math.max(1, B.width)} ${Math.max(1, B.height)}`);
-    geo = { pts, cols, segs, nodes, here };
+    geo = { pts, cols, line2, marks, nodes, here };
     last = -1;
     set(progress);
   }
@@ -114,11 +130,14 @@
   function set(p) {
     progress = clamp(p);
     if (!geo) return;
-    const { pts, cols, segs, nodes, here } = geo;
+    const { pts, cols, line2, marks, nodes, here } = geo;
     // The thread reaches the last stage a touch before the scroll does.
     const reach = clamp(progress / 0.94), h = reach * 6;
     const active = Math.round(progress * 6);
-    segs.forEach((seg, i) => seg.setAttribute('stroke-dashoffset', 1 - (i ? clamp(h - (i - 1)) : 1)));
+    if (line2) {
+      const k = Math.min(5, Math.floor(h)), len = marks[k] + (marks[k + 1] - marks[k]) * (h - k);
+      line2.setAttribute('stroke-dashoffset', +line2.dataset.total - len);
+    }
     if (here) {
       const k = Math.min(5, Math.floor(h)), f = h - k;
       const x = pts[k][0] + (pts[k + 1][0] - pts[k][0]) * f, y = pts[k][1] + (pts[k + 1][1] - pts[k][1]) * f;
@@ -127,8 +146,8 @@
     journey.style.setProperty('--ruler', reach.toFixed(3));
     // Only the deck's own times show: 11:00, the three-minute window to 11:03, and 15:00.
     const s = stages[active];
-    clock.textContent = active <= 1 ? `11:0${Math.min(3, Math.round(h * 1.5))}` : s.dataset.clock || 'Time unknown';
-    clock.classList.toggle('unknown', !s.dataset.clock && active > 1);
+    // Stages without a deck time show no time at all.
+    clock.textContent = active <= 1 ? `11:0${Math.min(3, Math.round(h * 1.5))}` : s.dataset.clock || '';
     if (active === last) return;
     last = active;
     stages.forEach((st, i) => {
@@ -141,8 +160,7 @@
     journey.style.setProperty('--now-c', css(s, '--c'));
     journey.style.setProperty('--now-ink', css(s, '--c-ink'));
     if (here) here.setAttribute('stroke', css(s, '--c'));
-    const unknown = !s.dataset.clock && active > 1 ? ' · time unknown' : '';
-    nowLabel.textContent = `${String(active + 1).padStart(2, '0')} · ${$('h4', s).textContent}${unknown}`;
+    nowLabel.textContent = `${String(active + 1).padStart(2, '0')} · ${$('h4', s).textContent}`;
   }
 
   window.fsJourney = { set, layout, stages };

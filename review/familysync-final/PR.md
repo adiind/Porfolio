@@ -4,6 +4,15 @@ Branch `familysync-final`. Local only: not pushed, merged or deployed.
 
 Built on the local working tree (brand pass + Codex pass 3), not on `main` or the live site. Critique and direction: `CRITIQUE.md`. Before/after: `index.html` (open via the dev server at `/review/familysync-final/index.html`, or as a file).
 
+## Round 3 (small fixes on 3a1674c)
+
+1. **No time on stages 04–06.** The "Time unknown" labels are gone from the stage headers and the big clock. When one of those stages is active, the clock is blank and the 11:00–15:00 ruler keeps advancing.
+2. **Thread is one clean path.** It used to be seven straight segments with square turns, which made a box around stages 01–02. It is now a single line: straight runs through the lanes, joined by wide rounded turns below the service labels and above the Stacy lane. The colour still shifts to each stage's service colour. The drawn part still stops exactly at each stage as you scroll.
+3. **Stage 07 marks.** Pinterest and Instacart no longer overlap: the tiles are 40px and fixed width, with a 10px gap.
+4. **Phone (390) navigation matches P&G.** There is a header row with "← Back to portfolio" that scrolls away, and a fixed "× Close" pill at the top right (36px, 12px from the edge). The numbered contents strip ("01 Context", "02 Research", …) sits under the opening and sticks to the top once reached. The active tab is underlined, and the strip scrolls it into view. Squad Up also keeps its back control at the top right. It has no contents strip on phones, so P&G is the model for the strip. Desktop is unchanged (left rail).
+
+Round 3 checks: 0 errors, 0 overflow and 0 filters at 1440, 390 and reduced motion. Stage buttons, payment and Close/Escape pass through `/work/familysync-jpmorgan`. The build passes. Journey row: `journey-row-round3.jpg`.
+
 ## Round 2 (after Adi's review of cb8a6e0)
 
 1. **Illustrations restored, with colour around them.** The four scenes are back. Synthesis, Exploration and Outcome now open with a two-column lead (heading | illustration), and each plate has a frame in its section's colour. Tension gets a wide plate under its copy. Synthesis, Exploration and Outcome also sit on a faint wash of their colour (blue, navy, green) that runs under the rail. No new images were generated: making new pictures from the style reference needs the image tool used in pass 3, and this session doesn't have it.
@@ -13,8 +22,8 @@ Built on the local working tree (brand pass + Codex pass 3), not on `main` or th
    - **Travelling thread:** one line runs lane by lane, down through a stage (Stacy → FamilySync → Services) and back up through the next. Each stretch is in that stage's service colour, it draws as you scroll, and it turns in the gaps so it never crosses text.
    - **Lit column:** a soft panel in the active stage's service colour slides from stage to stage.
    - **Fewer lines:** the table rules are gone. Stacy and FamilySync are soft white bands.
-   - **Clock:** the big clock runs 11:00 → 11:03 through the response window, reads "Time unknown" on stages 04–06, and lands on 15:00 at stage 07. A ruler under it fills from 11:00 to 15:00 as you scroll.
-3. **Stage times 04–06:** the deck gives none. Frames 43–58 were checked and show events only, no clock. These stages say "Time unknown" rather than an invented time.
+   - **Clock:** the big clock runs 11:00 → 11:03 through the response window, shows no time on stages 04–06 (round 3), and lands on 15:00 at stage 07. A ruler under it fills from 11:00 to 15:00 as you scroll.
+3. **Stage times 04–06:** the deck gives none. Frames 43–58 were checked and show events only, no clock. These stages show no time (round 3) rather than an invented one.
 
 ## What changed (round 1)
 
@@ -38,7 +47,7 @@ No new facts, times or metrics. Only 11:00, 11:03 and 15:00 come from the deck; 
 
 - `npm run build` passes (only the existing chunk-size warning) — `build.log`.
 - `capture.cjs after` (round 2) at 1440, 390, and both with reduced motion: 0 page/console errors, 0 broken images, 0 CSS filters, 0 horizontal overflow at every section. One Lenis instance and 25–27 ScrollTriggers with motion; no Lenis and 0 triggers with reduced motion — `after-qa.json`. The harness saves PNGs; they were converted to JPG for the repo.
-- `interact.cjs` through the real portfolio route `/work/familysync-jpmorgan`: the stage-4 button lands on stage 4 at 1440 and 390, and the clock reads "Time unknown" there; Confirm payment → "Cart created and paid, with your yes"; Visa text intact; Escape closes back to `/` — `interaction-qa.json`.
+- `interact.cjs` through the real portfolio route `/work/familysync-jpmorgan`: the stage-4 button lands on stage 4 at 1440 and 390, with no time shown; Confirm payment → "Cart created and paid, with your yes"; Visa text intact; Escape closes back to `/` — `interaction-qa.json`.
 - New colour pairs all ≥ 4.5:1, including the round-2 inks on the green wash. White dot numbers on coral failed (3.5:1), so they use dark ink; teal was darkened to `#127a6e` (white 5.2:1) — `contrast-qa.txt`.
 
 ## Not verified

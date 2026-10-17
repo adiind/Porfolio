@@ -1,7 +1,7 @@
 {
   "390": {
     "journeyActive": 3,
-    "clock": "Time unknown",
+    "clock": "",
     "approval": "confirmed",
     "cartAnswer": "Cart created and paid, with your yes",
     "visaText": "Default Payment:Visa ending 1234✓",
@@ -12,7 +12,7 @@
   },
   "1440": {
     "journeyActive": 3,
-    "clock": "Time unknown",
+    "clock": "",
     "approval": "confirmed",
     "cartAnswer": "Cart created and paid, with your yes",
     "visaText": "Default Payment:Visa ending 1234✓",
