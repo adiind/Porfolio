@@ -11,7 +11,7 @@
   const tick = (t) => lenis?.raf(t * 1000);
   function startLenis() {
     if (lenis || S.still() || !window.Lenis || !fine.matches) return;
-    lenis = window.lenis = new Lenis({ lerp: .11, autoRaf: false, anchors: false });
+    lenis = window.lenis = new Lenis({ lerp: .25, autoRaf: false, anchors: false });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /studio
 
-Sitemap: https://adiagarwal.com/sitemap.xml
+Sitemap: https://adidesign.org/sitemap.xml

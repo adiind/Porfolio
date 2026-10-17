@@ -1,0 +1,9 @@
+# Legacy GitHub Pages still runs pages-build-deployment (Jekyll) against main.
+# Production is the Cloudflare Worker in wrangler.jsonc, not Pages. Pages cannot
+# be switched off from the repository. Exclude the source tree so that automatic
+# build no longer fails on Liquid-like syntax in design notes, and so it does not
+# republish the repository. github-pages.md is the only page that job publishes.
+exclude:
+  - "*"
+include:
+  - "github-pages.md"

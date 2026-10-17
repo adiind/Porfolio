@@ -16,10 +16,12 @@ import jarvisData from './projects/jarvis.json';
 import plotterData from './projects/plotter.json';
 import portfolioWebsiteData from './projects/portfolio-website.json';
 import glyphData from './projects/glyph.json';
+import pgHaircareData from './projects/pg-haircare.json';
 
 // Projects shown in Selected Work section
 export const PROJECTS: Project[] = [
     glyphData as Project,
+    pgHaircareData as Project,
     zeroMyAIData as Project,
     familySyncData as Project,
     mcdonaldsInteractionData as Project,
@@ -34,6 +36,7 @@ export const PROJECTS: Project[] = [
 // All projects (for lookups via getProjectsByIds, e.g. TinkerVerse modal)
 const ALL_PROJECTS: Project[] = [
     glyphData as Project,
+    pgHaircareData as Project,
     zeroMyAIData as Project,
     familySyncData as Project,
     mcdonaldsInteractionData as Project,

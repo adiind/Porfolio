@@ -64,7 +64,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     type: "education",
     subtype: 'role',
     start: "2025-08-01",
-    end: "2026-03-31",
+    end: "2027-03-31",
     summary: "Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work.",
     bullets: [
       "Graduate program centered on human-centered design, systems thinking, and real-world problem solving",

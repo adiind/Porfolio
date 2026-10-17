@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Legacy GitHub Pages / Jekyll output. Production is the Cloudflare Worker.
+_site
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -23,3 +26,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Local Claude Code worktrees. These were committed as gitlinks with no
+# .gitmodules entry, which makes submodule checkout fail.
+.claude/worktrees/

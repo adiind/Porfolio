@@ -1,0 +1,54 @@
+{
+  "id": "pg-haircare",
+  "hero": {
+    "title": "P&G \u00b7 Hair Care Product Packaging",
+    "oneLiner": "Rethinking the bottle, and the routine around it."
+  },
+  "context": {
+    "text": "A P&G-sponsored Northwestern EDI project exploring hair care product packaging through consumer research, synthesis, and prototype exploration."
+  },
+  "build": {
+    "bullets": [
+      "Eight in-home visits.",
+      "Handling, dispensing, and routine activities.",
+      "A final packaging concept and prototype presentation."
+    ]
+  },
+  "decisions": [],
+  "review": {
+    "worked": [
+      "Testing dispensing, handling, and visual cues as distinct questions."
+    ],
+    "didnt": [
+      "This was a concept and prototype presentation; commercial performance was not established."
+    ]
+  },
+  "outcome": {
+    "status": "concept",
+    "text": "A packaging direction and physical prototype studies."
+  },
+  "reflection": {
+    "text": "A bottle's form, dispensing, and place in a routine need to work together."
+  },
+  "themeColor": "indigo",
+  "icon": "box",
+  "heroImage": "/images/pg-design-project.jpg",
+  "skills": [
+    {
+      "label": "Consumer Research",
+      "description": "In-home observation and central-site activities."
+    },
+    {
+      "label": "Packaging Design",
+      "description": "Bottle form, handling, visual cues, and dosing."
+    },
+    {
+      "label": "Physical Prototyping",
+      "description": "Experiments with bottle forms and dispensers."
+    },
+    {
+      "label": "Research Synthesis",
+      "description": "Functional and emotional needs translated into requirements."
+    }
+  ]
+}
