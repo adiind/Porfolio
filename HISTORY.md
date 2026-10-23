@@ -2,6 +2,7 @@
 
 ## Codex
 
+- 2026-10-23: Cleaned the three case-study layouts: one fixed header, in-flow chapter links, tighter text-only timelines, properly contained hero cutouts, natural-ratio documentary photos, simplified return controls, and no simulated Surya clock. Build/scoped TypeScript and desktop/phone visual review passed.
 - 2026-10-23: Reworked Sticker Studio into a deliberately scattered, overlapping collection with different scales, rotations and a dedicated phone composition; removed the oversized 3D name in favour of a restrained typographic opening, keeping Adi capitalized. Original sticker colours retained; silhouette-based pointer targets prevent transparent overlap interception. All 14 project entries passed at 320/390/768/1440, with focus return, drag, reduced motion and static fallback; standalone/root builds and 31 existing tests passed. Source-only candidate, public homepage unchanged.
 
 - 2026-10-23: Corrected Sticker Studio per Adi’s review: removed rectangular sticker panels and badges, staggered differently sized cutouts, preserved original artwork colours without WebGL relighting, and capitalized Adi in navigation and dimensional lettering; standalone build and 320/390/768/1440 browser journeys passed, preview remains at port 4466, production homepage unchanged.
