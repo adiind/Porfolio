@@ -8,6 +8,8 @@ From this folder: `npm install`, then `npm run dev`. The local URL is **http://1
 
 `npm run build` produces the standalone site in `dist/`. The content and optimized assets needed to run it are included. This entry is not automatically published by the existing production Vite build.
 
+The collection uses free-standing irregular cutouts, varied sizes and staggered placement. Sticker textures retain their original colour without scene relighting; the dimensional nameplate reads **Adi.**
+
 ## Interaction
 
 - Click any project sticker to open its story. Browser Back, Escape and the close controls return to the collection with focus restored.

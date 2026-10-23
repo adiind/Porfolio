@@ -21,7 +21,8 @@ export async function initScenes({projects,heroPositions,reduced}){
  function shadowTexture(img){const cvs=document.createElement('canvas');cvs.width=512;cvs.height=384;const ctx=cvs.getContext('2d');const s=Math.min(440/img.width,310/img.height);ctx.filter='blur(10px)';ctx.drawImage(img,(512-img.width*s)/2,(384-img.height*s)/2,img.width*s,img.height*s);ctx.globalCompositeOperation='source-in';ctx.fillStyle='#112837';ctx.fillRect(0,0,512,384);const tex=new THREE.CanvasTexture(cvs);tex.colorSpace=THREE.SRGBColorSpace;return tex}
  async function makeSticker(p,width,height,rot=0){const tex=await texture(p.sticker);const ratio=tex.image.width/tex.image.height;let w=width,h=w/ratio;if(h>height){h=height;w=h*ratio}
   const geo=new THREE.PlaneGeometry(w,h,36,24);const rest=geo.attributes.position.array.slice();
-  const mat=new THREE.MeshPhysicalMaterial({map:tex,emissiveMap:tex,emissive:0xffffff,emissiveIntensity:.16,transparent:true,alphaTest:.12,side:THREE.DoubleSide,roughness:.75,metalness:0,clearcoat:.06,clearcoatRoughness:.6,iridescence:.02,iridescenceIOR:1.4,iridescenceThicknessRange:[160,380],envMapIntensity:.04});
+  // The artwork already contains its lighting and foil finish. Preserve its printed colour.
+  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.12,side:THREE.DoubleSide,toneMapped:false});
   mat.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\nif (!gl_FrontFacing) { diffuseColor.rgb = vec3(0.88,0.85,0.76); }');};
   const mesh=new THREE.Mesh(geo,mat);mesh.rotation.z=THREE.MathUtils.degToRad(rot);mesh.position.z=30;
   const shTex=shadowTexture(tex.image);const shadow=new THREE.Mesh(new THREE.PlaneGeometry(w*1.2,h*1.25),new THREE.MeshBasicMaterial({map:shTex,transparent:true,opacity:.23,depthWrite:false}));shadow.rotation.z=mesh.rotation.z;shadow.position.set(9,-13,1);
@@ -39,7 +40,7 @@ export async function initScenes({projects,heroPositions,reduced}){
 
  const heroEl=document.querySelector('#hero-stage');const hero=baseScene(heroEl);hero.type='hero';scenes.push(hero);
  const fontJson=await new TTFLoader().loadAsync('/fonts/Bricolage-700.ttf');const font=new FontLoader().parse(fontJson);
- const lettering=new TextGeometry('adi.',{font,size:300,depth:42,curveSegments:20,bevelEnabled:true,bevelThickness:9,bevelSize:7,bevelSegments:8});lettering.computeBoundingBox();lettering.center();const nameMesh=new THREE.Mesh(lettering,new THREE.MeshPhysicalMaterial({color:0x4089bd,metalness:.26,roughness:.24,clearcoat:1,clearcoatRoughness:.12,envMapIntensity:.8}));hero.scene.add(nameMesh);hero.nameMesh=nameMesh;hero.nameWidth=lettering.boundingBox.max.x-lettering.boundingBox.min.x;
+ const lettering=new TextGeometry('Adi.',{font,size:300,depth:42,curveSegments:20,bevelEnabled:true,bevelThickness:9,bevelSize:7,bevelSegments:8});lettering.computeBoundingBox();lettering.center();const nameMesh=new THREE.Mesh(lettering,new THREE.MeshPhysicalMaterial({color:0x4089bd,metalness:.26,roughness:.24,clearcoat:1,clearcoatRoughness:.12,envMapIntensity:.8}));hero.scene.add(nameMesh);hero.nameMesh=nameMesh;hero.nameWidth=lettering.boundingBox.max.x-lettering.boundingBox.min.x;
  await Promise.all(heroPositions.map(async o=>{const p=projects.find(p=>p.id===o.id);const s=await makeSticker(p,o.w,o.h,o.rot);hero.scene.add(s.group);hero.objects.push({...s,layout:o,button:document.querySelector(`[data-hero="${o.id}"]`)});const item=hero.objects.at(-1);events(item.button,item,true)}));
  heroEl.classList.add('rendered');
  for(const el of document.querySelectorAll('.sticker-stage')){const p=projects.find(p=>p.id===el.dataset.sticker);const s=baseScene(el);s.type='card';s.project=p;s.ready=false;scenes.push(s);}
@@ -48,7 +49,7 @@ export async function initScenes({projects,heroPositions,reduced}){
   const mobile=innerWidth<=600;const factor=Math.min(1.15,(innerWidth-100)/1340);const mf=Math.min(1,(innerWidth-20)/390);
   const nameScale=r.width*(mobile?.67:.54)/hero.nameWidth;nameMesh.scale.setScalar(nameScale);nameMesh.position.set(mobile?8:0,mobile?-6:-8,42);nameMesh.rotation.set(-.12,-.1,-.04);
   for(const o of s.objects){const l=o.layout;const scale=mobile?mf:factor;const w=(mobile?l.mw:l.w)*scale,h=(mobile?l.mh:l.h)*scale;const sc=Math.min(w/o.w,h/o.h);o.group.scale.setScalar(sc);o.group.position.set(((mobile?l.mx:l.x)/100-.5)*r.width,(.5-(mobile?l.my:l.y)/100)*r.height,50);}
- }else if(s.ready){const o=s.objects[0];const scale=Math.min(r.width*.73/o.w,r.height*.67/o.h);o.group.scale.setScalar(scale);o.group.position.y=0;}}
+ }else if(s.ready){const o=s.objects[0];const scale=Math.min(r.width*.84/o.w,r.height*.80/o.h);o.group.scale.setScalar(scale);o.group.position.y=0;}}
  function draw(time){frame=0;if(!active||document.hidden)return;const dt=Math.min((time-last)/1000||.016,.04);last=time;renderer.setScissorTest(false);renderer.clear();renderer.setScissorTest(true);let unsettled=false;const modal=document.querySelector('#project-dialog').open;
   if(!modal){for(const s of scenes){const r=s.el.getBoundingClientRect();if(!s.visible||r.bottom<0||r.top>innerHeight||r.width<1||r.height<1||s.el.closest('[hidden]'))continue;sizeScene(s,r);for(const o of s.objects)unsettled=applyInteraction(o,dt)||unsettled;
    if(s.type==='hero'&&!reduced()){const px=pointer.x*.035,py=pointer.y*.025;nameMesh.rotation.y=ease(nameMesh.rotation.y,-.1+px,.05);nameMesh.rotation.x=ease(nameMesh.rotation.x,-.12+py,.05);}
