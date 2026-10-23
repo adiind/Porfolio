@@ -1,0 +1,104 @@
+[
+  {
+    "width": 1440,
+    "id": "surya",
+    "cardEntry": true,
+    "back": true,
+    "forward": true,
+    "escape": true,
+    "focusReturn": true
+  },
+  {
+    "width": 1440,
+    "id": "jarvis",
+    "cardEntry": true,
+    "back": true,
+    "forward": true,
+    "escape": true,
+    "focusReturn": true
+  },
+  {
+    "width": 1440,
+    "id": "plotter",
+    "cardEntry": true,
+    "back": true,
+    "forward": true,
+    "escape": true,
+    "focusReturn": true
+  },
+  {
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "id": "surya",
+    "cardEntry": true,
+    "back": true,
+    "forward": true,
+    "escape": true,
+    "focusReturn": true
+  },
+  {
+    "width": 390,
+    "id": "jarvis",
+    "cardEntry": true,
+    "back": true,
+    "forward": true,
+    "escape": true,
+    "focusReturn": true
+  },
+  {
+    "width": 390,
+    "id": "plotter",
+    "cardEntry": true,
+    "back": true,
+    "forward": true,
+    "escape": true,
+    "focusReturn": true
+  },
+  {
+    "width": 390,
+    "errors": []
+  },
+  {
+    "id": "pg-haircare",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "mcdonalds-interaction-design",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "familysync-jpmorgan",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "glyph",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "helios",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "zero-my-ai",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "solopump",
+    "route": true,
+    "broken": []
+  },
+  {
+    "id": "portfolio-website",
+    "route": true,
+    "broken": []
+  }
+]

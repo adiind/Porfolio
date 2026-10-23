@@ -6,7 +6,7 @@ import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import { trackEvent } from '../lib/analytics';
 import { useProjects } from '../context/ProjectsContext';
-import { INITIAL_WORK_PROJECT_ID } from '../lib/workRoutes';
+import { INITIAL_WORK_PROJECT_ID, resolveWorkProjectId } from '../lib/workRoutes';
 import CuttingMatSurface from './ui/CuttingMatSurface';
 import { useContentEngagement } from '../hooks/useContentEngagement';
 
@@ -101,6 +101,22 @@ const ProjectsSection: React.FC = () => {
         window.addEventListener('closeAllModals', handleCloseAll);
         return () => window.removeEventListener('closeAllModals', handleCloseAll);
     }, []);
+
+    // Reopen these case studies when Forward restores their existing history entry.
+    useEffect(() => {
+        const reopenWorld = () => {
+            if (window.history.state?.modal !== 'project') return;
+            if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+            const id = resolveWorkProjectId(window.location.pathname);
+            if (!id || !['surya', 'jarvis', 'plotter'].includes(id)) return;
+            const project = projects.find(project => project.id === id);
+            if (!project) return;
+            setActiveProjectSource('history');
+            setActiveProject(project);
+        };
+        window.addEventListener('popstate', reopenWorld);
+        return () => window.removeEventListener('popstate', reopenWorld);
+    }, [projects]);
 
     // Notify App.tsx when this modal opens/closes so global scroll-snap is blocked
     useEffect(() => {

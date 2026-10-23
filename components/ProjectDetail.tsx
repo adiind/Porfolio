@@ -13,6 +13,7 @@ import { useDialogA11y } from '../hooks/useDialogA11y';
 import { projectPath } from '../lib/workRoutes';
 import GlyphProjectDetail from './GlyphProjectDetail';
 import PgProjectDetail from './pg/PgProjectDetail';
+import WorldProjectDetail from './worlds/WorldProjectDetail';
 import FamilySyncProjectDetail from './hcd/FamilySyncProjectDetail';
 import McDonaldsProjectDetail from './hcd/McDonaldsProjectDetail';
 import { trackEvent } from '../lib/analytics';
@@ -472,6 +473,7 @@ const ProjectDetail: React.FC<Props> = (props) => {
         section: 'detail',
     });
 
+    if (['surya', 'jarvis', 'plotter'].includes(props.project.id)) return <WorldProjectDetail {...props} />;
     if (props.project.id === 'glyph') return <GlyphProjectDetail {...props} />;
     if (props.project.id === 'pg-haircare') return <PgProjectDetail {...props} />;
     if (props.project.id === 'familysync-jpmorgan') return <FamilySyncProjectDetail {...props} />;
