@@ -13,3 +13,16 @@ Premium editorial miniature 3D still life illustrating a local voice-to-home sys
 ## Plotter
 
 Premium editorial still life for a designer's speech-to-drawing machine story: a large curled strip of ivory drawing paper twisting in a single elegant ribbon across a deep oxblood red studio floor, delicate black single-line abstract continuous drawings on part of the paper, a beautiful brushed aluminum technical pen hovering above the near end, a small sculptural coral sound-wave shape at the far end. Close-up tactile paper grain and precise metallic pen. Cinematic museum object photography, raking warm light, rich shadows, unexpected sculptural composition. Landscape 3:2, entire ribbon and pen visible with generous margins. No text, letters, logos, people, screens, invented machines or brands. Concept illustration of sound becoming a mark, not a documentary photo of a plotter. Sophisticated polished material realism.
+
+# Flat transparent replacements — 2026-10-23
+
+Generated with the built-in ImageGen tool and transparent background enabled. Final files: `public/images/project-worlds/{surya,jarvis,plotter}-cutout.png`. Each PNG is RGBA with alpha. These replace the earlier 3D scene illustrations.
+
+## Surya
+Create an elegant 2D editorial vector illustration, isolated cutout with a genuinely transparent background. Subject: two simple connected window/room motifs, one warm golden sun and one indigo crescent moon, linked by a fine curved line; a small stylized flower motif suggests shared family rhythms. Flat shapes, hand-drawn fine linework, restrained terracotta, cream, muted gold and deep indigo palette, sophisticated print illustration, crisp edges, generous negative space, wide horizontal composition. Absolutely no 3D, no perspective, no diorama, no room render, no photography, no gradients, no backdrop, no shadows, no text, no lettering, no frame.
+
+## Jarvis
+Create a sophisticated 2D editorial vector illustration, isolated cutout with a genuinely transparent background. Subject: a clean violet sound-wave ribbon flows through a small flat graphite microchip outline and resolves into a simple amber lamp outline, communicating local voice input to a room response. Flat geometric forms with tasteful fine line details, lavender, muted violet, graphite, warm amber, crisp screen-print finish, wide horizontal composition, generous empty space around the complete artwork. Absolutely no 3D, no perspective, no rendered room, no photography, no gradients, no backdrop, no shadows, no text, no labels, no lettering, no frame.
+
+## Plotter
+Create a refined 2D editorial vector illustration, isolated cutout with a genuinely transparent background. Subject: a single flowing ivory paper ribbon with a precise black continuous-line drawing and a simple coral sound-wave mark at one end; include a minimal flat technical pen shape poised beside the line. Oxblood, coral, warm ivory and black ink, screen-printed illustration with slight hand-drawn character, clean silhouettes, wide horizontal composition, generous margins. Absolutely no 3D, no perspective, no curled photorealistic paper, no metallic render, no photography, no gradients, no backdrop, no shadows, no text, no lettering, no frame.
