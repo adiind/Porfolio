@@ -51,3 +51,69 @@ svg.season{width:195px;height:195px;filter:drop-shadow(0 16px 12px #68433320)}
 .world-jarvis .world-journey-line,.world-plotter .world-journey-line{left:0;width:40px}
 @media(max-width:700px){.plotter-visuals{grid-template-columns:1fr;gap:15px}.plotter-carriage-art{height:200px}.jarvis-device-art{height:200px}.world-motion-object{max-height:320px}}
 .world-generated-caption{font:9px/1.5 monospace!important;opacity:.55;text-align:center;margin:10px 0 20px!important}
+/* One fixed header; chapter links belong to the document. */
+.world-topbar{height:56px;padding:0 24px}
+.world-wordmark{font-size:14px;letter-spacing:0}
+.world-topbar button{font-size:12px}
+.world-chapters{position:relative;top:auto;z-index:auto;padding:18px 24px;gap:32px;justify-content:flex-start;max-width:1118px;margin:auto;border-bottom:1px solid #35271f20;overflow-x:auto}
+.world-chapters [aria-current]:after{display:none}
+.world-section{padding-block:88px;scroll-margin-top:80px}
+.world-hero-copy{padding-top:155px;max-width:47%;padding-right:20px}
+.world-hero-copy h1>span{font-size:clamp(50px,5vw,76px)}
+.world-opening{height:180svh}
+.world-camera{inset:100px 2vw 60px 40%;transform-origin:center}
+.world-camera img{position:static;transform:none;width:100%;height:100%;object-fit:contain;object-position:center}
+.world-stage-shade{display:none}
+.world-scene-footer{bottom:24px;font-size:9px}
+.world-process-step,.world-jarvis .world-process-step,.world-plotter .world-process-step{grid-template-columns:42px 1fr;gap:24px;min-height:0;padding:30px 0;border-top:1px solid #35271f20}
+.world-process-step>div:nth-child(2),.world-jarvis .world-process-step>div:nth-child(2),.world-plotter .world-process-step>div:nth-child(2){max-width:720px;padding:0}
+.world-process-step h3{font-size:32px}
+.world-process-step .world-eyebrow{display:none}
+.world-step-number{padding-top:3px;margin:0}
+.world-process{padding-bottom:60px}
+.world-image-button{background:transparent}
+.world-image-button img{height:auto;max-height:none;object-fit:contain}
+.world-source-pair{display:grid;grid-template-columns:1fr;gap:28px}
+.world-source-pair img{height:auto;object-fit:contain}
+.world-case figcaption{font:10px/1.6 Arial,sans-serif;opacity:.55;margin-top:12px}
+.world-interaction{background:var(--paper);min-height:0;gap:5vw}
+.world-jarvis .world-interaction{background:var(--paper);color:var(--ink)}
+.world-jarvis .world-interaction .world-eyebrow{color:var(--accent)}
+.surya-product-view{width:100%;margin:0;text-align:center}
+.surya-product-view img{display:block;width:100%;height:460px;object-fit:contain}
+.jarvis-device-art{height:310px}
+.signal-wave{height:60px;gap:3px}
+.signal-wave i{max-height:60px}
+.plot-paper{transform:none;box-shadow:none;border:1px solid #35271f15}
+.plotter-visuals{grid-template-columns:180px 1fr;gap:20px}
+.plotter-carriage-art{height:310px}
+.world-end{padding:60px 24px}
+.world-end>span{font-size:clamp(60px,9vw,120px)}
+@media(max-width:700px){
+ .world-topbar{padding:0 16px;height:56px}.world-topbar button>span{display:block;font-size:11px}.world-wordmark{font-size:13px}
+ .world-chapters{top:auto;padding:16px 24px;gap:24px;justify-content:flex-start}.world-chapters button{font-size:11px}
+ .world-stage{min-height:640px}.world-opening{height:160svh}
+ .world-hero-copy{padding:88px 24px 0;max-width:none}.world-hero-copy h1>span{font-size:clamp(40px,8.3vw,52px);max-width:450px}.world-hero-copy>.world-eyebrow{margin-bottom:20px}.world-intro{font-size:13px;max-width:420px}
+ .world-camera{inset:330px 12px 60px;transform-origin:center}.world-camera img{position:static;width:100%;height:100%;transform:none;object-fit:contain}
+ .world-scroll-cue{display:block;font-size:9px;opacity:.6}.world-scene-footer{bottom:18px}
+ .world-section{padding:56px 24px;scroll-margin-top:76px}.world-section h2{font-size:clamp(32px,7vw,42px)}
+ .world-process-step,.world-jarvis .world-process-step,.world-plotter .world-process-step{grid-template-columns:30px 1fr;gap:16px;padding:26px 0;min-height:0}.world-process-step h3{font-size:28px}.world-step-number{padding:2px 0;background:none}
+ .world-evidence-grid{gap:28px}.world-source-pair{grid-template-columns:1fr;gap:26px}.world-source-pair img{height:auto}
+ .surya-product-view img{height:360px}.jarvis-device-art{height:270px}.plotter-visuals{grid-template-columns:1fr}.plotter-carriage-art{height:250px}
+ .world-end{padding:44px 24px}
+}
+@media(max-height:700px) and (max-width:700px){.world-hero-copy{padding-top:78px}.world-hero-copy h1>span{font-size:38px}.world-intro{font-size:11px;max-width:320px}.world-camera{inset:300px 18px 48px}}
+@media(prefers-reduced-motion:reduce){.world-opening{height:100svh;min-height:640px}.world-stage{min-height:640px}}
+.world-case:focus{outline:none}
+.world-section{scroll-margin-top:0}
+.surya-product-view img{height:auto;max-height:440px}
+@media(max-width:700px){.world-section{scroll-margin-top:24px}.world-camera{inset:310px -18px 65px}.world-camera img{object-position:center 18%}.surya-product-view img{height:auto;max-height:400px}.world-scene-footer>span:first-child{font-size:9px;max-width:140px}}
+@media(max-height:700px) and (max-width:700px){.world-camera{inset:295px -12px 48px}}
+.world-end{display:flex;align-items:center;justify-content:space-between;gap:24px;background:var(--paper);color:var(--ink);border-top:1px solid #35271f20;padding:32px 7vw;text-align:left}
+.world-to-top{margin:0}
+.world-generated-caption{font:10px/1.6 Arial,sans-serif!important}
+@media(min-width:1001px){.world-jarvis .world-camera{left:44%}.world-jarvis .world-hero-copy h1>span{font-size:clamp(48px,4.4vw,64px)}}
+@media(min-width:701px) and (max-width:1000px){.world-hero-copy{max-width:none;padding:100px 6vw 0}.world-hero-copy h1>span{font-size:52px}.world-camera{inset:350px 4vw 75px}.world-camera img{object-position:center top}}
+@media(max-width:700px){.world-end{padding:28px 24px}.world-end .world-pill{font-size:11px!important;padding:10px 14px}.world-to-top{font-size:10px!important}}
+@media(max-width:700px){.world-camera{inset:300px 12px 65px}.world-hero-copy h1>span{font-size:clamp(34px,10.3vw,52px)}}
+@media(max-width:360px){.world-hero-copy h1>span{font-size:34px}.world-intro{font-size:12px}}

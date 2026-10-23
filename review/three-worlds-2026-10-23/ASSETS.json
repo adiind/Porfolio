@@ -64,5 +64,23 @@
     "source": "Built-in ImageGen edit referenced to plotter-source.jpg; master /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-9971955e-315d-41b2-8603-720b6d57ac24.png; source-guided illustration, not documentary photo. WebP q90, alpha preserved.",
     "sha256": "a3d66e7c332e7d7bdd62d3f0eda1d00c2be8552992b1657d454b753382309a19",
     "bytes": 202566
+  },
+  {
+    "file": "public/images/project-worlds/surya-hero-alpha.webp",
+    "source": "Built-in ImageGen background extraction referencing surya-world.webp, alpha enabled; master /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-16964353-b96a-486c-9d06-ca72bff8a839.png; WebP q90. Concept illustration.",
+    "sha256": "6476cf92ed81fd09ff0c6b41de837aafc8c569533c43e7a3653dd2de4470267b",
+    "bytes": 316902
+  },
+  {
+    "file": "public/images/project-worlds/jarvis-hero-alpha.webp",
+    "source": "Built-in ImageGen background extraction referencing jarvis-world.webp, alpha enabled; master /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-20db8077-19fc-4ac2-ac59-66350318ee9d.png; WebP q90. Concept illustration.",
+    "sha256": "ced0e3f9204918c75919151069b0add1fe179da7cb4b9f0b2b4d41f8a2383571",
+    "bytes": 156292
+  },
+  {
+    "file": "public/images/project-worlds/plotter-hero-alpha.webp",
+    "source": "Built-in ImageGen background extraction referencing plotter-world.webp, alpha enabled; master /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-86fcf468-79f0-478a-9888-554018826582.png; WebP q90. Concept illustration.",
+    "sha256": "f394b170963c6d938a5658838033b805a45fa71075fbf5a16ed3f5feec27d3b6",
+    "bytes": 152558
   }
 ]

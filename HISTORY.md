@@ -2,6 +2,7 @@
 
 ## Codex
 
+- 2026-10-23: Cleaned the three case-study layouts: one fixed header, in-flow chapter links, tighter text-only timelines, properly contained hero cutouts, natural-ratio documentary photos, simplified return controls, and no simulated Surya clock. Build/scoped TypeScript and desktop/phone visual review passed.
 - 2026-10-23: Extended the source-grounded artwork correction to Jarvis and Plotter: generated cutouts from their actual prototype photos, used them in scroll transitions and interaction explanations, and removed generic decorative timeline glyphs. Build, scoped TypeScript and responsive visual review passed.
 - 2026-10-23: Corrected the unrelated wooden-lotus imagery using an ImageGen cutout referenced to the actual Surya photo; replaced generic flower drawings in the slider, scroll transition and process timeline with the product view and workshop photos. Build and phone visual review passed.
 - 2026-10-23: Replaced Surya slider flower SVG with two transparent ImageGen concept images that crossfade between rest and open states; preserved the time control and labeled the imagery as illustrative.
