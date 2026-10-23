@@ -45,3 +45,7 @@ Create a refined source-faithful photographic cutout close-up of the actual pen 
 Three built-in ImageGen edits, each referenced to the corresponding original `{surya,jarvis,plotter}-world.webp` with transparent background enabled. The pages consume `{id}-hero-alpha.webp` at WebP q90. Common prompt:
 
 Background removal only. Preserve this exact existing cinematic 3D artwork, its composition, colors, lighting, materials, details, and every subject. Do NOT redesign, flatten, stylize or add objects. Remove only the surrounding studio backdrop and outside floor, including reflections and cast shadows outside the subject silhouette. Retain every connected illustrated object and its internal environment (including interiors inside architectural rooms). Isolate the complete artwork on true transparent alpha with generous even margins and all subject edges intact. No rectangular background, no vignette, no opaque shadow halo. The result must be the same artwork as a clean background-free cutout.
+
+# Process illustrations — 2026-10-23
+
+Nine built-in ImageGen images, three per project, with transparent backgrounds. Exact prompts, identity references, native PNG paths, published WebP files and hashes are recorded in [PROCESS-IMAGES.json](PROCESS-IMAGES.json). Generated explanations are labeled beside each image in the case studies.
