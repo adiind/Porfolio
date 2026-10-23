@@ -37,14 +37,6 @@ svg.season{width:195px;height:195px;filter:drop-shadow(0 16px 12px #68433320)}
 .world-hero-copy[inert]{pointer-events:none;visibility:hidden}
 /* Dashed drawing lengths scale with the SVG, keeping ink and pen coincident. */
 .world-motion-object path,.world-motion-object rect{vector-effect:none}
-
-/* The opening artwork is a flat, transparent cutout; let the paper color show through. */
-.world-opening,.world-stage{background:var(--paper);color:var(--ink)}
-.world-camera{inset:6% 4% 8% 36%;display:grid;place-items:center}
-.world-camera img{position:relative;right:auto;top:auto;transform:none;width:min(100%,1050px);height:auto;max-height:82%;object-fit:contain;object-position:center}
-.world-stage-shade{display:none}
-.world-hero-copy>.world-eyebrow,.world-hero-copy h1,.world-hero-copy h1 em,.world-intro{color:var(--ink)}
-.world-hero-copy h1 em{color:var(--accent)}
-.world-scene-footer{color:var(--ink)}
-.world-motion{display:none}
-@media(max-width:700px){.world-camera{inset:25% 3% 17%;}.world-camera img{max-height:100%;width:100%}.world-hero-copy{padding-top:112px}.world-scene-footer{color:var(--ink)}}
+.surya-bloom-art{position:relative;z-index:1;width:100%;height:350px;display:grid;place-items:center}
+.surya-bloom-art img{grid-area:1/1;width:min(100%,360px);height:100%;object-fit:contain;transition:opacity .35s ease}
+@media(max-width:700px){.surya-bloom-art{height:275px}.surya-bloom-art img{width:min(100%,300px)}}
