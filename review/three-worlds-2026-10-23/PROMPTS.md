@@ -1,0 +1,15 @@
+# Image generation — 2026-10-23
+
+All three assets were generated with the built-in imagegen tool. They illustrate the project themes and are labeled as AI-generated concept illustrations in the pages. No generated product, interface, research scene or mechanical assembly is presented as evidence. Original 1536×1024 PNG masters remain in the paths recorded in ASSETS.json; the pages use WebP derivatives at the same resolution. No source photographs were recolored.
+
+## Surya
+
+Create a premium editorial 3D miniature illustration for a portfolio story about family presence across time zones. A sculptural circular architectural diorama with two small domestic rooms joined by a slender brass arc, one room lit by amber morning sun and the other quiet indigo moonlight. Warm terracotta plaster, tiny chair, window, restrained plants, pale birch wood floor, immaculate tactile material detail, art-directed museum photography. Composition: wide landscape 3:2, entire circular diorama in right two thirds, generous margins, seamless dark espresso brown background. No text, no lettering, no clocks, no people, no logos, no device or invented product. This is a conceptual illustration of distance and day/night, not a photo of real research. Beautiful soft cinematic light, sophisticated restrained miniature world with real depth, avoid plastic cartoon styling.
+
+## Jarvis
+
+Premium editorial miniature 3D still life illustrating a local voice-to-home system. A floating sculptural violet glass sound wave on the left, a small abstract matte graphite cube processor at center with very fine circuit traces, a slender luminous lilac cable linking it to a beautifully crafted small architectural cutaway living room on the right with an amber floor lamp. Seamless midnight charcoal background. Isometric composition, all silhouettes complete, generous margins, landscape 3:2. Tactile materials, smoked glass, machined aluminum, soft felt, precision museum exhibit, cinematic lavender rim light and warm light in the tiny room. No words, text, labels, logos, people, or branded hardware. Conceptual illustration, not a representation of the actual Jarvis device. Sophisticated physically believable rendering, beautiful depth, coherent single still life.
+
+## Plotter
+
+Premium editorial still life for a designer's speech-to-drawing machine story: a large curled strip of ivory drawing paper twisting in a single elegant ribbon across a deep oxblood red studio floor, delicate black single-line abstract continuous drawings on part of the paper, a beautiful brushed aluminum technical pen hovering above the near end, a small sculptural coral sound-wave shape at the far end. Close-up tactile paper grain and precise metallic pen. Cinematic museum object photography, raking warm light, rich shadows, unexpected sculptural composition. Landscape 3:2, entire ribbon and pen visible with generous margins. No text, letters, logos, people, screens, invented machines or brands. Concept illustration of sound becoming a mark, not a documentary photo of a plotter. Sophisticated polished material realism.

@@ -1,0 +1,50 @@
+[
+  {
+    "file": "public/images/project-worlds/plotter-world.webp",
+    "source": "/Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-51d2815f-6c33-4ef7-a4ef-e43cccc80109.png \u2014 built-in imagegen conceptual illustration, 1536 \u00d7 1024 native, WebP quality 88 derivative",
+    "sha256": "04b2c83aae8b2d55152c7a77bc6df2492a80bfd78606b04f890386f386e7cd19",
+    "bytes": 164222
+  },
+  {
+    "file": "public/images/project-worlds/jarvis-world.webp",
+    "source": "/Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-503b9562-f2ab-42d9-9a69-f1184d2620f0.png \u2014 built-in imagegen conceptual illustration, 1536 \u00d7 1024 native, WebP quality 88 derivative",
+    "sha256": "e8c7825179fc95b938a1be55c38a681a06fe039c86716c390a2f002096dbd6e7",
+    "bytes": 112536
+  },
+  {
+    "file": "public/images/project-worlds/surya-engraving.webp",
+    "source": "/Users/adi/Downloads/IMG_9295.JPG \u2014 M03 in Surya inventory",
+    "sha256": "5097aeed1932622ac5c26c973afff2cf38655ab42540207b07e65ebfbe9e7eb9",
+    "bytes": 177592
+  },
+  {
+    "file": "public/images/project-worlds/surya-layers.webp",
+    "source": "/Users/adi/Downloads/IMG_9307.JPG \u2014 M06 in Surya inventory",
+    "sha256": "0feda093524b49b965c9a81ad3f25d1281967f3cff4a2e4dacac4bb1148b29ee",
+    "bytes": 239234
+  },
+  {
+    "file": "public/images/project-worlds/surya-world.webp",
+    "source": "/Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-6102984d-0766-4eac-8dfc-f23dee095922.png \u2014 built-in imagegen conceptual illustration, 1536 \u00d7 1024 native, WebP quality 88 derivative",
+    "sha256": "61017c8b5e85da54dfcf5ea3aec671717fec1a0eaa8d07278937e2df46e84c18",
+    "bytes": 138862
+  },
+  {
+    "file": "public/images/project-worlds/surya-source.jpg",
+    "source": "https://i.ibb.co/5gWPHd62/IMG-1438.jpg \u2014 existing data/projects/surya.json",
+    "sha256": "6bd2cea645dac9c1ade93734fafa8b0c1bb38b5962c57ca7a878835444be150e",
+    "bytes": 73836
+  },
+  {
+    "file": "public/images/project-worlds/plotter-source.jpg",
+    "source": "https://i.ibb.co/v6nVSTw9/IMG-8392-2.jpg \u2014 existing data/projects/plotter.json",
+    "sha256": "d8673c6daeecfee0842651536031b479a02d23b6c2f169cb20ae200c5d78e531",
+    "bytes": 90945
+  },
+  {
+    "file": "public/images/project-worlds/jarvis-source.jpg",
+    "source": "https://img.youtube.com/vi/3aCWb3PsAQs/maxresdefault.jpg \u2014 existing data/projects/jarvis.json",
+    "sha256": "3ea924ffc8e72d9e20bbf9496bb5835b31174cb4030684fefefb142a504ceea1",
+    "bytes": 192597
+  }
+]

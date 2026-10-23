@@ -1,0 +1,68 @@
+[
+  {
+    "id": "surya",
+    "width": 1440,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "jarvis",
+    "width": 1440,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "plotter",
+    "width": 1440,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "surya",
+    "width": 390,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "jarvis",
+    "width": 390,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "plotter",
+    "width": 390,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "surya",
+    "width": 320,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "jarvis",
+    "width": 320,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "plotter",
+    "width": 320,
+    "overflow": false,
+    "interactive": true
+  },
+  {
+    "id": "surya",
+    "reduced": true
+  },
+  {
+    "id": "jarvis",
+    "reduced": true
+  },
+  {
+    "id": "plotter",
+    "reduced": true
+  }
+]
