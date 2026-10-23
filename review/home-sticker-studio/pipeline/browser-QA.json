@@ -1,0 +1,45 @@
+{
+  "url": "http://127.0.0.1:4466/",
+  "started": "2026-10-23T20:08:58.360Z",
+  "viewports": [
+    {
+      "width": 320,
+      "projectCount": 14,
+      "filters": true,
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "width": 390,
+      "projectCount": 14,
+      "filters": true,
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "width": 768,
+      "projectCount": 14,
+      "filters": true,
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "width": 1440,
+      "projectCount": 14,
+      "filters": true,
+      "overflow": false,
+      "dialogOverflow": false
+    }
+  ],
+  "journeys": [
+    "All 14 project stories, focus return, browser Back/Forward/close",
+    "Mouse sticker drag bends and returns without opening a project",
+    "Direct project link closes in place; reduced motion stays still and stops rendering",
+    "WebGL context loss restores usable static artwork",
+    "Manual Motion off disables root smooth scrolling and fallback hover movement",
+    "No-WebGL static mode opens projects normally"
+  ],
+  "errors": [],
+  "pass": true,
+  "finished": "2026-10-23T20:09:25.213Z"
+}

@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-23T12:31:06.497Z",
+  "pass": true,
+  "checks": [
+    "Unselected new project plans its first two-reference generation job",
+    "Fresh checkout creates missing output directory",
+    "Existing selected v1 advances to v2",
+    "Repeated acceptance preserves previous file and advances version",
+    "Selected output and all source hashes validate",
+    "Opaque source rejected",
+    "Real registry unchanged"
+  ]
+}
