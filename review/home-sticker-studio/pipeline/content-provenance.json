@@ -1,0 +1,57 @@
+{
+  "captured": "2026-10-23",
+  "files": [
+    {
+      "path": "data/timeline.ts",
+      "sha256": "453e4b8a1cb3c5f5e345c6fb78fccac3df2c22bff9146bd1c312a276c82632af"
+    },
+    {
+      "path": "data/projects/glyph.json",
+      "sha256": "06ecae9160538459352d782581e647f9105125afa3f1bd2a7402d54f775a7143"
+    },
+    {
+      "path": "data/projects/familysync-jpmorgan.json",
+      "sha256": "105e635c2b8574d090f889415db9afce3b7e2cdee631ebccce82d2f50c778b9f"
+    },
+    {
+      "path": "data/projects/mcdonalds-interaction-design.json",
+      "sha256": "af63a4a4ed2f50eef3c832b80ae754c4197c35c7e060b7b1008f57895beb13b7"
+    },
+    {
+      "path": "data/projects/helios.json",
+      "sha256": "ac2256d04411f880578451688e5408a9aaff0cca3da8814c6f7656c8b05b2d1b"
+    },
+    {
+      "path": "data/projects/zero-my-ai.json",
+      "sha256": "69ff38f4dfdf58de0cb4e12de65a7e502ef4663781fc2dbf1a770e4bd18669df"
+    },
+    {
+      "path": "data/projects/surya.json",
+      "sha256": "ca68d2931cf888bdcfd03d400eab872ad2477afadd8aad7f5436a459f1da5653"
+    },
+    {
+      "path": "data/projects/pg-haircare.json",
+      "sha256": "a315e271ed86c5e8e43e2290bbc532f609a3f47272e22db5421cc9a8323ef8da"
+    },
+    {
+      "path": "data/projects/jarvis.json",
+      "sha256": "453e5f3c4861d60efa88c61d643100080ee2dd0522e386824f4de4f1195826a0"
+    },
+    {
+      "path": "data/projects/plotter.json",
+      "sha256": "0f526048ccbf7353c2be721852053fd02fee7db4dd1a2b76f0b2eeb6aaefef45"
+    },
+    {
+      "path": "data/projects/solopump.json",
+      "sha256": "15b964d12a430b14bc7f51a83dc8683d3d118ee188b89bde4d0d2746b0c5a454"
+    },
+    {
+      "path": "data/projects/lawn.json",
+      "sha256": "d961de223e31542a23b7f44a450851d991cb1f1d4314fffe6a46f3a9bb0d3463"
+    },
+    {
+      "path": "data/projects/portfolio-website.json",
+      "sha256": "2fb1adbe1f11bf51f12e72431f0ebd9ba1abed54f564f6a6c4b03e0a5c698f19"
+    }
+  ]
+}

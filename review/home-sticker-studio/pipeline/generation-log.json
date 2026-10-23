@@ -1,0 +1,62 @@
+[
+  {
+    "name": "zero",
+    "source": "public/images/zero_hero_banner.png",
+    "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+    "prompt": "Image 1 is the design to render. Image 2 is the style reference only: match its die-cut cream border, thickness, holo or matte finish, wear, glare, and outline. Don't copy Image 2's content.\n\nSubject: Render the existing Zero name and its green rounded chat-console panel as one compact wide die-cut sticker. Preserve the source's cream serif Zero lettering and deep forest-green interface identity. Omit all human portraits/faces, all counts, all tiny UI text, and other project panels. The source Zero word is the only lettering. No invented robot or mascot.\nFinish: holo, with restrained realistic foil highlights and very fine wear, sharp print at small sizes. For logos, keep the real shapes and letterforms from the official file exactly. Don't redraw type. No text that isn't in the source, and no human faces. Make the background genuinely transparent and preserve the generated alpha channel. Entire sticker visible with margin, straight-on print artwork ready to apply to a curved 3D sticker surface. Do not copy Self artwork.",
+    "original": "/Users/adi/.codex/generated_images/01a16780-fbf4-7530-a5d1-122490baf0a6/exec-79062638-71f8-48f0-b5bf-14e4f946e6ce.png",
+    "output": "review/stickers/zero-holo-v1.png",
+    "kind": "generated illustration",
+    "visualReview": "Legible identity, complete die cut, no faces. Source-derived illustration; pixel-exact fidelity not claimed."
+  },
+  {
+    "name": "lawn",
+    "source": "public/images/lawn/hero.jpg",
+    "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+    "prompt": "Image 1 is the design to render. Image 2 is the style reference only: match its die-cut cream border, thickness, holo or matte finish, wear, glare, and outline. Don't copy Image 2's content.\n\nSubject: Render a small island of the existing grassy lawn, its one visible red mushroom and faceted rock, isolated from the image as a landscape-shaped die-cut sticker. Preserve the real source scene's grass, mushroom, flowers and rock proportions. No animals, no invented lettering.\nFinish: holo, with restrained realistic foil highlights and very fine wear, sharp print at small sizes. For logos, keep the real shapes and letterforms from the official file exactly. Don't redraw type. No text that isn't in the source, and no human faces. Make the background genuinely transparent and preserve the generated alpha channel. Entire sticker visible with margin, straight-on print artwork ready to apply to a curved 3D sticker surface. Do not copy Self artwork.",
+    "original": "/Users/adi/.codex/generated_images/01a16780-fbf4-7530-a5d1-122490baf0a6/exec-7ffd9f05-b3bc-47fd-91d8-92d121f9d2ab.png",
+    "output": "review/stickers/lawn-holo-v1.png",
+    "kind": "generated illustration",
+    "visualReview": "Legible identity, complete die cut, no faces. Source-derived illustration; pixel-exact fidelity not claimed."
+  },
+  {
+    "name": "pg-haircare",
+    "source": "review/stickers/sources/pg-official.png",
+    "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+    "prompt": "Image 1 is the design to render. Image 2 is the style reference only: match its die-cut cream border, thickness, holo or matte finish, wear, glare, and outline. Don't copy Image 2's content.\n\nSubject: Render the exact official P&G circular blue mark. Keep the P&G white shapes and letterforms exactly, the blue disk and crescent geometry. Only add the cream die-cut rim and subtle holographic laminate from the finish reference. No extra text or shapes.\nFinish: holo, with restrained realistic foil highlights and very fine wear, sharp print at small sizes. For logos, keep the real shapes and letterforms from the official file exactly. Don't redraw type. No text that isn't in the source, and no human faces. Make the background genuinely transparent and preserve the generated alpha channel. Entire sticker visible with margin, straight-on print artwork ready to apply to a curved 3D sticker surface. Do not copy Self artwork.",
+    "original": "/Users/adi/.codex/generated_images/01a16780-fbf4-7530-a5d1-122490baf0a6/exec-dff8d14b-137f-4845-b1b2-43e12bed221f.png",
+    "output": "review/stickers/pg-haircare-holo-v1.png",
+    "kind": "generated illustration",
+    "visualReview": "Legible identity, complete die cut, no faces. Source-derived illustration; pixel-exact fidelity not claimed."
+  },
+  {
+    "name": "solopump",
+    "source": "public/images/solopump.png",
+    "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+    "prompt": "Image 1 is the design to render. Image 2 is the style reference only: match its die-cut cream border, thickness, holo or matte finish, wear, glare, and outline. Don't copy Image 2's content.\n\nSubject: Render only the actual black L-shaped dispensing device at the centre of Image 1 and its existing SOLOPUMP wordmark above it as one die-cut sticker. Preserve the visible device shape and the vivid tiny coloured nozzle lights. Remove the background, tagline and decorative star. No extrapolated hardware, glass, bottle or invented controls.\nFinish: holo, with restrained realistic foil highlights and very fine wear, sharp print at small sizes. For logos, keep the real shapes and letterforms from the official file exactly. Don't redraw type. No text that isn't in the source, and no human faces. Make the background genuinely transparent and preserve the generated alpha channel. Entire sticker visible with margin, straight-on print artwork ready to apply to a curved 3D sticker surface. Do not copy Self artwork.",
+    "original": "/Users/adi/.codex/generated_images/01a16780-fbf4-7530-a5d1-122490baf0a6/exec-03f75a1e-bd78-4468-813d-d26e29ea0cec.png",
+    "output": "review/stickers/solopump-holo-v1.png",
+    "kind": "generated illustration",
+    "visualReview": "Legible identity, complete die cut, no faces. Source-derived illustration; pixel-exact fidelity not claimed."
+  },
+  {
+    "name": "surya",
+    "source": "public/images/tinkerverse/surya-project-fallback.webp",
+    "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+    "prompt": "Image 1 is the design to render. Image 2 is the style reference only: match its die-cut cream border, thickness, holo or matte finish, wear, glare, and outline. Don't copy Image 2's content.\n\nSubject: Render the existing circular wooden mandala timepiece with its central small blue display and the existing Surya name under it as one die-cut sticker. Retain visible petal arrangement, layered wood and warm red-brown colours. Omit SHIPPED, badge, lightning icon and the original rounded card background. No new details or text.\nFinish: holo, with restrained realistic foil highlights and very fine wear, sharp print at small sizes. For logos, keep the real shapes and letterforms from the official file exactly. Don't redraw type. No text that isn't in the source, and no human faces. Make the background genuinely transparent and preserve the generated alpha channel. Entire sticker visible with margin, straight-on print artwork ready to apply to a curved 3D sticker surface. Do not copy Self artwork.",
+    "original": "/Users/adi/.codex/generated_images/01a16780-fbf4-7530-a5d1-122490baf0a6/exec-9278b7c0-40d8-4322-83b0-6a1bc01f7f47.png",
+    "output": "review/stickers/surya-holo-v1.png",
+    "kind": "generated illustration",
+    "visualReview": "Legible identity, complete die cut, no faces. Source-derived illustration; pixel-exact fidelity not claimed."
+  },
+  {
+    "name": "portfolio-website",
+    "source": "public/images/portfolio_hero.png",
+    "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+    "prompt": "Image 1 is the design to render. Image 2 is the style reference only: match its die-cut cream border, thickness, holo or matte finish, wear, glare, and outline. Don't copy Image 2's content.\n\nSubject: Create one typographic die-cut sticker from only the existing Adi Agarwal name at the bottom of Image 1. Preserve the exact visible name letterforms and spacing. No avatar, human faces, icons, subtitle, tagline or other text. Apply a subtle cool blue holographic print with the cream border of Image 2.\nFinish: holo, with restrained realistic foil highlights and very fine wear, sharp print at small sizes. For logos, keep the real shapes and letterforms from the official file exactly. Don't redraw type. No text that isn't in the source, and no human faces. Make the background genuinely transparent and preserve the generated alpha channel. Entire sticker visible with margin, straight-on print artwork ready to apply to a curved 3D sticker surface. Do not copy Self artwork.",
+    "original": "/Users/adi/.codex/generated_images/01a16780-fbf4-7530-a5d1-122490baf0a6/exec-5191e451-727b-4c29-80f7-02ce52b9f428.png",
+    "output": "review/stickers/portfolio-website-holo-v1.png",
+    "kind": "generated illustration",
+    "visualReview": "Legible identity, complete die cut, no faces. Source-derived illustration; pixel-exact fidelity not claimed."
+  }
+]

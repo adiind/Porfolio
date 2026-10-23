@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#bfdaeb"><meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Adi Agarwal — product thinking, design engineering, and things made real.">
+  <title>Adi Agarwal — Product thinking. Made tangible.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' rx='16' fill='%23182932'/%3E%3Ctext x='15' y='44' fill='%23c5e5f4' font-family='sans-serif' font-size='45' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="/fonts/Bricolage-700.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <a class="skip" href="#work">Skip to the work</a>
+  <header class="nav">
+    <a class="wordmark" href="#top" aria-label="Adi Agarwal home">Adi<span>↗</span></a>
+    <span class="nav-caption">PRODUCT · DESIGN · ENGINEERING</span>
+    <nav aria-label="Main navigation"><a href="#work">Work <sup>14</sup></a><a href="#experience">Experience</a><a class="contact-link" href="mailto:kriitya@gmail.com">Say hello <span>↗</span></a></nav>
+  </header>
+  <main>
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-top"><p>ADI AGARWAL<br><span>AI product manager & design engineer</span></p><p>ANALYTICAL BY TRAINING.<br>HANDS-ON BY INSTINCT.</p></div>
+      <div class="hero-stage" id="hero-stage" aria-label="Interactive collection of project stickers">
+        <div class="hero-links" id="hero-links"></div>
+        <span class="stage-note mono">A FEW THINGS I'VE PUT MY HANDS ON</span>
+      </div>
+      <div class="hero-bottom"><h1 id="hero-title">Product thinking.<br>Made tangible.</h1><div class="hero-intro"><p>From product analytics to agentic systems and physical prototypes. I work across the decisions, the design, and the build.</p><a class="text-link" href="#work">Explore the work <span>↓</span></a></div></div>
+      <div class="hero-foot mono"><span>BASED IN EVANSTON, IL</span><span>SCROLL TO EXPLORE ↓</span><span>DRAG A STICKER. FOLLOW A THREAD.</span></div>
+    </section>
+    <section class="work section" id="work" aria-labelledby="work-title">
+      <div class="section-top mono"><span>01 / SELECTED WORK & EXPLORATIONS</span><span>SOFTWARE ↔ PHYSICAL WORLD</span></div>
+      <div class="section-heading"><h2 id="work-title">Ideas with<br><em>something to show.</em></h2><p>Products, services, systems, and objects.<br>Pick one up. Look a little closer.</p></div>
+      <div class="work-toolbar"><div class="filters" role="group" aria-label="Filter projects"><button class="active" data-filter="all" aria-pressed="true">Everything <sup>14</sup></button><button data-filter="product" aria-pressed="false">Product & service</button><button data-filter="ai" aria-pressed="false">AI & systems</button><button data-filter="physical" aria-pressed="false">Physical computing</button></div><span id="result-count" class="mono" aria-live="polite">14 OBJECTS</span></div>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
+    <section class="experience section" id="experience" aria-labelledby="experience-title">
+      <div class="section-top mono"><span>02 / THE THREAD SO FAR</span><span>WORK + LEARNING + MAKING</span></div>
+      <div class="section-heading"><h2 id="experience-title">Different worlds.<br><em>Connected thinking.</em></h2><p>Product analytics, AI product work,<br>and design engineering.</p></div>
+      <div class="experience-list" id="experience-list"></div>
+      <a class="text-link resume" href="/Adi_Agarwal_Resume_2026.pdf" target="_blank" rel="noopener">The full picture — résumé <span>↗</span></a>
+    </section>
+    <footer id="contact"><p class="mono">03 / WHAT COULD WE MAKE?</p><a class="footer-title" href="mailto:kriitya@gmail.com">Let's make<br><em>it real.</em><span>↗</span></a><div class="footer-line"><a href="mailto:kriitya@gmail.com">kriitya@gmail.com</a><div><a href="https://www.linkedin.com/in/adiagarwal/" target="_blank" rel="noopener">LinkedIn ↗</a><a href="https://github.com/adiind" target="_blank" rel="noopener">GitHub ↗</a></div><span>ADI AGARWAL © 2026</span></div><div class="colophon"><span>Project stickers are generated illustrations based on original work.</span><button id="motion-toggle" aria-pressed="false">Motion on</button></div></footer>
+  </main>
+  <dialog id="project-dialog" aria-labelledby="dialog-title"><div class="dialog-bar"><button id="close-dialog" aria-label="Close project and return to collection">← Back to the collection</button><span class="mono" id="dialog-number"></span><button id="close-x" aria-label="Close project">×</button></div><div id="dialog-content"></div></dialog>
+  <div id="webgl-layer" aria-hidden="true"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

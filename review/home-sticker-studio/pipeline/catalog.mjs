@@ -1,0 +1,16 @@
+export const specs=[
+ ['glyph','Glyph','physical','#d9e1db','glyph-holo-v2.png','Wearable AI','/images/glyph/detail-angled.webp'],
+ ['familysync-jpmorgan','FamilySync','product','#c2d8ec','familysync-holo-v2.png','J.P. Morgan Payments','/images/familysync_jpmorgan_chase.webp'],
+ ['food-rescue','Food Rescue','product','#edccae','food-rescue-holo-v3.png','Zomato','/images/food_rescue.png'],
+ ['mcdonalds-interaction-design','Squad Up','product','#efe6ad','squad-up-holo-v2.png',"McDonald’s",'/images/mcd/squad-up/scenes/mcd-01-hero-drive-thru.webp'],
+ ['helios','Helios','physical','#d6c5b5','helios-holo-v1.png','Kinetic light','/images/helios.jpg'],
+ ['self-xyz','Self','ai','#c9d6c3','pilot/self-b-r4.png','AI product management','/images/self-logo.svg'],
+ ['zero-my-ai','Zero','ai','#cbd6d2','zero-holo-v1.png','Personal AI system','/images/zero_hero_banner.png'],
+ ['surya','Surya','physical','#ded0bb','surya-holo-v1.png','Presence across time zones','/images/tinkerverse/surya-project-fallback.webp'],
+ ['pg-haircare','P&G','product','#cbd7e5','pg-haircare-holo-v1.png','Consumer research & packaging','/images/pg/photo-session-safe.webp'],
+ ['jarvis','Jarvis','physical','#cfcec4','jarvis-home-assistant-holo-v2.png','Embedded voice assistant','/images/tinkerverse/jarvis-project-fallback.webp'],
+ ['plotter','Voice Plotter','physical','#dfd2c5','voice-plotter-holo-v2.png','Speech to drawing','/images/tinkerverse/plotter-project-fallback.webp'],
+ ['solopump','SoloPump','physical','#cdd4e1','solopump-holo-v1.png','Connected dispensing','/images/solopump.png'],
+ ['lawn','The Lawn','ai','#cfd9b9','lawn-holo-v1.png','A shared digital garden','/images/lawn/hero.jpg'],
+ ['portfolio-website','This portfolio','ai','#d2d9ec','portfolio-website-holo-v1.png','Human–AI collaboration','/images/portfolio_projects.png'],
+];
