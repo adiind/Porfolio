@@ -5,11 +5,10 @@ export function SuryaDemo() {
   const openness = Math.max(.08, Math.sin((hour - 6) / 12 * Math.PI));
   return <div className="world-demo surya-demo" style={{ '--bloom': openness } as React.CSSProperties}>
     <div className="sun-orbit" aria-hidden="true"><i style={{ transform: `rotate(${hour / 24 * 360}deg)` }}><b /></i></div>
-    <svg viewBox="0 0 500 400" aria-hidden="true" className="bloom-diagram">
-      <circle cx="250" cy="200" r="138" fill="none" stroke="currentColor" strokeOpacity=".18" />
-      {Array.from({length:12}, (_, i) => <g key={i} transform={`translate(250 200) rotate(${i * 30})`}><path d="M0 0 C-58 -35 -45 -105 0 -132 C45 -105 58 -35 0 0" fill={i % 2 ? '#cf8853' : '#e7b27c'} stroke="#583624" strokeWidth="1" style={{transform:`scale(${.28 + openness * .72})`,transition:'transform .25s ease'}} /></g>)}
-      <circle cx="250" cy="200" r="26" fill="#5b372b" /><circle cx="250" cy="200" r="17" fill="#e9c39a" />
-    </svg>
+    <div className="surya-bloom-art" aria-hidden="true">
+      <img src="/images/project-worlds/surya-flower-folded.webp" alt="" style={{ opacity: 1 - openness }} />
+      <img src="/images/project-worlds/surya-flower-open.webp" alt="" style={{ opacity: openness }} />
+    </div>
     <div className="world-demo-readout"><span>Illustrative local time</span><strong>{String(hour).padStart(2,'0')}:00</strong><span>{hour >= 7 && hour <= 18 ? 'A flower opens into the day' : 'A flower folds toward rest'}</span></div>
     <label className="world-slider">Move through the day<input aria-label="Illustrative hour of day" type="range" min="0" max="23" value={hour} onChange={e=>setHour(Number(e.target.value))} /><span><b>Midnight</b><b>Noon</b><b>Night</b></span></label>
   </div>;
