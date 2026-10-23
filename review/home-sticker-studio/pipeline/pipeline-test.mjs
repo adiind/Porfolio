@@ -1,0 +1,40 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import assert from 'node:assert/strict';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+const run=promisify(execFile);
+const base=path.resolve(import.meta.dirname,'..');
+const root=path.resolve(base,'../..');
+const temp=await fs.mkdtemp(path.join(os.tmpdir(),'sticker-pipeline-'));
+const project=path.join(temp,'review/home-sticker-studio');
+const originalRegistry=await fs.readFile(path.join(base,'pipeline/registry.json'),'utf8');
+const record={date:new Date().toISOString(),pass:false};
+try{
+ await fs.mkdir(path.join(project,'pipeline'),{recursive:true});
+ for(const name of ['registry.json','catalog.mjs','stickers.mjs'])await fs.copyFile(path.join(base,'pipeline',name),path.join(project,'pipeline',name));
+ await fs.symlink(path.join(base,'pipeline/inputs'),path.join(project,'pipeline/inputs'));
+ await fs.symlink(path.join(base,'node_modules'),path.join(project,'node_modules'));
+ await fs.symlink(path.join(root,'.agents'),path.join(temp,'.agents'));
+ const cli=path.join(project,'pipeline/stickers.mjs');
+ const call=async args=>JSON.parse((await run(process.execPath,[cli,...args],{cwd:temp})).stdout);
+ const registry=JSON.parse(originalRegistry);const selected=registry.items.find(i=>i.id==='zero-my-ai');
+ const candidate=path.join(root,selected.selected);
+ const newItem={...selected,id:'new-project-fixture',name:'new-project-fixture'};delete newItem.selected;delete newItem.originalSelected;
+ await fs.writeFile(path.join(project,'pipeline/registry.json'),JSON.stringify({...registry,items:[...registry.items,newItem]}));
+ const initialPlan=await call(['plan']);assert.equal(initialPlan.jobs.length,1);assert(initialPlan.jobs[0].output.endsWith('-v1.png'));assert.equal(initialPlan.jobs[0].arguments.referenced_image_paths.length,2);
+ await fs.writeFile(path.join(project,'pipeline/registry.json'),originalRegistry);
+ const planned=await call(['plan',selected.id]);assert(planned.jobs[0].output.endsWith('-v2.png'));
+ const first=await call(['accept',selected.id,candidate,'Isolated regression fixture using the already visually inspected selected artwork.']);
+ const firstBytes=await fs.readFile(path.join(temp,first.accepted));
+ const second=await call(['accept',selected.id,candidate,'Second isolated fixture; verify immutable versioning with identical inspected artwork.']);
+ assert.notEqual(first.accepted,second.accepted);assert.deepEqual(await fs.readFile(path.join(temp,first.accepted)),firstBytes);
+ assert.equal((await call(['validate'])).pass,true);
+ await assert.rejects(()=>call(['accept',selected.id,path.join(base,'public/media/glyph.webp'),'Opaque input rejection fixture; must not be accepted as a transparent sticker.']));
+ assert.equal(await fs.readFile(path.join(base,'pipeline/registry.json'),'utf8'),originalRegistry);
+ Object.assign(record,{pass:true,checks:['Unselected new project plans its first two-reference generation job','Fresh checkout creates missing output directory','Existing selected v1 advances to v2','Repeated acceptance preserves previous file and advances version','Selected output and all source hashes validate','Opaque source rejected','Real registry unchanged']});
+}catch(e){record.failure=e.stack;process.exitCode=1}finally{
+ await fs.rm(temp,{recursive:true,force:true});
+ await fs.writeFile(path.join(base,'pipeline/pipeline-QA.json'),JSON.stringify(record,null,2)+'\n');console.log(JSON.stringify(record,null,2));
+}

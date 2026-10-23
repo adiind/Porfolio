@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "anchor": ".agents/skills/sticker/assets/anchors/holo.png",
+  "items": [
+    {
+      "id": "glyph",
+      "source": "review/home-sticker-studio/pipeline/inputs/glyph-selected.png",
+      "originalSource": "review/stickers/glyph-holo-v2.png",
+      "sha256": "a6dca5396f2593b8533b78f3f48f8a04d71d45853dfceb6346f564b17a724b00",
+      "web": "/stickers/glyph.webp",
+      "width": 1100,
+      "height": 681,
+      "bytes": 376454,
+      "generated": true
+    },
+    {
+      "id": "familysync-jpmorgan",
+      "source": "review/home-sticker-studio/pipeline/inputs/familysync-jpmorgan-selected.png",
+      "originalSource": "review/stickers/familysync-holo-v2.png",
+      "sha256": "9b56b91c7c7ec789c0ae3af2930509ed217460c6b6357cb4bbc4363c4db3b2b7",
+      "web": "/stickers/familysync-jpmorgan.webp",
+      "width": 1100,
+      "height": 380,
+      "bytes": 206006,
+      "generated": true
+    },
+    {
+      "id": "food-rescue",
+      "source": "review/home-sticker-studio/pipeline/inputs/food-rescue-selected.png",
+      "originalSource": "review/stickers/food-rescue-holo-v3.png",
+      "sha256": "ae8ffac210ff439b10ec9569f90c3f597fb89c660eb9d4ade46d6f95d81e9e53",
+      "web": "/stickers/food-rescue.webp",
+      "width": 1100,
+      "height": 548,
+      "bytes": 215708,
+      "generated": true
+    },
+    {
+      "id": "mcdonalds-interaction-design",
+      "source": "review/home-sticker-studio/pipeline/inputs/mcdonalds-interaction-design-selected.png",
+      "originalSource": "review/stickers/squad-up-holo-v2.png",
+      "sha256": "b84cb7f6ca17be3c6fa83748eaf9cfb22db9949e00877633ff2d88b3fe9c21c1",
+      "web": "/stickers/mcdonalds-interaction-design.webp",
+      "width": 1100,
+      "height": 473,
+      "bytes": 172940,
+      "generated": true
+    },
+    {
+      "id": "helios",
+      "source": "review/home-sticker-studio/pipeline/inputs/helios-selected.png",
+      "originalSource": "review/stickers/helios-holo-v1.png",
+      "sha256": "05575465b780db278da8448d7be3353ca0173871ccf734fad2f6e4deb7e77b01",
+      "web": "/stickers/helios.webp",
+      "width": 695,
+      "height": 850,
+      "bytes": 272468,
+      "generated": true
+    },
+    {
+      "id": "self-xyz",
+      "source": "review/home-sticker-studio/pipeline/inputs/self-xyz-selected.png",
+      "originalSource": "review/stickers/pilot/self-b-r4.png",
+      "sha256": "06e2d00afd77c36db4c660bac86fa700fb010364dec1a62128b2a246ee65adbf",
+      "web": "/stickers/self-xyz.webp",
+      "width": 938,
+      "height": 420,
+      "bytes": 158928,
+      "generated": true
+    },
+    {
+      "id": "zero-my-ai",
+      "source": "review/home-sticker-studio/pipeline/inputs/zero-my-ai-selected.png",
+      "originalSource": "review/stickers/zero-holo-v1.png",
+      "sha256": "324ea0a63ed81b1c3966df86da4e479bea3ac89536c47470a46c2498b304afc3",
+      "web": "/stickers/zero-my-ai.webp",
+      "width": 1100,
+      "height": 504,
+      "bytes": 219890,
+      "generated": true
+    },
+    {
+      "id": "surya",
+      "source": "review/home-sticker-studio/pipeline/inputs/surya-selected.png",
+      "originalSource": "review/stickers/surya-holo-v1.png",
+      "sha256": "4280ae86d2848b32aac3ec817dd81aca819ef9cf75f70455980300fc34ab4ce5",
+      "web": "/stickers/surya.webp",
+      "width": 902,
+      "height": 850,
+      "bytes": 314934,
+      "generated": true
+    },
+    {
+      "id": "pg-haircare",
+      "source": "review/home-sticker-studio/pipeline/inputs/pg-haircare-selected.png",
+      "originalSource": "review/stickers/pg-haircare-holo-v1.png",
+      "sha256": "da88473da628ed97914f7cd730e03075712746fd366397eea5b4ffd52e1905de",
+      "web": "/stickers/pg-haircare.webp",
+      "width": 854,
+      "height": 850,
+      "bytes": 258870,
+      "generated": true
+    },
+    {
+      "id": "jarvis",
+      "source": "review/home-sticker-studio/pipeline/inputs/jarvis-selected.png",
+      "originalSource": "review/stickers/jarvis-home-assistant-holo-v2.png",
+      "sha256": "7c89f8ba8e9b7d61b3070f699ffa6c92285bc1d1fc77dc59d7c1b46785553fc1",
+      "web": "/stickers/jarvis.webp",
+      "width": 1100,
+      "height": 655,
+      "bytes": 257692,
+      "generated": true
+    },
+    {
+      "id": "plotter",
+      "source": "review/home-sticker-studio/pipeline/inputs/plotter-selected.png",
+      "originalSource": "review/stickers/voice-plotter-holo-v2.png",
+      "sha256": "a1390d5b9b4ad6b49ef2dca18a82271c25881ee495d2eeda2153d1db8a72239e",
+      "web": "/stickers/plotter.webp",
+      "width": 1100,
+      "height": 700,
+      "bytes": 266344,
+      "generated": true
+    },
+    {
+      "id": "solopump",
+      "source": "review/home-sticker-studio/pipeline/inputs/solopump-selected.png",
+      "originalSource": "review/stickers/solopump-holo-v1.png",
+      "sha256": "117716e165c54b88fda466d44b12b364e738fada8c13d25a43bdac63c397c60f",
+      "web": "/stickers/solopump.webp",
+      "width": 1100,
+      "height": 540,
+      "bytes": 191750,
+      "generated": true
+    },
+    {
+      "id": "lawn",
+      "source": "review/home-sticker-studio/pipeline/inputs/lawn-selected.png",
+      "originalSource": "review/stickers/lawn-holo-v1.png",
+      "sha256": "1ea6f7ed8a9936345e0730e1191da8b92cdd98c1c2e3d7ca726f7c1cfb991cf7",
+      "web": "/stickers/lawn.webp",
+      "width": 1100,
+      "height": 497,
+      "bytes": 283038,
+      "generated": true
+    },
+    {
+      "id": "portfolio-website",
+      "source": "review/home-sticker-studio/pipeline/inputs/portfolio-website-selected.png",
+      "originalSource": "review/stickers/portfolio-website-holo-v1.png",
+      "sha256": "c471c66158ae33acac780e18185ea3910ccb09c8c49f5305e9235436f06ea7e5",
+      "web": "/stickers/portfolio-website.webp",
+      "width": 1100,
+      "height": 280,
+      "bytes": 137022,
+      "generated": true
+    }
+  ],
+  "missing": []
+}

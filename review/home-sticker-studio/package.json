@@ -1,0 +1,27 @@
+{
+  "name": "adi-sticker-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --config vite.config.mjs",
+    "build": "vite build --config vite.config.mjs",
+    "prepare:assets": "node pipeline/prepare.mjs",
+    "stickers": "node pipeline/stickers.mjs",
+    "check:assets": "node pipeline/stickers.mjs validate",
+    "check:browser": "node pipeline/qa.mjs",
+    "capture": "node pipeline/capture.mjs"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "vite": "6.4.5",
+    "sharp": "0.35.5",
+    "typescript": "5.8.3",
+    "playwright": "1.64.0"
+  }
+}
