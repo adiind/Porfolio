@@ -7,7 +7,7 @@ import { useDialogA11y } from '../../hooks/useDialogA11y';
 import { projectPath } from '../../lib/workRoutes';
 import { worldStories, WorldId } from './worldStories';
 import { JarvisDemo, PlotterDemo, SuryaDemo } from './WorldDemos';
-import WorldMotion, { openingPose } from './WorldMotion';
+import { openingPose } from './WorldMotion';
 import './worlds.css';
 
 export default function WorldProjectDetail({project,onClose}:{project:Project;onClose:()=>void}) {
@@ -64,11 +64,10 @@ export default function WorldProjectDetail({project,onClose}:{project:Project;on
       <main>
         <section className="world-opening" ref={stageRef}>
           <div className="world-stage">
-            <div className="world-camera" ref={cameraRef}><img src={`/images/project-worlds/${id}-world.webp`} alt={id==='surya'?'Illustrated miniature rooms connect a sunlit day and a moonlit night.':id==='jarvis'?'Illustrated sound wave connects a processor to a softly lit room.':'Illustrated paper ribbon connects a sound wave to a technical pen.'} fetchPriority="high"/></div>
+            <div className="world-camera" ref={cameraRef}><img src={`/images/project-worlds/${id}-cutout.png`} alt={id==='surya'?'Flat illustration of a flower connecting a sunlit day and a moonlit night.':id==='jarvis'?'Flat illustration of a sound wave connecting a microchip to a lamp.':'Flat illustration of a pen drawing a continuous line across a paper ribbon.'} fetchPriority="high"/></div>
             <div className="world-stage-shade"/>
             <div className="world-hero-copy" inert={openingPose(travel,false).copyOpacity===0} style={{opacity:openingPose(travel,false).copyOpacity,transform:`translateY(${-Math.min(travel/.4,1)*30}px)`}}><p className="world-eyebrow">{story.category}</p><h1 id="world-title">{story.name}<span>{story.title[0]}<br/><em>{story.title[1]}</em></span></h1><p className="world-intro">{story.intro}</p><button className="world-pill" onClick={()=>jump('world-context')}>Explore the story <ArrowDown size={16}/></button></div>
-            {!reduce&&<WorldMotion id={id} progress={travel}/>}
-            <div className="world-scene-footer"><span>AI-generated concept illustration</span><div className="world-beat"><b>0{beat+1}</b><span>{story.beats[beat]}</span><div>{story.beats.map((b,i)=><i key={b} className={i===beat?'active':''}/>)}</div></div><span className="world-scroll-cue">Scroll to travel ↓</span></div>
+            <div className="world-scene-footer"><span>AI-generated flat illustration</span><div className="world-beat"><b>0{beat+1}</b><span>{story.beats[beat]}</span><div>{story.beats.map((b,i)=><i key={b} className={i===beat?'active':''}/>)}</div></div><span className="world-scroll-cue">Scroll to travel ↓</span></div>
           </div>
         </section>
         <nav className="world-chapters" aria-label={`${story.name} chapters`}>{story.chapters.map((c,i)=><button key={c} aria-current={chapter===i?'step':undefined} onClick={()=>jump(sections[i])}><span>0{i+1}</span>{c}</button>)}</nav>
