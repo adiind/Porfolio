@@ -46,5 +46,11 @@
     "source": "https://img.youtube.com/vi/3aCWb3PsAQs/maxresdefault.jpg \u2014 existing data/projects/jarvis.json",
     "sha256": "3ea924ffc8e72d9e20bbf9496bb5835b31174cb4030684fefefb142a504ceea1",
     "bytes": 192597
+  },
+  {
+    "file": "public/images/project-worlds/surya-product-cutout.webp",
+    "source": "Built-in ImageGen edit referenced to public/images/project-worlds/surya-source.jpg. Native master: /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-c68eafda-6a91-4929-814a-970ca60a7402.png. WebP quality 90, alpha preserved. Source-guided illustration, not documentary evidence.",
+    "sha256": "2a445903d1a504dd5350b2e51c45b82395496851db09eaa92797d85809c0e0e8",
+    "bytes": 296314
   }
 ]

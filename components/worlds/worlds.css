@@ -40,3 +40,5 @@ svg.season{width:195px;height:195px;filter:drop-shadow(0 16px 12px #68433320)}
 .surya-bloom-art{position:relative;z-index:1;width:100%;height:350px;display:grid;place-items:center}
 .surya-bloom-art img{grid-area:1/1;width:min(100%,360px);height:100%;object-fit:contain;transition:opacity .35s ease}
 @media(max-width:700px){.surya-bloom-art{height:275px}.surya-bloom-art img{width:min(100%,300px)}}
+.world-process-photo{display:block;max-width:100%;width:270px;height:210px;object-fit:contain}
+@media(max-width:700px){.world-process-photo{height:130px;width:150px}}

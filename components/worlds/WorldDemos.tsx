@@ -2,14 +2,12 @@ import React, { useRef, useState } from 'react';
 
 export function SuryaDemo() {
   const [hour, setHour] = useState(10);
-  const openness = Math.max(.08, Math.sin((hour - 6) / 12 * Math.PI));
-  return <div className="world-demo surya-demo" style={{ '--bloom': openness } as React.CSSProperties}>
+  return <div className="world-demo surya-demo">
     <div className="sun-orbit" aria-hidden="true"><i style={{ transform: `rotate(${hour / 24 * 360}deg)` }}><b /></i></div>
-    <div className="surya-bloom-art" aria-hidden="true">
-      <img src="/images/project-worlds/surya-flower-folded.webp" alt="" style={{ opacity: 1 - openness }} />
-      <img src="/images/project-worlds/surya-flower-open.webp" alt="" style={{ opacity: openness }} />
+    <div className="surya-bloom-art">
+      <img src="/images/project-worlds/surya-product-cutout.webp" alt="ImageGen cutout based on the actual Surya photograph: an engraved wooden mandala with three colorful printed flower mechanisms and a cyan display." />
     </div>
-    <div className="world-demo-readout"><span>Illustrative local time</span><strong>{String(hour).padStart(2,'0')}:00</strong><span>{hour >= 7 && hour <= 18 ? 'A flower opens into the day' : 'A flower folds toward rest'}</span></div>
+    <div className="world-demo-readout"><span>Illustrative local time</span><strong>{String(hour).padStart(2,'0')}:00</strong><span>{hour >= 7 && hour <= 18 ? 'Their day is underway' : 'Their night is quiet'}</span></div>
     <label className="world-slider">Move through the day<input aria-label="Illustrative hour of day" type="range" min="0" max="23" value={hour} onChange={e=>setHour(Number(e.target.value))} /><span><b>Midnight</b><b>Noon</b><b>Night</b></span></label>
   </div>;
 }
