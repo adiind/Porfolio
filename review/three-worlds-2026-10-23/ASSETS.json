@@ -46,5 +46,23 @@
     "source": "https://img.youtube.com/vi/3aCWb3PsAQs/maxresdefault.jpg \u2014 existing data/projects/jarvis.json",
     "sha256": "3ea924ffc8e72d9e20bbf9496bb5835b31174cb4030684fefefb142a504ceea1",
     "bytes": 192597
+  },
+  {
+    "file": "public/images/project-worlds/surya-product-cutout.webp",
+    "source": "Built-in ImageGen edit referenced to public/images/project-worlds/surya-source.jpg. Native master: /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-c68eafda-6a91-4929-814a-970ca60a7402.png. WebP quality 90, alpha preserved. Source-guided illustration, not documentary evidence.",
+    "sha256": "2a445903d1a504dd5350b2e51c45b82395496851db09eaa92797d85809c0e0e8",
+    "bytes": 296314
+  },
+  {
+    "file": "public/images/project-worlds/jarvis-product-cutout.webp",
+    "source": "Built-in ImageGen edit referenced to jarvis-source.jpg; master /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-d55c4f7f-1b90-4dda-a3a2-f2ebcc65d429.png; source-guided illustration, not documentary photo. WebP q90, alpha preserved.",
+    "sha256": "e65e1753b89514869d088485456c1cf5b9f61f41a10ebd76a3da98c35f3dca6f",
+    "bytes": 224708
+  },
+  {
+    "file": "public/images/project-worlds/plotter-product-cutout.webp",
+    "source": "Built-in ImageGen edit referenced to plotter-source.jpg; master /Users/adi/.codex/generated_images/01a16787-8d3e-7180-850b-bae6689b05cb/exec-9971955e-315d-41b2-8603-720b6d57ac24.png; source-guided illustration, not documentary photo. WebP q90, alpha preserved.",
+    "sha256": "a3d66e7c332e7d7bdd62d3f0eda1d00c2be8552992b1657d454b753382309a19",
+    "bytes": 202566
   }
 ]

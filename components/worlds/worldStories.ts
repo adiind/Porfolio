@@ -6,7 +6,7 @@ export const worldStories = {
     beats: ['Distance, made visible.', 'Different days. Shared rhythms.', 'Presence, beyond a screen.'],
     chapters: ['The distance', 'The rhythm', 'The making', 'The learning'],
     question: 'What if you could feel their day, without checking the time?',
-    demoTitle: 'A day unfolds.', demoIntro: 'Move through an illustrative day. The flower opens into daylight and folds toward night—an interpretation of the interaction, not a mechanical simulation.',
+    demoTitle: 'A day unfolds.', demoIntro: 'Three flowers represent three family members. Move through an illustrative day and night; the cutout below was generated from the actual project photograph.',
     steps: [
       ['Notice', 'Missed calls exposed the gap between knowing a time zone and sensing someone’s availability.'],
       ['Translate', 'One flower represents one family member. Movement carries the idea of waking and sleeping.'],

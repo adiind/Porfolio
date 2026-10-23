@@ -24,7 +24,7 @@ try{
    assert.equal(await page.locator('.project-card:visible').count(),n);
   }
   const ids=await page.evaluate(()=>window.__portfolioReview.projects);
-  for(const id of (width===1440?ids:['glyph','pg-haircare','portfolio-website'])){
+  for(const id of ids){
    const button=page.locator(`.card-open[data-open="${id}"]`);await button.scrollIntoViewIfNeeded();await button.click();
    await page.waitForFunction(()=>document.querySelector('dialog').open);
    assert(new URL(page.url()).searchParams.get('project')===id);

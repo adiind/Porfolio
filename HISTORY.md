@@ -2,10 +2,13 @@
 
 ## Codex
 
+- 2026-10-23: Reworked Sticker Studio into a deliberately scattered, overlapping collection with different scales, rotations and a dedicated phone composition; removed the oversized 3D name in favour of a restrained typographic opening, keeping Adi capitalized. Original sticker colours retained; silhouette-based pointer targets prevent transparent overlap interception. All 14 project entries passed at 320/390/768/1440, with focus return, drag, reduced motion and static fallback; standalone/root builds and 31 existing tests passed. Source-only candidate, public homepage unchanged.
+
 - 2026-10-23: Corrected Sticker Studio per Adi’s review: removed rectangular sticker panels and badges, staggered differently sized cutouts, preserved original artwork colours without WebGL relighting, and capitalized Adi in navigation and dimensional lettering; standalone build and 320/390/768/1440 browser journeys passed, preview remains at port 4466, production homepage unchanged.
 
 - 2026-10-23: Added independent Sticker Studio homepage candidate and reproducible source-qualified sticker pipeline under review/home-sticker-studio, with 14 projects and six new illustrations; standalone/root builds, 31 existing tests, asset integrity, fresh-checkout acceptance, desktop/mobile navigation, focus, drag, reduced-motion and WebGL fallback checked. Existing public homepage and routes unchanged.
 
-- 2026-10-23: Replaced the Surya, Jarvis and Plotter hero scenes with transparent flat ImageGen cutouts; removed the rendered hero overlay and retained scroll zoom. Prompt records are in `review/three-worlds-2026-10-23/PROMPTS.md`.
+- 2026-10-23: Extended the source-grounded artwork correction to Jarvis and Plotter: generated cutouts from their actual prototype photos, used them in scroll transitions and interaction explanations, and removed generic decorative timeline glyphs. Build, scoped TypeScript and responsive visual review passed.
+- 2026-10-23: Corrected the unrelated wooden-lotus imagery using an ImageGen cutout referenced to the actual Surya photo; replaced generic flower drawings in the slider, scroll transition and process timeline with the product view and workshop photos. Build and phone visual review passed.
 - 2026-10-23: Replaced Surya slider flower SVG with two transparent ImageGen concept images that crossfade between rest and open states; preserved the time control and labeled the imagery as illustrative.
 - 2026-10-23: Upgraded Surya, Jarvis and Plotter with labeled generated illustrations, reversible scroll motion, interactive explanations, process timelines and original project evidence; production build, 31 existing tests, scoped TypeScript, desktop/tablet/390/320 layouts, keyboard/reduced-motion/card/Back/Forward checks and independent review passed. Release/source records: review/three-worlds-2026-10-23.

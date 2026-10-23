@@ -1,6 +1,6 @@
 # Adi — Sticker Studio
 
-A complete homepage candidate: sculpted Three.js nameplate, source-derived holographic project stickers, a browsable 14-project collection, project stories, experience and contact. This is an independent review entry; the portfolio's existing homepage and case-study routes are preserved.
+A complete homepage candidate: restrained typographic introduction, source-derived holographic project stickers, a browsable 14-project collection, project stories, experience and contact. This is an independent review entry; the portfolio's existing homepage and case-study routes are preserved.
 
 ## Preview
 
@@ -8,7 +8,7 @@ From this folder: `npm install`, then `npm run dev`. The local URL is **http://1
 
 `npm run build` produces the standalone site in `dist/`. The content and optimized assets needed to run it are included. This entry is not automatically published by the existing production Vite build.
 
-The collection uses free-standing irregular cutouts, varied sizes and staggered placement. Sticker textures retain their original colour without scene relighting; the dimensional nameplate reads **Adi.**
+The collection uses deliberately scattered coordinates, varied scales, rotations and overlapping clusters, with a separate phone composition. Labels appear on hover or keyboard focus. Sticker textures retain their original colour without scene relighting. The oversized 3D name is removed; Adi remains capitalized in the navigation.
 
 ## Interaction
 

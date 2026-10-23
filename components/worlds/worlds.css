@@ -40,3 +40,14 @@ svg.season{width:195px;height:195px;filter:drop-shadow(0 16px 12px #68433320)}
 .surya-bloom-art{position:relative;z-index:1;width:100%;height:350px;display:grid;place-items:center}
 .surya-bloom-art img{grid-area:1/1;width:min(100%,360px);height:100%;object-fit:contain;transition:opacity .35s ease}
 @media(max-width:700px){.surya-bloom-art{height:275px}.surya-bloom-art img{width:min(100%,300px)}}
+.world-process-photo{display:block;max-width:100%;width:270px;height:210px;object-fit:contain}
+@media(max-width:700px){.world-process-photo{height:130px;width:150px}}
+.world-motion-object{height:100%;max-height:460px;object-fit:contain;filter:none}
+.jarvis-device-art{display:block;width:100%;height:250px;object-fit:contain;margin:0 auto 18px}
+.plotter-visuals{display:grid;grid-template-columns:170px 1fr;gap:26px;align-items:center}
+.plotter-carriage-art{width:100%;height:300px;object-fit:contain}
+.world-jarvis .world-process-step,.world-plotter .world-process-step{grid-template-columns:50px 1fr}
+.world-jarvis .world-process-step>div:nth-child(2),.world-plotter .world-process-step>div:nth-child(2){max-width:650px}
+.world-jarvis .world-journey-line,.world-plotter .world-journey-line{left:0;width:40px}
+@media(max-width:700px){.plotter-visuals{grid-template-columns:1fr;gap:15px}.plotter-carriage-art{height:200px}.jarvis-device-art{height:200px}.world-motion-object{max-height:320px}}
+.world-generated-caption{font:9px/1.5 monospace!important;opacity:.55;text-align:center;margin:10px 0 20px!important}
