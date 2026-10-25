@@ -1,6 +1,6 @@
 {
   "url": "http://127.0.0.1:4466/",
-  "started": "2026-10-23T20:08:58.360Z",
+  "started": "2026-10-25T06:31:11.048Z",
   "viewports": [
     {
       "width": 320,
@@ -32,8 +32,10 @@
     }
   ],
   "journeys": [
+    "Phone swipe starting on a sticker scrolls without opening or dragging it",
     "All 14 project stories, focus return, browser Back/Forward/close",
     "Mouse sticker drag bends and returns without opening a project",
+    "Direct Experience anchor reveals the collapsed history",
     "Direct project link closes in place; reduced motion stays still and stops rendering",
     "WebGL context loss restores usable static artwork",
     "Manual Motion off disables root smooth scrolling and fallback hover movement",
@@ -41,5 +43,5 @@
   ],
   "errors": [],
   "pass": true,
-  "finished": "2026-10-23T20:09:25.213Z"
+  "finished": "2026-10-25T06:31:43.283Z"
 }
