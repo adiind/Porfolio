@@ -30,7 +30,7 @@ export default function WorldMotion({id,progress}:{id:WorldId;progress:number}) 
 
   return <div className="world-motion" aria-hidden="true" style={{opacity:reveal,transform:`translate3d(0,${(1-reveal)*60}px,0) scale(${.86+reveal*.14})`}}>
     <div className="world-motion-copy"><span className="world-eyebrow">{id==='surya'?'A rhythm you can see':id==='jarvis'?'Intent travels through the system':'An idea takes shape'}</span><h2>{id==='surya'?<>A day opens.<br/><em>A night closes.</em></>:id==='jarvis'?<>Voice becomes<br/><em>physical action.</em></>:<>A passing thought.<br/><em>A lasting line.</em></>}</h2><p>{id==='surya'?'A flower carries the idea of someone’s day.':id==='jarvis'?'Recognize locally. Route the message. Respond.':'Voice → text → vector → motion.'}</p></div>
-    <img className="world-motion-object" src={`/images/project-worlds/${id}-product-cutout.webp`} alt=""/>
-    <span className="world-motion-caption">ImageGen cutout based on the project photograph</span>
+    <img className="world-motion-object" src={id==='jarvis'?'/images/project-worlds/originals/jarvis-assembly.jpg':`/images/project-worlds/originals/${id}.webp`} alt=""/>
+    <span className="world-motion-caption">{id==='jarvis'?'Frame from the original project video':'Original prototype photograph'}</span>
   </div>;
 }
