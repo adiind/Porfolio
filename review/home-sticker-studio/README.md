@@ -1,6 +1,6 @@
 # Adi — Sticker Studio
 
-A complete homepage candidate: restrained typographic introduction, source-derived holographic project stickers, a browsable 14-project collection, project stories, experience and contact. This is an independent review entry; the portfolio's existing homepage and case-study routes are preserved.
+An artwork-first homepage candidate: a small identity/navigation bar, one scattered 14-project sticker collection, project stories, collapsible experience and compact contact links. This is an independent review entry; the portfolio's existing homepage and case-study routes are preserved.
 
 ## Preview
 
@@ -8,12 +8,12 @@ From this folder: `npm install`, then `npm run dev`. The local URL is **http://1
 
 `npm run build` produces the standalone site in `dist/`. The content and optimized assets needed to run it are included. This entry is not automatically published by the existing production Vite build.
 
-The collection uses deliberately scattered coordinates, varied scales, rotations and overlapping clusters, with a separate phone composition. Labels appear on hover or keyboard focus. Sticker textures retain their original colour without scene relighting. The oversized 3D name is removed; Adi remains capitalized in the navigation.
+The collection uses deliberately scattered coordinates, varied scales, rotations and overlapping clusters, with a separate phone composition. Labels appear on hover or keyboard focus. Sticker textures retain their original colour without scene relighting. The slogan hero, duplicate sticker display and marketing headings are removed; Adi remains capitalized in the navigation.
 
 ## Interaction
 
 - Click any project sticker to open its story. Browser Back, Escape and the close controls return to the collection with focus restored.
-- Hover lifts and gently bends a sticker. On desktop, drag a hero sticker and release it to return. Touch remains available for ordinary page scrolling.
+- Hover lifts and gently bends a sticker. On desktop, drag a collection sticker and release it to return. Touch remains available for ordinary page scrolling.
 - Filters narrow the collection; experience rows expand.
 - System reduced-motion preferences and the footer motion control disable interactive movement. A static artwork fallback is available with `?no3d` and activates after WebGL failure.
 - Direct links use `?project=<id>`; existing full case studies retain their canonical `/work/<id>` links.

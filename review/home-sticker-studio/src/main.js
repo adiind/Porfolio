@@ -5,17 +5,8 @@ const byId=new Map(projects.map(p=>[p.id,p]));
 const grid=document.querySelector('#project-grid');
 const dialog=document.querySelector('#project-dialog');
 const statusLabels={shipped:'Built',concept:'Concept','in-progress':'In development',experience:'Experience',prototype:'Prototype',completed:'Completed'};
-const compact={glyph:'Wearable AI, with a physical interface.', 'familysync-jpmorgan':'Shared care. Clear authority. Thoughtful payments.', 'food-rescue':'Product analytics behind a second chance for food.', 'mcdonalds-interaction-design':'Making a group order feel like a group effort.', helios:'A mechanism that turns motion into light.', 'self-xyz':'Agentic products built around trust and control.', 'zero-my-ai':'An assistant with memory, tools, and boundaries.', surya:'Making distant daily rhythms visible.', 'pg-haircare':'Research, packaging, and physical prototype studies.', jarvis:'Local voice meets the connected home.', plotter:'A spoken idea becomes a physical drawing.', solopump:'Measured dispensing, with software in control.', lawn:'A garden that grows between visits.', 'portfolio-website':'An ongoing experiment in human–AI making.'};
-grid.innerHTML=projects.map((p,i)=>`<article class="project-card" data-group="${p.group}" data-project="${p.id}" data-slot="${i%6}" style="--card-color:${p.color};--angle:${[-7,5,-5,5,-7,4][i%6]}deg"><button class="card-open" data-open="${p.id}" aria-label="Explore ${escape(p.title)}"><span class="sticker-hit" aria-hidden="true"></span><div class="sticker-stage" data-sticker="${p.id}"><img src="${p.sticker}" alt="${escape(p.title)} project sticker" loading="lazy" decoding="async"></div><div class="card-caption"><div><h3>${escape(p.title)} <span aria-hidden="true">↗</span></h3><p>${escape(compact[p.id])}</p></div><span>${escape(p.group==='physical'?'Object & system':p.group==='ai'?'AI & engineering':'Product & service')}</span></div></button></article>`).join('');
+grid.innerHTML=projects.map((p,i)=>`<article class="project-card" data-group="${p.group}" data-project="${p.id}" data-slot="${i%6}" style="--card-color:${p.color};--angle:${[-7,5,-5,5,-7,4][i%6]}deg"><button class="card-open" data-open="${p.id}" aria-label="Explore ${escape(p.title)}"><span class="sticker-hit" aria-hidden="true"></span><div class="sticker-stage" data-sticker="${p.id}"><img src="${p.sticker}" alt="${escape(p.title)} project sticker" loading="lazy" decoding="async"></div><div class="card-caption"><div><h3>${escape(p.title)} <span aria-hidden="true">↗</span></h3></div><span>${escape(p.group==='physical'?'Object & system':p.group==='ai'?'AI & engineering':'Product & service')}</span></div></button></article>`).join('');
 
-export const heroPositions=[
- {id:'glyph',x:64,y:27,w:330,h:245,rot:-15,mx:33,my:27,mw:220,mh:160},
- {id:'familysync-jpmorgan',x:81,y:17,w:300,h:150,rot:10,mx:69,my:15,mw:200,mh:100},
- {id:'helios',x:89,y:57,w:185,h:245,rot:-9,mx:82,my:61,mw:105,mh:160},
- {id:'mcdonalds-interaction-design',x:69,y:61,w:345,h:205,rot:12,mx:42,my:64,mw:220,mh:140},
- {id:'food-rescue',x:54,y:74,w:220,h:155,rot:-18,mx:23,my:84,mw:138,mh:100},
- {id:'self-xyz',x:78,y:82,w:180,h:110,rot:-5,mx:65,my:88,mw:128,mh:80},
-];
 // Art-directed coordinates keep the collection irregular without random layout shifts.
 // Each entry is x, y, width, height, rotation, and stacking order.
 const desktopScatter=[
@@ -46,12 +37,12 @@ function layoutCollection(){
  window.dispatchEvent(new Event('sticker-layout'));
 }
 layoutCollection();addEventListener('resize',layoutCollection);
-const heroLinks=document.querySelector('#hero-links');
-heroLinks.innerHTML=heroPositions.map(o=>{const p=byId.get(o.id);return `<button class="hero-sticker" data-open="${p.id}" data-hero="${p.id}" aria-label="Explore ${escape(p.title)}" style="--rotation:${o.rot}deg"><span class="sticker-hit" aria-hidden="true"></span><img src="${p.sticker}" alt="" draggable="false" decoding="async"><span class="hero-label">${escape(p.title)} ↗</span></button>`}).join('');
-function layoutHero(){const mobile=innerWidth<=600;heroPositions.forEach(o=>{const el=document.querySelector(`[data-hero="${o.id}"]`);const scale=mobile?Math.min(1,(innerWidth-20)/390):Math.min(1.15,(innerWidth-100)/1340);el.style.left=(mobile?o.mx:o.x)+'%';el.style.top=(mobile?o.my:o.y)+'%';el.style.setProperty('--w',(mobile?o.mw:o.w)*scale+'px');el.style.setProperty('--h',(mobile?o.mh:o.h)*scale+'px');fitHitShape(el,byId.get(o.id).sticker,o.rot,true);});}
-layoutHero();addEventListener('resize',layoutHero);
 const dateYear=d=>d==='Present'?'Present':d?.slice(0,4)||'';
 document.querySelector('#experience-list').innerHTML=experiences.sort((a,b)=>b.start.localeCompare(a.start)).map(t=>`<details class="experience-item"><summary><span class="dates mono">${dateYear(t.start)} — ${dateYear(t.end)}</span><span class="company">${escape(t.company.split(' | ')[0])}</span><span class="role">${escape(t.title)}</span><span class="expand" aria-hidden="true">+</span></summary><p>${escape(t.summary)}</p></details>`).join('');
+const experience=document.querySelector('#experience');
+document.querySelector('a[href="#experience"]').addEventListener('click',()=>{experience.open=true});
+function revealExperience(){if(location.hash==='#experience')experience.open=true}
+revealExperience();addEventListener('hashchange',revealExperience);
 const filters=[...document.querySelectorAll('[data-filter]')];
 filters.forEach(btn=>btn.addEventListener('click',()=>{filters.forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-pressed',String(b===btn))});let count=0;document.querySelectorAll('.project-card').forEach(c=>{c.hidden=btn.dataset.filter!=='all'&&c.dataset.group!==btn.dataset.filter;if(!c.hidden){c.dataset.slot=String(count%6);count++}});document.querySelector('#result-count').textContent=`${count} OBJECT${count===1?'':'S'}`;layoutCollection();}));
 
@@ -77,5 +68,5 @@ function setMotion(value){reduce=value;document.body.classList.toggle('motion-of
 setMotion(reduce);motion.addEventListener('click',()=>setMotion(!reduce));matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>setMotion(e.matches));
 
 // Keep the document, links, and all project stories usable if graphics are unavailable.
-if(!new URL(location.href).searchParams.has('no3d'))import('./scene.js').then(({initScenes})=>initScenes({projects,heroPositions,reduced:()=>reduce})).catch(error=>{console.warn('Using the static project collection:',error.message);document.body.dataset.renderMode='static'});
-window.__portfolioReview={projects:projects.map(p=>p.id),showProject,hideProject,version:'sticker-studio-1'};
+if(!new URL(location.href).searchParams.has('no3d'))import('./scene.js').then(({initScenes})=>initScenes({projects,reduced:()=>reduce})).catch(error=>{console.warn('Using the static project collection:',error.message);document.body.dataset.renderMode='static'});
+window.__portfolioReview={projects:projects.map(p=>p.id),showProject,hideProject,version:'sticker-studio-2'};
