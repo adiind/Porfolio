@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-25",
+  "production": "Original project photographs and actual public video frames. WebP encoding/resizing and photo orientation normalization only; no generated geometry, retouching, reconstruction or fabricated internal mechanisms. Camera crops happen in CSS.",
+  "sources": [
+    {
+      "file": "public/images/project-worlds/originals/surya.webp",
+      "source": "/Users/adi/Downloads/IMG_1438.JPG",
+      "sha256": "bb54bd5bde8e80a3dc985adc2c3b973222d100a08cc155238b2ac0c84bd806f1"
+    },
+    {
+      "file": "public/images/project-worlds/originals/plotter.webp",
+      "source": "/Users/adi/Downloads/IMG_8392.JPG",
+      "sha256": "8b418a695e43efb4cc1f385a02b4e8ad171fe447e96d1df4d7a353279519bd6c"
+    },
+    {
+      "file": "public/images/project-worlds/originals/jarvis-room.jpg",
+      "source": "https://img.youtube.com/vi/3aCWb3PsAQs/hq1.jpg",
+      "sha256": "d0c0381676acfec3d002370fa0ed2feedbc0b35897c4a6fa0b69f56b68235359"
+    },
+    {
+      "file": "public/images/project-worlds/originals/jarvis-build.jpg",
+      "source": "https://img.youtube.com/vi/3aCWb3PsAQs/hq2.jpg",
+      "sha256": "55382d58e0e8154899986e9c2146872c7191a50507cf8bf0b0fbc63699431d78"
+    },
+    {
+      "file": "public/images/project-worlds/originals/jarvis-assembly.jpg",
+      "source": "https://img.youtube.com/vi/3aCWb3PsAQs/hq3.jpg",
+      "sha256": "73b4d3eacd003e25829d3f8f54f54680fed03f388cbdc02c75592600551bb0f2"
+    }
+  ],
+  "additionalSources": [
+    "public/images/project-worlds/surya-engraving.webp: original IMG_9295.JPG",
+    "public/images/project-worlds/surya-layers.webp: original IMG_9307.JPG"
+  ],
+  "limits": [
+    "Jarvis frames are 480 by 360 pixels including letterboxing; CSS removes the letterbox and camera travel is deliberately restrained.",
+    "Scroll animations move the camera across actual still imagery; they are not captures of moving hardware.",
+    "Earlier conceptual hero artwork remains explicitly labeled as generated illustration."
+  ]
+}
