@@ -1,0 +1,7 @@
+{
+  // Static site: the Helios V10 scroll assembly, served at 3d.adidesign.org
+  "name": "helios-3d",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public" },
+  "routes": [{ "pattern": "3d.adidesign.org", "custom_domain": true }]
+}

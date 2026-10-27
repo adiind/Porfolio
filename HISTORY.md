@@ -2,6 +2,8 @@
 
 ## Codex
 
+- 2026-10-27: Prepared the existing Helios V10 showcase for 3d.adidesign.org without changing HTML, model, or rendering. Connected the previously undeployed helios-3d Worker to the existing portfolio GitHub integration with a main-only scoped build trigger. JavaScript syntax, model integrity, desktop/phone rendering, overflow and replay checks passed; portfolio build and 31 tests passed. Production verification pending PR merge.
+
 - 2026-10-25: Replaced approximate generated prototype/process imagery with original Surya/Plotter photos and actual Jarvis video frames; added reversible scroll-controlled camera/detail sequences, direct step navigation, image enlargement, and complete static reduced-motion stories. Production build, scoped TypeScript and 12 tests passed; desktop/320/390/tablet/landscape, reverse travel, card entry, Close, Escape/focus return and browser errors checked. Sources and motion evidence in review/three-worlds-2026-10-25.
 - 2026-10-25: Simplified Sticker Studio to one artwork-first 14-project collection with a small identity/navigation bar, compact filters, collapsed Experience and contact links; removed duplicate hero stickers, slogans and marketing sections. Preserved stories, source assets, full-colour cutouts and silhouette targets; transferred drag to collection with padded rendering and explicit focus return. All project entries at 320/390/768/1440, max drag, real touch swipe, direct Experience/project links, keyboard/Back, reduced motion and static fallback passed; standalone/root builds and 31 tests passed; independent review cleared.
 
