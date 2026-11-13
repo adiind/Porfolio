@@ -615,7 +615,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     type: "corporate",
     subtype: 'role',
     start: "2020-06-01",
-    end: "2022-08-31",
+    end: "2022-09-30",
     summary: "Building ads analytics and supply infrastructure during Snapdeal's first-party transition.",
     bullets: [
       "Set up data pipelines to support Snapdeal's first-party product rollout",
