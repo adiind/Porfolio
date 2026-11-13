@@ -108,7 +108,7 @@ for title,sub,body in [
     right=para(sub,x,right,sw,8.2,10.6,MUTED)+4
     right=para(body,x,right,sw,9.1,12)+8
 right=label('EDUCATION',x,right+1,sw)
-for title,body in [('Northwestern University','MS Engineering Design Innovation<br/>2025–Present'),('BITS Pilani','MSc Biological Science<br/>BE Civil Engineering · 2016–2021')]:
+for title,body in [('Northwestern University','MS Engineering Design Innovation<br/>2025–Present'),('BITS Pilani','MSc Biological Science<br/>B.Tech Civil Engineering · 2016–2021')]:
     right=para(title,x,right,sw,9.4,12,font='Bold')+2
     right=para(body,x,right,sw,8.9,11.7)+9
 right=label('TOOLKIT',x,right+1,sw)
