@@ -117,6 +117,16 @@ export interface JournalEntry {
   projectId?: string;
 }
 
+export interface TinkerVerseReel {
+  id: string;
+  instagramUrl: string;
+  publishedAt: string;
+  caption: string;
+  posterUrl: string;
+  videoUrl: string;
+  alt: string;
+}
+
 export interface TimelineConfig {
   startDate: string;
   endDate: string;

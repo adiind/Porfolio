@@ -4,16 +4,21 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateJournalEntries } from './verify-instagram-data.mjs';
+import { validateJournalEntries, validateReelEntries } from './verify-instagram-data.mjs';
+import { collectArchiveReels, materializeReel, publishReels, selectReels } from './tinkerverse-reels.mjs';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_ROOT = path.resolve(SCRIPT_DIR, '..');
 const APIFY_URL = 'https://api.apify.com/v2/acts/apify~instagram-post-scraper/run-sync-get-dataset-items';
 
 function parseArguments(argv) {
-  const options = { root: DEFAULT_ROOT, fixturePath: null, failpoint: null };
+  const options = { root: DEFAULT_ROOT, fixturePath: null, failpoint: null, fromArchive: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
+    if (argument === '--from-archive') {
+      options.fromArchive = true;
+      continue;
+    }
     const value = argv[index + 1];
     if (!['--root', '--fixture', '--failpoint'].includes(argument)) {
       throw new Error(`Unknown argument: ${argument}`);
@@ -92,7 +97,7 @@ async function loadRawPosts(options) {
   const response = await fetch(APIFY_URL, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: ['tinker_verse'], resultsLimit: 12, resultsType: 'posts' }),
+    body: JSON.stringify({ username: ['tinker_verse'], resultsLimit: 30, resultsType: 'posts' }),
   });
   if (!response.ok) throw new Error(`Apify API error ${response.status}; last-known-good data was preserved.`);
   return response.json();
@@ -158,12 +163,44 @@ function publish(root, stageRoot, entries) {
   fs.renameSync(temporaryManifest, finalManifest);
 }
 
+function journalCandidates(rawPosts) {
+  const failures = [];
+  const posts = [];
+  rawPosts.forEach((post, index) => {
+    try {
+      posts.push(normalizePost(post, index));
+    } catch (error) {
+      failures.push(error instanceof Error ? error : new Error(String(error)));
+    }
+  });
+  if (posts.length === 0) {
+    throw failures[0] ?? new Error('Apify response was empty; last-known-good data was preserved.');
+  }
+  return posts
+    .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt))
+    .slice(0, 12);
+}
+
+async function stageReels(reels, stageRoot) {
+  if (reels.length === 0) return null;
+  const stageDirectory = path.join(stageRoot, 'public', 'media', 'tinkerverse', 'reels');
+  fs.mkdirSync(stageDirectory, { recursive: true });
+  const entries = [];
+  for (const reel of reels) {
+    entries.push(await materializeReel(reel, stageDirectory));
+  }
+  const errors = validateReelEntries(entries, { root: stageRoot });
+  if (errors.length) throw new Error(`Staged reel validation failed: ${errors.join(' | ')}`);
+  return entries;
+}
+
 export async function runJournalUpdate(options) {
   const rawPosts = await loadRawPosts(options);
   if (!Array.isArray(rawPosts) || rawPosts.length === 0) {
     throw new Error('Apify response was empty; last-known-good data was preserved.');
   }
-  const posts = rawPosts.map(normalizePost).sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt));
+  const posts = journalCandidates(rawPosts);
+  const reels = selectReels(rawPosts);
   const stageRoot = path.join(options.root, `.instagram-sync-stage-${process.pid}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`);
   const stageMediaDirectory = path.join(stageRoot, 'public', 'images', 'tinkerverse');
   const stageManifest = path.join(stageRoot, 'data', 'tinkerverse_journal.json');
@@ -187,9 +224,40 @@ export async function runJournalUpdate(options) {
     fs.writeFileSync(stageManifest, `${JSON.stringify(entries, null, 2)}\n`);
     const errors = validateJournalEntries(entries, { root: stageRoot });
     if (errors.length) throw new Error(`Staged journal validation failed: ${errors.join(' | ')}`);
+    const reelEntries = await stageReels(reels, stageRoot);
     if (options.failpoint === 'after-stage-validation') throw new Error('Simulated interrupted staging after validation.');
+    if (reelEntries) publishReels(options.root, stageRoot, reelEntries);
     publish(options.root, stageRoot, entries);
     return entries;
+  } finally {
+    fs.rmSync(stageRoot, { recursive: true, force: true });
+  }
+}
+
+export async function runArchiveReelSeed(options) {
+  const archivePath = path.join(options.root, 'data', 'instagram_posts.json');
+  const archive = JSON.parse(fs.readFileSync(archivePath, 'utf8'));
+  if (!Array.isArray(archive) || archive.length === 0) {
+    throw new Error('Stored Instagram archive is empty; reels manifest was preserved.');
+  }
+  const { reels, skippedVideoUrls } = await collectArchiveReels(archive, async (url) => {
+    const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+    return response.text();
+  });
+  for (const url of skippedVideoUrls) {
+    console.log(`Stored video post had no downloadable media and was skipped: ${url}`);
+  }
+  if (reels.length === 0) {
+    throw new Error('Stored archive has no downloadable videos; reels manifest was preserved.');
+  }
+  const stageRoot = path.join(options.root, `.instagram-sync-stage-${process.pid}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`);
+  try {
+    const reelEntries = await stageReels(reels, stageRoot);
+    if (!reelEntries) throw new Error('Stored archive has no downloadable videos; reels manifest was preserved.');
+    publishReels(options.root, stageRoot, reelEntries);
+    console.log(`Durable reels prepared: ${reelEntries.length}.`);
+    return reelEntries;
   } finally {
     fs.rmSync(stageRoot, { recursive: true, force: true });
   }
@@ -198,8 +266,14 @@ export async function runJournalUpdate(options) {
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isDirectRun) {
   try {
-    const entries = await runJournalUpdate(parseArguments(process.argv.slice(2)));
-    console.log(`Instagram journal updated atomically with ${entries.length} entries.`);
+    const options = parseArguments(process.argv.slice(2));
+    if (options.fromArchive) {
+      const reels = await runArchiveReelSeed(options);
+      console.log(`TinkerVerse reels updated from the stored archive with ${reels.length} videos.`);
+    } else {
+      const entries = await runJournalUpdate(options);
+      console.log(`Instagram journal updated atomically with ${entries.length} entries.`);
+    }
   } catch (error) {
     console.error(`Instagram journal update failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;

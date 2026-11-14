@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, ExternalLink, Play, X } from 'lucide-react';
 import { JournalEntry, SocialPost, TimelineItem } from '../types';
-import { TINKERVERSE_JOURNAL, TINKERVERSE_LOGO } from '../constants';
+import { TINKERVERSE_JOURNAL, TINKERVERSE_LOGO, TINKERVERSE_REELS } from '../constants';
 import { Project } from '../types/Project';
 import { useProjects } from '../context/ProjectsContext';
 import { useDialogA11y } from '../hooks/useDialogA11y';
@@ -11,6 +11,7 @@ import CuttingMatSurface from './ui/CuttingMatSurface';
 import GlassSurface from './ui/GlassSurface';
 import ProjectDetail from './ProjectDetail';
 import { useContentEngagement } from '../hooks/useContentEngagement';
+import TinkerVerseReels from './TinkerVerseReels';
 
 interface Props {
     item: TimelineItem;
@@ -196,6 +197,8 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
                                         </div>
                                     </GlassSurface>
                                 )}
+
+                                <TinkerVerseReels reels={TINKERVERSE_REELS} />
 
                                 <section aria-labelledby="tinkerverse-projects-title">
                                     <div className="mb-4">
