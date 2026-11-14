@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Zero, a second brain that talks back — Adi Agarwal</title>
+<script>if (matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("static")) document.documentElement.classList.add("no-motion");</script>
+<link rel="stylesheet" href="./zero.css?v=4">
+</head>
+<body>
+<a class="back" href="/" data-close><span aria-hidden="true">←</span> Portfolio</a>
+
+<nav class="rail" aria-label="Chapters">
+  <p class="rail-name"><span class="rail-face"><img src="./assets/persona-zero.webp" alt="" width="64" height="64"></span>Zero</p>
+  <div class="rail-body">
+    <div class="rail-bar" id="railBar" aria-hidden="true"><span class="rail-fill" id="railFill"></span><img class="rail-cap" id="railCap" src="./assets/art/capsule-v.webp" alt=""></div>
+    <ol id="railList">
+      <li><a href="#s-film" data-ch="s-film">One sentence</a></li>
+      <li><a href="#s-router" data-ch="s-router">Router</a></li>
+      <li><a href="#s-memory" data-ch="s-memory">Memory</a></li>
+      <li><a href="#s-voices" data-ch="s-voices">Voices</a></li>
+      <li><a href="#s-council" data-ch="s-council">Council</a></li>
+      <li><a href="#s-loop" data-ch="s-loop">Build loop</a></li>
+      <li><a href="#s-trust" data-ch="s-trust">Trust and cost</a></li>
+      <li><a href="#s-end" data-ch="s-end">What I learned</a></li>
+    </ol>
+  </div>
+</nav>
+<div class="prog" aria-hidden="true"><i></i></div>
+
+<main>
+
+<!-- 1–3 · Hero, the scattered apps, and one sentence followed through Zero -->
+<section class="scene" id="s-film" data-scene="film" style="--len:7.9" aria-labelledby="zeroTitle">
+  <div class="pin">
+    <div class="felt" aria-hidden="true"></div>
+
+    <div class="hero" id="hero">
+      <p class="eyebrow">Adi Agarwal · Personal product · Mar–Jul 2026</p>
+      <h1 id="zeroTitle">Zero. A second brain that talks back.</h1>
+      <p class="sum">My own AI assistant. It listens, remembers my people and projects, runs parts of my home, and turns bugs and ideas into tracked work. I was the product manager, the designer and the only engineer.</p>
+      <ul class="stats">
+        <li><b>95k</b>lines of Python</li>
+        <li><b>1,287</b>automated tests</li>
+        <li><b>10</b>workspaces</li>
+      </ul>
+      <dl class="meta">
+        <div><dt>My role</dt><dd>Product, design, and every line of code</dd></div>
+        <div><dt>Built with</dt><dd>Python, Gemini Live, SQLite, ChromaDB, Home Assistant</dd></div>
+      </dl>
+    </div>
+
+    <figure class="console" id="console">
+      <img src="./assets/console.webp" alt="Zero's real Operator Console: a dark green chat panel, tabs for Code, Tasks, Memory, Bugs and more, and a shelf of project books on the right." width="1200" height="740">
+      <figcaption>The real console · offline, so the transcript is empty</figcaption>
+    </figure>
+
+    <div class="apps" id="apps" aria-hidden="true">
+      <span>Calendar</span><span>Reminders</span><span>Obsidian notes</span><span>Canvas classes</span><span>Home Assistant</span><span>Code editor</span><span>Browser tabs</span><span>Spotify</span><span>Bug notes</span>
+    </div>
+    <p class="line" id="lineApps">My day lived in nine apps.<small>Every assistant I tried forgot me between chats. So I built one place that keeps the context.</small></p>
+
+    <div class="say" id="say">
+      <p class="say-label" id="sayLabel">Say it out loud</p>
+      <p class="say-text"><span id="sayType"></span><i class="caret" aria-hidden="true"></i></p>
+    </div>
+
+    <div class="pipe" id="pipe" aria-hidden="true">
+      <i class="pipe-base"></i><i class="pipe-lit"></i>
+      <div class="pipe-st" style="--at:6%"><span class="plate">1 · Heard</span><i class="pipe-glow"></i><img src="./assets/art/station.webp" alt=""></div>
+      <div class="pipe-st" style="--at:35%"><span class="plate">2 · Sorted</span><i class="pipe-glow"></i><img src="./assets/art/station.webp" alt=""></div>
+      <div class="pipe-st" style="--at:65%"><span class="plate">3 · Remembered</span><i class="pipe-glow"></i><img src="./assets/art/station.webp" alt=""></div>
+      <div class="pipe-st" style="--at:94%"><span class="plate">4 · Done</span><i class="pipe-glow"></i><img src="./assets/art/station.webp" alt=""></div>
+      <img class="capsule" src="./assets/art/capsule.webp" alt="">
+    </div>
+
+    <div class="station" data-i="0">
+      <div class="st-art st-heard">
+        <img src="./assets/persona-zero.webp" alt="" width="96" height="96">
+        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <small>Step 1 · Voice</small>
+      <h2>Heard, while my hands were busy.</h2>
+      <p>Gemini Live streams my voice both ways. I can talk over Zero to interrupt it, or hold a key so it only listens when I mean it.</p>
+    </div>
+    <div class="station" data-i="1">
+      <div class="st-art st-sorted" aria-hidden="true">
+        <span class="plate">Chat</span><span class="plate on">Quick task · home</span><span class="plate">Code</span><span class="plate">Research</span><span class="plate">Judgment</span><span class="plate">Vision</span>
+      </div>
+      <small>Step 2 · Router</small>
+      <h2>Sorted before any big model thinks.</h2>
+      <p>This is a quick home task, not a conversation. A router picks one of six lanes first, so simple things stay fast, cheap and predictable.</p>
+    </div>
+    <div class="station" data-i="2">
+      <div class="st-art st-remem" aria-hidden="true">
+        <span><b>"bedroom"</b> → bedroom temperature sensor</span>
+        <span><b>"fan"</b> → bedroom fan switch</span>
+      </div>
+      <small>Step 3 · Memory</small>
+      <h2>Remembered what my words mean.</h2>
+      <p>Zero keeps the nicknames I use for rooms and devices, so "the fan" lands on the right switch without me naming it.</p>
+    </div>
+    <div class="station" data-i="3">
+      <div class="st-art st-fan" aria-hidden="true">
+        <div class="fan"><img class="fan-body" src="./assets/art/fan-body.webp" alt="" width="419" height="640"><img class="fan-blades" id="fanBlades" src="./assets/art/fan-blades.webp" alt="" width="639" height="640"></div>
+        <div class="st-done">
+          <p><b>Watching</b> bedroom temperature</p>
+          <p class="temp"><b id="fanTemp">21°</b><span id="fanState">fan on</span></p>
+          <p class="dim">below 18° → fan off · no AI call needed</p>
+        </div>
+      </div>
+      <small>Step 4 · Action</small>
+      <h2>Done, and it keeps watching.</h2>
+      <p>Zero saves a monitor. From then on it checks the sensor itself and switches the fan off, with no AI call each time.</p>
+    </div>
+
+    <div class="outro" id="lineEnd">
+      <p class="outro-h">Four steps on the surface. Six parts underneath.<small>I designed and built every one. Here is how each part works, and why I made it that way.</small></p>
+      <div class="parts" id="parts">
+        <a href="#s-router"><img src="./assets/art/tube.webp" alt="" width="375" height="900"><span class="plate">01 · Router</span></a>
+        <a href="#s-memory"><img src="./assets/art/drawer.webp" alt="" width="800" height="476"><span class="plate">02 · Memory</span></a>
+        <a href="#s-voices"><img src="./assets/art/mic.webp" alt="" width="400" height="800"><span class="plate">03 · Voices</span></a>
+        <a href="#s-council"><img src="./assets/art/gavel.webp" alt="" width="640" height="407"><span class="plate">04 · Council</span></a>
+        <a href="#s-loop"><img src="./assets/art/beetle.webp" alt="" width="548" height="640"><span class="plate">05 · Build loop</span></a>
+        <a href="#s-trust"><img src="./assets/art/padlock.webp" alt="" width="419" height="640"><span class="plate">06 · Trust</span></a>
+      </div>
+    </div>
+    <p class="note" id="filmNote">Illustration of a real flow · device names simplified</p>
+    <button type="button" class="more" id="more" aria-label="Scroll to the next part"><span>Keep scrolling</span> <b aria-hidden="true">↓</b></button>
+  </div>
+</section>
+
+<!-- 4 · Router: the sorting desk -->
+<section class="scene" id="s-router" data-scene="router" style="--len:4.4" aria-labelledby="routerTitle">
+  <div class="pin">
+    <div class="copy">
+      <small>01 · Router</small>
+      <h2 id="routerTitle">Sort first. Think second.</h2>
+      <p class="lede">Before any request reaches a big model, a small one drops it into one of six lanes.</p>
+      <ol class="steps">
+        <li><b>A request comes in.</b><span>Typed or spoken, it becomes one line of text.</span></li>
+        <li><b>A small model stamps it.</b><span>It answers four things: which lane, how sure it is, why, and which tools are needed.</span></li>
+        <li><b>The lane picks the worker.</b><span>A lamp switch never waits on a big model. Code goes to a coding model. Research runs in the background.</span></li>
+        <li><b>No model? Keywords take over.</b><span>If the small model is down, a plain keyword list fills the same six lanes. Rougher guesses, but nothing breaks.</span></li>
+      </ol>
+      <p class="why"><b>Why I built it:</b> sending everything to the biggest model was slow and costly. Lanes make common requests take the same path every time.</p>
+      <button type="button" class="chip-btn" id="failBtn" aria-pressed="false">Simulate the model going down</button>
+    </div>
+    <div class="stage rt" id="rt">
+      <div class="rt-rack">
+        <div class="rt-tube"><p class="rt-got"></p><i class="rt-glow"></i><img src="./assets/art/tube.webp" alt="" width="375" height="900"><b class="plate on">Chat</b><span>live voice chat</span></div>
+        <div class="rt-tube"><p class="rt-got"></p><i class="rt-glow"></i><img src="./assets/art/tube.webp" alt="" width="375" height="900"><b class="plate on">Quick task</b><span>lights, todos, people</span></div>
+        <div class="rt-tube"><p class="rt-got"></p><i class="rt-glow"></i><img src="./assets/art/tube.webp" alt="" width="375" height="900"><b class="plate on">Code</b><span>a coding model</span></div>
+        <div class="rt-tube"><p class="rt-got"></p><i class="rt-glow"></i><img src="./assets/art/tube.webp" alt="" width="375" height="900"><b class="plate on">Research</b><span>runs in the background</span></div>
+        <div class="rt-tube"><p class="rt-got"></p><i class="rt-glow"></i><img src="./assets/art/tube.webp" alt="" width="375" height="900"><b class="plate on">Judgment</b><span>a careful answer</span></div>
+        <div class="rt-tube"><p class="rt-got"></p><i class="rt-glow"></i><img src="./assets/art/tube.webp" alt="" width="375" height="900"><b class="plate on">Vision</b><span>looks at the image</span></div>
+      </div>
+      <i class="at rt-desk" aria-hidden="true"></i>
+      <div class="mv rt-slip" data-to="1" data-why="asks to switch a device" data-tools="home"><p><mark>Turn on</mark> the desk lamp</p><em></em></div>
+      <div class="mv rt-slip" data-to="2" data-why="asks for a code change" data-tools="coding agent"><p><mark>Fix</mark> the chat header spacing</p><em></em></div>
+      <div class="mv rt-slip" data-to="3" data-why="long reading job" data-tools="web research"><p><mark>Research</mark> e-ink screens overnight</p><em></em></div>
+      <div class="mv rt-slip" data-to="5" data-why="there is an image to read" data-tools="vision"><p>What's in this <mark>screenshot</mark>?</p><em></em></div>
+      <div class="mv rt-slip" data-to="0" data-why="open-ended, so talk" data-tools="none"><p>How do I start my week?</p><em></em></div>
+      <div class="mv rt-slip" data-to="4" data-why="asks for a decision" data-tools="none"><p><mark>Should I</mark> ship this today?</p><em></em></div>
+      <img class="mv rt-stamp" src="./assets/art/stamp.webp" alt="" width="546" height="640">
+      <img class="mv rt-mag" src="./assets/art/magnifier.webp" alt="" width="640" height="435">
+      <dl class="at rt-ticket" id="rtTicket" aria-hidden="true">
+        <small>What the stamp says</small>
+        <div><dt>Lane</dt><dd id="rtLane">Quick task</dd></div>
+        <div><dt>How sure</dt><dd>high</dd></div>
+        <div><dt>Why</dt><dd id="rtWhy">asks to switch a device</dd></div>
+        <div><dt>Tools</dt><dd id="rtTools">home</dd></div>
+      </dl>
+      <p class="at rt-down" id="rtDown">Small model unreachable. Reading for keywords.</p>
+    </div>
+    <p class="note">Example requests. The six lanes, the four answers and the keyword backup are how Zero's router works.</p>
+  </div>
+</section>
+
+<!-- 5 · Memory: three drawers and one desk -->
+<section class="scene" id="s-memory" data-scene="memory" style="--len:4.6" aria-labelledby="memoryTitle">
+  <div class="pin">
+    <div class="copy">
+      <small>02 · Memory</small>
+      <h2 id="memoryTitle">Three drawers and one desk.</h2>
+      <p class="lede">One long chat log is slow to search and easy to get wrong. Zero files each kind of thing where it belongs.</p>
+      <ol class="steps">
+        <li><b>File it by kind.</b><span>A preference, a hard fact and a loose note each go to a different drawer, built for how it will be found later.</span></li>
+        <li><b>Pull only what this moment needs.</b><span>For each reply Zero lays out one briefing page, capped at 28,000 characters. The project in focus gets full detail; every other project gets one line.</span></li>
+        <li><b>Write back what changed.</b><span>When a session ends, Zero reads it back and adds the new todos, decisions and open questions to the project.</span></li>
+      </ol>
+      <p class="why"><b>Why three:</b> facts I must be able to check live in a database. Fuzzy things I only half remember are found by meaning.</p>
+    </div>
+    <div class="stage mm" id="mm">
+      <figure class="at mm-drawer" data-k="0"><img src="./assets/art/drawer.webp" alt="" width="800" height="476"><b>Instant</b></figure>
+      <figure class="at mm-drawer" data-k="1"><img src="./assets/art/drawer.webp" alt="" width="800" height="476"><b>Facts</b></figure>
+      <figure class="at mm-drawer" data-k="2"><img src="./assets/art/drawer.webp" alt="" width="800" height="476"><b>Meaning</b></figure>
+      <p class="at mm-cap" data-k="0"><b>Instant</b>Preferences and nicknames. One small file, read in under a tenth of a second.</p>
+      <p class="at mm-cap" data-k="1"><b>Facts</b>Projects, deadlines, people, bugs. Rows in a database, so every fact can be checked.</p>
+      <p class="at mm-cap" data-k="2"><b>Meaning</b>Old chats, saved pages and notes, stored by what they mean. Search works without the exact words.</p>
+      <i class="at mm-from" data-k="0"></i><i class="at mm-from" data-k="1"></i><i class="at mm-from" data-k="2"></i>
+      <div class="at mm-desk" id="mmDesk">
+        <img class="mm-blotter" src="./assets/art/blotter.webp" alt="" width="1100" height="724">
+        <i class="mm-pool"></i>
+      </div>
+      <img class="at mm-lamp" src="./assets/art/lamp.webp" alt="" width="662" height="700">
+      <i class="at mm-slot" data-k="0"></i><i class="at mm-slot" data-k="1"></i><i class="at mm-slot" data-k="2"></i><i class="at mm-slot" data-k="3"></i>
+      <p class="at mm-ask" id="mmAsk">"What should I do on my thesis tonight?"</p>
+      <div class="mv paper mm-in" data-k="0">"Keep your answers short."</div>
+      <div class="mv paper mm-in" data-k="1">"My thesis draft is due Friday."</div>
+      <div class="mv paper mm-in" data-k="2">"Note: the methods section needs sources."</div>
+      <div class="mv paper mm-out" data-k="0"><small>from Instant</small>Keep answers short</div>
+      <div class="mv paper mm-out" data-k="1"><small>from Facts</small>Thesis draft · due Friday</div>
+      <div class="mv paper mm-out" data-k="2"><small>from Meaning</small>Methods section needs sources</div>
+      <div class="mv paper mm-back" id="mmBack"><small>new todo</small>Add sources to methods</div>
+      <img class="mv mm-pen" id="mmPen" src="./assets/art/pen.webp" alt="" width="640" height="422">
+      <div class="at mm-meter" id="mmMeter"><span class="mm-ruler"><img src="./assets/art/ruler.webp" alt=""><img id="mmFill" src="./assets/art/ruler.webp" alt=""></span><p>Briefing page · capped at 28,000 characters</p></div>
+    </div>
+    <p class="note">Example cards. The three stores, the 28,000-character cap and the write-back are real.</p>
+  </div>
+</section>
+
+<!-- 6 · Voices: one brain, four voices -->
+<section class="scene" id="s-voices" data-scene="voices" style="--len:3.4" aria-labelledby="voicesTitle">
+  <div class="pin">
+    <div class="copy">
+      <small>03 · Voices</small>
+      <h2 id="voicesTitle">Four voices. One brain.</h2>
+      <p class="lede">Some moments need a quick answer, some need warmth. I can switch who Zero sounds like in the middle of a conversation.</p>
+      <ol class="steps">
+        <li><b>A voice is two settings.</b><span>A spoken voice from Gemini Live, and a short note on manner. That is the whole persona.</span></li>
+        <li><b>Turning the dial swaps only those two.</b><span>Same question, four very different replies.</span></li>
+        <li><b>Everything else stays put.</b><span>Memory, tools and the router do not change, so no voice ever forgets me.</span></li>
+      </ol>
+      <div class="pick" role="group" aria-label="Pick a voice">
+        <button type="button" data-v="0" aria-pressed="true">Zero</button><button type="button" data-v="1" aria-pressed="false">Ember</button><button type="button" data-v="2" aria-pressed="false">Pip</button><button type="button" data-v="3" aria-pressed="false">Muse</button>
+      </div>
+    </div>
+    <div class="stage vc" id="vc">
+      <div class="vc-wires" id="vcWires" aria-hidden="true"><i class="vc-cord"></i><i class="vc-cord"></i><i class="vc-cord"></i><i class="vc-cord"></i></div>
+      <figure class="at vc-face" data-v="0"><img src="./assets/persona-zero.webp" alt="Zero's portrait: a detective with a hat and magnifying glass." width="480" height="480"><figcaption><b>Zero</b>Snappy strategist</figcaption></figure>
+      <figure class="at vc-face" data-v="1"><img src="./assets/persona-ember.webp" alt="Ember's portrait: a woman with long dark hair and a black blazer." width="480" height="480"><figcaption><b>Ember</b>Warm and caring</figcaption></figure>
+      <figure class="at vc-face" data-v="2"><img src="./assets/persona-pip.webp" alt="Pip's portrait." width="480" height="480"><figcaption><b>Pip</b>Ultra-succinct</figcaption></figure>
+      <figure class="at vc-face" data-v="3"><img src="./assets/persona-muse.webp" alt="Muse's portrait." width="480" height="480"><figcaption><b>Muse</b>Creative thinker</figcaption></figure>
+      <img class="at vc-mic" src="./assets/art/mic.webp" alt="" width="400" height="800">
+      <div class="at vc-wave wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <img class="at vc-dial" id="vcDial" src="./assets/art/dial.webp" alt="" width="631" height="640">
+      <div class="at paper vc-recipe" aria-live="polite">
+        <small>The whole persona</small>
+        <p><b>Voice</b><span id="vcVoice">Charon</span></p>
+        <p><b>Manner</b><span id="vcManner"></span></p>
+      </div>
+      <ul class="at vc-same" id="vcSame"><li class="plate">Same memory</li><li class="plate">Same tools</li><li class="plate">Same router</li></ul>
+      <div class="at vc-bubble" aria-live="polite"><small>Sample reply to "I'm behind on my thesis"</small><p id="vcText"></p></div>
+    </div>
+    <p class="note">Sample replies show each manner. The voices and the four personas are Zero's real ones.</p>
+  </div>
+</section>
+
+<!-- 7 · Council: the round table -->
+<section class="scene" id="s-council" data-scene="council" style="--len:4.4" aria-labelledby="councilTitle">
+  <div class="pin">
+    <div class="copy">
+      <small>04 · Council</small>
+      <h2 id="councilTitle">When one answer isn't enough, three models argue.</h2>
+      <ol class="steps">
+        <li><b>Ask, with the notes attached.</b><span>The question goes on the table together with the project's context, so nobody argues from nothing.</span></li>
+        <li><b>Three seats answer at the same time.</b><span>The Skeptic hunts for what could fail. The Architect thinks about structure. The Shipper wants the smallest next step.</span></li>
+        <li><b>A fourth, the Judge, rules.</b><span>It reads all three and writes one clear ruling with ordered next steps.</span></li>
+        <li><b>The ruling becomes work.</b><span>One click turns it into a task, a decision, a note or a bug.</span></li>
+      </ol>
+      <p class="why"><b>Why seats:</b> a single answer hides the disagreement. Three opposed roles put the risk, the structure and the shortcut side by side before I decide.</p>
+    </div>
+    <div class="stage cn" id="cn">
+      <img class="at cn-table" src="./assets/art/table.webp" alt="" width="893" height="900">
+      <div class="at paper cn-ctx" id="cnCtx">+ project notes attached</div>
+      <div class="at paper cn-q" id="cnQ">"Should Zero add things to my calendar without asking?"</div>
+      <figure class="at cn-seat" data-s="0"><img src="./assets/art/magnifier.webp" alt="" width="640" height="435"><figcaption><b>The Skeptic</b>finds what could fail</figcaption></figure>
+      <figure class="at cn-seat" data-s="1"><img src="./assets/art/compass.webp" alt="" width="342" height="640"><figcaption><b>The Architect</b>thinks in systems</figcaption></figure>
+      <figure class="at cn-seat" data-s="2"><img src="./assets/art/watch.webp" alt="" width="457" height="640"><figcaption><b>The Shipper</b>wants the smallest step</figcaption></figure>
+      <p class="at paper cn-say" data-s="0">One wrong guess and my real calendar is wrong. I won't notice until I miss something.</p>
+      <p class="at paper cn-say" data-s="1">Keep a draft layer between Zero and the calendar. Every write goes through one place.</p>
+      <p class="at paper cn-say" data-s="2">Show a draft with a Confirm button. Ship that today, automate later.</p>
+      <i class="at cn-flash" id="cnFlash"></i>
+      <div class="at paper cn-verdict" id="cnVerdict"><small>The Judge rules</small><p>Draft first. Write only after I confirm.</p></div>
+      <img class="at cn-seal" id="cnSeal" src="./assets/art/seal.webp" alt="" width="627" height="640">
+      <figure class="at cn-judge" id="cnJudge"><img id="cnGavel" src="./assets/art/gavel.webp" alt="" width="640" height="407"><figcaption><b>The Judge</b>reads all three</figcaption></figure>
+      <ul class="at cn-out" id="cnOut"><li class="plate on">Task</li><li class="plate">Decision</li><li class="plate">Note</li><li class="plate">Bug</li></ul>
+    </div>
+    <p class="note">Debate lines show the format. The draft-first rule is how Zero's calendar and reminders really work.</p>
+  </div>
+</section>
+
+<!-- 8 · Build loop: the bug under glass -->
+<section class="scene" id="s-loop" data-scene="loop" style="--len:4.4" aria-labelledby="loopTitle">
+  <div class="pin">
+    <div class="copy">
+      <small>05 · Build loop</small>
+      <h2 id="loopTitle">Zero helps build Zero.</h2>
+      <p class="lede">My own daily use is the backlog. Every complaint goes round the same loop.</p>
+      <ol class="steps">
+        <li><b>It breaks.</b><span>I say "save this as a bug" without leaving what I was doing.</span></li>
+        <li><b>Pinned, with evidence.</b><span>Zero attaches the exact error, the tool call and the conversation. The same bug twice merges into one card.</span></li>
+        <li><b>Handed off.</b><span>From the same screen I pass the card to a coding agent, with all of that attached.</span></li>
+        <li><b>Reviewed and sealed.</b><span>I read what changed, the tests run, and only then is the bug closed.</span></li>
+      </ol>
+      <p class="why"><b>The product thinking:</b> bugs, ideas and decisions live in one database, not in my head.</p>
+    </div>
+    <div class="stage bl" id="bl">
+      <div class="at bl-ring" id="blRing" aria-hidden="true"><img src="./assets/art/hoop.webp" alt=""><img class="lit" id="blLit" src="./assets/art/hoop.webp" alt=""></div>
+      <p class="mv bl-lab plate" data-l="0"><b>1 · It breaks</b></p>
+      <p class="mv bl-lab plate" data-l="1"><b>2 · Pinned</b></p>
+      <p class="mv bl-lab plate" data-l="2"><b>3 · Handed off</b></p>
+      <p class="mv bl-lab plate" data-l="3"><b>4 · Sealed</b></p>
+      <img class="mv bl-gear" data-g="0" src="./assets/art/gear.webp" alt="" width="635" height="640">
+      <img class="mv bl-gear" data-g="1" src="./assets/art/gear.webp" alt="" width="635" height="640">
+      <div class="mv paper bl-ev" data-e="0">the exact error</div>
+      <div class="mv paper bl-ev" data-e="1">the tool call</div>
+      <div class="mv paper bl-ev" data-e="2">the conversation</div>
+      <div class="mv paper bl-card" id="blCard"><small>Bug</small>Voice cuts out after a long reply<em id="blFix">fix attached</em></div>
+      <img class="mv bl-beetle" id="blBeetle" src="./assets/art/beetle.webp" alt="" width="548" height="640">
+      <img class="mv bl-seal" id="blSeal" src="./assets/art/seal.webp" alt="" width="627" height="640">
+      <div class="at bl-count"><div class="bezel"><img src="./assets/art/bezel.webp" alt=""><div class="odo" id="odo" aria-label="1,287"><span><i></i></span><b>,</b><span><i></i></span><span><i></i></span><span><i></i></span></div></div><p>automated tests guard each change</p></div>
+    </div>
+    <p class="note">Example bug. The evidence links, the merge of repeats and the test count are real.</p>
+  </div>
+</section>
+
+<!-- 9 · Trust and cost: five rules, five small machines -->
+<section class="scene" id="s-trust" data-scene="trust" style="--len:5" aria-labelledby="trustTitle">
+  <div class="pin">
+    <div class="copy">
+      <small>06 · Trust and cost</small>
+      <h2 id="trustTitle">An assistant you can leave running.</h2>
+      <p class="lede">Zero touches my calendar, my home and my code. What it may do on its own was a product decision each time.</p>
+      <ol class="steps">
+        <li><b>Asks before it writes.</b><span>Calendar and reminder changes start as a draft. Nothing is saved until I confirm.</span></li>
+        <li><b>Data stays home.</b><span>The databases, the memory and the notes live on my own machine.</span></li>
+        <li><b>Locked outside the house.</b><span>Inside my home network plain addresses are fine. Anything outside must use https, or Zero refuses the connection.</span></li>
+        <li><b>No secrets in the logs.</b><span>Keys and tokens are blacked out before a line is written.</span></li>
+        <li><b>Every session has a price tag.</b><span>A usage view estimates what each session cost and counts every tool call.</span></li>
+      </ol>
+    </div>
+    <div class="stage tr" id="tr">
+      <div class="tr-v" data-t="0">
+        <img class="at tr-blotter" src="./assets/art/blotter.webp" alt="" width="1100" height="724">
+        <div class="at paper tr-draft"><small id="trState">Draft</small>Dentist<br>Tue, 3:00 pm</div>
+        <span class="at tr-confirm plate" id="trConfirm">Confirm</span>
+        <img class="mv tr-pen" id="trPen" src="./assets/art/pen.webp" alt="" width="640" height="422">
+      </div>
+      <div class="tr-v" data-t="1">
+        <img class="at tr-box open" src="./assets/art/strongbox-open.webp" alt="" width="900" height="808">
+        <div class="mv paper tr-file" data-f="0">Databases</div>
+        <div class="mv paper tr-file" data-f="1">Memory</div>
+        <div class="mv paper tr-file" data-f="2">Notes</div>
+        <img class="at tr-box shut" src="./assets/art/strongbox.webp" alt="" width="900" height="596">
+        <p class="at tr-tagline">On my machine. Not in someone else's cloud.</p>
+      </div>
+      <div class="tr-v" data-t="2">
+        <div class="at paper tr-url" data-u="0"><small>inside my home network</small>http://192.168.1.20</div>
+        <span class="at tr-ok" data-u="0">allowed</span>
+        <div class="at paper tr-url" data-u="1"><small>outside</small>http<i id="trS">s</i>://zero.example.com</div>
+        <span class="at tr-ok" data-u="1" id="trOk1">refused</span>
+        <img class="mv tr-lock" id="trLock" src="./assets/art/padlock.webp" alt="" width="419" height="640">
+        <img class="mv tr-key" id="trKey" src="./assets/art/key.webp" alt="" width="640" height="231">
+      </div>
+      <div class="tr-v" data-t="3">
+        <div class="at paper tr-log">
+          <small>log</small>
+          <p>10:42 calendar draft created</p>
+          <p>10:42 token = <span class="tr-secret"><u>9f3a-77c2-41e0</u><i id="trInk"></i></span></p>
+          <p>10:43 fan switched off</p>
+        </div>
+        <img class="mv tr-stamp" id="trStamp" src="./assets/art/stamp.webp" alt="" width="546" height="640">
+      </div>
+      <div class="tr-v" data-t="4">
+        <div class="at tr-tag" id="trTag"><img src="./assets/art/tag.webp" alt="" width="305" height="640"><p><small>this session</small><b>≈ $0.12</b><span>14 tool calls</span></p></div>
+        <ul class="at tr-rows"><li>estimated cost per session</li><li>every tool call counted</li><li>a confidence label on each estimate</li></ul>
+      </div>
+    </div>
+    <p class="note">Example values. The five rules are how Zero is built.</p>
+  </div>
+</section>
+
+<!-- End -->
+<section class="end" id="s-end" aria-labelledby="endTitle">
+  <div class="end-in">
+    <small>What I learned</small>
+    <h2 id="endTitle">The hard part isn't another model call.</h2>
+    <p class="big">It is deciding what the assistant should do on its own, what it should confirm, and what it should keep visible. Zero made me think like the designer, the engineer and the product owner at once.</p>
+    <figure class="console-end"><img src="./assets/console.webp" alt="Zero's real Operator Console." width="1200" height="740" loading="lazy"></figure>
+    <h3>Decisions and tradeoffs</h3>
+    <div class="dec">
+      <article><b>An experiment, not a product demo</b><p>It shows how I think through fuzzy AI problems: what to automate, what to confirm, what to show.</p><span>Tradeoff: some parts are deeper than others.</span></article>
+      <article><b>A router before model calls</b><p>Clear requests take a fixed, fast path. The model only handles the open-ended ones.</p><span>Tradeoff: the routing rules need upkeep when a request mixes intents.</span></article>
+      <article><b>Four memory stores instead of one chat log</b><p>Hard facts stay checkable in SQL; meaning search finds the rest.</p><span>Tradeoff: more moving parts to keep in sync.</span></article>
+    </div>
+    <p class="next"><b>What I'd do next:</b> give people clearer controls over what Zero remembers about them, and tighten the story so it never reads as a pile of features.</p>
+    <a class="back-end" href="/" data-close>← Back to portfolio</a>
+  </div>
+</section>
+
+</main>
+<script src="./parts.js?v=4"></script>
+<script src="./zero.js?v=4"></script>
+</body>
+</html>
