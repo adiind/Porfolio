@@ -1,6 +1,6 @@
 # 2026 resume
 
-September 30 leadership update: Added user-confirmed Camp EDI Camp Lead and Bambu Lab ambassadorship under Leadership & Prototyping, replacing the Snapdeal award while retaining TEDx Stage Design Head and ASEAN Top 10. Camp workshop scope is grounded in `Camp EDI/Camp Calendar/README.md` and its workshop record; Bambu's School Ambassador naming, lab upgrades and training scope are recorded in `Documents/Bambu/data/dashboard.json`. Used 2026 for Camp and no unverified ambassador start date or participant count. Kept font sizes unchanged and adjusted spacing; the local one-page PDF passed visual and two-parser review. Not published.
+September 30 leadership update: Added user-confirmed Camp EDI Camp Lead and Bambu Lab ambassadorship under Leadership & Prototyping, replacing the Snapdeal award while retaining TEDx Stage Design Head and Top 10. Camp workshop scope is grounded in `Camp EDI/Camp Calendar/README.md` and its workshop record; Bambu's School Ambassador naming, lab upgrades and training scope are recorded in `Documents/Bambu/data/dashboard.json`. Used 2026 for Camp and no unverified ambassador start date or participant count. Kept font sizes unchanged and adjusted spacing; the local one-page PDF passed visual and two-parser review. Not published.
 
 The public download is `public/Adi_Agarwal_Resume_2026.pdf`. Its editable content is in `data/resume-2026.json`; `scripts/build-resume.py` generates the PDF with ReportLab and Arial fonts. Set `RESUME_FONT_DIR` if the Arial TTF files are elsewhere.
 
@@ -28,7 +28,7 @@ After editing, check that the PDF remains one page and inspect a rendered page b
 - The user corrected the existing portfolio record: Squad Up was developed WITH McDonald's as a project partner. The earlier "not affiliated" claim was wrong. Partnership and product implementation are separate facts; describe the designed/prototyped experience without asserting a launch or definite non-launch.
 - The user clarified FamilySync as an agentic payments service for caregivers. All three academic partner projects should communicate human-centered research, synthesis, design, and prototyping, not merely interface features.
 - P&G is given two substantive bullets covering the verified five-person team, 8 in-home and 16 central-site visits, research synthesis, requirements, concepts, prototyping, and iterative testing. General methods are supported by the prior resume and portfolio; no confidential solution or novel consumer insight is disclosed. P&G uses 2025 instead of the old ongoing date; Northwestern retains the resume's 2025-Present rather than inferring a graduation date from the site's older timeline.
-- Existing employment dates and metrics come from the prior resume; the Edge AI award uses the portfolio's corrected ASEAN-wide wording.
+- Existing employment dates and metrics come from the prior resume; the Edge AI award uses the portfolio's corrected wording (IoT & Edge AI Project Challenge 2024, open across India and ASEAN).
 
 ## ATS compatibility
 

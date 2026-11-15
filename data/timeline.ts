@@ -353,7 +353,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     id: "jarvis-competition",
     lane: 2,
     title: "Jarvis Assistant",
-    company: "Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge",
+    company: "Top 10 Finalist · IoT & Edge AI Project Challenge 2024 (India and ASEAN)",
     companyUrl: "https://circuitdigest.com/tags/iot-and-edge-ai-electronics-design-contest-2024",
     headline: "Voice-controlled AI home assistant built from scratch.",
     type: "competition",
@@ -362,7 +362,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     end: "2024-11-30",
     summary: "Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT.",
     bullets: [
-      "Selected among the Top 10 projects in an Edge AI & IoT challenge open across ASEAN countries, hosted by Circuit Digest and DigiKey.",
+      "Selected among the Top 10 projects in the IoT & Edge AI Project Challenge 2024, open across India and ASEAN countries and hosted by Circuit Digest and DigiKey.",
       "Integrated Voice Recognition, Motion Detection, and Home Assistant via MQTT.",
       "Designed custom 3D-printed enclosure and open-sourced the library."
     ],
@@ -381,7 +381,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       { label: "GitHub", url: "https://github.com/adiind/diy-jarvis" },
       { label: "Circuit Digest", url: "https://circuitdigest.com/microcontroller-projects/voice-controlled-smart-home-assistant" }
     ],
-    extendedDescription: `Jarvis is an open-source, voice-controlled smart home assistant that integrates IoT and AI technologies to deliver a seamless and interactive smart home experience. Developed for an Edge AI & IoT Challenge open across ASEAN countries and hosted by Circuit Digest and DigiKey, the project was selected as one of the challenge's Top 10 finalists and received praise for its innovative approach and detailed video demonstration.
+    extendedDescription: `Jarvis is an open-source, voice-controlled smart home assistant that integrates IoT and AI technologies to deliver a seamless and interactive smart home experience. Developed for the IoT & Edge AI Project Challenge 2024, open across India and ASEAN countries and hosted by Circuit Digest and DigiKey, the project was selected as one of the challenge's Top 10 finalists and received praise for its innovative approach and detailed video demonstration.
 
 The assistant leverages voice recognition, motion detection, and MQTT communication to interact with Home Assistant, allowing precise control of smart devices. With dynamic visual feedback, advanced voice commands, and a modular design, Jarvis bridges the gap between smart home technology and user accessibility. Its open-source nature invites experimentation and customization, empowering smart home enthusiasts to tailor it to their specific needs. Balancing affordability with advanced functionality, Jarvis exemplifies a scalable and adaptable solution in the smart home space.
 

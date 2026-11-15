@@ -303,7 +303,7 @@ const TimelineEvent: React.FC<Props> = ({
         className={`flex flex-col items-center justify-center gap-2 rounded-l-md border-y border-l p-1 text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/80 ${isCompetition ? 'bg-purple-900 border-purple-400/40 hover:bg-purple-800' : 'bg-teal-900 border-teal-400/40 hover:bg-teal-800'}`}
       >
         {isCompetition ? <Trophy size={20} /> : <Flower size={20} />}
-        <span className="text-[9px] font-bold text-center leading-tight uppercase tracking-wider">{isCompetition ? 'ASEAN Top 10' : 'Project'}</span>
+        <span className="text-[9px] font-bold text-center leading-tight uppercase tracking-wider">{isCompetition ? 'Top 10' : 'Project'}</span>
       </motion.button>
     );
   }
