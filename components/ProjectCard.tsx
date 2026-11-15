@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { ChevronDown, Trophy } from 'lucide-react';
 import { Project } from '../types/Project';
+import JarvisRecognition from './jarvis/JarvisRecognition';
 
 interface Props {
     project: Project;
@@ -119,6 +120,7 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
 
     const colors = colorMap[project.themeColor || 'amber'];
     const hasImage = !!project.heroImage;
+    const isJarvis = project.id === 'jarvis';
 
     const statusLabels: Record<string, string> = {
         'shipped': 'Shipped',
@@ -213,21 +215,21 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
                     </div>
                 )}
 
-                {/* Status Badge (Top Right) */}
-                <div className="absolute top-3 right-3 z-20">
+                {/* Status Badge (Top Right). Jarvis uses the contest plate instead. */}
+                {!isJarvis && <div className="absolute top-3 right-3 z-20">
                     <span
                         className={`inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${colors.status}`}
                     >
                         <Trophy size={10} />
                         {statusLabel}
                     </span>
-                </div>
+                </div>}
 
                 {/* Title and preview stay mounted, so first and repeat hover use the
                     same geometry. Neither participates in the card's height. */}
                 <motion.div
                     initial={false}
-                    animate={{ y: isHovered ? 40 : 140 }}
+                    animate={{ y: isHovered ? (isJarvis ? 68 : 40) : 140 }}
                     transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-x-4 top-0 z-10"
                 >
@@ -247,7 +249,7 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
                     initial={false}
                     animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 8 }}
                     transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-                    className="pointer-events-none absolute inset-x-4 top-[82px] z-10"
+                    className={`pointer-events-none absolute inset-x-4 z-10 ${isJarvis ? 'top-[116px]' : 'top-[82px]'}`}
                 >
                     <p className="text-sm text-white/70 leading-relaxed line-clamp-2">
                         {project.hero.oneLiner}
@@ -279,6 +281,11 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
                     animate={{ opacity: isHovered ? 0.8 : 0.3 }}
                 />
             </motion.div>
+            {isJarvis && (
+                <div className="absolute inset-x-0 top-0 z-30">
+                    <JarvisRecognition variant="card" />
+                </div>
+            )}
         </div>
     );
 };

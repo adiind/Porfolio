@@ -10,6 +10,7 @@ import { JarvisDemo, PlotterDemo, SuryaDemo } from './WorldDemos';
 import WorldMotion, { openingPose } from './WorldMotion';
 import ProcessScroll from './ProcessScroll';
 import './worlds.css';
+import JarvisRecognition from '../jarvis/JarvisRecognition';
 
 export default function WorldProjectDetail({project,onClose}:{project:Project;onClose:()=>void}) {
   const id=project.id as WorldId;
@@ -60,7 +61,7 @@ export default function WorldProjectDetail({project,onClose}:{project:Project;on
           <div className="world-stage">
             <div className="world-camera" ref={cameraRef}><img src={`/images/project-worlds/${id}-hero-alpha.webp`} alt={id==='surya'?'Illustrated miniature rooms connect a sunlit day and a moonlit night.':id==='jarvis'?'Illustrated sound wave connects a processor to a softly lit room.':'Illustrated paper ribbon connects a sound wave to a technical pen.'} fetchPriority="high"/></div>
             <div className="world-stage-shade"/>
-            <div className="world-hero-copy" inert={openingPose(travel,false).copyOpacity===0} style={{opacity:openingPose(travel,false).copyOpacity,transform:`translateY(${-Math.min(travel/.4,1)*30}px)`}}><p className="world-eyebrow">{story.category}</p><h1 id="world-title">{story.name}<span>{story.title[0]}<br/><em>{story.title[1]}</em></span></h1><p className="world-intro">{story.intro}</p></div>
+            <div className="world-hero-copy" inert={openingPose(travel,false).copyOpacity===0} style={{opacity:openingPose(travel,false).copyOpacity,transform:`translateY(${-Math.min(travel/.4,1)*30}px)`}}><p className="world-eyebrow">{story.category}</p><h1 id="world-title">{story.name}<span>{story.title[0]}<br/><em>{story.title[1]}</em></span></h1><p className="world-intro">{story.intro}</p>{id==='jarvis'&&<JarvisRecognition variant="stage"/>}</div>
             {!reduce&&<WorldMotion id={id} progress={travel}/>}
             <div className="world-scene-footer"><span style={{opacity:1-openingPose(travel,false).reveal}}>AI-generated concept illustration</span><span className="world-scroll-cue">Scroll to explore ↓</span></div>
           </div>
