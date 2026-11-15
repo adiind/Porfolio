@@ -114,7 +114,7 @@ for title,body in [('Northwestern University','MS Engineering Design Innovation<
 right=label('TOOLKIT',x,right+1,sw)
 right=para('<b>AI & data:</b> Claude Code, Codex,<br/>RAG, MCP, Python, SQL<br/><b>Design & making:</b> User research,<br/>journey mapping, CAD, 3D printing,<br/>Arduino, IoT, C/C++',x,right,sw,8.9,11.8)+13
 right=label('RECOGNITION',x,right,sw)
-right=para('<b>ASEAN Top 10</b> · Edge AI & IoT<br/>Circuit Digest / DigiKey · 2024<br/><b>TEDx BITS Hyderabad</b><br/>Stage Design Head · 2019',x,right,sw,8.5,11.4)+12
+right=para('<b>Top 10</b> · IoT & Edge AI Challenge<br/>Circuit Digest / DigiKey · 2024<br/><b>TEDx BITS Hyderabad</b><br/>Stage Design Head · 2019',x,right,sw,8.5,11.4)+12
 print('COLUMN BOTTOMS',left,right)
 # Compact portfolio handoff, separated from the resume text.
 box(32,759,548,1,'#C8D2C8')
