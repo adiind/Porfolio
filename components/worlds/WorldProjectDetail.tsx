@@ -51,7 +51,7 @@ export default function WorldProjectDetail({project,onClose}:{project:Project;on
   useEffect(()=>{if(expanded)lightboxClose.current?.focus();else previousFocus.current?.focus({preventScroll:true})},[expanded]);
   const jump=(target:string)=>{const el=scrollRef.current?.querySelector<HTMLElement>('#'+target);el?.scrollIntoView({behavior:reduce?'instant':'smooth',block:'start'});el?.focus({preventScroll:true})};
   const enlarge=(src:string)=>{previousFocus.current=document.activeElement as HTMLElement;setExpanded(src)};
-  const decisions=id==='surya'?project.decisions.filter(d=>!d.decision.includes('Motor')):project.decisions;
+  const decisions=project.decisions;
   return ReactDOM.createPortal(<div ref={dialogRef} className={`world-case world-${id}`} role="dialog" aria-modal="true" aria-label={project.hero.title} tabIndex={-1}>
     <header className="world-topbar"><button onClick={onClose} aria-label="Back to portfolio"><ArrowLeft size={17}/><span>Portfolio</span></button><span className="world-wordmark">{story.name}</span><button onClick={onClose} aria-label={`Close ${story.name} case study`}><X size={19}/></button></header>
     <div className="world-scroll" ref={scrollRef}>

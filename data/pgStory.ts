@@ -1,7 +1,9 @@
-// Only eight in-home visits is cleared for the public metric chip.
+// Confirmed public research counts: 8 in-home visits, and 16 central-site visits with real people, across 2 rounds.
 // TODO: Confirm whether "10 bottle form studies" may be shown publicly. The source summary records ten weighted 3D-printed studies, but Adi's latest handoff excludes it pending confirmation.
-// TODO: Do not reuse the older "16 central-site visits" count. Current material supports two central-site rounds, not a participant/visit count.
-export const pgMetrics = [{ value: '8', label: 'in-home visits' }];
+export const pgMetrics = [
+  { value: '8', label: 'in-home visits' },
+  { value: '16', label: 'central-site visits with real people, across 2 rounds' },
+];
 
 export const pgSections = [
   { id: 'pg-glance', number: '01', label: 'At a glance', title: 'Research to exploration.', intro: 'Consumer research, prototyping, and synthesis.' },
