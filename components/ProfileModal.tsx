@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Linkedin, FileText, ExternalLink } from 'lucide-react';
+import { Linkedin, FileText, ExternalLink } from 'lucide-react';
+import BackPill from './BackPill';
 import { REAL_USER_IMAGE, PROFILE_BIO, PROFILE_SKILLS, SOCIAL_LINKS } from '../constants';
 import { trackEvent } from '../lib/analytics';
 import { useDialogA11y } from '../hooks/useDialogA11y';
@@ -62,9 +63,11 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       data-profile-backdrop
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020706]/45 p-3 backdrop-blur-sm focus:outline-none sm:p-5 md:p-8"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020706]/45 p-3 pt-[64px] backdrop-blur-sm focus:outline-none sm:p-5 sm:pt-[72px] md:p-8 md:pt-[80px]"
       onClick={handleManualClose}
     >
+      {/* The one way out: Back, top left */}
+      <BackPill zClass="z-30" onClick={handleManualClose} ariaLabel="Back" />
       <GlassSurface
         as={motion.div}
         data-profile-glass
@@ -75,15 +78,8 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative flex max-h-[92vh] w-full max-w-5xl origin-center flex-col overflow-hidden rounded-[1.75rem] md:max-h-[88vh] md:flex-row"
+        className="relative flex max-h-[calc(100dvh-76px)] w-full max-w-5xl origin-center flex-col overflow-hidden rounded-[1.75rem] md:max-h-[calc(100dvh-112px)] md:flex-row"
       >
-        <button
-          onClick={handleManualClose}
-          aria-label="Close profile"
-          className="absolute right-3 top-3 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#06100e]/75 text-white/70 transition-colors hover:border-white/35 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5E55A] md:right-4 md:top-4"
-        >
-          <X size={20} />
-        </button>
 
         {/* Left Column: Image */}
         <div className="relative h-64 w-full overflow-hidden bg-[#071411]/70 sm:h-72 md:h-auto md:w-[38%]">
@@ -99,7 +95,7 @@ const ProfileModal: React.FC<Props> = ({ onClose }) => {
         <div className="custom-scrollbar flex flex-1 flex-col overflow-y-auto p-6 md:p-9">
           <div className="mb-6">
             <h2 id="profile-modal-title" className="text-2xl md:text-3xl font-bold text-white mb-2">Hello, I'm Adi.</h2>
-            <p className="text-[#F0F570] font-medium tracking-[0.12em] uppercase text-xs">Tangible AI · Product Design · Creative Technology</p>
+            <p className="text-[#F0F570] font-medium tracking-[0.12em] uppercase text-xs">Product Management · AI Product Development · Product Analytics</p>
           </div>
 
           {/* Mobile: actions surfaced above the bio so they're reachable without scrolling */}

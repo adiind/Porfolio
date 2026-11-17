@@ -1,0 +1,6 @@
+[
+  {"id":"ads","kicker":"1 of 4 · Seller ads","title":"Understanding ad performance","lines":["I worked on seller ads analytics and the data pipelines behind it.","The work covered CPC, transaction-based ads, and banners."]},
+  {"id":"result","kicker":"2 of 4 · The result","title":"14% more ad revenue","lines":["I supported experiments and ad optimization that contributed to a 14% increase in seller ad revenue."]},
+  {"id":"warehouse","kicker":"3 of 4 · Supply","title":"First-party warehousing","lines":["I worked on analytics for Snapdeal’s move into first-party inventory and warehousing.","That included procurement and inventory visibility."]},
+  {"id":"role","kicker":"4 of 4 · My role","title":"Data analyst","lines":["I built data pipelines and replenishment logic, and supported inventory planning.","I also worked with finance on seller ads reconciliations."]}
+]

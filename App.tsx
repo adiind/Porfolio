@@ -21,7 +21,12 @@ import { ProjectsProvider, useProjects } from './context/ProjectsContext';
 // Background removed for performance
 import { useScrollDetection } from './hooks/useScrollDetection';
 import { trackEvent } from './lib/analytics';
-import { INITIAL_WORK_PROJECT_ID } from './lib/workRoutes';
+import { INITIAL_EXPERIENCE_ID, INITIAL_WORK_PROJECT_ID } from './lib/workRoutes';
+
+// Deep link (/experience/<id>): the timeline stop opens at boot, the same view a click on that stop opens.
+const INITIAL_EXPERIENCE = INITIAL_EXPERIENCE_ID && INITIAL_EXPERIENCE_ID !== 'tinkerverse'
+  ? TIMELINE_DATA.find((item) => item.id === INITIAL_EXPERIENCE_ID) ?? null
+  : null;
 
 type PublicNavSection = 'profile' | 'experiences' | 'projects';
 type ActiveSection = PublicNavSection | 'writings';
@@ -83,15 +88,15 @@ const PortfolioApp: React.FC = () => {
 
   // Modal State
   const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
-  const [activeProject, setActiveProject] = useState<TimelineItem | null>(null);
-  const [activeProjectSource, setActiveProjectSource] = useState('timeline');
+  const [activeProject, setActiveProject] = useState<TimelineItem | null>(INITIAL_EXPERIENCE);
+  const [activeProjectSource, setActiveProjectSource] = useState(INITIAL_EXPERIENCE ? 'deep_link' : 'timeline');
   const { projects } = useProjects();
 
   const richProject = useMemo(() => {
     return activeProject ? projects.find(p => p.id === activeProject.id) : null;
   }, [activeProject, projects]);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(false);
+  const [isTinkerVerseOpen, setIsTinkerVerseOpen] = useState(INITIAL_EXPERIENCE_ID === 'tinkerverse');
   // Deep link: ProjectsSection mounts with its detail already open and fires
   // projectDetailOpen before this component's listener attaches, so seed it.
   const [isProjectDetailOpen, setIsProjectDetailOpen] = useState(INITIAL_WORK_PROJECT_ID !== null);
@@ -110,13 +115,16 @@ const PortfolioApp: React.FC = () => {
     };
   }, []);
 
-  // Deep link: park the underlying page at the Selected Work section so
-  // closing the detail reveals the grid the project belongs to.
+  // Deep link: park the underlying page at the Selected Work section (or the
+  // timeline, for a stop) so closing the detail reveals where it belongs.
+  // /classic#work (the 3D home's "Work" link) also opens at Selected Work.
   useEffect(() => {
-    if (!INITIAL_WORK_PROJECT_ID) return;
-    const projectsEl = document.getElementById('projects');
-    if (projectsEl && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = Math.max(0, getSectionTop('projects') - 80);
+    const section = INITIAL_WORK_PROJECT_ID || /^#(work|projects)$/.test(window.location.hash) ? 'projects'
+      : INITIAL_EXPERIENCE_ID ? 'resume' : null;
+    if (!section) return;
+    const sectionEl = document.getElementById(section);
+    if (sectionEl && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = Math.max(0, getSectionTop(section) - 80);
     }
   }, [getSectionTop]);
 
@@ -584,7 +592,7 @@ const PortfolioApp: React.FC = () => {
                   <div className="absolute inset-0 h-2 w-2 rounded-full bg-[#E5E55A] opacity-40 blur-sm group-hover:opacity-70" />
                   <div className="relative h-2 w-2 rounded-full bg-[#E5E55A] shadow-[0_0_8px_rgba(229,229,90,0.34)]" />
                 </div>
-                <span className="text-[10px] text-white/62 transition-colors duration-300 group-hover:text-white/80">Tangible AI + Product Systems</span>
+                <span className="text-[10px] text-white/62 transition-colors duration-300 group-hover:text-white/80">Product + Analytics</span>
               </div>
             </div>
 

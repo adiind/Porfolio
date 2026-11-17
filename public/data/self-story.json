@@ -1,0 +1,6 @@
+[
+  {"id":"vault","kicker":"1 of 4 · Agent Vault","title":"Agents that can pay","lines":["Agent Vault lets an AI agent log in and check out on your behalf.","You stay in control of its access."]},
+  {"id":"protect","kicker":"2 of 4 · How it works","title":"Your card stays protected","lines":["The agent uses stand-in details.","An enclave swaps in real credentials, hidden from the agent."]},
+  {"id":"role","kicker":"3 of 4 · My role","title":"AI product manager","lines":["I tested Agent Vault and helped shape its pitch.","I built AI workflows and defined behavior and evaluations."]},
+  {"id":"deleteme","kicker":"4 of 4 · Partnership","title":"Self × DeleteMe","lines":["A partnership to create an agentic version of DeleteMe’s product.","I am the AI product manager across this work."]}
+]

@@ -1,0 +1,66 @@
+/* ================= Project books on the mat =================
+   Every project that has a flip book lies here as a closed booklet, on the open mat to the left of the printer.
+   A booklet is the book's real cover on its boards, seen from straight above: the boards show a little round the
+   cover, the outer corners are round and the spine edge is square, as in the open book. Its three shadows are the
+   ones every block on this page has, and they swing with the same light (--sdx / --sdy, set by sun.js).
+   Clicking one goes to its page; the page starts with this same mat and the booklet exactly where it lay (books.js). */
+.bk-zone{grid-column:3/5;grid-row:3/5;position:relative;z-index:3;min-width:0;min-height:0;pointer-events:none;transform-style:preserve-3d;container-type:size}
+/* (--bk-h is how tall one booklet may be: with several, each gets its share of the zone's height, see books.js) */
+.bk{position:absolute;left:50%;top:50%;width:min(86cqw,calc(var(--bk-h,74cqh)*5/3));aspect-ratio:5/3;margin:0;display:block;container-type:inline-size;pointer-events:auto;text-decoration:none;color:#18204f;
+  translate:calc(-50% + var(--bx,0%)) calc(-50% + var(--by,0%));opacity:0;transform:translate3d(0,40px,-900px) rotateX(24deg);
+  transition:transform 1.5s var(--ease,cubic-bezier(.2,.8,.2,1)) .62s,opacity .9s ease .62s}
+.is-in .bk{opacity:1;transform:translateZ(14px)}
+.is-set .bk{transition:transform .35s var(--ease,cubic-bezier(.2,.8,.2,1)),opacity .3s ease}
+/* the boards reach 1.7% of the cover's width past it on every side, and their outer corners are 5.3% of it: the open book's own numbers */
+.bk-in{position:absolute;inset:-1.7cqw;padding:1.7cqw;display:block;rotate:var(--bt,0deg);background:var(--bk-board,#2b160d);border-radius:0 5.3cqw 5.3cqw 0;
+  box-shadow:calc(var(--sdx,1)*-1.5px) calc(var(--sdy,1)*2px) 2px rgba(var(--sc,2,10,44),.42),
+    calc(var(--sdx,1)*-7px) calc(var(--sdy,1)*9px) 12px -2px rgba(var(--sc,2,10,44),.36),
+    calc(var(--sdx,1)*-24px) calc(var(--sdy,1)*30px) 36px -9px rgba(var(--sc,2,10,44),.5);
+  transition:box-shadow .35s ease,rotate .35s var(--ease,cubic-bezier(.2,.8,.2,1))}
+.bk-in img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0 3.6cqw 3.6cqw 0}
+/* With four or more booklets and a wide window they take four columns of the wall (the room the printer had), two to a
+   row (books.js sets data-cols). Each is placed from the middle of the zone, a quarter of its width either side. */
+@media (min-width:821px) and (min-aspect-ratio:4/5){
+  .bk-zone[data-cols="2"]{grid-column:3/7}
+  .bk-zone[data-cols="2"] .bk{width:min(41cqw,calc(var(--bk-h,44cqh)*5/3))}
+}
+/* pointing at a booklet lifts it off the mat a little, as the other blocks lift */
+@media (hover:hover) and (pointer:fine){
+  .is-in .bk:hover{transform:translateZ(32px) translateY(-2%)}
+  .bk:hover .bk-in{box-shadow:calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 3px rgba(var(--sc,2,10,44),.36),
+    calc(var(--sdx,1)*-12px) calc(var(--sdy,1)*16px) 18px -3px rgba(var(--sc,2,10,44),.34),
+    calc(var(--sdx,1)*-38px) calc(var(--sdy,1)*48px) 48px -12px rgba(var(--sc,2,10,44),.5)}
+}
+.bk:focus-visible{outline:2px solid #fff;outline-offset:8px;border-radius:4px}
+/* the name, on a small white tag under the booklet (the printer's tag, in the same hand) */
+.bk-tag{position:absolute;left:50%;top:calc(100% + 1.2cqh + 10px);translate:-50% 0;white-space:nowrap;padding:.42em .9em .46em;border-radius:99px;background:#fff;color:#18204f;
+  font:600 clamp(10.5px,.8vw,12.5px)/1.2 Geist,-apple-system,sans-serif;box-shadow:0 8px 14px -8px rgba(4,10,60,.6);opacity:0;transition:opacity .25s ease}
+.bk-tag b{font-weight:700}
+.bk:hover .bk-tag,.bk:focus-visible .bk-tag{opacity:1}
+@media (hover:none){.bk-tag{opacity:1}}
+
+/* Leaving for a book: the wall lies flat, everything but the mat and that booklet fades, the booklet straightens its lift.
+   (books.js marks what fades with .bk-fade and the page with .is-booking.) */
+.is-booking .bx-board{transform:none!important;transition:transform .34s cubic-bezier(.4,0,.2,1)}
+.is-booking .bk.is-going{transform:none!important;transition:transform .34s cubic-bezier(.4,0,.2,1)}
+.bk-fade{transition:opacity .3s ease!important}
+.is-booking .bk-fade{opacity:0!important;pointer-events:none}
+/* Coming back from a book: the booklet is already lying there; the rest of the page fades in round it. */
+.bk-back .bk.is-home{opacity:1;transform:translateZ(14px);transition:none}
+.bk-back .bx-board{transition:none}
+@keyframes bk-return{from{opacity:0}to{opacity:1}}
+.bk-back .bk-fade{animation:bk-return .7s ease .1s both}
+.bk-back .sun-c,.bk-back .sun-oc{transition:none}
+
+/* phones and narrow windows: the wall is a plain column; the booklets get rows of their own above the printer.
+   One booklet takes two rows; each further one adds a row (--bk-rows, set by books.js), so a pile of them never
+   spills onto the cards above or the printer below. */
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bk-zone{grid-column:1/3;grid-row:span var(--bk-rows,2)}
+  .bk{width:min(78cqw,calc(var(--bk-h,70cqh)*5/3))}
+  .bk-tag{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  .bk,.bk-in,.bk-fade,.is-booking .bx-board{transition:none!important}
+  .bk-back .bk-fade{animation:none}
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adi Agarwal · Bambu Lab ambassador (prototype)</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="corner.css">
+<style>html,body{margin:0;min-height:100%;background:#EDF5F0}.bb-badge{visibility:hidden}</style>
+</head>
+<body>
+<!-- corner.css and corner.js are unchanged copies from review/bambu-corner-v3. There the space opens from a badge;
+     here it is the page, so it opens at once and the X goes back to the home page. -->
+<script src="corner.js"></script>
+<script>
+(function () {
+  var badge = document.querySelector('.bb-badge'), x = document.querySelector('.bb-x');
+  if (!badge || !x) return;
+  badge.click();
+  x.addEventListener('click', function () { if (history.length > 1) history.back(); else location.href = '../index.html'; });
+})();
+</script>
+</body>
+</html>

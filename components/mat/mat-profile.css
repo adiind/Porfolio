@@ -1,0 +1,8 @@
+.fb-look[data-profile='true']{right:clamp(20px,4vw,64px);width:min(46vw,610px);max-height:calc(100dvh - 70px);overflow-y:auto;overscroll-behavior:contain;background:#f9fbf6;color:#102c27;border-radius:24px;padding:clamp(22px,2.4vw,36px);box-shadow:0 22px 65px #061a3d70;box-sizing:border-box}
+.mat-profile-kicker{font-size:11px;letter-spacing:.16em;font-weight:700;color:#3a7765;margin:0 0 12px}
+.fb-look[data-profile='true'] .mat-profile h2{font-size:clamp(29px,3vw,43px);letter-spacing:-.035em;line-height:1;margin:0 0 10px;color:#102c27}
+.mat-profile-subtitle{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#37725d;margin:0 0 19px}
+.mat-profile-bio{font-size:clamp(13px,1.05vw,15px);line-height:1.48;color:#314b43}.mat-profile-bio p{margin:0 0 12px}
+.mat-profile h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#427663;margin:19px 0 10px}.mat-profile-skills{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}.mat-profile-skills li{font-size:11px;border:1px solid #b8d4c8;border-radius:30px;padding:5px 9px;background:#eaf4ee}
+.mat-profile-links{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 17px}.mat-profile-links a{color:#fff;background:#175c48;text-decoration:none;border-radius:30px;padding:10px 15px;font-size:13px;font-weight:700}.mat-profile-links a:focus-visible,.fb-look[data-profile='true'] button:focus-visible{outline:3px solid #2d8a69;outline-offset:3px}
+.fb-look[data-profile='true'] .fb-look-actions{margin-top:0}

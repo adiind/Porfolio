@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Project } from '../../types/Project';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
 import { useContentEngagement } from '../../hooks/useContentEngagement';
@@ -33,7 +33,8 @@ const PgProjectDetail: React.FC<{ project: Project; onClose: () => void; analyti
     animate={{ opacity: 1 }}
     transition={{ duration: reduceMotion ? 0 : .15 }}
   >
-    <button type="button" className="pg-close" onClick={onClose} aria-label="Close P&G case study"><X size={18} /> Close</button>
+    {/* The one way out: Back, top left (same pill as every other page) */}
+    <button type="button" className="pg-close" onClick={onClose} aria-label="Back to portfolio"><ArrowLeft size={16} aria-hidden="true" /><span>Back</span></button>
     <div ref={engagementRef} className="pg-story-frame-wrap">
       <iframe
         className="pg-story-frame"

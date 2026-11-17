@@ -1,0 +1,12 @@
+# Browser caching for the site. Cloudflare (Workers static assets) reads this file from the build output and does not serve it.
+# Ship layer: kept in scripts/ship/files/public/_headers and copied to public/_headers by scripts/ship/port-home.mjs.
+# index.html and the page addresses get no rule: Cloudflare's default for them (public, max-age=0, must-revalidate, with an ETag)
+# makes every visit check for the newest build.
+
+# The build's code and stylesheets: each file name carries a hash of its content, so one address never changes.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Pictures and fonts get no rule on purpose. Their names do not change when the picture does, so a long cache would keep
+# showing an old poster after a new one is published. Cloudflare's default (check with the server every time, answer
+# "not changed" when it is the same file) costs a small request and never shows a stale picture.

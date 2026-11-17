@@ -25,7 +25,7 @@ export const worldStories = {
     question: 'How much assistant does a simple action really need?',
     demoTitle: 'Follow the signal.', demoIntro: 'Step through the documented architecture. This is an interactive explanation; it does not listen to your microphone or control a device.',
     steps: [
-      ['Wake', 'A wake-word model begins a deliberately scoped interaction.'],
+      ['Wake', 'A PIR motion sensor wakes it when someone walks up.'],
       ['Recognize', 'Embedded command recognition interprets the next input locally.'],
       ['Route', 'MQTT decouples the voice interface from the devices it can reach.'],
       ['Respond', 'Home Assistant automations act, while LEDs make the interaction state visible.'],

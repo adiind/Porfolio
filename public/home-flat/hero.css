@@ -1,0 +1,1274 @@
+/* Home v14: the first screen proves the role with evidence instead of stating it.
+   cqw / cqh are 1% of the hero's own width / height. */
+.bx{position:relative;height:var(--bx-h,100svh);min-height:600px;container-type:size;overflow:hidden;isolation:isolate;background:#f4f3ef;color:#131416;font-family:Geist,-apple-system,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;--rx:0;--ry:0;--pad:clamp(20px,4.6cqw,80px);--ease:cubic-bezier(.16,.84,.24,1);--g:max(8px,.85cqw);--r:max(12px,1.15cqw);--lime:#dfe44f}
+.bx *{box-sizing:border-box}
+
+.bx-light{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.6s ease}
+.is-in .bx-light{opacity:1}
+.bx-dots{position:absolute;inset:0;background:radial-gradient(circle,rgba(19,20,22,.16) 1px,transparent 1.4px) 0 0/26px 26px;-webkit-mask-image:radial-gradient(86cqh 70cqh at 67% 50%,#000 0%,transparent 100%);mask-image:radial-gradient(86cqh 70cqh at 67% 50%,#000 0%,transparent 100%);opacity:0;transition:opacity 2s ease .4s}
+.is-in .bx-dots{opacity:1}
+
+.bx-a{color:inherit;text-decoration:none;cursor:pointer}
+.bx-a:focus-visible,.bx-b:focus-visible,.bx-bk:focus-visible{outline:2px solid #131416;outline-offset:3px}
+.bx-nav{position:absolute;z-index:3;top:0;left:0;right:0;height:clamp(54px,8cqh,72px);padding:0 var(--pad);display:flex;justify-content:space-between;align-items:center}
+.bx-name{font-weight:600;letter-spacing:-.01em}
+.bx-links{display:flex;gap:clamp(18px,2.4cqw,36px);color:#2c2e33}
+.bx-links .bx-a{padding:12px 0}
+.bx-links .bx-a:hover{color:#000}
+
+/* Words: a greeting, then one proof at a time. */
+.bx-text{position:absolute;z-index:2;left:var(--pad);top:50%;transform:translateY(-50%);width:29.5cqw}
+.bx-hi{margin:0;font-weight:600;font-size:min(5.4cqw,12cqh);line-height:1;letter-spacing:-.045em;overflow:hidden;padding-bottom:.14em}
+.bx-hi span{display:block;transform:translateY(112%);transition:transform 1.15s var(--ease) .15s}
+.bx-say{position:relative;margin:clamp(8px,1.6cqh,16px) 0 0;height:2.5em;font-size:min(2.35cqw,5.2cqh);line-height:1.2;font-weight:500;letter-spacing:-.025em;color:#6f727a;overflow:hidden;opacity:0;transition:opacity .9s ease .6s}
+.bx-say span{position:absolute;left:0;top:0;right:0;transition:transform .8s var(--ease),opacity .6s ease}
+.bx-say .is-out{transform:translateY(-70%);opacity:0}
+.bx-say .is-wait{transform:translateY(70%);opacity:0;transition:none}
+.bx-facts{margin:clamp(14px,2.8cqh,28px) 0 0;padding:0;list-style:none}
+.bx-facts li{position:relative;display:grid;grid-template-columns:4.8em 1fr;padding:clamp(7px,1.25cqh,11px) 0;font-size:clamp(12.5px,1.75cqh,15px);opacity:0;transform:translateY(8px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.bx-facts li::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:rgba(19,20,22,.14);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease)}
+.bx-facts li:nth-child(1),.bx-facts li:nth-child(1)::before{transition-delay:.8s}
+.bx-facts li:nth-child(2),.bx-facts li:nth-child(2)::before{transition-delay:.9s}
+.bx-facts li:nth-child(3),.bx-facts li:nth-child(3)::before{transition-delay:1s}
+.bx-facts i{font-style:normal;color:#767982}
+.bx-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;margin-top:clamp(14px,2.8cqh,28px);opacity:0;transform:translateY(10px);transition:opacity .9s var(--ease) 1.15s,transform 1s var(--ease) 1.15s}
+.bx-btn{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 24px;border-radius:999px;background:#131416;color:#f4f3ef;font-weight:500;translate:var(--bx,0px) var(--by,0px);transition:background .15s,translate .35s var(--ease)}
+.bx-btn:hover{background:#000}
+.bx-btn svg{transition:transform .3s var(--ease)}
+.bx-btn:hover svg{transform:translateY(3px)}
+.bx-link{padding:12px 0;color:#2c2e33;text-decoration:underline;text-decoration-color:rgba(19,20,22,.3);text-underline-offset:5px}
+.bx-link:hover{text-decoration-color:#131416}
+.is-in .bx-hi span{transform:none}
+.is-in .bx-say,.is-in .bx-facts li,.is-in .bx-cta{opacity:1;transform:none}
+.is-in .bx-facts li::before{transform:none}
+
+/* The wall. Perspective on the stage gives the board real depth; the board turns a little with the pointer. */
+.bx-stage{position:absolute;z-index:1;left:37.5cqw;top:13.5cqh;width:58cqw;height:75cqh;perspective:1700px}
+.bx-board{width:100%;height:100%;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:var(--g);transform-style:preserve-3d;transform:rotateX(calc((2 + var(--rx))*1deg)) rotateY(calc((-7 + var(--ry))*1deg))}
+
+.bx-b{position:relative;display:block;min-width:0;min-height:0;overflow:hidden;border-radius:var(--r);background:#fff;color:inherit;text-decoration:none;box-shadow:0 1.4cqw 2.2cqw -1.2cqw rgba(24,28,48,.3),0 .2cqw .5cqw rgba(24,28,48,.07),0 0 0 1px rgba(24,28,48,.06);opacity:0;transform:translate3d(0,6cqh,-900px) rotateX(24deg);transition:transform 1.5s var(--ease) calc(var(--i)*70ms + .2s),opacity .8s ease calc(var(--i)*70ms + .2s),box-shadow .6s var(--ease)}
+.is-in .bx-b{opacity:1;transform:translateZ(var(--z,0px))}
+.is-set .bx-b{transition:transform .7s var(--ease),box-shadow .6s var(--ease)}
+.bx-b:hover,.bx-b:focus-visible,.bx-b.is-hot{--z:2.6cqw;box-shadow:0 2.6cqw 3.4cqw -1.6cqw rgba(24,28,48,.4),0 .3cqw .8cqw rgba(24,28,48,.1),0 0 0 1px rgba(24,28,48,.07)}
+/* Sheen that follows the pointer, and an edge light that runs round the block the sentence is talking about. */
+.bx-b::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(70% 55% at var(--mx,30%) var(--my,0%),rgba(255,255,255,.4),transparent 70%);mix-blend-mode:soft-light;pointer-events:none}
+@property --bxa{syntax:'<angle>';inherits:false;initial-value:0deg}
+.bx-b::before{content:"";position:absolute;inset:0;z-index:3;border-radius:inherit;padding:2px;background:conic-gradient(from var(--bxa),transparent 0 62%,rgba(255,255,255,.95) 76%,var(--lime) 86%,transparent 96%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:0;transition:opacity .5s;pointer-events:none}
+.bx-b.is-hot::before{opacity:1;animation:bx-beam 3.2s linear infinite}
+@keyframes bx-beam{to{--bxa:360deg}}
+
+.bx-self{grid-column:1/3;grid-row:1}
+.bx-zo{grid-column:3/5;grid-row:1/3}
+.bx-ch{grid-column:5/7;grid-row:1/3}
+.bx-rescue{grid-column:1;grid-row:2}
+.bx-ads{grid-column:2;grid-row:2}
+.bx-mc{grid-column:1/3;grid-row:3/5}
+.bx-cab{grid-column:3/7;grid-row:3/5}
+
+.bx-tag{position:absolute;z-index:2;right:.8cqw;top:.8cqw;padding:.22em .7em;border-radius:99px;background:rgba(19,20,22,.07);font-size:max(10.5px,.74cqw);font-weight:500;color:#3a3c42;white-space:nowrap}
+.bx-t{display:block;font-size:max(11px,.82cqw);line-height:1.35;color:#5d6068}
+.bx-t b{display:block;font-size:max(13px,1.12cqw);font-weight:600;letter-spacing:-.01em;color:#131416}
+
+.bx-self{display:flex;flex-direction:column;justify-content:space-between;padding:1.1cqw 1.2cqw 1cqw}
+.bx-self-logo{display:block;height:2.5cqw;width:auto;align-self:flex-start}
+
+.bx-zo{background:#0e0e0e;color:#fff}
+.bx-zo img{position:absolute;left:0;top:24%;width:100%;height:auto}
+.bx-stat{position:absolute;z-index:1;left:1.3cqw;right:1.3cqw;top:1.1cqw;font-size:max(11px,.86cqw);line-height:1.4;color:#b9bbc2}
+.bx-stat b{display:block;margin-bottom:.12em;font-size:3.7cqw;line-height:1;font-weight:600;letter-spacing:-.04em;color:#fff;font-variant-numeric:tabular-nums}
+
+.bx-ch{background:linear-gradient(180deg,#eef0f8,#d9dfee);padding:1.1cqw 1.2cqw}
+.bx-ui{position:absolute;left:8%;width:84%;height:auto;translate:calc(var(--ry)*-1.4px) calc(var(--rx)*1.4px)}
+.bx-ui1{top:25%}
+.bx-ui2{top:60%;left:14%;translate:calc(var(--ry)*-2.6px) calc(var(--rx)*2.6px)}
+
+.bx-m{padding:1cqw 1.1cqw;display:flex;flex-direction:column}
+.bx-m b{font-size:2.55cqw;line-height:1;font-weight:600;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.bx-ml{margin-top:.3em;font-size:max(11px,.82cqw);line-height:1.3;color:#3a3c42}
+.bx-mf{order:-1;margin-bottom:.55em;font-size:max(10.5px,.74cqw);font-weight:500;color:#767982}
+.bx-bars{position:absolute;right:1cqw;bottom:1cqw;height:30%;display:flex;align-items:flex-end;gap:.3cqw}
+.bx-bars i{width:.72cqw;height:var(--h);border-radius:.2cqw .2cqw 0 0;background:#cfd1d6;transform:scaleY(0);transform-origin:bottom;transition:transform 1s var(--ease) 1.4s}
+.bx-bars i.is-y{background:var(--lime);transition-delay:1.75s}
+.bx-ads .bx-bars i:nth-child(2){transition-delay:1.5s}.bx-ads .bx-bars i:nth-child(3){transition-delay:1.6s}
+.is-in .bx-bars i{transform:none}
+
+.bx-mc{background:#e9e9ec}
+.bx-shots img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;opacity:0;transform:translateY(3%);transition:opacity .7s ease,transform .9s var(--ease)}
+.bx-shots img.is-on{opacity:1;transform:none}
+.bx-mc .bx-tag{top:auto;bottom:1cqw;background:rgba(19,20,22,.08)}
+.bx-t-over{position:absolute;z-index:1;left:0;right:0;bottom:0;padding:2.6cqw 1.2cqw 1cqw;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.94) 46%)}
+
+/* The cabinet. It has its own perspective, so it reads as a real recessed shelf,
+   and its eye point moves with the pointer, so you can look around inside it.
+   --D is how deep the shelf is. Books are real boxes: a spine, a front cover, a page block on top. */
+.k-ai{--c:#27364f}.k-iot{--c:#b5553b}.k-des{--c:#2f5d4a}.k-ana{--c:#b98a1f}
+.bx-cab{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;opacity:0;transform:translate3d(0,6cqh,-900px) rotateX(24deg);transition:transform 1.5s var(--ease) calc(var(--i)*70ms + .2s),opacity .8s ease calc(var(--i)*70ms + .2s)}
+/* The tiny lift makes the cabinet a real layer in the board's 3D space; without it the board catches the pointer instead. */
+.is-in .bx-cab{opacity:1;transform:translateZ(.1px)}
+/* Only the books and objects take the pointer. The shelf box itself must not, or it swallows the hover. */
+.bx-cab{pointer-events:none}
+.bx-ob,.bx-bk{pointer-events:auto}
+.bx-cap{margin:0 0 .5cqw;padding:0 .3cqw;display:flex;justify-content:space-between;align-items:baseline;gap:1cqw;font-size:max(11px,.8cqw);color:#5d6068;white-space:nowrap}
+.bx-cap b{font-weight:600;color:#131416}
+.bx-cap-t{overflow:hidden;text-overflow:ellipsis}
+.bx-key{font-size:max(10.5px,.72cqw);color:#767982}
+.bx-key i{display:inline-block;width:.62em;height:.62em;margin:0 .32em 0 .7em;border-radius:2px;background:var(--c)}
+.bx-box{position:relative;flex:1;min-height:0;--D:6.4cqw;--rim:.5cqw;perspective:calc(var(--D)*8);perspective-origin:calc(50% + var(--ry)*-5%) calc(24% + var(--rx)*5%);border-radius:.8cqw;box-shadow:0 1.6cqw 2.4cqw -1.3cqw rgba(24,28,48,.34)}
+/* Content is shifted forward by D and the eye is D further back (8 x D instead of 7 x D); scaling by 7/8 about the eye point keeps the picture identical. */
+.bx-in{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:calc(50% + var(--ry)*-5%) calc(24% + var(--rx)*5%);transform:translateZ(var(--D)) scale(.875)}
+.f{position:absolute;display:block}
+.f-back{inset:0;transform:translateZ(calc(var(--D)*-1));background:linear-gradient(#cbc6bb,#e4e0d6 24%,#dcd8ce 50%,#c9c4b9 51%,#e2ded4 74%,#dad6cc)}
+.f-top{left:0;right:0;top:0;height:var(--D);transform-origin:50% 0;transform:rotateX(-90deg);background:linear-gradient(to bottom,#ece9e2,#cdc9bf)}
+.f-left{left:0;top:0;bottom:0;width:var(--D);transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(to right,#f3f0ea,#d1cdc3)}
+.f-right{right:0;top:0;bottom:0;width:var(--D);transform-origin:100% 50%;transform:rotateY(-90deg);background:linear-gradient(to left,#f3f0ea,#d1cdc3)}
+.f-plank,.f-floor{left:0;right:0;height:var(--D);transform-origin:50% 100%;transform:rotateX(90deg);background:linear-gradient(to bottom,#cfcbc1,#f7f4ee)}
+.f-plank{top:calc(50% - var(--D))}
+.f-floor{bottom:0}
+.f-edge{left:0;right:0;top:calc(50% - var(--rim)/2);height:var(--rim);background:#fdfcfa;box-shadow:0 .12cqw .3cqw rgba(24,28,48,.2)}
+.f-rim{inset:0;border:var(--rim) solid #fdfcfa;border-radius:.8cqw;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(24,28,48,.07),0 0 0 1px rgba(24,28,48,.06)}
+
+/* Physical builds stand on the shelf with a soft shadow lying on the wood under them. */
+.bx-ob{position:absolute;left:var(--x);bottom:var(--y);height:var(--h);aspect-ratio:var(--ar);display:block;transform-style:preserve-3d;transform:translateZ(calc(var(--D)*var(--oz,-.5)));opacity:0;translate:0 14%;transition:opacity .7s ease calc(var(--k)*70ms + 1.25s),translate 1s var(--ease) calc(var(--k)*70ms + 1.25s)}
+.bx-ob img{position:relative;display:block;width:100%;height:100%;transition:transform .45s var(--ease)}
+.bx-ob .sh{position:absolute;left:-12%;right:-12%;bottom:0;height:calc(var(--D)*.5);transform-origin:50% 100%;transform:translateZ(calc(var(--D)*.25)) rotateX(90deg);background:radial-gradient(closest-side,rgba(30,26,18,.5),transparent)}
+.bx-ob:hover img,.bx-ob:focus-visible img{transform:translateY(-6%) scale(1.05)}
+.o-surya{--x:5%;--y:calc(50% + .25cqw);--h:41%;--ar:1.011;--oz:-.74}
+.o-glyph{--x:41%;--y:calc(50% + .25cqw);--h:42.5%;--ar:.704;--oz:-.42}
+.o-helios{--x:72%;--y:calc(50% + .25cqw);--h:42%;--ar:.796;--oz:-.55}
+.o-jarvis{--x:33.5%;--y:.5cqw;--h:26%;--ar:.905;--oz:-.42}
+.o-plotter{--x:85.5%;--y:.5cqw;--h:41.5%;--ar:.515;--oz:-.5}
+
+.bx-bk{position:absolute;left:var(--x);bottom:.5cqw;width:7.8%;height:var(--bh);display:block;color:#f6f1e4;text-decoration:none;transform-style:preserve-3d;--bd:calc(var(--D)*.62);transform:translateZ(calc(var(--D)*-.2));opacity:0;translate:0 14%;transition:opacity .7s ease calc(var(--k)*70ms + 1.25s),translate 1s var(--ease) calc(var(--k)*70ms + 1.25s)}
+.is-in .bx-bk,.is-in .bx-ob{opacity:1;translate:0 0}
+.bk-hit{position:absolute;inset:0 -5%;display:block}
+.bk-body{position:absolute;inset:0;display:block;transform-style:preserve-3d;pointer-events:none;transition:transform .6s var(--ease)}
+.bk-body>span{position:absolute;display:block}
+.bk-spine{inset:0;border-radius:.18cqw;background:var(--c);box-shadow:inset .16cqw 0 0 rgba(255,255,255,.16),inset -.3cqw 0 .4cqw rgba(0,0,0,.22)}
+.bk-spine::before{content:"";position:absolute;left:16%;right:16%;top:.55cqw;height:.14cqw;background:rgba(246,241,228,.6);box-shadow:0 .32cqw 0 rgba(246,241,228,.32)}
+.bk-spine em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg);font-style:normal;font-size:max(10.5px,.82cqw);font-weight:500;white-space:nowrap}
+.bk-cover{left:100%;top:0;width:var(--bd);height:100%;transform-origin:0 50%;transform:rotateY(90deg);background:var(--c);padding:.7cqw .45cqw .5cqw .55cqw;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),inset .9cqw 0 1cqw -.6cqw rgba(0,0,0,.4)}
+.bk-cover b,.bk-cover em{opacity:0;transition:opacity .3s ease}
+.is-set .bx-bk:hover .bk-cover b,.is-set .bx-bk:hover .bk-cover em,.is-set .bx-bk:focus-visible .bk-cover b,.is-set .bx-bk:focus-visible .bk-cover em{opacity:1}
+.bk-cover b{display:block;font-size:max(11px,.84cqw);font-weight:600;line-height:1.15}
+.bk-cover em{display:block;margin-top:.45em;font-style:normal;font-size:max(10px,.66cqw);line-height:1.25}
+.bk-left{left:0;top:0;width:var(--bd);height:100%;transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--c)}
+.bk-top{left:0;top:0;width:100%;height:var(--bd);transform-origin:50% 0;transform:rotateX(-90deg);background:repeating-linear-gradient(90deg,#f1ead9 0 1px,#dfd7c3 1px 2px)}
+/* Pointing at a book pulls it off the shelf and turns it to show its cover. */
+.is-set .bx-bk:hover .bk-body,.is-set .bx-bk:focus-visible .bk-body{transform:translateZ(calc(var(--D)*.5)) translateX(-34%) rotateY(-58deg)}
+
+
+/* ---------- Walls ----------
+   Three versions of the same page with a real wall colour and material instead of white and soft gradients.
+   The moving light is switched off in all three. Pick with the dots at the bottom left (review control only). */
+.bx[data-theme] .bx-light{display:none}
+.bx[data-theme]{box-shadow:inset 0 0 16cqw rgba(0,0,0,.22)}
+.bx[data-theme]::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.bx[data-theme] .bx-name,.bx[data-theme] .bx-hi{color:var(--fg)}
+.bx[data-theme] .bx-links,.bx[data-theme] .bx-link,.bx[data-theme] .bx-facts li{color:var(--fg)}
+.bx[data-theme] .bx-links .bx-a:hover{color:var(--fg)}
+.bx[data-theme] .bx-link{text-decoration-color:var(--line)}
+.bx[data-theme] .bx-say,.bx[data-theme] .bx-facts i{color:var(--fg2)}
+.bx[data-theme] .bx-facts li::before{background:var(--line)}
+.bx[data-theme] .bx-btn{background:var(--btn);color:var(--btn-fg)}
+.bx[data-theme] .bx-dots{background-image:radial-gradient(circle,var(--dot) 1px,transparent 1.4px)}
+.bx[data-theme] .bx-a:focus-visible,.bx[data-theme] .bx-b:focus-visible,.bx[data-theme] .bx-bk:focus-visible{outline-color:var(--fg)}
+.bx[data-theme] .bx-b{box-shadow:0 1.5cqw 2cqw -1cqw var(--shade),0 .25cqw .5cqw var(--shade2)}
+.bx[data-theme] .bx-b:hover,.bx[data-theme] .bx-b:focus-visible,.bx[data-theme] .bx-b.is-hot{box-shadow:0 2.8cqw 3.2cqw -1.4cqw var(--shade),0 .35cqw .8cqw var(--shade2)}
+.bx[data-theme] .bx-cap{color:var(--fg2)}
+.bx[data-theme] .bx-cap b{color:var(--fg)}
+.bx[data-theme] .bx-key{color:var(--fg2)}
+.bx[data-theme] .bx-box{box-shadow:0 1.8cqw 2.4cqw -1.2cqw var(--shade)}
+
+/* A. Library: deep green wall, walnut shelf, brass. Taken from the look of his own Zero app. */
+.bx[data-theme="library"]{background:#17382c;--fg:#f3ead6;--fg2:#a9c0a6;--line:rgba(243,234,214,.24);--dot:rgba(243,234,214,.13);--btn:#d8b45c;--btn-fg:#182a20;--shade:rgba(0,0,0,.6);--shade2:rgba(0,0,0,.28);--lime:#d8b45c}
+.bx[data-theme="library"] .bx-self,.bx[data-theme="library"] .bx-m{background:#f6efe0}
+.bx[data-theme="library"] .f-back{background:linear-gradient(#3d2a1b,#5c4029 24%,#553b26 50%,#38261a 51%,#5a3f29 74%,#513825)}
+.bx[data-theme="library"] .f-top{background:linear-gradient(to bottom,#7a573a,#4a3322)}
+.bx[data-theme="library"] .f-left{background:linear-gradient(to right,#86603f,#4b3423)}
+.bx[data-theme="library"] .f-right{background:linear-gradient(to left,#86603f,#4b3423)}
+.bx[data-theme="library"] .f-plank,.bx[data-theme="library"] .f-floor{background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 2px,transparent 2px 9px),linear-gradient(to bottom,#4c3524,#9a7049)}
+.bx[data-theme="library"] .f-edge{background:#a37a51}
+.bx[data-theme="library"] .f-rim{border-color:#9a7049;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.2)}
+
+/* B. Clay: terracotta wall, birch plywood shelf, ink navy. */
+.bx[data-theme="clay"]{background:#c2533a;--fg:#fff4e4;--fg2:#ffd6c0;--line:rgba(255,244,228,.34);--dot:rgba(255,244,228,.18);--btn:#1b2742;--btn-fg:#fff4e4;--shade:rgba(74,20,8,.55);--shade2:rgba(74,20,8,.22);--lime:#1b2742}
+.bx[data-theme="clay"] .bx-self,.bx[data-theme="clay"] .bx-m{background:#fff6ea}
+.bx[data-theme="clay"] .f-back{background:linear-gradient(#b8945f,#dcbc8c 24%,#d3b384 50%,#b38f5b 51%,#d9b989 74%,#cfae7e)}
+.bx[data-theme="clay"] .f-top{background:linear-gradient(to bottom,#efd7ae,#c19d6b)}
+.bx[data-theme="clay"] .f-left{background:linear-gradient(to right,#f1dab3,#c09c69)}
+.bx[data-theme="clay"] .f-right{background:linear-gradient(to left,#f1dab3,#c09c69)}
+.bx[data-theme="clay"] .f-plank,.bx[data-theme="clay"] .f-floor{background:repeating-linear-gradient(90deg,rgba(120,80,30,.07) 0 2px,transparent 2px 11px),linear-gradient(to bottom,#bd9966,#f6e2bf)}
+.bx[data-theme="clay"] .f-edge{background:repeating-linear-gradient(180deg,#f3dfbd 0 1.5px,#cfae7e 1.5px 3px)}
+.bx[data-theme="clay"] .f-rim{border-color:#f0dab4;box-shadow:inset 0 0 0 1px rgba(90,50,10,.25),0 0 0 1px rgba(90,50,10,.2)}
+
+/* C. Blueprint: cobalt wall with drawing-paper grid lines, white steel shelf, lime. */
+.bx[data-theme="blueprint"]{background:#2143d2;--fg:#fff;--fg2:#c9d4ff;--line:rgba(255,255,255,.34);--dot:transparent;--btn:#e4e84f;--btn-fg:#0f1638;--shade:rgba(6,14,70,.6);--shade2:rgba(6,14,70,.25)}
+.bx[data-theme="blueprint"]::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px) 0 0/130px 130px,linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px) 0 0/130px 130px,linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px) 0 0/26px 26px}
+
+/* Review control: three dots to switch the wall. Not part of the final page. */
+.bx-themes{position:absolute;z-index:4;left:var(--pad);bottom:clamp(14px,3cqh,26px);display:flex;align-items:center;gap:10px;font-size:12px;color:var(--fg2,#767982)}
+.bx-themes button{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:var(--sw);cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.bx-themes button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--fg,#131416)}
+
+
+/* ---------- The photo shelf (replaces the 3D cabinet) ----------
+   One photograph. A book's hotspot shows its own piece of the same photograph, so lifting the hotspot lifts that book. */
+.bx-cab{justify-content:flex-end}
+.bx-shelf{position:relative;width:100%;aspect-ratio:2/1;max-height:calc(100% - 2cqw);border-radius:.5cqw;background:#dfe2ea center/100% 100% no-repeat;box-shadow:0 1.6cqw 2.2cqw -1.1cqw var(--shade,rgba(24,28,48,.4))}
+.bx-hs{position:absolute;display:block;pointer-events:auto;background-repeat:no-repeat;text-decoration:none;color:#fff;transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
+.bx-hs:hover,.bx-hs:focus-visible{z-index:2;transform:translateY(-7%) scale(1.07);box-shadow:0 1.2cqw 1.4cqw -.5cqw rgba(10,14,40,.55)}
+.bx-hs:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.bx-hs em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg);font-style:normal;font-size:max(10.5px,.8cqw);font-weight:600;letter-spacing:.01em;color:rgba(255,255,255,.95);white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+/* Objects are not lifted; pointing at one draws corner marks round it. */
+.bx-hs.is-ob{--m:.9cqw;--w:2px;transition:none}
+.bx-hs.is-ob:hover,.bx-hs.is-ob:focus-visible{transform:none;box-shadow:none;outline:0;
+  background:
+    linear-gradient(var(--lime),var(--lime)) 0 0/var(--m) var(--w) no-repeat,linear-gradient(var(--lime),var(--lime)) 0 0/var(--w) var(--m) no-repeat,
+    linear-gradient(var(--lime),var(--lime)) 100% 0/var(--m) var(--w) no-repeat,linear-gradient(var(--lime),var(--lime)) 100% 0/var(--w) var(--m) no-repeat,
+    linear-gradient(var(--lime),var(--lime)) 0 100%/var(--m) var(--w) no-repeat,linear-gradient(var(--lime),var(--lime)) 0 100%/var(--w) var(--m) no-repeat,
+    linear-gradient(var(--lime),var(--lime)) 100% 100%/var(--m) var(--w) no-repeat,linear-gradient(var(--lime),var(--lime)) 100% 100%/var(--w) var(--m) no-repeat}
+
+
+/* ================= v18 changes =================
+   Layout: three portrait blocks on top (Self, Zomato, human-centered design), two numbers and the shelf below. */
+.bx[data-theme="blueprint"]{--mint:#00ffb6;--sun:#ffd84d;--zred:#e23744;--ink:#0f1638;
+  --disp:"Bricolage Grotesque",Geist,-apple-system,"Helvetica Neue",Arial,sans-serif;--serif:"Instrument Serif","Times New Roman",serif}
+.bx-self{grid-column:1/3;grid-row:1/3}
+.bx-zo{grid-column:3/5;grid-row:1/3}
+.bx-hcd{grid-column:5/7;grid-row:1/3}
+.bx-rescue{grid-column:1;grid-row:3/5}
+.bx-ads{grid-column:2;grid-row:3/5}
+.bx-cab{grid-column:3/7;grid-row:3/5}
+
+/* Lettering: a display grotesque for the greeting and the big numbers, an italic serif in colour for the words that matter. */
+.bx[data-theme="blueprint"] .bx-hi{font-family:var(--disp);font-weight:750;letter-spacing:-.035em;word-spacing:.06em;font-size:min(5.5cqw,12.2cqh)}
+.bx-hi em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;font-size:1.16em;color:var(--lime);padding-right:.06em}
+.bx-say b{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.14em;letter-spacing:-.01em}
+.bx-say .c-self{color:var(--mint)}.bx-say .c-hcd{color:var(--sun)}.bx-say .c-num{color:var(--lime)}.bx-say .c-zo{color:#ffb3ba}
+.bx[data-theme="blueprint"] .bx-say{color:#e3e9ff}
+.bx-facts li b{font-weight:600}
+.bx[data-theme="blueprint"] .bx-facts i{color:var(--lime)}
+.bx-stat b,.bx-m b{font-family:var(--disp);font-weight:750}
+
+/* Self, in Self's colours: mint card, black logo, a large tone-on-tone mark. */
+.bx[data-theme="blueprint"] .bx-self{background:var(--mint);color:#04140e;padding:1.2cqw 1.3cqw 1.2cqw;justify-content:flex-start}
+.bx-self .bx-tag{background:rgba(4,20,14,.12);color:#04140e}
+.bx-self-logo{height:3.1cqw;margin-top:.2cqw}
+.bx-self-mark{position:absolute;right:-12%;bottom:-10%;width:78%;aspect-ratio:1;background:url("assets/self-mark.svg") center/contain no-repeat;opacity:.13;filter:brightness(0);pointer-events:none}
+.bx-self .bx-t{position:absolute;left:1.3cqw;right:1.3cqw;bottom:1.2cqw;color:#0b3a2b;font-size:max(11px,.86cqw)}
+.bx-self .bx-t b{font-family:var(--disp);font-weight:700;font-size:max(15px,1.5cqw);line-height:1.1;letter-spacing:-.02em;color:#04140e;margin-bottom:.3em}
+
+/* Human-centered design: one block, three projects, as a deck of cards. */
+.bx-hcd{background:#fbf6ea;padding:1.1cqw 1.2cqw}
+.bx-hcd .bx-t b{font-family:var(--disp);font-weight:700;font-size:max(14px,1.3cqw);letter-spacing:-.02em}
+.bx-deck{position:absolute;left:0;right:0;top:25%;bottom:13%}
+.bx-card{position:absolute;left:27%;top:5%;width:46%;height:86%;border-radius:.9cqw;overflow:hidden;background:#fff;box-shadow:0 .9cqw 1.4cqw -.6cqw rgba(15,22,56,.5),0 0 0 1px rgba(15,22,56,.08);transition:transform .85s var(--ease),opacity .4s ease}
+.bx-card img{display:block;width:100%;height:100%;object-fit:cover;object-position:top center}
+.bx-card.c-chase{background:linear-gradient(180deg,#eef0f8,#d5dcee)}
+.bx-card.c-chase img{object-fit:contain;object-position:center 34%;padding:0 7%}
+.bx-card i{position:absolute;left:.5cqw;bottom:.5cqw;padding:.24em .7em;border-radius:99px;background:rgba(255,255,255,.94);color:#131416;font-style:normal;font-size:max(10.5px,.74cqw);font-weight:600;box-shadow:0 1px 3px rgba(15,22,56,.25)}
+.bx-card[data-pos="0"]{z-index:3;transform:rotate(-4deg)}
+.bx-card[data-pos="1"]{z-index:2;transform:translate(34%,2%) rotate(10deg) scale(.95)}
+.bx-card[data-pos="2"]{z-index:1;transform:translate(-34%,3%) rotate(-12deg) scale(.92)}
+.bx-card.is-out{z-index:4;transform:translate(118%,-14%) rotate(26deg);opacity:0}
+.bx-hcd:hover .bx-card[data-pos="0"],.bx-hcd:focus-visible .bx-card[data-pos="0"]{transform:translateY(-3%) rotate(-2deg) scale(1.03)}
+.bx-hcd:hover .bx-card[data-pos="1"],.bx-hcd:focus-visible .bx-card[data-pos="1"]{transform:translate(52%,4%) rotate(16deg) scale(.96)}
+.bx-hcd:hover .bx-card[data-pos="2"],.bx-hcd:focus-visible .bx-card[data-pos="2"]{transform:translate(-52%,5%) rotate(-18deg) scale(.94)}
+.bx-deck-cap{position:absolute;left:1.2cqw;right:1.2cqw;bottom:.9cqw;font-size:max(11px,.8cqw);color:#5d6068;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Food waste: Zomato red, with the Food Rescue bag. Ads revenue: ink card, tall lime chart. */
+.bx[data-theme="blueprint"] .bx-rescue{background:var(--zred);color:#fff;padding:1cqw 1cqw 1.1cqw}
+.bx-rescue .bx-mf{color:rgba(255,255,255,.86)}
+.bx-rescue .bx-ml{color:#fff}
+.bx-bag{display:block;width:92%;height:auto;margin:auto auto .6cqw;filter:drop-shadow(0 .7cqw .7cqw rgba(90,10,16,.45));transform:translateY(8%) rotate(-5deg);opacity:0;transition:transform 1s var(--ease) 1.2s,opacity .6s ease 1.2s}
+.is-in .bx-bag{transform:rotate(-5deg);opacity:1}
+.bx-rescue:hover .bx-bag{transition-delay:0s;transform:translateY(-4%) rotate(3deg)}
+.bx-rescue b,.bx-ads b{font-size:2.5cqw;letter-spacing:-.05em}
+.bx[data-theme="blueprint"] .bx-ads{background:var(--ink);color:#fff;padding:1cqw 1cqw 1.1cqw}
+.bx-ads .bx-mf{color:#aab5ea}
+.bx-ads .bx-ml{color:#e3e9ff}
+.bx-ads .bx-bars{left:1cqw;right:1cqw;bottom:1.1cqw;height:46%;justify-content:space-between;gap:.35cqw}
+.bx-ads .bx-bars i{flex:1;width:auto;background:rgba(255,255,255,.26);border-radius:.25cqw .25cqw 0 0}
+.bx-ads .bx-bars i.is-y{background:var(--lime)}
+.bx-ads .bx-bars i:nth-child(4){transition-delay:1.7s}.bx-ads .bx-bars i:nth-child(5){transition-delay:1.85s}
+
+@media (prefers-reduced-motion:reduce){
+  .bx *,.bx *::before,.bx *::after{transition:none!important;animation:none!important}
+}
+
+/* Phones and narrow windows: words first, then the same blocks in two columns. No tilt. */
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx{height:auto;min-height:100svh;container-type:inline-size;padding-bottom:28px;--g:10px;--r:16px}
+  .bx-nav{position:relative;height:56px}
+  .bx-links .bx-a:nth-child(2){display:none}
+  .bx-text{position:relative;left:auto;top:auto;transform:none;width:auto;padding:16px var(--pad) 0}
+  .bx-hi{font-size:min(14cqw,72px)}
+  .bx-say{font-size:min(6cqw,28px);height:2.5em}
+  .bx-facts li{font-size:13.5px;padding:9px 0}
+  .bx-cta{gap:2px 22px}
+  .bx-btn{flex:1 0 100%;justify-content:center}
+  .bx-stage{position:relative;left:auto;top:auto;width:auto;height:auto;perspective:none;margin:26px var(--pad) 0}
+  .bx-board{height:auto;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:38cqw;transform:none}
+  .bx-b{transform:translateY(24px)}
+  .is-in .bx-b,.bx-b:hover,.bx-b.is-hot{transform:none}
+  .bx-self,.bx-zo,.bx-ch,.bx-mc,.bx-cab{grid-column:1/3}
+  .bx-self{grid-row:auto}.bx-rescue,.bx-ads{grid-column:auto;grid-row:auto}
+  .bx-zo{grid-row:span 3}.bx-ch{grid-row:span 2}.bx-mc{grid-row:span 3}.bx-cab{grid-row:auto;display:block}
+  .bx-cab{transform:translateY(24px)}
+  .bx-zo img{top:auto;bottom:0}
+  .bx-tag{right:12px;top:12px;font-size:11px}
+  .bx-t{font-size:12.5px}.bx-t b{font-size:15.5px}
+  .bx-self{padding:14px 16px}.bx-self-logo{height:30px}
+  .bx-stat{left:16px;top:14px;font-size:13px}.bx-stat b{font-size:17cqw}
+  .bx-ch{padding:14px 16px}.bx-ui{translate:none}
+  .bx-m{padding:13px 14px}.bx-m b{font-size:9.6cqw}.bx-ml{font-size:12.5px}.bx-mf{font-size:11.5px}
+  .bx-mc .bx-tag{bottom:14px}
+  .bx-bars{right:13px;bottom:13px;gap:4px}.bx-bars i{width:9px;border-radius:3px 3px 0 0}
+  .bx-t-over{padding:40px 16px 14px}
+  .bx-cap{font-size:12px;margin-bottom:8px;white-space:normal}.bx-key{display:none}
+  .bx-shelf{max-height:none;border-radius:8px}
+  .bx-hs em{font-size:10px}
+  .bx-themes{position:relative;left:auto;bottom:auto;margin:22px var(--pad) 0}
+  .bx-box{--D:15cqw;--rim:5px;perspective-origin:50% 24%;border-radius:10px}
+  .bx-in{transform-origin:50% 24%}
+  .f-rim{border-radius:10px}
+  .bk-spine em{font-size:11px}.bk-cover b{font-size:12px}.bk-cover em{font-size:10.5px}
+}
+
+/* v18 on phones and narrow windows. */
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx[data-theme="blueprint"] .bx-hi{font-size:min(14.5cqw,74px)}
+  .bx-self,.bx-zo,.bx-hcd,.bx-cab{grid-column:1/3}
+  .bx-self{grid-row:span 2}.bx-zo{grid-row:span 3}.bx-hcd{grid-row:span 3}
+  .bx-rescue,.bx-ads{grid-column:auto;grid-row:span 2}
+  .bx[data-theme="blueprint"] .bx-self{padding:16px}
+  .bx-self-logo{height:38px}
+  .bx-self .bx-t{left:16px;right:16px;bottom:14px;font-size:12.5px}.bx-self .bx-t b{font-size:19px}
+  .bx-hcd{padding:14px 16px}.bx-hcd .bx-t b{font-size:17px}
+  .bx-card{border-radius:12px}.bx-card i{left:8px;bottom:8px;font-size:11px}
+  .bx-deck-cap{left:16px;right:16px;bottom:12px;font-size:12px}
+  .bx[data-theme="blueprint"] .bx-rescue,.bx[data-theme="blueprint"] .bx-ads{padding:13px}
+  .bx-rescue b,.bx-ads b{font-size:10.5cqw}
+  .bx-ads .bx-bars{left:13px;right:13px;bottom:13px;gap:5px}
+}
+
+/* ================= v19 changes =================
+   The blue wall and its grid now belong to the whole page, so the timeline below continues the same sheet. */
+html{scroll-behavior:smooth}
+.pg{position:relative;color:#fff;font-family:Geist,-apple-system,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;
+  --lime:#e4e84f;--fg2:#c9d4ff;--mint:#00ffb6;--disp:"Bricolage Grotesque",Geist,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  background:
+    linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px) 0 0/130px 130px,linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px) 0 0/130px 130px,
+    linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px) 0 0/26px 26px,#2143d2}
+.pg *{box-sizing:border-box}
+.bx[data-theme="blueprint"]{background:transparent;box-shadow:none}
+.bx[data-theme="blueprint"]::after,.bx[data-theme="blueprint"]::before{display:none}
+
+/* His name: the same display face as the greeting, in lime. No italic serif. */
+.bx-hi em{font-family:var(--disp);font-style:normal;font-weight:750;font-size:1em;letter-spacing:inherit;color:var(--lime);padding:0}
+
+/* Snapdeal in Snapdeal's colours: white card, red chart. */
+.bx[data-theme="blueprint"] .bx-ads{background:#fff;color:#1c1c20}
+.bx-ads .bx-mf{color:#e40046;font-weight:600}
+.bx-ads .bx-ml{color:#3a3c42}
+.bx-ads .bx-bars i{background:#f6cdd9}
+.bx-ads .bx-bars i.is-y{background:#e40046}
+
+/* Design cards: one clear picture on top, the partner's name and what it was underneath, in the partner's colour. */
+.bx-card{left:24%;top:2%;width:52%;height:94%;display:flex;flex-direction:column}
+.bx-card img,.bx-card.c-chase img{flex:1 1 0;min-height:0;width:100%;height:auto;padding:0;object-fit:cover;object-position:center}
+.bx-cp{flex:0 0 auto;display:block;padding:.6cqw .65cqw .65cqw;font-size:max(10.5px,.7cqw);line-height:1.25}
+.bx-cp b{display:block;margin-bottom:.15em;font-family:var(--disp);font-weight:750;font-size:max(13px,1.02cqw);line-height:1.08;letter-spacing:-.02em}
+.c-chase .bx-cp{background:#117aca;color:#fff}
+.c-mcd .bx-cp{background:#ffc72c;color:#27251f}
+.c-pg .bx-cp{background:#fff;color:#003da5}
+
+/* A small timeline along the bottom of the first screen. It is the top edge of the full timeline below. */
+.bx-rail{position:absolute;z-index:2;left:var(--pad);right:var(--pad);bottom:clamp(12px,2.2cqh,24px);height:44px;display:block;color:#fff;text-decoration:none;opacity:0;transition:opacity 1s ease 1.9s}
+.is-in .bx-rail{opacity:1}
+.bx-rail:focus-visible{outline:2px solid #fff;outline-offset:6px}
+.bx-rail-in{position:absolute;left:0;right:8.4em;top:0;bottom:0}
+.bx-rail-in::after{content:"";position:absolute;left:0;right:0;top:27px;height:1px;background:rgba(255,255,255,.45)}
+.bx-rb{position:absolute;height:5px;border-radius:3px;background:rgba(255,255,255,.6);transition:background .25s,transform .25s}
+.bx-rb.l0{top:1px}.bx-rb.l1{top:10px}.bx-rb.l2{top:19px;background:transparent;box-shadow:inset 0 0 0 1.2px rgba(255,255,255,.75)}
+.bx-rb.is-on{background:var(--lime);box-shadow:none;transform:scaleY(1.9)}
+.bx-ry{position:absolute;top:31px;font-size:10.5px;color:var(--fg2);transform:translateX(-50%)}
+.bx-rail-go{position:absolute;right:0;top:8px;display:inline-flex;align-items:center;gap:.5em;font-size:13px;font-weight:600;white-space:nowrap}
+.bx-rail-go svg{transition:transform .3s}
+.bx-rail:hover .bx-rail-go svg{transform:translateY(3px)}
+
+/* ---------- The timeline section ---------- */
+.tl{position:relative;padding:clamp(56px,10vh,110px) clamp(20px,4.6vw,80px) clamp(64px,11vh,120px)}
+.tl h2{margin:0;font-family:var(--disp);font-weight:750;font-size:clamp(34px,4.4vw,66px);line-height:1;letter-spacing:-.035em}
+.tl h2 em{font-style:normal;color:var(--lime)}
+.tl-sub{margin:.7em 0 0;max-width:36em;font-size:clamp(15px,1.3vw,19px);line-height:1.5;color:var(--fg2)}
+.tl-chart{position:relative;margin-top:clamp(34px,6vh,64px);height:322px}
+.tl-lane{position:absolute;left:0;right:0;height:58px}
+.tl-lane.l0{top:28px}.tl-lane.l1{top:122px}.tl-lane.l2{top:216px}
+.tl-lane::before{content:attr(data-lane);position:absolute;left:0;top:-23px;font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--fg2)}
+.tl-lane::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.16)}
+.tl-bar{position:absolute;z-index:1;top:0;height:100%;min-width:14px;margin:0;padding:0 12px;border:0;border-radius:9px;background:#fff;color:#131416;font:inherit;text-align:left;white-space:nowrap;overflow:hidden;cursor:pointer;transform:scaleX(0);transform-origin:left center;transition:transform 1s cubic-bezier(.16,.84,.24,1) calc(var(--k)*90ms),box-shadow .2s,filter .2s}
+.tl.is-in .tl-bar{transform:none}
+.tl-bar b{display:block;font-weight:650;font-size:14.5px;letter-spacing:-.01em}
+.tl-bar span{display:block;margin-top:1px;font-size:12px;color:#5d6068;overflow:hidden;text-overflow:ellipsis}
+.tl-bar.is-thin{padding:0}
+.tl-bar.is-thin b,.tl-bar.is-thin span{display:none}
+.tl-bar.is-cut{border-top-left-radius:0;border-bottom-left-radius:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px);mask-image:linear-gradient(90deg,transparent,#000 28px)}
+.l1 .tl-bar{background:var(--lime)}
+.l2 .tl-bar{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px #fff;color:#fff}
+.l2 .tl-bar span{color:var(--fg2)}
+.tl-bar[data-id="self-xyz"]{background:var(--mint)}
+.tl-bar:hover{filter:brightness(1.06)}
+.tl-bar.is-sel{box-shadow:0 0 0 3px #2143d2,0 0 0 6px #fff}
+.l2 .tl-bar.is-sel{box-shadow:inset 0 0 0 1.5px #fff,0 0 0 3px #2143d2,0 0 0 6px #fff}
+.tl-bar:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.tl-tip{position:absolute;z-index:1;bottom:calc(100% + 5px);font-size:12px;font-weight:600;white-space:nowrap;transform:translateX(-50%);opacity:0;transition:opacity .6s ease 1s}
+.tl.is-in .tl-tip{opacity:1}
+.tl-bar.is-half{padding:0 10px;display:flex;align-items:center}
+.tl-bar.is-half b{font-size:13px}
+.tl-bar.is-half span{display:none}
+.tl-bar.is-half.is-thin{padding:0}
+.tl-tip.is-below{bottom:auto;top:calc(100% + 4px)}
+.tl-tip,.tl-yr,.bx-ry{font-style:normal}
+.tl-axis{position:absolute;left:0;right:0;bottom:0;height:30px;border-top:1.5px solid rgba(255,255,255,.6)}
+.tl-yr{position:absolute;top:9px;font-size:12.5px;color:var(--fg2);transform:translateX(-50%)}
+.tl-yr::before{content:"";position:absolute;left:50%;top:-9px;height:6px;border-left:1.5px solid rgba(255,255,255,.6)}
+.tl-now{position:absolute;top:6px;bottom:30px;border-left:1.5px dashed var(--lime);pointer-events:none}
+.tl-now::before{content:"Today";position:absolute;left:6px;top:-6px;font-size:11.5px;font-weight:600;color:var(--lime)}
+.tl-card{margin-top:30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px 56px;align-items:start;padding:26px 30px;border-radius:20px;background:#fff;color:#131416;box-shadow:0 26px 40px -22px rgba(6,14,70,.6)}
+.tl-card h3{margin:0;font-family:var(--disp);font-weight:750;font-size:clamp(22px,2.3vw,34px);line-height:1.05;letter-spacing:-.03em}
+.tl-who{margin:.5em 0 0;font-size:15px;font-weight:600}
+.tl-when{margin:.25em 0 0;font-size:13.5px;color:#5d6068}
+.tl-what{margin:0;font-size:clamp(15.5px,1.3vw,19px);line-height:1.5;color:#2c2e33}
+.tl-list{display:none;margin:26px 0 0;padding:0;list-style:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .tl *{transition:none!important}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx-rail{display:none}
+  .tl{padding:44px 26px 64px}
+  .tl-chart,.tl-card{display:none}
+  .tl-list{display:block}
+  .tl-list li{display:grid;grid-template-columns:5.6em 1fr;gap:4px 14px;padding:14px 0;border-top:1px solid rgba(255,255,255,.28)}
+  .tl-list li i{font-style:normal;font-size:12px;line-height:1.5;color:var(--fg2)}
+  .tl-list li b{display:block;font-size:15.5px;font-weight:600}
+  .tl-list li span{display:block;font-size:13.5px;color:var(--fg2)}
+  .tl-list li em{display:inline-block;margin-bottom:5px;padding:.12em .6em;border-radius:99px;font-style:normal;font-size:11px;font-weight:600;background:rgba(255,255,255,.14)}
+}
+
+/* ================= v20 changes =================
+   Depth is now real everywhere: things that should stand out sit in front of their block in 3D space,
+   so they shift against the block as the wall turns and can reach past its edge. */
+
+/* Zomato: the brand bubbles float in front of the phone. */
+.bx-zo{overflow:visible;transform-style:preserve-3d;background:transparent}
+.bx-zo-clip{position:absolute;inset:0;border-radius:inherit;overflow:hidden;background:#0e0e0e}
+.bx-zo-clip img{position:absolute;left:0;top:24%;width:100%;height:auto}
+.bx-zo-bubs{position:absolute;left:0;top:24%;width:100%;aspect-ratio:772/1008;transform-style:preserve-3d;pointer-events:none}
+.bx-bub{position:absolute;left:var(--l);top:var(--t);width:var(--s);aspect-ratio:1;border-radius:50%;transform:translateZ(var(--bz));scale:0;translate:0 0;box-shadow:0 1.2cqw 1.3cqw -.5cqw rgba(0,0,0,.6);transition:scale .9s var(--ease) var(--bd),translate .6s var(--ease),transform .6s var(--ease)}
+.bx-bub img{position:static;display:block;width:100%;height:100%;animation:bx-bob var(--bt) ease-in-out var(--bo) infinite}
+@keyframes bx-bob{0%,100%{transform:translateY(-3.5%)}50%{transform:translateY(3.5%)}}
+.is-in .bx-bub{scale:1}
+.is-set .bx-bub{transition:scale .5s var(--ease),translate .6s var(--ease),transform .6s var(--ease)}
+/* Pointing at the block, or the sentence reaching it, pushes them further out. */
+.bx-zo:hover .bx-bub,.bx-zo:focus-visible .bx-bub,.bx-zo.is-hot .bx-bub{scale:1.28;translate:var(--px) var(--py);transform:translateZ(calc(var(--bz)*2.1))}
+.b-ph{--l:81.6%;--t:24.5%;--s:15.8%;--bz:3.4cqw;--px:10%;--py:-26%;--bd:1.5s;--bt:5.2s;--bo:-1s}
+.b-bk{--l:1.8%;--t:48.8%;--s:19.4%;--bz:4.6cqw;--px:-30%;--py:-6%;--bd:1.65s;--bt:6.1s;--bo:-3s}
+.b-dm{--l:73.7%;--t:61.4%;--s:23.3%;--bz:5.6cqw;--px:22%;--py:8%;--bd:1.8s;--bt:5.6s;--bo:-2s}
+
+/* Human-centered design: the three cards are a real fan standing off the block. */
+.bx-hcd{overflow:visible;transform-style:preserve-3d}
+.bx-deck{transform-style:preserve-3d}
+.bx-card{box-shadow:0 1px 0 #e6e0d2,0 2px 0 #d9d2c2,0 3px 0 #cbc3b1,0 1.6cqw 1.8cqw -.6cqw rgba(15,22,56,.55)}
+.bx-card[data-pos="0"]{transform:translateZ(3.6cqw) rotate(-4deg)}
+.bx-card[data-pos="1"]{transform:translate(34%,2%) translateZ(2.1cqw) rotate(10deg) scale(.95)}
+.bx-card[data-pos="2"]{transform:translate(-34%,3%) translateZ(.9cqw) rotate(-12deg) scale(.92)}
+.bx-card.is-out{transform:translate(26%,-34%) translateZ(9cqw) rotate(16deg);opacity:0}
+.bx-hcd:hover .bx-card[data-pos="0"],.bx-hcd:focus-visible .bx-card[data-pos="0"]{transform:translateY(-4%) translateZ(6cqw) rotate(-2deg) scale(1.04)}
+.bx-hcd:hover .bx-card[data-pos="1"],.bx-hcd:focus-visible .bx-card[data-pos="1"]{transform:translate(54%,4%) translateZ(3.6cqw) rotate(16deg) scale(.97)}
+.bx-hcd:hover .bx-card[data-pos="2"],.bx-hcd:focus-visible .bx-card[data-pos="2"]{transform:translate(-54%,5%) translateZ(1.8cqw) rotate(-18deg) scale(.95)}
+
+/* Books: every spine is lettered differently, like a real shelf, and a book is a solid block when you pull it out. */
+.bx-cab,.bx-shelf{transform-style:preserve-3d}
+.bx-hs.is-bk{transform-style:preserve-3d;--bt2:2.4cqw}
+.bx-hs.is-bk::before{content:"";position:absolute;left:100%;top:0;width:var(--bt2);height:100%;background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(0,0,0,.05)),var(--bc);transform-origin:0 50%;transform:rotateY(90deg)}
+.bx-hs.is-bk::after{content:"";position:absolute;left:0;top:0;width:100%;height:var(--bt2);background:repeating-linear-gradient(90deg,#f3ecdc 0 1px,#ded5c0 1px 2.2px);transform-origin:50% 0;transform:rotateX(-90deg)}
+.bx-hs.is-bk:hover,.bx-hs.is-bk:focus-visible{z-index:2;transform:translate3d(0,-4%,3.4cqw) rotateX(-7deg) rotateY(-16deg);box-shadow:none}
+.bx-hs em{font-size:max(10.5px,.82cqw);letter-spacing:.01em;text-shadow:none}
+.bx-hs em::before,.bx-hs em::after{content:"";position:absolute;top:8%;bottom:8%;width:1px}
+.sp-1 em{font-family:var(--serif);font-size:max(13px,1.12cqw);color:#f3d98b;letter-spacing:.02em}
+.sp-1 em::before{left:14%;right:14%;top:5%;bottom:auto;width:auto;height:1px;background:#f3d98b;box-shadow:0 3px 0 #f3d98b}
+.sp-2 em{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:max(10px,.76cqw);letter-spacing:.14em;color:#f4efe2}
+.sp-3 em{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-weight:600;font-size:max(10px,.74cqw);letter-spacing:.06em;color:#3a2a05}
+.sp-3 em::after{left:20%;right:20%;top:auto;bottom:6%;width:auto;height:.5cqw;background:#3a2a05;border-radius:1px}
+.sp-4 em{font-family:var(--serif);font-style:italic;font-size:max(13px,1.14cqw);color:#f6f1e4}
+.sp-5 em{font-family:var(--disp);font-weight:700;font-size:max(11px,.88cqw);letter-spacing:-.01em;color:#ffd84d}
+.sp-5 em::before{left:14%;right:14%;top:auto;bottom:5%;width:auto;height:1px;background:#ffd84d;box-shadow:0 -3px 0 #ffd84d}
+.sp-6 em{font-weight:700;text-transform:uppercase;font-size:max(9.5px,.7cqw);letter-spacing:.18em;color:#fff3e6}
+
+/* ---------- The timeline, redone: a road of stops, newest first. Each stop is a card in that place's own colour, with its picture. ---------- */
+.tl{padding-bottom:clamp(72px,12vh,140px)}
+.tl-road{position:relative;list-style:none;margin:clamp(34px,6vh,64px) 0 0;padding:0;perspective:1600px}
+.tl-road::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;border-radius:2px;background:linear-gradient(to bottom,var(--lime),rgba(255,255,255,.75) 12%,rgba(255,255,255,.75) 92%,transparent)}
+.tl-stop{position:relative;display:grid;grid-template-columns:minmax(0,1fr) clamp(96px,10vw,150px) minmax(0,1fr);align-items:center;margin-bottom:clamp(18px,3vh,30px)}
+.tl-yr{grid-column:2;grid-row:1;justify-self:center;position:static;transform:none;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:5.2em;padding:.5em .7em;border-radius:99px;background:#fff;color:#131416;font-family:var(--disp);font-weight:750;font-size:clamp(15px,1.5vw,22px);line-height:1;letter-spacing:-.02em;box-shadow:0 10px 18px -8px rgba(6,14,70,.6)}
+.tl-yr::before{display:none}
+.tl-yr small{display:block;margin-top:.3em;font-family:Geist,sans-serif;font-weight:500;font-size:11.5px;letter-spacing:0;color:#5d6068;white-space:nowrap}
+.tl-item{grid-row:1;display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1fr);min-height:clamp(170px,22vh,220px);border-radius:24px;overflow:hidden;background:var(--c);color:var(--f);box-shadow:0 30px 44px -26px rgba(6,14,70,.7);opacity:0;transition:transform 1.1s var(--ease,cubic-bezier(.16,.84,.24,1)),opacity .7s ease}
+.tl-stop.is-l .tl-item{grid-column:1;transform:translateX(-9%) rotateY(26deg);transform-origin:right center}
+.tl-stop.is-r .tl-item{grid-column:3;transform:translateX(9%) rotateY(-26deg);transform-origin:left center}
+.tl-stop.is-in .tl-item{opacity:1;transform:none}
+.tl-pic{position:relative;min-height:0;background:var(--c2,rgba(0,0,0,.14)) center/cover no-repeat}
+.tl-pic.is-logo{background-size:56% auto}
+.tl-stop.is-r .tl-pic{order:2}
+.tl-body{padding:clamp(16px,1.8vw,26px) clamp(16px,1.9vw,28px);display:flex;flex-direction:column;justify-content:center;min-width:0}
+.tl-kind{font-size:12px;font-weight:600;letter-spacing:.02em;opacity:.78}
+.tl-item h3{margin:.25em 0 0;font-family:var(--disp);font-weight:750;font-size:clamp(20px,2vw,30px);line-height:1.05;letter-spacing:-.03em}
+.tl-who{margin:.45em 0 0;font-size:14.5px;font-weight:600}
+.tl-who span{font-weight:400;opacity:.8}
+.tl-what{margin:.55em 0 0;font-size:clamp(13.5px,1.02vw,15.5px);line-height:1.45;opacity:.92;color:inherit}
+.tl-pic.is-fit{background-size:contain}
+.tl-chips{display:flex;flex-wrap:wrap;gap:6px;margin:.9em 0 0;padding:0;list-style:none}
+.tl-chips li{padding:.28em .75em;border-radius:99px;background:var(--chip,rgba(255,255,255,.2));font-size:12px;font-weight:600;white-space:nowrap}
+/* Side projects are small pins on the road between the stops. */
+.tl-pin{position:relative;display:grid;grid-template-columns:minmax(0,1fr) clamp(96px,10vw,150px) minmax(0,1fr);align-items:center;margin-bottom:clamp(18px,3vh,30px)}
+.tl-pin i{grid-column:2;justify-self:center;width:15px;height:15px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px #2143d2,0 0 0 5.5px var(--lime)}
+.tl-pin p{margin:0;font-size:14.5px;line-height:1.35;color:var(--fg2)}
+.tl-pin p b{display:block;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:-.01em;color:#fff}
+.tl-pin.is-l p{grid-column:1;grid-row:1;text-align:right;padding-right:6px}
+.tl-pin.is-r p{grid-column:3;grid-row:1;padding-left:6px}
+@media (prefers-reduced-motion:reduce){
+  .bx-bub img{animation:none}
+  .tl-item{opacity:1!important;transform:none!important}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx-hs.is-bk::before,.bx-hs.is-bk::after{display:none}
+  .tl-road{perspective:none}
+  .tl-road::before{left:9px}
+  .tl-stop,.tl-pin{display:block;padding-left:34px}
+  .tl-yr{position:absolute;left:-2px;top:14px;min-width:0;width:24px;height:24px;padding:0;font-size:0;border-radius:50%}
+  .tl-yr small{display:none}
+  .tl-stop.is-l .tl-item,.tl-stop.is-r .tl-item{transform:translateY(20px)}
+  .tl-stop.is-in .tl-item{transform:none}
+  .tl-item{grid-template-columns:1fr;min-height:0;border-radius:20px}
+  .tl-pic{height:150px;order:0!important}
+  .tl-item h3{font-size:22px}
+  .tl-pin i{position:absolute;left:2px;top:6px}
+  .tl-pin p,.tl-pin.is-l p{text-align:left;padding:0}
+}
+/* The shelf caption sits on the right, clear of the bubble that hangs off the Zomato block. */
+.bx-cap{justify-content:flex-end}
+.bx-cap-t{text-align:right}
+
+/* ================= v21: the timeline on one screen =================
+   What the current site's timeline does well: the whole path is readable almost without scrolling, and you open the part you
+   care about. So: every stop is a small card in one row, the true dates are drawn on one line under them, and picking a stop
+   opens it in the panel below, with what he did there. Nothing else to scroll. */
+.tv{min-height:100svh;display:flex;flex-direction:column;padding-top:clamp(36px,6vh,72px);padding-bottom:clamp(30px,5vh,60px)}
+.tv-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px 48px}
+.tv h2{font-size:clamp(30px,3.6vw,54px)}
+.tv .tl-sub{margin:0;max-width:27em;font-size:clamp(14px,1.15vw,17px);text-align:right}
+.tv-strip{display:grid;grid-template-columns:repeat(var(--n,7),minmax(0,1fr));gap:clamp(8px,.9vw,14px);margin-top:clamp(18px,3.2vh,34px);perspective:1400px}
+.tv-stop{position:relative;display:flex;flex-direction:column;min-width:0;height:clamp(148px,21vh,204px);margin:0;padding:0;border:0;border-radius:18px;overflow:hidden;background:var(--c);color:var(--f);font:inherit;text-align:left;cursor:pointer;box-shadow:0 18px 26px -16px rgba(6,14,70,.7);opacity:0;transform:translateY(28px) rotateX(20deg);transform-origin:50% 100%;transition:transform .7s cubic-bezier(.16,.84,.24,1) calc(var(--k)*60ms),opacity .5s ease calc(var(--k)*60ms),box-shadow .3s}
+.tv.is-in .tv-stop{opacity:1;transform:none}
+.tv.is-set .tv-stop{transition:transform .35s cubic-bezier(.16,.84,.24,1),box-shadow .3s}
+.tv.is-in .tv-stop:hover{transform:translateY(-6px)}
+.tv.is-in .tv-stop[aria-selected="true"]{transform:translateY(-12px);box-shadow:0 0 0 3px #2143d2,0 0 0 6px #fff,0 28px 30px -16px rgba(6,14,70,.85)}
+.tv-stop:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.tv-pic{flex:1 1 0;min-height:0;background:var(--c2,rgba(0,0,0,.12)) center/cover no-repeat}
+.tv-pic.is-logo{background-size:auto 56%}
+.tv-pic.is-fit{background-size:contain}
+.tv-txt{flex:0 0 auto;padding:9px 12px 11px}
+.tv-txt b{display:block;font-family:var(--disp);font-weight:750;font-size:clamp(15px,1.3vw,19px);line-height:1.1;letter-spacing:-.02em}
+.tv-txt span{display:block;margin-top:3px;font-size:12px;line-height:1.3;opacity:.86;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-txt i{display:block;margin-top:4px;font-style:normal;font-size:12px;font-weight:600}
+/* The time line: each stop as a bar in its own colour at its true dates; side builds as dots. */
+.tv-axis{position:relative;height:50px;margin-top:16px}
+.tv-axis::before{content:"";position:absolute;left:0;right:0;top:25px;height:1.5px;background:rgba(255,255,255,.55)}
+.tv-seg{position:absolute;height:7px;border-radius:4px;background:var(--c);box-shadow:0 0 0 1.5px #2143d2;transition:transform .25s,box-shadow .25s}
+.tv-seg.r0{top:4px}.tv-seg.r1{top:14px}
+.tv-seg.is-on{transform:scaleY(1.5);box-shadow:0 0 0 1.5px #2143d2,0 0 0 3.5px #fff}
+.tv-dot{position:absolute;top:19px;width:14px;height:14px;margin:0 0 0 -7px;padding:0;border:0;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px #2143d2;cursor:pointer;transition:transform .2s}
+.tv-dot:hover,.tv-dot[aria-selected="true"]{transform:scale(1.35)}
+.tv-dot:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.tv-y{position:absolute;top:33px;font-size:12px;font-style:normal;color:var(--fg2);transform:translateX(-50%);pointer-events:none}
+.tv-dot{z-index:1}
+.tv-y::before{content:"";position:absolute;left:50%;top:-8px;height:6px;border-left:1.5px solid rgba(255,255,255,.55)}
+/* The open stop. */
+.tv-panel{flex:1 1 auto;min-height:clamp(236px,33vh,330px);margin-top:14px;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.25fr) minmax(0,1.3fr);border-radius:24px;overflow:hidden;background:var(--c);color:var(--f);box-shadow:0 30px 44px -26px rgba(6,14,70,.75);transition:opacity .25s ease,transform .35s cubic-bezier(.16,.84,.24,1)}
+.tv-panel.is-swap{opacity:0;transform:translateY(10px)}
+.tv-panel.no-pic{grid-template-columns:minmax(0,1.25fr) minmax(0,1.3fr)}
+.tv-panel.no-pic .tv-ppic{display:none}
+.tv-ppic{min-height:0;background:var(--c2,rgba(0,0,0,.12)) center/cover no-repeat}
+.tv-ppic.is-logo{background-size:auto 44%}
+.tv-ppic.is-fit{background-size:contain}
+.tv-pmain{padding:clamp(18px,2.2vw,32px);display:flex;flex-direction:column;justify-content:center;min-width:0}
+.tv-kind{font-size:12px;font-weight:600;opacity:.8}
+.tv-pmain h3{margin:.25em 0 0;font-family:var(--disp);font-weight:750;font-size:clamp(22px,2.4vw,36px);line-height:1.04;letter-spacing:-.03em}
+.tv-who{margin:.5em 0 0;font-size:15px;font-weight:600}
+.tv-who span{font-weight:400;opacity:.82}
+.tv-what{margin:.6em 0 0;font-size:clamp(14px,1.1vw,16.5px);line-height:1.45;opacity:.94}
+.tv-chips{display:flex;flex-wrap:wrap;gap:6px;margin:1em 0 0;padding:0;list-style:none}
+.tv-chips li{padding:.28em .75em;border-radius:99px;background:var(--chip,rgba(255,255,255,.2));font-size:12px;font-weight:600;white-space:nowrap}
+.tv-psub{padding:clamp(16px,1.8vw,26px);display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0;background:rgba(0,0,0,.09)}
+.tv-psub h4{margin:0 0 2px;font-size:12px;font-weight:600;opacity:.8}
+.tv-sub{padding:9px 12px;border-radius:12px;background:var(--chip,rgba(255,255,255,.18))}
+.tv-sub b{display:block;font-size:14px;font-weight:650;letter-spacing:-.005em}
+.tv-sub span{margin-top:2px;font-size:12.5px;line-height:1.35;opacity:.92;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.tv-psub:empty{display:none}
+@media (prefers-reduced-motion:reduce){
+  .tv-stop{opacity:1!important;transform:none!important;transition:none!important}
+  .tv-panel{transition:none}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .tv{min-height:0;display:block}
+  .tv .tl-sub{text-align:left}
+  .tv-strip{display:flex;gap:10px;margin:22px -26px 0;padding:14px 26px 8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;perspective:none}
+  .tv-strip::-webkit-scrollbar{display:none}
+  .tv-stop{flex:0 0 40vw;height:168px;scroll-snap-align:center;transform:translateY(16px)}
+  .tv-axis{display:none}
+  .tv-panel,.tv-panel.no-pic{display:block;min-height:0;margin-top:12px;border-radius:20px}
+  .tv-ppic{height:150px}
+  .tv-pmain{padding:18px}
+  .tv-pmain h3{font-size:23px}
+  .tv-psub{padding:14px 18px 18px}
+}
+
+/* ================= v22 =================
+   1. The mat is an object now: rounded, with a thick edge and a shadow, lying on a dark dotted desk (the same idea as the
+      mat on the current site). The grid belongs to the mat, not to the whole page.
+   2. The timeline is driven by scrolling. It stays in place while you scroll; a marker travels back along the date line and
+      the stop it reaches grows wide and shows what happened there. Nothing is open before you scroll.
+   3. Every stop is a link to its page. There is no panel. */
+html,body{background:#080b1a}
+.pg{--desk:clamp(10px,1.25vw,22px);padding:var(--desk);background:#080b1a radial-gradient(rgba(228,232,79,.2) .8px,transparent .95px) 0 0/9px 9px}
+.mat{position:relative;border-radius:clamp(16px,1.7vw,28px);
+  background:
+    linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px) 0 0/130px 130px,linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px) 0 0/130px 130px,
+    linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px) 0 0/26px 26px,#2143d2;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2),inset 0 0 7vw rgba(8,14,70,.35),0 7px 0 #15298f,0 46px 80px -22px rgba(0,0,0,.85)}
+.bx[data-theme="blueprint"]{height:calc(100svh - var(--desk));border-radius:inherit}
+
+/* ---------- timeline: pinned, scroll-driven ---------- */
+.tv{display:block;min-height:0;padding:0;height:calc(100svh + var(--n,7)*30vh + 34vh)}
+.tv-pin{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;padding:clamp(30px,5vh,60px) clamp(20px,4.6vw,80px) clamp(26px,4.4vh,50px)}
+.tv-strip{flex:1 1 auto;min-height:0;display:flex;align-items:stretch;gap:clamp(8px,.9vw,14px);margin-top:clamp(16px,3vh,30px);perspective:none}
+.tv-stop{flex:var(--w,1) 1 0;position:relative;display:block;min-width:0;height:auto;margin:0;padding:0;border-radius:20px;overflow:hidden;background:var(--c);color:var(--f);text-decoration:none;cursor:pointer;
+  box-shadow:0 calc(18px + var(--up,0)*16px) calc(26px + var(--up,0)*18px) -16px rgba(6,14,70,.75);opacity:0;transform:translateY(30px);
+  transition:opacity .6s ease calc(var(--k)*60ms),transform .7s cubic-bezier(.16,.84,.24,1) calc(var(--k)*60ms)}
+.tv.is-in .tv-stop{opacity:1;transform:translateY(calc(var(--up,0)*-12px))}
+.tv.is-set .tv-stop{transition:none}
+.tv.is-in .tv-stop:hover,.tv.is-in .tv-stop[aria-selected]{transform:translateY(calc(var(--up,0)*-12px))}
+.tv.is-in .tv-stop:hover{filter:brightness(1.05)}
+.tv.is-in .tv-stop[aria-selected="true"]{box-shadow:0 calc(18px + var(--up,0)*16px) calc(26px + var(--up,0)*18px) -16px rgba(6,14,70,.75)}
+.tv-stop:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+/* Left part: what every stop always shows. Right part: revealed as the stop grows wide. */
+.tv-left{position:absolute;left:0;top:0;bottom:0;width:min(100%,var(--lw));display:flex;flex-direction:column}
+.tv{--lw:clamp(150px,13.4vw,204px)}
+.tv-pic{flex:1 1 0;min-height:0}
+.tv-more{position:absolute;left:var(--lw);top:0;bottom:0;width:clamp(260px,27vw,400px);padding:clamp(16px,1.6vw,26px);display:flex;flex-direction:column;justify-content:center;opacity:var(--o,0);pointer-events:none}
+.tv-more .tv-kind{font-size:12px;font-weight:600;opacity:.8}
+.tv-more h3{margin:.25em 0 0;font-family:var(--disp);font-weight:750;font-size:clamp(20px,1.95vw,29px);line-height:1.05;letter-spacing:-.03em}
+.tv-more .tv-who{margin:.5em 0 0;font-size:14px;font-weight:600}
+.tv-more .tv-who span{font-weight:400;opacity:.82}
+.tv-more .tv-what{margin:.6em 0 0;font-size:clamp(13.5px,1.02vw,15.5px);line-height:1.42;opacity:.94;color:inherit}
+.tv-more .tv-chips{margin:.8em 0 0}
+.tv-in{margin:.9em 0 0;padding:0;list-style:none;font-size:13px;line-height:1.35}
+.tv-in li{position:relative;padding:.22em 0 .22em 1.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-in li::before{content:"";position:absolute;left:.15em;top:.82em;width:.42em;height:.42em;border-radius:50%;background:currentColor;opacity:.7}
+.tv-go{margin-top:1em;display:inline-flex;align-self:flex-start;align-items:center;gap:.5em;padding:.5em .95em;border-radius:99px;background:var(--f);color:var(--c);font-size:13px;font-weight:600}
+/* The date line, with the travelling marker. */
+.tv-axis{flex:0 0 auto;height:54px;margin-top:18px}
+.tv-seg.is-on{transform:scaleY(1.6);box-shadow:0 0 0 1.5px #2143d2,0 0 0 3.5px #fff}
+.tv-mark{position:absolute;top:-6px;bottom:14px;width:0;border-left:2px solid var(--lime);pointer-events:none;transition:opacity .3s}
+.tv-mark::after{content:attr(data-y);position:absolute;left:50%;top:-20px;transform:translateX(-50%);padding:.12em .55em;border-radius:99px;background:var(--lime);color:#131416;font-size:11.5px;font-weight:700;white-space:nowrap}
+.tv-hint{margin:10px 0 0;font-size:13px;color:var(--fg2);display:flex;justify-content:space-between;gap:20px}
+.tv-hint b{font-weight:600;color:#fff}
+/* A small note for the links that only exist inside the real site. Prototype only. */
+.bx-note{position:fixed;left:50%;bottom:22px;z-index:20;transform:translate(-50%,16px);max-width:min(92vw,560px);padding:.75em 1.2em;border-radius:14px;background:#131416;color:#fff;font:500 14px/1.4 Geist,-apple-system,sans-serif;box-shadow:0 18px 34px -12px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s,transform .3s}
+.bx-note.is-on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){
+  .tv{height:auto}
+  .tv-pin{position:static;height:auto;min-height:100svh}
+  .tv-mark{display:none}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .pg{--desk:7px}
+  .bx[data-theme="blueprint"]{height:auto}
+  .tv{height:auto}
+  .tv-pin{position:static;height:auto;display:block;padding:44px 26px 54px}
+  .tv-strip{display:flex;gap:12px;margin:22px -26px 0;padding:6px 26px 14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .tv-strip::-webkit-scrollbar{display:none}
+  .tv-stop,.tv.is-in .tv-stop{flex:0 0 74vw;scroll-snap-align:center;transform:none}
+  .tv-left{position:static;width:auto;display:block}
+  .tv-pic{height:150px}
+  .tv-more{position:static;width:auto;padding:4px 14px 18px;opacity:1}
+  .tv-more h3{font-size:21px}
+  .tv-axis{display:none}
+}
+/* ---- v22b: fixes after looking at the captures ---- */
+.pg{--desk:clamp(12px,1.9vw,32px);background:#080b1a radial-gradient(rgba(228,232,79,.3) .8px,transparent .95px) 0 0/9px 9px}
+.mat{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),inset 0 2px 0 rgba(255,255,255,.3),inset 0 0 7vw rgba(8,14,70,.35),0 7px 0 #15298f,0 0 0 1px rgba(0,0,0,.5),0 16px 50px rgba(0,0,0,.6),0 46px 80px -22px rgba(0,0,0,.85)}
+.tv{height:calc(100svh + var(--n,7)*26vh + 30vh)}
+.tv-stop{container-type:inline-size}
+.tv-txt b{font-size:clamp(12.5px,11.5cqw,19px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* v22c: narrow stops keep their dates on one line */
+.tv-txt{padding:9px clamp(8px,8cqw,12px) 11px}
+.tv-txt i{font-size:clamp(10.5px,10.5cqw,12px);white-space:nowrap}
+.tv-more{width:var(--mw,300px)}
+.tv-more h3{font-size:clamp(18px,1.6vw,24px);line-height:1.08}
+.tv-in li{white-space:normal}
+.tv-p{display:none}
+@media (prefers-reduced-motion:reduce){
+  .tv{height:auto}
+  .tv-s{display:none}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .tv{height:auto}
+  .tv-s,.tv-d{display:none}
+  .tv-p{display:inline}
+  .tv-left{display:flex;flex-direction:column}
+  .tv-pic{flex:0 0 150px}
+  .tv-more{width:auto}
+  .tv-hint{display:block}
+}
+/* ================= v23 =================
+   1. His name is black, not lime.
+   2. A real photo of him sits by the greeting, as a small print.
+   3. The timeline is vertical: time runs top to bottom, newest at the top. Two lanes side by side, Work and School, like the
+      current site. It still fits one window. As you scroll, a marker travels down the date rail and the stop it reaches grows. */
+.bx-hi em{color:#0a0b10}
+.bx-me{display:block;width:min(13.5cqw,28cqh);aspect-ratio:1/1.06;margin:0 0 clamp(12px,2.6cqh,26px);border:min(.42cqw,6px) solid #fff;border-radius:min(1.2cqw,18px);overflow:hidden;background:#ecebe6;
+  box-shadow:0 18px 30px -14px rgba(6,14,70,.8);transform:rotate(-4deg) translateY(10px);opacity:0;transition:opacity .9s var(--ease) .1s,transform 1.1s var(--ease) .1s}
+.is-in .bx-me{opacity:1;transform:rotate(-4deg)}
+.bx-me img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+/* try-outs, switched from the address bar (?nm=label, ?me=lime ...). Prototype only. */
+.bx.nm-label .bx-hi em{display:inline-block;padding:0 .16em .02em;margin-left:.02em;border-radius:.14em;background:#fff}
+.bx.nm-all .bx-hi{color:#0a0b10}
+.bx.nm-lime .bx-hi em{color:var(--lime)}
+.bx.me-lime .bx-me{background:var(--lime)}
+.bx.me-mint .bx-me{background:var(--mint)}
+.bx.me-round .bx-me{border-radius:50%;aspect-ratio:1;transform:none}
+.bx.me-big .bx-me{width:min(13.5cqw,28cqh)}
+
+/* ---------- v24, first screen: real details in every block ----------
+   Self: how the work was shaped (agent steps, an evaluation, a human checkpoint), with a dot that travels the pipeline.
+   Zomato: his role on the block. Food Rescue: his role and reach. Snapdeal: his real staff ID card instead of a made-up
+   bar chart, plus the award. Design deck: real screens and a real research photo instead of cartoon pictures. */
+.bx-flow{position:absolute;z-index:1;left:1.5cqw;right:1.5cqw;top:43%;height:3.4cqw;display:flex;justify-content:space-between;align-items:flex-start;opacity:0;transition:opacity .9s ease 1.5s}
+.is-in .bx-flow{opacity:1}
+.bx-flow::before{content:"";position:absolute;left:.4cqw;right:.4cqw;top:.38cqw;height:2px;background:rgba(5,61,44,.4)}
+.bx-flow .f-n{position:relative;flex:0 0 auto;width:.86cqw;height:.86cqw;border-radius:50%;background:#053d2c;font-style:normal}
+.bx-flow .f-n b{position:absolute;top:1.5cqw;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:max(9.5px,.68cqw);font-weight:600;letter-spacing:0;color:#075a40}
+.bx-flow .f-n:first-child b{left:0;transform:none}
+.bx-flow .f-n:nth-last-child(2) b{left:auto;right:0;transform:none}
+.bx-flow .f-n.is-h{width:1.5cqw;height:1.5cqw;margin-top:-.32cqw;box-shadow:0 0 0 .32cqw rgba(4,20,14,.16)}
+.bx-flow .f-n.is-h::after{content:"";position:absolute;left:50%;top:50%;width:.46cqw;height:.46cqw;margin:-.23cqw 0 0 -.23cqw;border-radius:50%;background:var(--mint)}
+.bx-flow .f-n.is-h b{top:1.82cqw;color:#053d2c}
+.bx-flow .f-dot{position:absolute;top:.13cqw;left:0;width:.6cqw;height:.6cqw;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #053d2c;animation:bx-flow 5.6s cubic-bezier(.6,0,.3,1) 2.6s infinite both}
+@keyframes bx-flow{0%{left:0;opacity:0}5%{left:0;opacity:1}32%{left:calc(33% - .2cqw)}54%,76%{left:calc(66.5% - .3cqw)}93%{left:calc(100% - .6cqw);opacity:1}100%{left:calc(100% - .6cqw);opacity:0}}
+.bx-self .bx-t{font-size:max(10.5px,.8cqw);line-height:1.35;color:#075a40}
+.bx-self .bx-t b{color:#053d2c}
+.bx[data-theme="blueprint"] .bx-self{color:#053d2c}
+.bx-self .bx-tag{color:#053d2c}
+.bx-zr{display:block;margin-top:.55em;font-weight:600;color:#fff}
+.bx-mx{display:block;margin-top:.55em;padding-top:.5em;border-top:1px solid rgba(255,255,255,.32);font-size:max(10px,.7cqw);line-height:1.3;font-weight:500}
+.bx[data-theme="blueprint"] .bx-ads{color:#18204f}
+.bx-ads .bx-ml{color:#39417a}
+.bx-rescue .bx-bag{width:84%}
+@container (max-width:1300px){.bx-cap-x{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .bx-flow{opacity:1;transition:none}
+  .bx-flow .f-dot{display:none}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx-flow{left:16px;right:16px;height:44px}
+  .bx-flow::before{left:5px;right:5px;top:5px}
+  .bx-flow .f-n{width:12px;height:12px}
+  .bx-flow .f-n b{top:20px;font-size:10px}
+  .bx-flow .f-n.is-h{width:20px;height:20px;margin-top:-4px;box-shadow:0 0 0 4px rgba(4,20,14,.16)}
+  .bx-flow .f-n.is-h::after{width:6px;height:6px;margin:-3px 0 0 -3px}
+  .bx-flow .f-n.is-h b{top:24px}
+  .bx-flow .f-dot{display:none}
+  .bx-mx{font-size:11px}
+}
+/* ---------- vertical timeline, v24: every bar designed on its own ----------
+   Each stop carries its own real details: dates and how long, the role, its proof (numbers where they exist), and, when the
+   marker reaches it, small pictures of the actual work with his role on each. Finish is less flat: tighter corners, a lit
+   top edge, the photo fading into the bar. Every bar is in its own colour; text on the light ones is navy or deep green,
+   never black. */
+.vt{display:block;padding:0;height:calc(100svh + var(--n,7)*26vh + 30vh)}
+.vt-pin{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;padding:clamp(24px,4.4vh,44px) clamp(20px,4.6vw,80px) clamp(20px,3.8vh,38px)}
+.vt-head{flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px 48px}
+.vt h2{font-size:clamp(30px,3.6vw,54px)}
+.vt .tl-sub{margin:0;max-width:31em;font-size:clamp(14px,1.12vw,16.5px);text-align:right}
+.vt .tl-sub b{font-weight:600;color:#fff}
+.vt-p{display:none}
+.vt-body{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:70px minmax(0,1.42fr) minmax(0,1fr);gap:clamp(10px,1.1vw,16px);margin-top:clamp(12px,2.4vh,24px)}
+/* the date rail: to scale, 2027 at the top */
+.vt-rail{position:relative;margin:26px 0 0}
+.vt-rail-in{position:absolute;left:0;right:0;top:8px;bottom:8px}
+.vt-rail-in::before{content:"";position:absolute;left:43px;top:-8px;bottom:-8px;width:1.5px;background:rgba(255,255,255,.55)}
+.vt-y{position:absolute;left:0;width:33px;text-align:right;transform:translateY(-50%);font-size:11.5px;font-style:normal;font-variant-numeric:tabular-nums;color:var(--fg2);pointer-events:none}
+.vt-y::after{content:"";position:absolute;left:37px;top:50%;width:6px;border-top:1.5px solid rgba(255,255,255,.55)}
+.vt-seg{position:absolute;width:7px;border-radius:4px;background:var(--c);box-shadow:0 0 0 1.5px #2143d2;transition:transform .25s,box-shadow .25s}
+.vt-seg.r0{left:49px}.vt-seg.r1{left:60px}
+.vt-seg.is-on{transform:scaleX(1.5);box-shadow:0 0 0 1.5px #2143d2,0 0 0 3.5px #fff}
+.vt-dot{position:absolute;left:37px;width:13px;height:13px;margin-top:-6.5px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px #2143d2;z-index:1;transition:transform .2s}
+.vt-dot:hover{transform:scale(1.35)}
+.vt-mark{position:absolute;left:30px;right:-8px;height:0;border-top:2px solid var(--lime);pointer-events:none;z-index:2}
+.vt-mark::after{content:attr(data-y);position:absolute;left:-32px;top:-10px;min-width:40px;text-align:center;padding:.16em .5em;border-radius:99px;background:var(--lime);color:#131416;font-size:11px;font-weight:700;line-height:1.3;white-space:nowrap}
+/* lanes */
+.vt-lane{display:flex;flex-direction:column;min-width:0;min-height:0}
+.vt-lab{flex:0 0 26px;font-size:12.5px;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-lab b{margin-right:.55em;font-weight:600;color:#fff}
+.vt-cards{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:clamp(7px,1vh,10px)}
+/* one bar */
+.vt-stop{--mix:100%;--c:color-mix(in srgb,var(--cc) var(--mix),#14288f);--f:color-mix(in srgb,var(--cf) var(--mix),#fff);--acc:color-mix(in srgb,var(--ca) var(--mix),var(--b));
+  position:relative;flex:var(--w,1) 1 0;min-height:0;display:block;border-radius:14px;overflow:hidden;background:linear-gradient(var(--b),var(--b)) var(--pw) 0/3px 100% no-repeat,var(--c);color:var(--f);text-decoration:none;container-type:size;cursor:pointer;
+  box-shadow:0 calc(12px + var(--up,0)*16px) calc(20px + var(--up,0)*18px) -12px rgba(4,10,60,.8);opacity:0;transform:translateY(24px);
+  transition:opacity .6s ease calc(var(--k)*60ms),transform .7s cubic-bezier(.16,.84,.24,1) calc(var(--k)*60ms)}
+.vt.is-in .vt-stop{opacity:1;transform:none}
+.vt.is-set .vt-stop{transition:none}
+.vt-stop::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,0) 40%,rgba(0,0,0,.09))}
+.vt-stop::after{content:"";position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.07),inset 0 -1px 0 rgba(0,0,0,.2)}
+.vt-stop:hover .vt-arr{transform:translateX(3px)}
+.vt-stop:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.l-work{--pw:27%}.l-school{--pw:34%}
+.vt-pic{position:absolute;left:0;top:0;bottom:0;z-index:1;width:var(--pw);background:var(--c2,rgba(0,0,0,.12)) center/cover no-repeat}
+.vt-pic::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 68%,var(--c))}
+.vt-pic.is-logo{background-size:auto min(52%,104px)}
+.vt-pic.is-fit{background-size:contain}
+.vt-pic.is-logo::after,.vt-pic.is-card::after,.vt-pic.is-fit::after{display:none}
+/* a real object instead of a photo: his staff ID card, whole, lying on the bar */
+.vt-pic.is-card{background:color-mix(in srgb,var(--c) 80%,#000)}
+.vt-pic.is-card img{position:absolute;left:50%;top:50%;width:auto;height:auto;max-width:80%;max-height:min(84%,236px);border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.14),0 12px 18px -8px rgba(0,0,0,.65);transform:translate(-50%,-50%) rotate(-5deg)}
+/* resting: dates, name and role, proof */
+.vt-line{position:absolute;left:var(--pw);right:0;top:0;bottom:0;z-index:2;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:0 60px 0 clamp(14px,1.5vw,22px);opacity:calc(1 - var(--o,0))}
+.vt-meta{font-size:12px;font-weight:600;line-height:1.3;opacity:.86;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.vt-meta i{font-style:normal;font-weight:400}
+.vt-name{display:flex;align-items:baseline;gap:.6em;min-width:0}
+.vt-name b{flex:0 0 auto;font-family:var(--disp);font-weight:750;font-size:clamp(18px,1.6vw,24px);line-height:1.05;letter-spacing:-.025em}
+.vt-name span{flex:1 1 0;min-width:0;font-size:clamp(12.5px,1vw,14.5px);line-height:1.3;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-proofs{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;max-height:24px;overflow:hidden;margin-top:1px;font-size:12.5px;line-height:24px}
+.vt-pf{white-space:nowrap}
+.vt-pf.is-num b{margin-right:.32em;font-family:var(--disp);font-weight:750;font-size:1.36em;letter-spacing:-.02em;color:var(--acc)}
+.vt-pf.is-tag{padding:0 .7em;border-radius:99px;box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 32%,transparent);font-weight:500;line-height:22px}
+.vt-arr{position:absolute;right:clamp(12px,1.2vw,18px);top:50%;margin-top:-16px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--f);color:var(--c);font-size:15px;line-height:1;transition:transform .25s}
+.l-school .vt-line{padding-right:clamp(14px,1.5vw,22px)}
+.l-school .vt-name{display:block}
+.l-school .vt-name span{display:block;margin-top:4px;white-space:normal}
+.l-school .vt-proofs{max-height:54px;padding-right:38px}
+.l-school .vt-arr{top:auto;bottom:12px;margin:0}
+@container (max-height:104px){.vt-proofs{display:none}}
+@container (max-height:72px){.vt-meta{display:none}}
+@container (max-height:176px){.l-school .vt-proofs{display:none}}
+@container (max-height:118px){.l-school .vt-name span{white-space:nowrap}}
+/* grown: the same facts, larger, plus the work itself */
+.vt-more{position:absolute;left:var(--pw);right:0;top:0;bottom:0;z-index:2;display:flex;flex-direction:column;justify-content:center;justify-content:safe center;gap:8px;padding:14px clamp(14px,1.5vw,22px);opacity:var(--o,0);pointer-events:none}
+.vt-more > *{flex:0 0 auto;min-width:0}
+.vt-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:28px}
+.vt-top .vt-meta{flex:1 1 0;min-width:0}
+.vt-go{flex:0 0 auto;display:inline-flex;padding:.42em .9em;border-radius:99px;background:var(--f);color:var(--c);font-size:12.5px;font-weight:600;white-space:nowrap}
+.vt-more h3{margin:0;font-family:var(--disp);font-weight:750;font-size:clamp(19px,1.7vw,25px);line-height:1.06;letter-spacing:-.03em}
+.vt-what{margin:0;font-size:clamp(13px,1vw,14.5px);line-height:1.4;opacity:.93;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.vt-stats{display:flex;align-items:center;margin:2px 0 0;padding:0;list-style:none}
+.vt-stats .is-num{flex:0 1 auto;min-width:0;padding:0 14px;border-left:1px solid color-mix(in srgb,currentColor 24%,transparent)}
+.vt-stats .is-num:first-child{padding-left:0;border-left:0}
+.vt-stats .is-num b{display:block;font-family:var(--disp);font-weight:750;font-size:clamp(22px,1.9vw,28px);line-height:1;letter-spacing:-.03em;color:var(--acc)}
+.vt-stats .is-num span{display:block;margin-top:4px;max-width:10.5em;font-size:11.5px;line-height:1.25;opacity:.9}
+.vt-stats .is-tags{flex:1 1 0;min-width:0;display:flex;flex-wrap:wrap;align-content:center;gap:5px 6px;padding-left:14px}
+.vt-stats .is-tags:first-child{padding-left:0}
+.vt-stats .is-tag{padding:.22em .72em;border-radius:99px;box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 32%,transparent);font-size:12px;font-weight:500;line-height:1.35;white-space:nowrap}
+.vt-works{display:flex;gap:10px;margin-top:2px}
+.vt-wk{flex:1 1 0;min-width:0;max-width:150px}
+.vt-wk i{display:block;aspect-ratio:2.15/1;border-radius:8px;background:rgba(0,0,0,.16) center/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14),0 8px 12px -8px rgba(0,0,0,.5)}
+.vt-wk i.is-text{display:grid;place-items:center;padding:0 6px;font-style:normal;font-family:var(--disp);font-weight:750;font-size:13px;letter-spacing:-.01em;text-align:center;background:color-mix(in srgb,currentColor 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 22%,transparent)}
+.vt-wk b{display:block;margin-top:6px;font-size:11.5px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-wk em{display:block;font-style:normal;font-size:10.5px;line-height:1.3;opacity:.84;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-notes{margin:2px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.38}
+.vt-notes li{position:relative;padding:.14em 0 .14em 1.05em}
+.vt-notes li::before{content:"";position:absolute;left:.12em;top:.72em;width:.4em;height:.4em;border-radius:50%;background:var(--acc);opacity:.9}
+.l-school .vt-more{padding-bottom:52px}
+.l-school .vt-top{display:block;min-height:0}
+.l-school .vt-top .vt-meta{white-space:normal}
+.vt-top .vt-meta b{font-weight:700}
+.vt-top .vt-meta u{text-decoration:none}
+.l-school .vt-top .vt-meta b{display:block;font-size:13px}
+.l-school .vt-top .vt-meta u{display:none}
+.l-school .vt-more h3{font-size:clamp(18px,1.5vw,22px)}
+.l-school .vt-wk b{font-size:10.5px}
+.l-school .vt-wk em{font-size:10px}
+.l-school .vt-works{gap:8px}
+.l-school .vt-go{position:absolute;left:clamp(14px,1.5vw,22px);bottom:14px}
+.l-school .vt-what{-webkit-line-clamp:2}
+.l-school .vt-stats{flex-wrap:wrap;gap:8px 0}
+.l-school .vt-stats .is-tags{flex:1 1 100%;padding-left:0}
+.l-school .vt-wk b{white-space:normal}
+@container (max-height:296px){.l-work .vt-works,.l-work .vt-notes{display:none}}
+@container (max-height:372px){.l-school .vt-works,.l-school .vt-notes{display:none}}
+@container (max-height:300px){.l-school .vt-what{-webkit-line-clamp:2}}
+/* try-out from the address bar: ?bars=rest keeps resting bars deep blue and colours only the one the marker reaches.
+   Adi found black resting bars "too much black" and blue ones "too much blue", so every bar keeps its own colour. */
+.vt[data-bars="rest"] .vt-stop{--mix:calc(var(--o,0)*100%)}
+/* side builds, in the school lane between Northwestern and BITS (2024 to 2026) */
+.vt-also{flex:1.2 1 0;min-height:140px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.vt-also-lab{font-size:12.5px;color:var(--fg2)}
+.vt-also-lab b{margin-right:.55em;font-weight:600;color:#fff}
+.vt-side{display:flex;align-items:center;gap:10px;min-width:0;padding:8px 12px;border-radius:10px;background:rgba(8,14,70,.36);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);color:#fff;text-decoration:none;font-size:13px;line-height:1.3;transition:background .2s}
+.vt-side:hover{background:rgba(8,14,70,.58)}
+.vt-side:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.vt-side::before{content:"";flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--lime)}
+.vt-side b{flex:0 0 auto;font-weight:600}
+.vt-side span{flex:1 1 0;min-width:0;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-side i{flex:0 0 auto;font-style:normal;font-size:12px;font-variant-numeric:tabular-nums;color:var(--fg2)}
+@media (prefers-reduced-motion:reduce){
+  .vt{height:auto}
+  .vt-pin{position:static}
+  .vt-mark,.vt-s{display:none}
+  .vt-stop{opacity:1!important;transform:none!important;transition:none!important}
+  .bx-me{opacity:1;transform:rotate(-4deg);transition:none}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx-me{width:104px;margin-bottom:16px}
+  .vt{height:auto}
+  .vt-pin{position:static;height:auto;display:block;padding:44px 20px 54px}
+  .vt .tl-sub{margin-top:.7em;text-align:left}
+  .vt-s,.vt-d{display:none}
+  .vt-p{display:inline}
+  .vt-body{display:block;margin-top:8px}
+  .vt-rail{display:none}
+  .vt-lane{display:block;margin-top:22px}
+  .vt-lab{display:block;margin-bottom:8px}
+  .vt-cards{display:block}
+  .vt-stop,.vt.is-in .vt-stop{height:122px;margin-top:10px;transform:none}
+  .vt-more{display:none}
+  .vt-line .vt-meta i{display:none}
+  .vt-line,.l-school .vt-line{padding:0 52px 0 14px;opacity:1}
+  .vt-name,.l-school .vt-name{display:block}
+  .vt-name span,.l-school .vt-name span{display:block;margin-top:3px;white-space:nowrap}
+  .vt-proofs,.l-school .vt-proofs{display:flex;max-height:24px;padding:0}
+  .l-school .vt-arr{top:50%;bottom:auto;margin-top:-16px}
+  .vt-also{display:block;min-height:0;margin-top:22px}
+  .vt-side{margin-top:6px}
+}
+/* ================= v26 =================
+   1. On the main page itself: the GitHub history small in the top bar, and the Bambu Lab ambassador role as a small
+      print beside his photo that opens his own Bambu page.
+   2. The shelf: a small label under every object, and each book shows its cover when you point at it. */
+/* GitHub, small, in the top bar: the real commit history of this site */
+.bx-gh{display:flex;align-items:center;gap:.9em;height:38px;padding:0 14px 0 12px;border-radius:99px;background:#f6f4ee;color:#18204f;font-size:12.5px;white-space:nowrap;box-shadow:0 1px 0 #d9d3c3,0 8px 14px -8px rgba(4,10,60,.6);opacity:0;transition:opacity .9s ease 1.2s,transform .3s}
+.is-in .bx-gh{opacity:1}
+.bx-gh:hover{transform:translateY(-2px)}
+.bx-gh svg{flex:0 0 auto;width:18px;height:18px}
+.gh-n b{margin-right:.28em;font-family:var(--disp);font-weight:750;font-size:15px;letter-spacing:-.02em}
+.gh-grid{flex:0 0 auto;display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,3px);grid-auto-columns:3px;gap:1px}
+.gh-grid i{border-radius:1px;background:rgba(24,32,79,.13)}
+.gh-grid i[data-l="1"]{background:#7bd88f}.gh-grid i[data-l="2"]{background:#40c463}.gh-grid i[data-l="3"]{background:#30a14e}.gh-grid i[data-l="4"]{background:#216e39}
+.gh-t{display:flex;align-items:center;gap:6px;color:#39417a}
+.gh-t img{width:16px;height:16px;object-fit:contain;border-radius:4px}
+.gh-t img.is-w{padding:2px;background:#18204f}
+.gh-go{font-size:13px;color:#39417a}
+/* More work: his project stickers stuck on the mat, and one object, the printer, which opens his Bambu Lab page.
+   Stickers lie flat and are turned a little; pointing at one straightens it, lifts it off the mat and shows its name.
+   Nothing is stretched: each sticker has a height, its width is that height times its own proportions (--ar), and
+   everything is scaled together by --s. Every label, the printer's too, shows only when you point at it. */
+.bx-pills{display:flex;align-items:center;gap:10px;min-width:0}
+.bx-cap{justify-content:flex-end}
+.bx-cap-t{text-align:right}
+.bx-stk{--s:1;--ox:0px;--oy:0px;--zp:49px;--zh:63px;position:relative;flex:1 1 auto;min-height:0;width:100%;pointer-events:none;transform-style:preserve-3d}
+.bx-st{--x:var(--xw);--y:var(--yw);--h:var(--hw);position:absolute;display:block;pointer-events:auto;text-decoration:none;color:#18204f;
+  left:calc(var(--ox) + var(--s)*var(--x)*1px);top:calc(var(--oy) + var(--s)*var(--y)*1px);height:calc(var(--s)*var(--h)*1px);width:calc(var(--s)*var(--h)*var(--ar)*1px);
+  transform:translateZ(6px) rotate(var(--r,0deg)) scale(1.25);opacity:0;transition:opacity .5s ease calc(1.5s + var(--k)*70ms),transform .7s var(--ease) calc(1.5s + var(--k)*70ms)}
+.bx-stk.is-tall .bx-st{--x:var(--xt);--y:var(--yt);--h:var(--ht)}
+.is-in .bx-st{opacity:1;transform:translateZ(6px) rotate(var(--r,0deg))}
+.is-set .bx-st{transition:transform .35s var(--ease)}
+.bx-st img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;filter:drop-shadow(-1px 1.5px 1.5px rgba(4,10,60,.5)) drop-shadow(-4px 6px 6px rgba(4,10,60,.3))}
+.is-in .bx-st:hover,.is-in .bx-st:focus-visible{z-index:6;transform:translateZ(var(--zh)) rotate(0deg) scale(1.14)}
+.bx-st:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.st-tag{position:absolute;left:50%;top:100%;z-index:1;transform:translateX(-50%);margin-top:3px;padding:.26em .7em .3em;border-radius:6px;background:#fff;font-size:max(10px,calc(var(--s)*11px));font-weight:500;line-height:1.25;white-space:nowrap;
+  box-shadow:0 5px 9px -4px rgba(4,10,60,.6);opacity:0;pointer-events:none;transition:opacity .2s}
+.st-tag b{margin-right:.4em;font-weight:700}
+.bx-st:hover .st-tag,.bx-st:focus-visible .st-tag{opacity:1}
+/* the printer: an object standing on the mat, further forward than a block ever lifts, so a click on it is always its own.
+   Its glow (where it is printing) is the invitation, not a label. */
+.bx-st.is-obj{transform:translateZ(var(--zp)) scale(1.1)}
+.is-in .bx-st.is-obj{transform:translateZ(var(--zp))}
+.is-in .bx-st.is-obj:hover,.is-in .bx-st.is-obj:focus-visible{transform:translateZ(calc(var(--zp) + 12px)) translateY(-3%) scale(1.05)}
+.bx-st.is-obj .st-tag b{color:#067a31}
+.st-glow{position:absolute;left:50.4%;top:61.8%;width:40%;aspect-ratio:1;margin:-20% 0 0 -20%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,200,110,.9),rgba(255,140,40,.4) 45%,transparent 72%);mix-blend-mode:screen;pointer-events:none;animation:st-glow 2.6s ease-in-out infinite}
+@keyframes st-glow{0%,100%{opacity:.12;transform:scale(.8)}50%{opacity:.85;transform:scale(1.1)}}
+/* a touch screen has no pointing, so the printer (the only one with no lettering of its own) keeps its label showing there */
+@media (hover:none){.bx-st.is-obj .st-tag{opacity:1}}
+/* the main button: black, like his name. (The lime one looked "greenish" in the sunlight and he disliked it.) */
+.bx[data-theme="blueprint"]{--btn:#0b0c10;--btn-fg:#fff}
+.bx[data-theme] .bx-btn:hover{background:#000}
+.bb-wash{position:fixed;inset:0;z-index:100;background:#EDF5F0}
+/* narrower windows: the label keeps just the name, and the GitHub pill sheds its extras, before anything can touch */
+@container (max-width:1240px){.gh-l{display:none}}
+@container (max-width:1000px){.gh-t{display:none}}
+/* at narrower windows the Self pipeline keeps two labels instead of four, so they never run into each other */
+@container (max-width:1180px){.bx-flow .f-n:nth-child(2) b,.bx-flow .f-n:nth-child(4) b{display:none}}
+/* measured at seven window sizes: the Zomato role line touches the phone picture by 3 to 11 px on desktop, so there it stays out
+   (the role is in the facts list and the timeline). It shows in the tall phone layout, which has room (142 px). */
+.bx-zr{display:none}
+
+/* ---------- shelf ---------- */
+/* a clip-on label under each object, so you know what it is without pointing at it */
+.bx-plate{position:absolute;left:50%;top:calc(100% + .1cqw);z-index:1;transform:translateX(-50%) translateZ(.2cqw);padding:.14em .62em .2em;border-radius:3px;background:#f4f1e8;color:#3b4160;font-size:max(9px,.64cqw);font-weight:500;line-height:1.3;white-space:nowrap;box-shadow:0 1px 0 #d9d3c3,0 3px 5px -2px rgba(0,0,0,.45);pointer-events:none;transition:background .2s}
+.bx-plate b{margin-right:.4em;font-weight:700;color:#18204f}
+.bx-hs.is-ob:hover .bx-plate,.bx-hs.is-ob:focus-visible .bx-plate{background:var(--lime)}
+/* pointing at a book shows its cover: a real picture of the project and one line */
+.bx-cover{position:absolute;left:50%;bottom:108%;z-index:3;width:max(132px,10.6cqw);padding:5px 5px 8px;border-radius:9px;background:#fff;color:#18204f;text-align:left;box-shadow:0 14px 20px -9px rgba(4,10,60,.65),0 0 0 1px rgba(24,32,79,.08);transform:translate(-50%,10px);opacity:0;pointer-events:none;transition:opacity .22s ease,transform .35s var(--ease)}
+.bx-cover i{display:block;aspect-ratio:16/9;border-radius:5px;background:#e8e8ee center/cover no-repeat}
+.bx-cover b{display:block;margin:7px 3px 0;font-family:var(--disp);font-weight:750;font-size:12.5px;line-height:1.15;letter-spacing:-.01em}
+.bx-cover span{display:block;margin:2px 3px 0;font-size:10.5px;font-weight:400;line-height:1.3;color:#39417a}
+.bx-cover u{display:block;margin:5px 3px 0;font-size:10.5px;font-weight:700;text-decoration:none;color:#18204f}
+.bx-hs.is-bk:hover .bx-cover,.bx-hs.is-bk:focus-visible .bx-cover{opacity:1;transform:translate(-50%,0) rotateY(16deg) rotateX(7deg)}
+/* timeline: room for one more line in the side list */
+.vt-also{min-height:178px}
+@media (prefers-reduced-motion:reduce){
+  .bx-cover{transition:none}
+  .bx-gh{opacity:1;transition:none}
+  .st-glow{animation:none;opacity:.5}
+  .bx-st{opacity:1;transform:translateZ(.3cqw) rotate(var(--r,0deg));transition:none}
+  .tr-obj{transition:none}
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .bx-nav{height:auto;min-height:56px;flex-wrap:wrap;padding-top:8px;padding-bottom:10px}
+  .bx-pills{order:3;flex:1 0 100%;flex-wrap:wrap;margin-top:4px}
+  .bx-gh{gap:.7em;padding:0 12px}
+  .gh-l,.gh-go,.gh-t{display:none}
+  .bx-zr{display:block}
+  .bx-cab{grid-row:span 4;display:flex}
+  .bx-cab .bx-stk{margin-top:6px}
+  .bx-plate{font-size:9px}
+  .bx-cover{display:none}
+  .vt-also{min-height:0}
+}
+/* ================= v29 =================
+   "Declutter, but still add clutter": the side projects ride a thin strip of tape across the whole mat, at the very top of the
+   page, quiet and slow, no label. The first screen is that much shorter, so everything still fits one screen. In the wall, the
+   old sticker area is open mat with the printer standing in it. */
+
+/* ---------- the first screen gives up the strip's height (wide windows) ---------- */
+.pg{--tpz:clamp(51px,7.4svh,67px)}   /* 15% taller than the first try */
+@media (min-width:821px) and (min-aspect-ratio:4/5){
+  .bx[data-theme="blueprint"]{height:calc(100svh - var(--desk) - var(--tpz))}
+  /* the printer stands in the right of the old sticker area, with open mat to its left */
+  .bx-prt{grid-column:4/7;grid-row:3/5}
+  /* the shorter first screen: the photo scales down on short windows so the buttons stay clear of the timeline rail */
+  /* the text column sits centred in the space between the nav and the timeline rail, and gives up a little on short windows */
+  .bx-text{top:calc((clamp(54px,8cqh,72px) + 100cqh - clamp(12px,2.2cqh,24px) - 44px) / 2)}
+  .bx-me{width:min(13.5cqw,20cqh)}
+  .bx-cta{gap:8px 18px}
+}
+@media (min-width:821px) and (min-aspect-ratio:4/5){
+  @container (max-height:690px){
+    .bx-me{width:min(13.5cqw,15cqh);margin-bottom:10px}
+    .bx-facts{margin-top:10px}
+    .bx-facts li{padding-top:5px;padding-bottom:5px}
+    .bx-cta{margin-top:12px}
+  }
+}
+
+/* ---------- the strip ---------- */
+.tp-zone{position:relative;z-index:2;height:var(--tpz);overflow:hidden;display:flex;align-items:center;border-radius:clamp(16px,1.7vw,28px) clamp(16px,1.7vw,28px) 0 0}
+.tp-wrap{--tg:30px;position:relative;width:100%;height:calc(100% - 12px);pointer-events:none;
+  filter:drop-shadow(calc(var(--sdx,1)*-1px) calc(var(--sdy,1)*1.5px) 1.5px rgba(var(--sc,2,10,44),.4)) drop-shadow(calc(var(--sdx,1)*-6px) calc(var(--sdy,1)*8px) 8px rgba(var(--sc,2,10,44),.32))}
+.tp-band{position:absolute;inset:0;pointer-events:auto;overflow:hidden}
+.tp-track{display:flex;align-items:stretch;width:max-content;height:100%;animation:tp-run var(--tpd,90s) linear infinite}
+@keyframes tp-run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* the tape: white, with the mat's ruler ticks printed small along both edges; the tape itself travels with the stickers */
+.tp-set{display:flex;align-items:center;flex:0 0 auto;height:100%;gap:var(--tg);padding-left:var(--tg);background:
+  linear-gradient(90deg,rgba(24,32,79,.6) 1px,transparent 1px) 0 0/60px 7px repeat-x,
+  linear-gradient(90deg,rgba(24,32,79,.35) 1px,transparent 1px) 0 0/12px 4px repeat-x,
+  linear-gradient(90deg,rgba(24,32,79,.6) 1px,transparent 1px) 0 100%/60px 7px repeat-x,
+  linear-gradient(90deg,rgba(24,32,79,.35) 1px,transparent 1px) 0 100%/12px 4px repeat-x,
+  #fff}
+/* pointing at the strip, or tabbing into it, stops it so a sticker can be clicked */
+.tp-band:hover .tp-track,.tp-zone:focus-within .tp-track{animation-play-state:paused}
+.tp-st{position:relative;flex:0 0 auto;display:block;height:calc(100% - 14px);aspect-ratio:var(--ar);transform:translateY(var(--dy,0)) rotate(var(--r,0deg));transition:transform .3s cubic-bezier(.16,.84,.24,1);text-decoration:none}
+.tp-st img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;filter:drop-shadow(-1px 1px 1px rgba(4,10,60,.4))}
+.tp-st:hover,.tp-st:focus-visible{z-index:2;transform:rotate(0deg) scale(1.14)}
+.tp-st:focus-visible{outline:2px solid #18204f;outline-offset:2px}
+/* ---------- the printer: unchanged in look, standing on the open mat, in front of the wall ---------- */
+.bx-prt{position:relative;display:block;min-width:0;min-height:0;color:#18204f;text-decoration:none;opacity:0;transform:translate3d(0,6cqh,-900px) rotateX(24deg);
+  transition:transform 1.5s var(--ease) calc(var(--i)*70ms + .2s),opacity .8s ease calc(var(--i)*70ms + .2s)}
+.is-in .bx-prt{opacity:1;transform:translateZ(3.4cqw)}
+.is-set .bx-prt{transition:transform .35s var(--ease)}
+.is-in .bx-prt:hover,.is-in .bx-prt:focus-visible{transform:translateZ(4.6cqw) translateY(-2%) scale(1.04)}
+.bx-prt:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.pr-obj{position:absolute;left:50%;top:3%;bottom:26px;aspect-ratio:var(--ar);max-width:100%;transform:translateX(-50%);display:block}
+.pr-obj img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 3px rgba(var(--sc,2,10,44),.5)) drop-shadow(calc(var(--sdx,1)*-22px) calc(var(--sdy,1)*26px) 22px rgba(var(--sc,2,10,44),.5))}
+.bx-prt .st-tag{left:50%;top:auto;bottom:0;margin:0;font-size:max(10px,.74cqw);opacity:0}
+.bx-prt .st-tag b{color:#067a31}
+.bx-prt:hover .st-tag,.bx-prt:focus-visible .st-tag{opacity:1}
+@media (hover:none){.bx-prt .st-tag{opacity:1}}
+
+/* ---------- phones and narrow windows: kept working, not yet designed ---------- */
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .pg{--tpz:52px}
+  .bx-prt{grid-column:1/3;grid-row:span 2}
+  .pr-obj{top:6%;bottom:38px}
+  .bx-prt .st-tag{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .tp-band{overflow-x:auto;scrollbar-width:thin}
+  .tp-set[aria-hidden="true"]{display:none}
+  .tp-track{width:auto;animation:none}
+  .tp-st{transition:none}
+}
+/* ================= v30: a wall that keeps changing =================
+   1. The wall re-tiles like a sliding puzzle (tiles.js): Self is a small tall block now, and every few seconds one block glides
+      into the one open slot. Blocks only slide; they never change size.
+   2. The design block is one full picture with a pill at the bottom naming the project; the three projects slide up through it,
+      a different direction from the strip.
+   3. Fixes from v29: the printer no taller than his photo; the photo back to full size where there is room. */
+
+/* The blocks lie in the tilted wall's own plane, and the browser sometimes gives a click to the wall instead of the block on top
+   of it. The wall itself never needs a click, so it takes none; every block and the printer do. */
+.bx-board{pointer-events:none}
+.bx-board > .bx-b,.bx-board > .bx-prt{pointer-events:auto}
+@media (min-width:821px) and (min-aspect-ratio:4/5){
+  /* where the blocks start (tiles.js moves them from here) */
+  .bx-self{grid-column:1/2;grid-row:1/3}
+  .bx-zo{grid-column:2/4;grid-row:1/3}
+  .bx-hcd{grid-column:4/6;grid-row:1/3}
+  .bx-rescue{grid-column:6/7;grid-row:1/3}
+  .bx-ads{grid-column:1/2;grid-row:3/5}
+  .bx-prt{grid-column:4/7;grid-row:3/5}
+  .bx-me{width:min(13.5cqw,24cqh)}
+
+  /* a block gliding to its next place */
+  .is-in .bx-b.is-sliding{z-index:4;transition:translate 1.4s cubic-bezier(.65,0,.25,1),transform .7s var(--ease),box-shadow .6s var(--ease)}
+
+  /* ---------- Self, small: logo across the top, the pipeline standing up, the role at the bottom ---------- */
+  .bx[data-theme="blueprint"] .bx-self{padding:1cqw .95cqw}
+  .bx-self .bx-tag{display:none}
+  .bx-self .bx-self-logo{height:auto;width:100%;margin:0}
+  .bx-self .bx-self-mark{width:150%;right:-62%;bottom:-8%}
+  .bx-self .bx-flow{left:1.1cqw;right:auto;top:27%;bottom:40%;width:auto;height:auto;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start}
+  .bx-self .bx-flow::before{left:.38cqw;right:auto;top:.4cqw;bottom:.4cqw;width:2px;height:auto}
+  .bx-self .bx-flow .f-n b,.bx-self .bx-flow .f-n:first-child b,.bx-self .bx-flow .f-n:nth-last-child(2) b{top:50%;left:1.5cqw;right:auto;transform:translateY(-50%);font-size:max(9.5px,.66cqw)}
+  .bx-self .bx-flow .f-n.is-h{margin:0 0 0 -.32cqw}
+  .bx-self .bx-flow .f-n.is-h b{top:50%;left:1.9cqw}
+  .bx-self .bx-flow .f-dot{left:.13cqw;top:0;animation-name:bx-flow-v}
+  .bx-self .bx-t{left:.95cqw;right:.95cqw;bottom:1cqw;font-size:0}
+  .bx-self .bx-t b{font-size:max(13px,1.12cqw);margin:0}
+  .bx-self .bx-t::after{content:"Jun to Aug 2026";display:block;margin-top:.35em;font-size:max(10px,.7cqw);line-height:1.3;color:#075a40}
+}
+/* blocks now slide in under Zomato, so its Domino's bubble stays inside Zomato's own block instead of hanging over the block below */
+.b-dm{--t:38%;--l:73%}
+@keyframes bx-flow-v{0%{top:0;opacity:0}5%{top:0;opacity:1}32%{top:calc(33% - .2cqw)}54%,76%{top:calc(66.5% - .3cqw)}93%{top:calc(100% - .6cqw);opacity:1}100%{top:calc(100% - .6cqw);opacity:0}}
+
+/* ---------- the design block: one full picture, a pill at the bottom, the projects sliding up ---------- */
+.bx-board .bx-hcd .bx-t{display:none}
+/* the block is a 3D layer, which switches clipping off; the deck is flat and clips its own pictures to the block's shape */
+.bx-board .bx-hcd .bx-deck{left:0;right:0;top:0;bottom:0;transform-style:flat;overflow:hidden;border-radius:inherit;clip-path:inset(0 round var(--r,16px))}
+.bx-board .bx-hcd .bx-card{left:0;top:0;width:100%;height:100%;border-radius:0;box-shadow:none;background:#e9e7e1;display:block;opacity:1;transition:transform 1s cubic-bezier(.65,0,.25,1)}
+.bx-board .bx-hcd .bx-card img,.bx-board .bx-hcd .bx-card.c-chase img{width:100%;height:100%;padding:0;object-fit:cover;object-position:center 30%}
+.bx-board .bx-hcd .bx-card .bx-cp{display:none}
+.bx-board .bx-hcd .bx-card[data-pos="0"]{z-index:2;transform:translateY(0)}
+.bx-board .bx-hcd .bx-card[data-pos="1"]{z-index:1;transform:translateY(100%)}
+.bx-board .bx-hcd .bx-card[data-pos="2"]{z-index:0;transform:translateY(100%);transition:none}
+.bx-board .bx-hcd .bx-card.is-out{z-index:3;transform:translateY(-100%);opacity:1}
+.bx-board .bx-hcd .bx-deck:has(.is-out) .bx-card[data-pos="1"]{transform:translateY(0)}
+.hc-pill{position:absolute;z-index:5;left:.9cqw;right:.9cqw;bottom:.9cqw;display:block;padding:.62em 1.1em .66em;border-radius:99px;background:#fff;color:#18204f;box-shadow:0 10px 18px -8px rgba(4,10,60,.6)}
+.hc-k{display:block;font-size:max(9.5px,.64cqw);font-weight:600;line-height:1.25;color:#5a6290}
+.bx-board .bx-hcd .bx-deck-cap{position:static;display:block;margin-top:2px;font-size:max(11px,.84cqw);font-weight:650;line-height:1.25;color:#18204f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- the printer: no taller than his photo, standing on the open mat ---------- */
+.bx-prt .pr-obj{top:auto;bottom:26px;height:min(80%,25cqh)}   /* no taller than his photo */
+
+@media (min-width:821px) and (min-aspect-ratio:4/5){
+  /* short windows: the Food Rescue bag gives up a little height so the role line stays inside the block */
+  @container (max-height:690px){ .bx-rescue .bx-bag{width:64%} .bx-me{width:min(13.5cqw,15cqh)} }   /* the short-window photo size must come after the full-size rule above */
+  /* narrow windows: the small Self block keeps its pipeline dots but drops their words, which would run past its edge */
+  @container (max-width:1020px){ .bx-self .bx-flow .f-n b{display:none} }
+  /* very narrow windows: no room for the pipeline at all; the logo and role stay */
+  @container (max-width:900px){ .bx-self .bx-flow{display:none} }
+}
+@media (max-width:820px),(max-aspect-ratio:4/5){
+  .hc-pill{left:12px;right:12px;bottom:12px}
+  .bx-prt .pr-obj{height:min(78%,240px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .bx-board .bx-hcd .bx-card{transition:none}
+  /* the strip stands still but still runs the full width: keep its copies, no scrolling */
+  .tp-set[aria-hidden="true"]{display:flex}
+  .tp-band{overflow:hidden}
+  .tp-track{width:max-content}
+}
+
+/* ================= Sunlit mat =================
+   Reference: a blue cutting mat in a sunny room. Thin grid lines, a small bright cross where the big squares meet,
+   window light lying across it in long bands, leaf shadows, and things on it casting long soft shadows down and to the left. */
+.mat{--blue:#1b62d4;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M0 12.5H120M0 36.5H120M0 84.5H120M0 108.5H120M12.5 0V120M36.5 0V120M84.5 0V120M108.5 0V120' stroke='%23fff' stroke-opacity='.13' stroke-width='1'/%3E%3Cpath d='M0 60.5H120M60.5 0V120' stroke='%23fff' stroke-opacity='.3' stroke-width='1'/%3E%3Ccircle cx='60.5' cy='60.5' r='7' fill='url(%23g)'/%3E%3Cpath d='M55 60.5H66M60.5 55V66' stroke='%23fff' stroke-opacity='.75' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/120px 120px,
+    var(--blue)}
+/* Printed detail: ruler ticks and numbers on the top and left edges (built by mat.js), angle lines. */
+.mat-print{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+.mp-top,.mp-left{position:absolute;left:0;top:0}
+.mp-top{right:0;height:10px;background:linear-gradient(90deg,rgba(255,255,255,.75) 1px,transparent 1px) 60px 0/120px 10px repeat-x,linear-gradient(90deg,rgba(255,255,255,.45) 1px,transparent 1px) 12px 0/24px 5px repeat-x}
+.mp-left{bottom:0;width:10px;background:linear-gradient(rgba(255,255,255,.75) 1px,transparent 1px) 0 60px/10px 120px repeat-y,linear-gradient(rgba(255,255,255,.45) 1px,transparent 1px) 0 12px/5px 24px repeat-y}
+.mp-n{position:absolute;font:500 9px/1 Geist,-apple-system,sans-serif;font-style:normal;color:rgba(255,255,255,.62);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.mp-nx{top:13px;transform:translateX(-50%)}
+.mp-ny{left:13px;transform:translateY(-50%)}
+.mp-ang{position:absolute;left:0;width:250vmax;height:0;border-top:1px solid rgba(255,255,255,.3);transform-origin:0 0;transform:rotate(var(--a))}
+.mp-dash{border-top:1px dashed rgba(255,255,255,.22)}
+.mp-ang b{position:absolute;left:170px;top:-15px;font:500 9px/1 Geist,-apple-system,sans-serif;color:rgba(255,255,255,.6)}
+.tv-seg.is-on{box-shadow:0 0 0 1.5px var(--blue,#1b62d4),0 0 0 3.5px #fff}
+
+/* The light: a layer the size of the mat whose picture stays pinned to the screen.
+   "hard-light" blending: mid grey changes nothing, darker shades, lighter lights. */
+.sun{position:absolute;inset:0;pointer-events:none;border-radius:inherit;overflow:clip;mix-blend-mode:hard-light}
+.sun-u{z-index:0}
+.sun-o{z-index:30}
+.sun-c,.sun-oc{position:sticky;top:0;display:block;width:100%;height:100vh;height:100svh;opacity:0;transition:opacity 1.8s ease .3s}
+.sun-c.is-on{opacity:1}
+/* Over the cards the light is weaker: enough to show they share the room, not enough to wash out words. */
+.sun-oc.is-on{opacity:.2}
+@media (prefers-reduced-motion:reduce){.sun-c,.sun-oc{transition:none}}
+
+/* Shadows with depth: a tight dark contact shadow, a middle one, and a long soft one falling down and to the left
+   (the sun is up and to the right). --sdx/--sdy are set by sun.js so the shadows swing with the light. */
+.mat{--sdx:1;--sdy:1;--sc:2,10,44}
+.bx[data-theme] .bx-b{box-shadow:
+  calc(var(--sdx)*-1.5px) calc(var(--sdy)*2px) 2px rgba(var(--sc),.42),
+  calc(var(--sdx)*-8px) calc(var(--sdy)*10px) 12px -2px rgba(var(--sc),.36),
+  calc(var(--sdx)*-30px) calc(var(--sdy)*38px) 40px -10px rgba(var(--sc),.55)}
+.bx-b:hover,.bx[data-theme] .bx-b:focus-visible,.bx[data-theme] .bx-b.is-hot{box-shadow:
+  calc(var(--sdx)*-2px) calc(var(--sdy)*3px) 3px rgba(var(--sc),.35),
+  calc(var(--sdx)*-14px) calc(var(--sdy)*18px) 18px -3px rgba(var(--sc),.34),
+  calc(var(--sdx)*-46px) calc(var(--sdy)*58px) 52px -12px rgba(var(--sc),.55)}
+.bx-me{filter:drop-shadow(calc(var(--sdx)*-2px) calc(var(--sdy)*3px) 2px rgba(var(--sc),.4)) drop-shadow(calc(var(--sdx)*-18px) calc(var(--sdy)*24px) 18px rgba(var(--sc),.5))}
+.bx-bub{box-shadow:calc(var(--sdx)*-2px) calc(var(--sdy)*2px) 3px rgba(var(--sc),.45),calc(var(--sdx)*-14px) calc(var(--sdy)*18px) 18px -4px rgba(var(--sc),.6)}
+.bx-card{box-shadow:0 1px 0 #e6e0d2,0 2px 0 #d9d2c2,0 3px 0 #cbc3b1,calc(var(--sdx)*-10px) calc(var(--sdy)*14px) 16px -4px rgba(var(--sc),.6)}
+.vt-stop{box-shadow:
+  calc(var(--sdx)*-1.5px) calc(var(--sdy)*2px) 2px rgba(var(--sc),.4),
+  calc(var(--sdx)*(-8px - var(--up,0)*4px)) calc(var(--sdy)*(10px + var(--up,0)*5px)) 12px -2px rgba(var(--sc),.34),
+  calc(var(--sdx)*(-26px - var(--up,0)*12px)) calc(var(--sdy)*(32px + var(--up,0)*14px)) calc(34px + var(--up,0)*10px) -9px rgba(var(--sc),.55)}
+.tv-stop{box-shadow:calc(var(--sdx)*-1.5px) calc(var(--sdy)*2px) 2px rgba(var(--sc),.4),calc(var(--sdx)*-26px) calc(var(--sdy)*32px) 34px -9px rgba(var(--sc),.55)}
+.vt-side{box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),calc(var(--sdx)*-6px) calc(var(--sdy)*8px) 10px -3px rgba(var(--sc),.45)}
+.bx-btn{box-shadow:calc(var(--sdx)*-1px) calc(var(--sdy)*2px) 2px rgba(var(--sc),.4),calc(var(--sdx)*-10px) calc(var(--sdy)*13px) 14px -3px rgba(var(--sc),.5)}
+/* Big type sits printed on the mat but catches a faint shadow, so it reads as ink on a surface, not a screen. */
+.bx-hi,.vt h2{text-shadow:calc(var(--sdx)*-2px) calc(var(--sdy)*3px) 4px rgba(var(--sc),.35)}
+
+/* Mat texture and the protractor printed at the corner where the angle lines start (mat.js). */
+.mat-print::before{content:"";position:absolute;inset:0;opacity:.22;mix-blend-mode:soft-light;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.mp-pro{position:absolute;left:0;overflow:visible}
+.mp-pro path,.mp-pro line{stroke:#fff;fill:none}
+.mp-pro text{fill:rgba(255,255,255,.6);font:500 9px Geist,-apple-system,sans-serif}
+.mp-circ{position:absolute;border-radius:50%;border:1px dashed rgba(255,255,255,.2);transform:translate(-50%,-50%)}
+.mp-circ::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;background:linear-gradient(#fff,#fff) center/1px 100% no-repeat,linear-gradient(#fff,#fff) center/100% 1px no-repeat;opacity:.55}
+
+/* v26 fit: things added after the sunlit look take its blue and its shadows. */
+.vt-seg{box-shadow:0 0 0 1.5px var(--blue,#2143d2)}
+.vt-seg.is-on{box-shadow:0 0 0 1.5px var(--blue,#2143d2),0 0 0 3.5px #fff}
+.vt-dot{box-shadow:0 0 0 3px var(--blue,#2143d2)}
+.bx-gh{box-shadow:0 1px 0 #d9d3c3,calc(var(--sdx,1)*-8px) calc(var(--sdy,1)*11px) 14px -4px rgba(var(--sc,2,10,44),.55)}
+.bx-st img{filter:drop-shadow(calc(var(--sdx,1)*-1px) calc(var(--sdy,1)*1.5px) 1.5px rgba(var(--sc,2,10,44),.5)) drop-shadow(calc(var(--sdx,1)*-4px) calc(var(--sdy,1)*6px) 6px rgba(var(--sc,2,10,44),.3))}
+.bx-st.is-obj img{filter:drop-shadow(calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 3px rgba(var(--sc,2,10,44),.5)) drop-shadow(calc(var(--sdx,1)*-22px) calc(var(--sdy,1)*26px) 22px rgba(var(--sc,2,10,44),.5))}

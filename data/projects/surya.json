@@ -1,7 +1,7 @@
 {
     "id": "surya",
     "hero": {
-        "title": "Surya – Kinetic Wall Timepiece",
+        "title": "Surya: Kinetic Wall Timepiece",
         "oneLiner": "A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep."
     },
     "context": {
@@ -10,9 +10,9 @@
     "build": {
         "bullets": [
             "Layered laser-cut wooden mandala body (wall-mount) inspired by solar geometry",
-            "Set of mechanical flowers (petals) driven by micro-servos",
-            "Custom calibration workflow for tuning servo ranges per flower",
-            "Control electronics + wiring harness (power distribution + servo control)",
+            "Set of mechanical flowers (petals) driven by small DC motors",
+            "Custom calibration workflow for tuning each flower's motor range",
+            "Control electronics + wiring harness (power distribution + motor control)",
             "Firmware that maps each flower to a family member and syncs motion to that time zone's light cycle",
             "Physical button inputs for instant 'what time is it for them' checks",
             "Assembly files: CAD/laser-cut vectors + enclosure/jig files for alignment and mounting"
@@ -39,7 +39,7 @@
         "worked": [
             "Slow, continuous motion made the piece feel calm and alive rather than mechanical.",
             "Assigning one flower per family member made the interaction immediately understandable.",
-            "The wall-mounted, layered mandala form gave it the presence of a lasting artifact, not a gadget."
+            "The wall-mounted, layered mandala form gave it the presence of a lasting artifact."
         ],
         "didnt": [
             "Achieving smooth, synchronized motion across all flowers took far more iteration than expected due to motor and mechanical variance."
@@ -47,7 +47,7 @@
     },
     "outcome": {
         "status": "shipped",
-        "text": "Surya became a functioning kinetic wall timepiece that stays in constant sync with my family's day-night cycles across time zones. More than a prototype, it became a personal artifact that made distance legible and emotionally present. The project established my approach to translating abstract feelings into physical interaction, using motion and form instead of screens to communicate meaning.",
+        "text": "Surya became a functioning kinetic wall timepiece that stays in constant sync with my family's day-night cycles across time zones. The project established my approach to translating abstract feelings into physical interaction, using motion and form instead of screens to communicate meaning.",
         "proof": "https://www.instagram.com/p/DPm6dEjjCmO/"
     },
     "reflection": {
@@ -74,7 +74,7 @@
         },
         {
             "label": "Arduino",
-            "description": "Microcontroller programming for servo and sensor control."
+            "description": "Microcontroller programming for motor and sensor control."
         },
         {
             "label": "Kinetic Sculpture",

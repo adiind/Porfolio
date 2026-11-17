@@ -1,0 +1,109 @@
+{
+  "ref": {
+    "w": 1440,
+    "h": 900
+  },
+  "booklet": {
+    "x": 948.5,
+    "y": 659.1,
+    "w": 223.6,
+    "h": 134.1,
+    "turn": -4
+  },
+  "posters": [
+    {
+      "id": "self",
+      "label": "Self: AI Product Manager intern, 2026, agentic AI products",
+      "src": "/images/mat/posters/self.webp",
+      "x": 546.8,
+      "y": 202.8,
+      "w": 124.1,
+      "h": 296.4,
+      "radius": 15.9,
+      "kind": "card"
+    },
+    {
+      "id": "zomato",
+      "label": "Zomato: home screen analytics. ~10M daily users, ~80% of orders start there.",
+      "src": "/images/mat/posters/zomato.webp",
+      "x": 682.7,
+      "y": 202.8,
+      "w": 260,
+      "h": 296.4,
+      "radius": 15.9,
+      "kind": "card"
+    },
+    {
+      "id": "design",
+      "label": "Human-centered design at Northwestern: JPMorgan Chase, McDonald’s and P&G",
+      "src": "/images/mat/posters/design.webp",
+      "x": 954.4,
+      "y": 202.8,
+      "w": 260,
+      "h": 296.4,
+      "radius": 15.9,
+      "kind": "card"
+    },
+    {
+      "id": "rescue",
+      "label": "Zomato Food Rescue: about 50 percent less food waste",
+      "src": "/images/mat/posters/rescue.webp",
+      "x": 1226.2,
+      "y": 202.8,
+      "w": 124.1,
+      "h": 296.4,
+      "radius": 15.9,
+      "kind": "card"
+    },
+    {
+      "id": "snapdeal",
+      "label": "Snapdeal: ads revenue up 14 percent",
+      "src": "/images/mat/posters/snapdeal.webp",
+      "x": 546.8,
+      "y": 510.9,
+      "w": 124.1,
+      "h": 296.4,
+      "radius": 15.9,
+      "kind": "card"
+    },
+    {
+      "id": "photo",
+      "label": "Adi Agarwal",
+      "src": "/images/mat/posters/photo.webp",
+      "x": 91.1,
+      "y": 191.8,
+      "w": 187,
+      "h": 198.2,
+      "radius": 16.6,
+      "kind": "card"
+    },
+    {
+      "id": "printer",
+      "label": "Bambu Lab 3D printer",
+      "src": "/images/mat/posters/printer.webp",
+      "x": 1094.3,
+      "y": 579.8,
+      "w": 116,
+      "h": 201.5,
+      "radius": 0,
+      "kind": "cutout"
+    }
+  ],
+  "pieces": {
+    "_note": "Things laid on the stage that used to be flat HTML. resume: the résumé sheet's paper width and turn (it lies beside the photo; with its tape it is no taller than the photo). The words' places are laid out by lib/mat/wordPieces.ts layoutWords; github and work here are no longer read.",
+    "resume": {
+      "x": 312,
+      "y": 150,
+      "w": 118,
+      "turn": 3
+    },
+    "github": {
+      "x": 546,
+      "y": 54
+    },
+    "work": {
+      "x": 66,
+      "y": 750
+    }
+  }
+}

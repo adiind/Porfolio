@@ -1,11 +1,11 @@
 {
     "id": "helios",
     "hero": {
-        "title": "Helios – Mechanical Kinetic Lamp",
-        "oneLiner": "A mechanical lamp that uses gears and physical motion to restore tactile interaction in an otherwise app-driven lighting world."
+        "title": "Helios: Mechanical Kinetic Lamp",
+        "oneLiner": "A 3D-printed lamp. Turn the ring by hand and eight spur gears change the light."
     },
     "context": {
-        "text": "Smart lighting has optimized control but removed interaction. Most lamps are reduced to sliders, presets, or voice commands, making light feel passive and disposable. I wanted to design a lamp where changing light felt intentional and physical, something you engage with using your hands, not an app. The constraint was to make the mechanism visible, understandable, and satisfying rather than hidden."
+        "text": "Smart lighting has optimized control but removed interaction. Most lamps are reduced to sliders, presets, or voice commands. I wanted to design a lamp where changing light felt intentional and physical, something you engage with using your hands, not an app. The constraint was to make the mechanism visible, understandable, and satisfying rather than hidden."
     },
     "build": {
         "bullets": [
@@ -38,7 +38,6 @@
     "review": {
         "worked": [
             "Gear-driven motion made interaction slow, deliberate, and satisfying.",
-            "Visible mechanics helped users immediately understand cause and effect.",
             "Print-first design reduced assembly complexity."
         ],
         "didnt": [
@@ -47,12 +46,12 @@
     },
     "outcome": {
         "status": "shipped",
-        "text": "Helios resulted in a fully functional kinetic lamp where light is shaped through motion rather than settings. It stands as a proof that mechanical interaction can coexist with modern lighting without relying on software or automation.",
+        "text": "Helios resulted in a fully functional kinetic lamp where light is shaped through motion rather than settings.",
         "proof": "https://www.instagram.com/p/DDqweMUT021/",
         "blocker": ""
     },
     "reflection": {
-        "text": "Helios reinforced that physical resistance, motion, and visibility can make everyday interactions feel intentional rather than optimized away."
+        "text": "Helios reinforced that physical resistance, motion, and visibility can make everyday interactions feel intentional."
     },
     "themeColor": "amber",
     "icon": "layers",

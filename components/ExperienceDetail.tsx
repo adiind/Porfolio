@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, ScrollText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ExternalLink, ScrollText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TimelineItem, CaseStudy, FeatureCard } from '../types';
 import { Project } from '../types/Project';
 import { formatDate } from '../utils';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { experiencePath } from '../lib/workRoutes';
 import { useProjects } from '../context/ProjectsContext';
 import ProjectDetail from './ProjectDetail';
+import BackPill from './BackPill';
 import { trackEvent } from '../lib/analytics';
 import { useContentEngagement } from '../hooks/useContentEngagement';
 
@@ -94,11 +95,17 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, ana
         onClose();
     };
 
-    const dialogRef = useDialogA11y(handleTopmostClose, { historyTag: 'experience' });
+    const dialogRef = useDialogA11y(handleTopmostClose, { historyTag: 'experience', historyPath: experiencePath(item.id) });
 
     const handleManualClose = () => {
         handleTopmostClose();
     };
+
+    // The pill goes beside this dialog (same parent), not into document.body, so the profile (z-100) and the
+    // case study (z-200) that can open on top of this page also cover its pill. The page itself now sits above
+    // the app header (z-55 > z-50), like every other page, so the pill never lands on the header's name badge.
+    const [pillHost, setPillHost] = useState<HTMLElement | null>(null);
+    useEffect(() => { setPillHost(dialogRef.current?.parentElement ?? null); }, [dialogRef]);
 
     return (
         <motion.div
@@ -111,7 +118,7 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, ana
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`fixed inset-0 bg-black/95 overflow-hidden focus:outline-none ${selectedFeatureCard || activeLinkedProject ? 'z-[100]' : 'z-[45]'}`}
+            className={`fixed inset-0 bg-black/95 overflow-hidden focus:outline-none ${selectedFeatureCard || activeLinkedProject ? 'z-[100]' : 'z-[55]'}`}
             onClick={handleManualClose} // Backdrop click closes
         >
             {/* Background Ambience */}
@@ -120,18 +127,9 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, ana
                 <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/15 blur-[120px] rounded-full" />
             </div>
 
-            {/* Close Button */}
-            {!selectedFeatureCard && !activeLinkedProject && ReactDOM.createPortal(
-                <motion.button
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
-                    className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold transition-all hover:bg-gray-100 shadow-2xl"
-                >
-                    <X size={20} strokeWidth={2.5} />
-                    <span className="text-sm">Close</span>
-                </motion.button>,
-                document.body
+            {/* The one way out: Back, top left. Hidden while a nested feature or project is on top (they show their own). */}
+            {pillHost && !selectedFeatureCard && !activeLinkedProject && (
+                <BackPill portalTarget={pillHost} zClass="z-[60]" onClick={handleManualClose} ariaLabel="Back" />
             )}
 
             {/* Main Content */}
@@ -146,7 +144,7 @@ const ExperienceDetail: React.FC<Props> = ({ item, onClose, onOpenCaseStudy, ana
             // We want creating a specific container for the content that stops propagation
             >
                 <div
-                    className="max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-16"
+                    className="max-w-6xl mx-auto px-6 md:px-12 pt-[72px] pb-12 md:py-16"
                     onClick={(e) => e.stopPropagation()} // Stop clicks on content from closing modal
                 >
 
@@ -479,26 +477,20 @@ const FeatureCardModal: React.FC<{ card: FeatureCard; onClose: () => void; accen
             aria-modal="true"
             aria-labelledby="feature-card-modal-title"
             data-feature-detail
-            className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md focus:outline-none"
+            className="fixed inset-0 z-[300] flex items-center justify-center p-4 pt-[72px] bg-black/80 backdrop-blur-md focus:outline-none"
             onClick={(e) => {
                 e.stopPropagation();
                 onClose();
             }}
         >
+            <BackPill onClick={onClose} ariaLabel="Back" />
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 onClick={(e) => e.stopPropagation()}
-                className={`w-full bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] relative ${hasMediaGallery ? 'max-w-5xl' : 'max-w-2xl'}`}
+                className={`w-full bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-88px)] relative ${hasMediaGallery ? 'max-w-5xl' : 'max-w-2xl'}`}
             >
-                <button
-                    onClick={onClose}
-                    aria-label="Close"
-                    className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white/70 hover:text-white transition-colors backdrop-blur-sm z-50"
-                >
-                    <X size={20} />
-                </button>
 
                 <div className="overflow-y-auto custom-scrollbar flex-1">
                     {/* Header with visual flare or Image */}

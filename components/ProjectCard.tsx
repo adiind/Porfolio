@@ -129,7 +129,7 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => {
     const statusLabel = project.id === 'glyph' ? 'Prototype' : statusLabels[project.outcome.status];
     const titleParts = project.id === 'glyph'
         ? ['Glyph', 'A Body for AI']
-        : project.hero.title.split('–').map((part) => part.trim());
+        : project.hero.title.split(/–|:\s/).map((part) => part.trim());
 
     // The preview grows over the grid rather than changing its row height.
     // One explicit height tween owns the expansion; nested layout projection and

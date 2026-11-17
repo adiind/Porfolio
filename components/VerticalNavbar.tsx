@@ -122,7 +122,7 @@ const VerticalNavbar: React.FC<VerticalNavbarProps> = ({ activeSection, onNaviga
                         </span>
                         <span className="min-w-0">
                             <span className="block truncate text-[11px] font-semibold leading-tight text-white">Adi Agarwal</span>
-                            <span className="block max-w-[76px] truncate text-[8px] leading-tight text-white/58">Tangible AI + Product Systems</span>
+                            <span className="block max-w-[76px] truncate text-[8px] leading-tight text-white/58">Product + Analytics</span>
                         </span>
                     </button>
 

@@ -12,16 +12,12 @@ export const SOCIAL_LINKS = {
   email: "mailto:kriitya@gmail.com"
 };
 
-export const PROFILE_BIO = `I work at the seam between design and technology, with a focus on making AI tangible. I turn invisible models and complex systems into interfaces, devices, and services that people can see, feel, understand, and trust.
-
-I came to design through product analytics, working across e-commerce, advertising, supply chains, and food delivery before joining Northwestern’s Engineering Design Innovation program. That path lets me translate in both directions: I bring human context, design judgment, and product intent to technologists, while giving designers a working understanding of the systems underneath the interface.
-
-My work now spans agentic assistants, embedded intelligence, service design, healthcare, and physical prototypes. Whether the output is a wearable, an AI workflow, or a decision system, I care about the same question: how do we make powerful technology legible enough to become genuinely useful?`;
+export const PROFILE_BIO = `I came to product through analytics: e-commerce, advertising, supply chains and food delivery. Now I’m in Northwestern’s Engineering Design Innovation program.`;
 
 export const PROFILE_SKILLS = [
-  "Tangible AI", "Interaction Design", "Product Strategy",
+  "Interaction Design", "Product Strategy",
   "Agentic Systems", "Embedded Systems", "Rapid Prototyping",
-  "Product Analytics", "Service Design", "Technical Storytelling",
+  "Product Analytics", "Service Design",
   "Claude Code", "Codex", "RAG"
 ];
 

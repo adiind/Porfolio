@@ -1,0 +1,5 @@
+[
+ {"id":"home","kicker":"1 of 3 · Homepage & search","title":"About 10 million people a day","lines":["I analyzed discovery, search and ranking across a homepage used by about 10 million people daily.","Clickstream and experiments helped guide product and design decisions."]},
+ {"id":"friends","kicker":"2 of 3 · Friends","title":"Recommendations from friends","lines":["I led analytics for Friends Recommendation, looking at how friend activity influenced ordering behavior."]},
+ {"id":"rescue","kicker":"3 of 3 · Food Rescue","title":"Giving meals another chance","lines":["As lead product analyst, I worked on Food Rescue, which offers cancelled meals to nearby customers.","The project reported about 50% less food waste across India."]}
+]

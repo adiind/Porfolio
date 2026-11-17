@@ -9,7 +9,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     title: "AI Product Manager (Intern)",
     company: "Self",
     companyUrl: "https://self.xyz",
-    headline: "Shaping agentic products around trust, clarity, and human control.",
+    headline: "Multi-step AI pipelines, with a human checkpoint.",
     type: "corporate",
     subtype: 'role',
     start: "2026-06-01",
@@ -35,23 +35,22 @@ export const TIMELINE_DATA: TimelineItem[] = [
     lane: 2,
     title: "Portfolio V2",
     company: "Personal Project",
-    headline: "A portfolio built with Agentic AI.",
+    headline: "This site, built with agentic AI.",
     type: "personal",
     subtype: 'project',
     start: "2025-01-01",
     end: "Present",
-    summary: "Building a portfolio using advanced agentic coding workflows to explore the future of human-AI collaboration.",
+    summary: "Building this portfolio with agentic coding workflows.",
     bullets: [
       "Coordinated Antigravity, Codex, and Claude across implementation, critique, and verification.",
-      "Moved beyond 'vibe coding' to structured, verifiable agentic development.",
-      "Showcasing the potential of AI as a pair programmer and system architect."
+      "Checked changes with production builds, browser screenshots, and accessibility audits."
     ],
     logoUrl: "/images/portfolio_hero.png",
     imageUrl: "/images/portfolio_projects.png",
     skills: [
-      { label: "Agentic AI", description: "Collaborating with autonomous agents." },
-      { label: "React + Vite", description: "The actual frontend runtime and build system." },
-      { label: "Tailwind", description: "Utility-first styling." }
+      { label: "Agentic AI", description: "Directing AI coding agents." },
+      { label: "React + Vite", description: "Frontend and build." },
+      { label: "Tailwind", description: "Styling." }
     ]
   },
 
@@ -60,7 +59,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     lane: 0,
     title: "MS Engineering Design Innovation",
     company: "Northwestern University | Segal Design Institute",
-    headline: "Deepening design engineering skills to build what matters.",
+    headline: "4 studio projects with 3 industry partners: JPMorgan Chase, McDonald's and P&G.",
     type: "education",
     subtype: 'role',
     start: "2025-08-01",
@@ -70,10 +69,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       "Graduate program centered on human-centered design, systems thinking, and real-world problem solving",
       "Studio-led work in ambiguous problem spaces with an emphasis on framing the right problem before building",
       "Strong focus on user research, synthesis, and translating insight into concrete decisions",
-      "Regular exposure to trade-offs between technical feasibility, user needs, and execution constraints",
       "Hands-on prototyping across physical and digital artifacts to validate ideas early",
-      "Collaborative, critique-driven environment that prioritizes clarity of thinking and intent",
-      "Winter Quarter partner work became standalone Selected Work case studies with McDonald's and JPMorgan Chase"
     ],
     logoUrl: "/images/northwestern_wildcats_logo.svg",
     imageUrl: "/images/northwestern_ford.png",
@@ -103,7 +99,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
           "Conducted primary stakeholder interviews (patients, clinicians, caregivers) to surface unmet clinical needs",
           "Built and screened a structured needs list to prioritize problems with real clinical and workflow impact",
           "Defined a defensible need statement with explicit users, outcomes, and constraints",
-          "Evaluated early concepts against adoption, regulatory, and feasibility risks—not just technical novelty",
+          "Evaluated early concepts against adoption, regulatory, and feasibility risks",
           "Produced a pitch-ready concept grounded in clinical reality and system constraints"
         ],
         skills: [
@@ -181,14 +177,14 @@ export const TIMELINE_DATA: TimelineItem[] = [
     lane: 1,
     title: "Senior Product Analyst",
     company: "Zomato",
-    headline: "Driving decisions for India's largest food delivery home screen.",
+    headline: "Home screen analytics: ~10M daily users, ~80% of orders start there.",
     type: "corporate",
     subtype: 'role',
     start: "2024-10-01",
     end: "2025-07-31",
-    summary: "Analytics for the highest-leverage surface in India's largest food delivery app.",
+    summary: "Analytics for the home screen of India's largest food delivery app.",
     bullets: [
-      "Senior Product Analyst on Zomato's Homepage & Search team, the highest-leverage surface through which ~80% of all orders were placed.",
+      "Senior Product Analyst on Zomato's Homepage & Search team, the surface where ~80% of all orders start.",
       "Worked directly with product, engineering and design teams on UI layout, listing size, module ordering, ranking logic and surface interactions.",
       "Analytics covered ~10 million daily active users, using clickstream data to understand how users scrolled, clicked, searched, abandoned, or converted.",
       "Evaluated ML-based ranking output and helped identify gaps between algorithm predictions and real user behavior, feeding improvements into the ranking model.",
@@ -259,7 +255,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
       {
         title: "Food Rescue (Waste Reduction)",
         subtitle: "Sole Product Analyst",
-        summary: "Powered a system that surfaced expiring inventory at discounts, reducing waste and creating revenue from previously lost orders.",
+        summary: "Cancelled orders offered at a discount to nearby customers, so the food is eaten and the order still earns.",
         expandedSummary: "Food Rescue surfaced time-sensitive surplus inventory via targeted discounts. Analytics determined what discount to show, to which segment, and how long. Experimentation across cuisines, user segments and times of day showed how elastic each user / price / cuisine group was (how likely they were to buy when price changed). This work enabled restaurants and ops to convert inventory that otherwise would have been lost.",
         pills: [
           { label: "Sell-Through", description: "% of surplus inventory successfully sold." },
@@ -274,7 +270,6 @@ export const TIMELINE_DATA: TimelineItem[] = [
         skills: [
           { label: "Pricing Analytics", description: "Analyzing optimal discount levels for conversion." },
           { label: "Elasticity Testing", description: "Measuring price sensitivity across segments." },
-          { label: "SKU-Level Modeling", description: "Building item-level demand and supply models." },
           { label: "Demand Triggers", description: "Identifying what drives purchase decisions." }
         ],
         imageUrl: "/images/food_rescue.png",
@@ -381,13 +376,11 @@ export const TIMELINE_DATA: TimelineItem[] = [
       { label: "GitHub", url: "https://github.com/adiind/diy-jarvis" },
       { label: "Circuit Digest", url: "https://circuitdigest.com/microcontroller-projects/voice-controlled-smart-home-assistant" }
     ],
-    extendedDescription: `Jarvis is an open-source, voice-controlled smart home assistant that integrates IoT and AI technologies to deliver a seamless and interactive smart home experience. Developed for an Edge AI & IoT Challenge open across ASEAN countries and hosted by Circuit Digest and DigiKey, the project was selected as one of the challenge's Top 10 finalists and received praise for its innovative approach and detailed video demonstration.
+    extendedDescription: `Jarvis is an open-source smart home assistant: it wakes when you walk up, listens for a voice command, and sends it over MQTT to Home Assistant. I built it for an Edge AI & IoT Challenge open across ASEAN countries and hosted by Circuit Digest and DigiKey, where it was one of the Top 10 finalists.
 
-The assistant leverages voice recognition, motion detection, and MQTT communication to interact with Home Assistant, allowing precise control of smart devices. With dynamic visual feedback, advanced voice commands, and a modular design, Jarvis bridges the gap between smart home technology and user accessibility. Its open-source nature invites experimentation and customization, empowering smart home enthusiasts to tailor it to their specific needs. Balancing affordability with advanced functionality, Jarvis exemplifies a scalable and adaptable solution in the smart home space.
+The challenge was to create an Edge AI and IoT project using specific boards. Due to stock unavailability, I couldn’t get the display version of the Maixduino board. Instead, I used its onboard LEDs and an MQTT-connected LED strip for visual feedback. Using the Maixduino’s AI capabilities, I designed it as a voice assistant with a PIR motion detector as a trigger: walk up to Jarvis and it activates. Using an ESP32 for Wi-Fi connectivity, I integrated the system with my local Home Assistant setup, enabling it to control all my IoT devices through specific commands.
 
-The challenge was to create an Edge AI and IoT project using specific boards. Due to stock unavailability, I couldn’t get the display version of the Maixduino board. Instead, I used its onboard LEDs and an MQTT-connected LED strip for visual feedback. Leveraging the Maixduino’s AI capabilities, I designed it as a voice assistant with a PIR motion detector as a trigger—simply approach Jarvis, and it activates. Using an ESP32 for Wi-Fi connectivity, I integrated the system with my local Home Assistant setup, enabling it to control all my IoT devices through specific commands.
-
-The entire microcontroller was programmed using Arduino, and I enhanced its functionality by releasing my own version of the library with improved algorithms. I also designed and 3D-printed a custom case for the board and its peripherals, which I supplied as part of the project. Given the challenge’s time constraints, I prioritized creating a complete and functional product. While this limited software optimization, the final outcome included fully working open-source code and 3D models, making it a comprehensive and accessible project.`
+The entire microcontroller was programmed using Arduino, and I enhanced its functionality by releasing my own version of the library with improved algorithms. I also designed and 3D-printed a custom case for the board and its peripherals, which I supplied as part of the project. Given the challenge’s time constraints, I prioritized creating a complete and functional product. While this limited software optimization, the final outcome included fully working open-source code and 3D models.`
   },
 
   {
@@ -395,7 +388,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     lane: 1,
     title: "Product Analyst",
     company: "Udaan",
-    headline: "Scaling supply chain & marketplace ops via data intelligence.",
+    headline: "Supply-chain and marketplace analytics, pan-India.",
     type: "corporate",
     subtype: 'role',
     start: "2023-02-01",
@@ -403,7 +396,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     summary: "Built analytics and decision systems across supply chain, marketplace, and product at national scale.",
     bullets: [
       "Worked full-time across Udaan's supply-chain vertical, supporting marketplace and inventory models at national scale.",
-      "Owned reporting systems, procurement and availability analytics, and operational decision-intelligence used by product managers, central ops, warehousing, catalogue, pricing and CX teams.",
+      "Owned reporting systems and procurement and availability analytics used by product managers, central ops, warehousing, catalogue, pricing and CX teams.",
       "Built supply-chain systems first for single-city pilots, then scaled operations pan-India across FMCG, pharma and food.",
       "Designed real-time reporting dashboards that enabled teams to act immediately instead of waiting for analyst decks.",
       "Founding analyst for Percept Insights, a Mixpanel-alternative analytics platform used internally and by external partner teams.",
@@ -484,14 +477,14 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
         ],
         skills: [
           { label: "Platform Thinking", description: "Building reusable systems that serve multiple teams and use cases." },
-          { label: "Internal Enablement", description: "Empowering colleagues to work independently with data and tools." },
+          { label: "Internal Enablement", description: "Helping colleagues work independently with data and tools." },
           { label: "Analytics Training", description: "Teaching non-technical stakeholders to interpret and act on data." }
         ]
       }
     ],
     caseStudy: {
       title: "Unified Procurement Reporting",
-      summary: "A system built to bring clarity, speed, and trust to India-wide procurement reporting.",
+      summary: "India-wide procurement reporting after Udaan unified its supply chain.",
       thumbnailUrl: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Chart%20Decreasing.png",
       themeColor: 'orange',
       slides: [
@@ -500,7 +493,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           title: 'Unified Procurement Reporting',
           content: {
             subtitle: "Dashboard System for Udaan's B2B Supply Chain",
-            description: 'A system built to bring clarity, speed, and trust to India-wide procurement reporting after a complete supply-chain restructuring.',
+            description: 'Dashboards for India-wide procurement reporting after a complete supply-chain restructuring.',
             role: 'Adi Agarwal - Product Analyst'
           }
         },
@@ -570,10 +563,8 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
           title: 'Reflection',
           content: {
             points: [
-              'This project started as a data cleanup task but evolved into a study of how design translates trust in data.',
-              'Dashboard Changed Decision-Making altogether, leadership reviews began directly in dashboards.',
-              "By merging engineering precision with human-centered visual language, Udaan's procurement dashboard became a living, shared system.",
-              'Not just improving viewing performance, but aligning every team on what performance means.'
+              'It started as a data cleanup task.',
+              'Leadership reviews began in the dashboards.'
             ]
           }
         }
@@ -615,7 +606,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
     type: "corporate",
     subtype: 'role',
     start: "2020-06-01",
-    end: "2022-08-31",
+    end: "2022-09-30",
     summary: "Building ads analytics and supply infrastructure during Snapdeal's first-party transition.",
     bullets: [
       "Set up data pipelines to support Snapdeal's first-party product rollout",
@@ -690,9 +681,9 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
   {
     id: "tinkerverse",
     lane: 2,
-    title: "Founder & Creator",
+    title: "Creator",
     company: "Tinker Verse",
-    headline: "A sandbox for physical computing, agentic software, and creative tech.",
+    headline: "My lab for hardware and AI builds.",
     type: "personal",
     subtype: 'role',
     start: "2024-02-01",
@@ -708,15 +699,14 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
       {
         id: "zero-my-ai",
         title: "Zero",
-        description: "Part Jarvis, part second brain: a human-centered AI assistant experiment with voice, chat, image generation, four-layer memory, Codex coding support, smart-home context, and bug/feature loops.",
+        description: "An AI assistant experiment with voice, chat, image generation, four-layer memory, Codex coding support, smart-home context, and bug/feature loops.",
         imageUrl: "/images/zero_hero_banner.png",
-        tags: ["Second Brain", "Voice + Chat", "Codex", "4-Layer Memory"],
-        link: "#"
+        tags: ["Second Brain", "Voice + Chat", "Codex", "4-Layer Memory"]
       },
       {
         id: "jarvis",
         title: "Jarvis Home Assistant",
-        description: "A voice-controlled home automation system built with Maixduino and MQTT. Features local voice recognition, motion detection, and seamless integration with Home Assistant.",
+        description: "A voice-controlled home automation system built with Maixduino and MQTT. Features local voice recognition, motion detection, and integration with Home Assistant.",
         imageUrl: "https://img.youtube.com/vi/3aCWb3PsAQs/maxresdefault.jpg",
         videoUrl: "https://www.youtube.com/watch?v=3aCWb3PsAQs",
         tags: ["IoT", "AI", "C++"],
@@ -725,36 +715,34 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
       {
         id: "plotter",
         title: "Voice Plotter",
-        description: "A generative art machine that translates spoken words into physical drawings. Explores the imperfection of translation between digital voice and analog motion.",
+        description: "A machine that turns spoken words into physical drawings.",
         imageUrl: "https://i.ibb.co/v6nVSTw9/IMG-8392-2.jpg",
-        tags: ["Generative Art", "Robotics", "Python"],
-        link: "#"
+        tags: ["Generative Art", "Robotics", "Python"]
       }
     ]
   },
   {
     id: "bits",
     lane: 0,
-    title: "B.Tech Civil Engineering + M.Sc. Biological Sciences",
+    title: "B.E. Civil Engineering + M.Sc. Biological Sciences",
     company: "BITS Pilani, Hyderabad Campus",
-    headline: "Foundational dual-degree in Engineering & Biology.",
+    headline: "Dual degree: civil engineering and biological sciences.",
     type: "education",
     subtype: 'role',
     start: "2016-08-01",
     end: "2021-05-30",
     summary: "Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives.",
     bullets: [
-      "Dual-degree education spanning civil engineering and biological sciences, enabling systems-level thinking across physical and biological domains.",
+      "Dual-degree education spanning civil engineering and biological sciences.",
       "Early exposure to medical innovation and bio-design through structured workshops and healthcare-focused projects.",
       "Led and contributed to healthcare and sanitation design projects addressing real-world constraints and usability.",
       "Stage Design Head for TEDx BITS Hyderabad, responsible for concept development and execution.",
-      "Secretary, Synapsis (Biological Science Association), driving academic engagement and student-led initiatives.",
+      "Secretary, Synapsis (Biological Science Association).",
       "Founder and Instructor, Inferno (Self Defense Society), trained and mentored students with a focus on fitness and personal safety.",
       "Hockey A Team member, representing the institute in competitive sports."
     ],
     logoUrl: "https://upload.wikimedia.org/wikipedia/en/d/d3/BITS_Pilani-Logo.svg",
     imageUrl: "/images/bits_hyderabad.jpg",
-    differentiator: "This phase shaped my interdisciplinary instincts by working across biology, engineering, and design long before it became a formal specialization.",
     skills: [
       { label: "Healthcare Instrumentation", description: "Designing medical devices and testing systems for clinical use." },
       { label: "Product Design", description: "End-to-end physical product development from concept to prototype." },
@@ -768,7 +756,7 @@ The entire microcontroller was programmed using Arduino, and I enhanced its func
         title: "Rightbiotic: Antimicrobial Testing Machine",
         subtitle: "Healthcare Instrumentation",
         summary: "Collaborated on a low-cost antimicrobial resistance testing system to reduce test turnaround from days to hours.",
-        expandedSummary: "Worked under the guidance of Dr. Suman Kapur (late) to repurpose a UTI analysis machine for antimicrobial resistance testing. Owned the product design layer, working with multiple PCB vendors and proposing a compact redesign using smaller, more efficient components. Co-developed a simple, lab-friendly app with a software collaborator to improve usability for technicians. Project could not be fabricated due to COVID-19 disruptions and health constraints, but reflects real-world healthcare innovation under pressure.",
+        expandedSummary: "Worked under the guidance of Dr. Suman Kapur (late) to repurpose a UTI analysis machine for antimicrobial resistance testing. Owned the product design layer, working with multiple PCB vendors and proposing a compact redesign using smaller, more efficient components. Co-developed a simple, lab-friendly app with a software collaborator to improve usability for technicians. Project could not be fabricated due to COVID-19 disruptions and health constraints.",
         pills: [
           { label: "AMR Testing", description: "Antimicrobial Resistance testing to identify drug-resistant bacteria." },
           { label: "PCB Design", description: "Printed circuit board layout and component integration." },

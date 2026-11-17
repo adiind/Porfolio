@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    X, Check, AlertTriangle, ArrowRight,
+    Check, AlertTriangle, ArrowRight,
     Lightbulb, Wrench, Scale, Trophy, Sparkles,
     ChevronLeft, ChevronRight, Cpu, Zap, Code2, Globe, ExternalLink
 } from 'lucide-react';
 import { Project } from '../types/Project';
 import ScrollTracker, { projectDetailSections } from './ui/ScrollTracker';
 import GitHubActivity from './GitHubActivity';
+import BackPill from './BackPill';
 import { useDialogA11y } from '../hooks/useDialogA11y';
 import { projectPath } from '../lib/workRoutes';
 import GlyphProjectDetail from './GlyphProjectDetail';
@@ -230,18 +230,8 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                 <div className="absolute bottom-[-30%] right-[-20%] w-[60%] h-[60%] bg-indigo-600/20 blur-[150px] rounded-full" />
             </div>
 
-            {/* Close Button */}
-            {ReactDOM.createPortal(
-                <button
-                    onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
-                    aria-label="Close project"
-                    className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 shadow-2xl"
-                >
-                    <X size={20} strokeWidth={2.5} />
-                    <span className="text-sm">Close</span>
-                </button>,
-                document.body
-            )}
+            {/* The one way out: Back, top left */}
+            <BackPill portal onClick={handleManualClose} ariaLabel="Back to portfolio" />
 
             {/* Scroll Tracker */}
             <ScrollTracker
@@ -256,7 +246,7 @@ const DefaultProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                 className="relative z-10 h-full overflow-y-auto"
             >
                 <div
-                    className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-14 md:pt-16 pb-16"
+                    className="max-w-5xl mx-auto px-6 md:px-12 lg:px-16 lg:pl-24 pt-[72px] md:pt-16 pb-16"
                     onClick={(e) => e.stopPropagation()}
                 >
 

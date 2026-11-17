@@ -1,0 +1,232 @@
+/* ================= The timeline (2026-11-14), ported to components/mat/TimelineSection.tsx =================
+   Copied from review/home-cc-timeline/timeline.css. The root is .mt-timeline (was .t2); the section paints no mat, grid or sun. The phone rules are not ported.
+   Written to sit beside the home page's first screen, so it speaks the same language as the hero blocks:
+   12px-and-up corners, the hero's own cream (#fbf6ea), the hero's own brand colours, Bricolage for names and numbers,
+   the same sun-driven shadows, no textures of its own.
+   What it keeps from the version Adi said yes to: Work on the left, School on the right, one year ruler between them,
+   newest at the top, a colour year tab on every stop, photos as plain rounded prints, no cut-off text.
+   What it does with the later asks: a resting stop shows only photo, name and role (pointing adds dates and facts); the
+   stop you scroll to opens, and takes its colour (see the colour block).
+   All classes start with t2 so the old .vt rules in hero.css cannot leak in. */
+.mt-timeline{position:relative;display:block;height:calc(100svh + var(--n,7)*26vh + 30vh);color:#fff;
+  --paper:#fbf6ea;--paper2:#f1e9d6;--edge:#e3d9c0;--rad:max(12px,1.1vw);--ink:#18204f;--ink2:#4a5180;--ink3:#646a92;--hair:rgba(24,32,79,.13);
+  --fgs:#dfe6ff;--tabw:clamp(60px,5.6vw,80px);--hd:clamp(88px,12vh,116px);
+  /* set by the prototype's .pg / .mat ancestors; defined here so the section stands alone on a transparent page */
+  --lime:#e4e84f;--disp:"Bricolage Grotesque",'FB Geist',-apple-system,"Helvetica Neue",Arial,sans-serif;--sdx:1;--sdy:1;--sc:2,10,44;
+  font-family:'FB Geist',-apple-system,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;background:transparent}
+.mt-timeline *{box-sizing:border-box}
+.t2-pin{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;padding:clamp(24px,4.4vh,44px) clamp(20px,4.6vw,80px) clamp(20px,3.8vh,38px)}
+
+/* ---------- title ---------- */
+.t2-top{flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:8px 48px}
+.mt-timeline h2{margin:0;font-family:var(--disp);font-weight:750;font-size:clamp(30px,3.6vw,54px);line-height:1;letter-spacing:-.035em;
+  text-shadow:calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 4px rgba(var(--sc,2,10,44),.35)}
+.mt-timeline h2 em{font-style:normal;color:var(--lime)}
+.t2-sub{margin:0;max-width:32em;font-size:clamp(14px,1.12vw,16.5px);line-height:1.5;color:var(--fgs);text-align:right;text-wrap:balance}
+.t2-sub b{font-weight:600;color:#fff}
+.t2-p{display:none}
+
+/* ---------- the three columns: Work, the ruler, School ---------- */
+.t2-body{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1.4fr) 54px minmax(0,1fr);gap:clamp(10px,1vw,14px);margin-top:clamp(12px,2.4vh,24px)}
+.t2-lane{display:flex;flex-direction:column;min-width:0;min-height:0}
+.t2-lab{flex:0 0 28px;margin:0;display:flex;align-items:baseline;gap:.65em;font-size:13px;line-height:1.2;color:var(--fgs);white-space:nowrap}
+.t2-lab b{font-weight:650;font-size:15px;color:#fff}
+.t2-cards{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:clamp(7px,1vh,10px)}
+
+/* Paper lying on the mat. Shadows fall down and to the left and swing with the light (sun.js sets --sdx / --sdy). */
+.t2-stop,.t2-side,.t2-rule{background:var(--paper);box-shadow:
+  0 1px 0 var(--edge),
+  calc(var(--sdx,1)*-1.5px) calc(var(--sdy,1)*2px) 2px rgba(var(--sc,2,10,44),.36),
+  calc(var(--sdx,1)*-8px) calc(var(--sdy,1)*10px) 12px -2px rgba(var(--sc,2,10,44),.3),
+  calc(var(--sdx,1)*-24px) calc(var(--sdy,1)*30px) 32px -9px rgba(var(--sc,2,10,44),.5)}
+
+/* ---------- colour ----------
+   Every stop has its own colour, the same colours the hero blocks and the old timeline use (set by timeline.js).
+   A resting stop is cream with a colour year tab. The stop you scroll to takes its colour across the whole card as it
+   opens, flat, the way the hero's Self and Food Rescue blocks are flat colour. Adi picked this over "colour stays on the
+   year tab only" ("A: takes colour").
+   What Adi said about it, in order (his words; my readings are unconfirmed):
+     "make it more visually curated, understandable, premium and less tacky"
+     "yes but think progressive disclosure not the entire thing being visible all the time, and what texture can make it look classy"
+     "nahhh it should be that color full and when we scroll on it then opens but dont like any of these"
+     "nahhh this is too much colored and less textured, these colors make it tacky"
+     "really, really wrong. It doesn't feel like it's part of the portfolio. It doesn't feel professional. It feels like childhood craft project."
+   (The last was about photographed stone, metal and oak cards with stained tabs. Textures on the cards were rejected three
+   times: cloth / cotton / linen, a fine grain, stone / metal / oak. None is used here.)
+   --fl is how far a stop is coloured (0 cream, 1 fully coloured). It follows how far the stop has opened (--up, set by
+   timeline.js). Everything inside a stop takes its ink from the variables below, so one card design works on cream and on colour. */
+.t2-stop{--fl:clamp(0,calc((var(--up,0) - .1)*2.4),1);
+  --tb:color-mix(in srgb,var(--tab) calc(var(--fl)*100%),var(--tc));
+  --ink:color-mix(in srgb,var(--on) calc(var(--fl)*100%),#18204f);
+  --ink2:color-mix(in srgb,var(--on) calc(var(--fl)*100%),#4a5180);
+  --ink3:color-mix(in srgb,var(--on) calc(var(--fl)*100%),#646a92);
+  --deep:color-mix(in srgb,var(--num) calc(var(--fl)*100%),var(--dp));
+  --hair:color-mix(in srgb,color-mix(in srgb,var(--on) 30%,transparent) calc(var(--fl)*100%),rgba(24,32,79,.13));
+  --paper2:color-mix(in srgb,color-mix(in srgb,var(--c) 86%,#000) calc(var(--fl)*100%),#f1e9d6);
+  --edge:color-mix(in srgb,color-mix(in srgb,var(--c) 62%,#000) calc(var(--fl)*100%),#e3d9c0);
+  background-color:color-mix(in srgb,var(--c) calc(var(--fl)*100%),var(--paper))}
+
+/* ---------- the ruler: one year per band, newest at the top ---------- */
+.t2-rule{position:relative;margin-top:28px;border-radius:9px}
+.t2-rule-in{position:absolute;left:0;right:0;top:9px;bottom:9px}
+.t2-yl{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--hair)}
+.t2-yn{position:absolute;left:0;right:0;text-align:center;transform:translateY(-50%);font-style:normal;font-size:11px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+/* each stop is a bar at its true dates: work on the side that faces Work, school on the side that faces School */
+.t2-seg{position:absolute;width:5px;border-radius:3px;background:var(--c);box-shadow:0 0 0 1.5px var(--paper);transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.t2-seg.r0{left:4px;transform-origin:0 50%}
+.t2-seg.r1{right:4px;transform-origin:100% 50%}
+.t2-seg.is-on{transform:scaleX(1.7);z-index:1}
+/* the marker: sits on today until you scroll, then travels back through the years */
+.t2-mark{position:absolute;left:-7px;right:-7px;z-index:2;height:22px;margin-top:-11px;border-radius:99px;display:grid;place-items:center;background:var(--lime);color:var(--ink);
+  font-style:normal;font-size:11px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;pointer-events:none;
+  box-shadow:0 1px 0 #b7bb33,calc(var(--sdx,1)*-4px) calc(var(--sdy,1)*5px) 8px -2px rgba(var(--sc,2,10,44),.5)}
+.t2-mark::after{content:attr(data-y)}
+
+/* ---------- one stop ---------- */
+.t2-stop{--hv:0;--rv:min(1,calc(var(--up,0)*3.5));position:relative;flex:var(--w,1) 1 0;min-height:0;display:flex;border-radius:var(--rad);overflow:hidden;color:var(--ink);text-decoration:none;container-type:size;cursor:pointer;
+  opacity:0;transform:translateY(14px);transition:opacity .6s ease calc(var(--k)*55ms),transform .7s cubic-bezier(.16,.84,.24,1) calc(var(--k)*55ms)}
+.mt-timeline.is-in .t2-stop{opacity:1;transform:none}
+.t2-stop:hover,.t2-stop:focus-visible{--hv:1;--rv:1}
+.mt-timeline.is-set .t2-stop{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease}
+.mt-timeline.is-set .t2-side{transition:none}
+.mt-timeline.is-set .t2-stop:hover{transform:translateY(-2px);box-shadow:
+  0 1px 0 var(--edge),
+  calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 3px rgba(var(--sc,2,10,44),.3),
+  calc(var(--sdx,1)*-11px) calc(var(--sdy,1)*14px) 16px -3px rgba(var(--sc,2,10,44),.3),
+  calc(var(--sdx,1)*-32px) calc(var(--sdy,1)*40px) 40px -10px rgba(var(--sc,2,10,44),.52)}
+.mt-timeline.is-fitting *{transition:none!important}            /* while timeline.js measures, nothing may be mid-animation */
+.t2-stop:focus-visible,.t2-sd:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.l-work .t2-stop{flex-direction:row-reverse}          /* the year tab faces the ruler */
+
+/* the year tab: the only place the stop's own colour is used large */
+.t2-tab{flex:0 0 var(--tabw);display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:var(--pv,12px) 6px calc(var(--pv,12px) - 1px) 11px;background-color:var(--tb);color:var(--ton)}
+.t2-yr{display:block;font-family:var(--disp);font-weight:750;font-size:clamp(15px,1.25vw,18px);line-height:1.08;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t2-yr i{display:block;font-style:normal;font-weight:650;font-size:.84em;opacity:.82}
+.t2-go{display:grid;place-items:center;width:26px;height:26px;margin-left:-3px;border-radius:50%;
+  background:color-mix(in srgb,var(--ton) calc(var(--up,0)*100%),transparent);color:color-mix(in srgb,var(--tb) calc(var(--up,0)*100%),var(--ton));transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.t2-go svg{display:block;width:14px;height:14px}
+.t2-stop:hover .t2-go{transform:translateX(3px)}
+@container (max-height:96px){.t2-go{display:none}}
+@container (max-height:70px){.t2-main,.t2-tab{--pv:8px}}
+
+/* the paper part */
+.t2-main{--pv:12px;flex:1 1 0;min-width:0;min-height:0;display:flex;flex-direction:column;padding:var(--pv) 14px var(--pv) 12px}
+.t2-main::before{content:"";flex:calc(1 - var(--up,0)) 1 0;min-height:0}   /* the spring above the header; the details below are the other one */
+.t2-pic{flex:0 0 auto;display:block;aspect-ratio:5/4;border-radius:7px;overflow:hidden;background:var(--paper2);box-shadow:inset 0 0 0 1px rgba(24,32,79,.1)}
+.t2-pic img{display:block;width:100%;height:100%;object-fit:cover}
+.t2-pic.is-logo{position:relative;background:color-mix(in srgb,#fff calc(var(--fl)*100%),var(--tc))}
+.t2-pic.is-logo img{position:absolute;left:50%;top:50%;width:auto;height:46%;transform:translate(-50%,-50%)}
+.t2-name{display:block;margin:0;font-family:var(--disp);font-weight:750;font-size:clamp(20px,1.7vw,25px);line-height:1.12;letter-spacing:-.025em;color:var(--ink)}
+.t2-role{display:block;font-size:clamp(13.5px,1.05vw,15px);font-weight:500;line-height:1.32;color:var(--ink)}
+/* Second layer: dates and how long. Hidden while the stop rests; it opens when you point at the stop or scroll to it. */
+.t2-when{display:flex;flex-wrap:wrap;gap:0 1.1em;overflow:hidden;font-size:12px;line-height:1.35;font-variant-numeric:tabular-nums;color:var(--ink2);
+  max-height:calc(var(--rv)*54px);opacity:var(--rv);transition:max-height .3s cubic-bezier(.2,.8,.2,1),opacity .24s ease,margin-top .3s cubic-bezier(.2,.8,.2,1)}
+.t2-when span{position:relative}
+.t2-when span + span{white-space:nowrap}
+.t2-when span + span::before{content:"·";position:absolute;left:-.72em;color:var(--ink3)}
+/* Second layer too: numbers and short facts, shown when you point at the stop. What does not fit on the line is left out
+   whole. Once the stop opens, the same numbers appear large, so this line steps aside. */
+.t2-proof{display:flex;flex-wrap:wrap;gap:0 13px;overflow:hidden;font-size:12.5px;line-height:20px;color:var(--ink2);
+  max-height:calc(var(--hv)*(1 - var(--o,0))*var(--pl,20px));opacity:calc(var(--hv)*(1 - var(--up,0)*2.6));transition:max-height .3s cubic-bezier(.2,.8,.2,1),opacity .24s ease,margin-top .3s cubic-bezier(.2,.8,.2,1)}
+.t2-pf{white-space:nowrap}
+.t2-pf b{margin-right:.3em;font-family:var(--disp);font-weight:750;font-size:1.28em;line-height:1;letter-spacing:-.02em;color:var(--deep)}
+.t2-pf.is-tag::before{content:"";display:inline-block;width:5px;height:5px;margin-right:.5em;border-radius:1px;background:var(--deep);vertical-align:.14em}
+
+/* Work lane: print on the left, words beside it. Lines that do not fit move to a hidden second column (never "…"). */
+.l-work .t2-hd{flex:0 0 auto;display:flex;align-items:center;gap:clamp(10px,1vw,14px);min-height:0}
+.l-work .t2-pic{height:min(100cqh - 2*var(--pv),var(--hd))}
+.l-work .t2-txt{flex:1 1 0;min-width:0;max-height:min(100cqh - 2*var(--pv),var(--hd));display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;column-gap:60px;overflow:hidden}
+.l-work .t2-txt > *{flex:0 0 auto;width:100%}
+.l-work .t2-name{font-size:clamp(19px,17cqh,26px)}
+.l-work .t2-role{margin-top:1px}
+.l-work .t2-when{margin-top:calc(var(--rv)*4px)}
+.l-work .t2-proof{margin-top:calc(var(--hv)*(1 - var(--o,0))*5px)}
+
+/* School lane: narrower, so the print and name share the first row and the long degree name runs underneath. */
+.l-school .t2-hd{flex:0 0 auto;min-height:0;max-height:calc(100cqh - 2*var(--pv));display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;column-gap:60px;overflow:hidden}
+.l-school .t2-hd > *{flex:0 0 auto;width:100%}
+.t2-id{display:flex;flex-wrap:wrap;align-items:center;gap:8px 11px;min-width:0}   /* the name drops under the photo only when its longest word cannot sit beside it */
+.l-school .t2-pic{height:clamp(52px,8vh,72px)}
+.t2-nm{flex:1 1 0;min-width:min-content}
+.l-school .t2-when{margin-top:calc(var(--rv)*3px)}
+.l-school .t2-role{margin-top:8px;max-width:34em}
+.l-school .t2-proof{--pl:40px;margin-top:calc(var(--hv)*(1 - var(--o,0))*6px)}
+
+/* ---------- grown: what happened there. Fades in under the header once the stop is tall enough to hold it. ---------- */
+.t2-more{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.2vh,12px);margin-top:calc(var(--up,0)*clamp(9px,1.3vh,12px));padding-top:calc(var(--up,0)*clamp(9px,1.3vh,12px));border-top:1px solid color-mix(in srgb,var(--hair) calc(var(--o,0)*100%),transparent);overflow:hidden;opacity:var(--o,0);pointer-events:none}
+.t2-more > *{flex:0 0 auto;min-width:0}
+.t2-what{margin:0;font-size:clamp(13.5px,1.02vw,15px);line-height:1.42;color:var(--ink);max-width:40em;text-wrap:pretty}
+.t2-stats{display:flex;gap:0 clamp(14px,1.6vw,26px);margin:0;padding:0;list-style:none}
+.t2-st{flex:0 1 auto;min-width:0}
+.t2-st b{display:block;font-family:var(--disp);font-weight:750;font-size:clamp(23px,2vw,30px);line-height:1;letter-spacing:-.03em;color:var(--deep)}
+.t2-st span{display:block;margin-top:4px;max-width:11.5em;font-size:12px;line-height:1.28;color:var(--ink2);text-wrap:balance}
+.t2-tags{display:flex;flex-wrap:wrap;gap:3px 16px;font-size:12.5px;font-weight:550;line-height:1.4;color:var(--ink)}
+.t2-tags span{white-space:nowrap}
+.t2-tags span::before{content:"";display:inline-block;width:5px;height:5px;margin-right:.5em;border-radius:1px;background:var(--deep);vertical-align:.14em}
+/* the work itself: a small picture, what it was, and his role on it */
+.t2-works{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
+.t2-wk{display:block;min-width:0}
+.t2-wk i{display:block;aspect-ratio:2.15/1;border-radius:6px;background:var(--paper2) center/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(24,32,79,.1)}
+.t2-wk i.is-text{display:grid;place-items:center;padding:0 6px;font-style:normal;font-family:var(--disp);font-weight:750;font-size:13px;letter-spacing:-.01em;text-align:center;color:var(--ink);border:0;background:color-mix(in srgb,var(--ink) 9%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 24%,transparent)}
+.t2-wk b{display:block;margin-top:6px;font-size:12.5px;font-weight:650;line-height:1.25;color:var(--ink)}
+.t2-wk em{display:block;margin-top:1px;font-style:normal;font-size:11.5px;line-height:1.3;color:var(--ink2)}
+.t2-notes{margin:0;padding:0;list-style:none;font-size:13px;line-height:1.4;color:var(--ink);max-width:44em}
+.t2-notes li{position:relative;padding:.16em 0 .16em 1.05em}
+.t2-notes li::before{content:"";position:absolute;left:.1em;top:.74em;width:5px;height:5px;border-radius:1px;background:var(--deep)}
+.mt-timeline.is-sizing .t2-more{flex:0 0 auto}
+/* a wide stop (a big window) sets the sentence and numbers beside the work instead of above it */
+@container (min-width:590px){
+  .l-work .t2-more{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:auto auto 1fr;gap:10px clamp(20px,2.4vw,36px);align-content:start}
+  .l-work .t2-what,.l-work .t2-stats,.l-work .t2-tags{grid-column:1}
+  .l-work .t2-works,.l-work .t2-notes{grid-column:2;grid-row:1 / span 3}
+  .l-work .t2-works{grid-template-columns:minmax(0,1fr);gap:8px}
+  .l-work .t2-wk{display:grid;grid-template-columns:72px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:11px}
+  .l-work .t2-wk i{grid-row:1 / span 3;aspect-ratio:1.7/1}
+  .l-work .t2-wk b{margin-top:2px}
+}
+/* the school lane lists the work as rows: its column is too narrow for three pictures side by side */
+.l-school .t2-works{grid-template-columns:minmax(0,1fr);gap:7px}
+.l-school .t2-wk{display:grid;grid-template-columns:60px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:10px}
+.l-school .t2-wk i{grid-row:1 / span 3;aspect-ratio:1.7/1}
+.l-school .t2-wk b{margin-top:1px}
+/* If a grown stop is still too short for everything (a small window), timeline.js leaves out whole parts, least
+   important first: the pictures of the work, then the sentence. It never clips a line in half. */
+.t2-stop[data-drop="1"] .t2-works,.t2-stop[data-drop="1"] .t2-notes,
+.t2-stop[data-drop="2"] .t2-works,.t2-stop[data-drop="2"] .t2-notes,.t2-stop[data-drop="2"] .t2-what,
+.t2-stop[data-drop="3"] .t2-works,.t2-stop[data-drop="3"] .t2-notes,.t2-stop[data-drop="3"] .t2-what,.t2-stop[data-drop="3"] .t2-tags{display:none}
+
+/* ---------- on the side: a campus role and the builds, between the two schools (which is when they happened) ----------
+   At rest: names and years only. Point at a row and it opens its one line of description (where the card is tall enough).
+   When an open school stop needs the room (short windows), the list folds down to its title line. Rows are shown whole
+   or not at all. */
+.t2-side{flex:calc(1.25*(1 - var(--sq,0))) 1 0;min-height:calc(150px - 114px*var(--sq,0));display:flex;flex-direction:column;border-radius:var(--rad);overflow:hidden;color:var(--ink);container-type:size;
+  opacity:0;transform:translateY(14px);transition:opacity .6s ease .2s,transform .7s cubic-bezier(.16,.84,.24,1) .2s}
+.mt-timeline.is-in .t2-side{opacity:1;transform:none}
+.t2-side-h{flex:0 0 auto;margin:0;padding:10px 14px 9px calc(var(--tabw) + 12px);font-size:12.5px;color:var(--ink2);background:linear-gradient(var(--paper2),var(--paper2)) 0 0/var(--tabw) 100% no-repeat}
+.t2-side-l{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .6em;height:17px;overflow:hidden;line-height:17px}   /* one line; the second part is left out whole if it will not fit */
+.t2-side-l b{font-weight:650;font-size:13.5px;color:var(--ink)}
+.t2-side-l span{white-space:nowrap;color:var(--ink)}
+.t2-sd{flex:1 1 0;min-height:0;display:grid;grid-template-columns:var(--tabw) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;border-top:1px solid var(--hair);color:var(--ink);text-decoration:none;transition:background .18s,flex-grow .32s cubic-bezier(.2,.8,.2,1)}
+.t2-sd:hover,.t2-sd:focus-visible{background:#fff;flex-grow:2.4}
+.t2-sw{display:flex;align-items:center;padding:0 4px 0 11px;background:var(--paper2);font-size:12px;font-weight:650;line-height:1.14;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.t2-sw i{display:block;font-style:normal;font-weight:550;font-size:.92em}
+.t2-sd p{align-self:center;margin:0;padding:3px 14px 3px 12px;font-size:12.5px;line-height:1.36;color:var(--ink2);text-wrap:pretty}
+.t2-sd b{display:block;font-weight:650;font-size:13.5px;line-height:1.3;color:var(--ink)}
+.t2-sd p span{display:block;max-height:0;opacity:0;overflow:hidden;transition:max-height .32s cubic-bezier(.2,.8,.2,1),opacity .24s ease}
+.t2-sd:hover p span,.t2-sd:focus-visible p span{max-height:3.6em;opacity:1}
+@container (max-height:206px){.t2-sd p span{display:none} .t2-sd:hover,.t2-sd:focus-visible{flex-grow:1}}
+@container (max-height:140px){.t2-sd{display:none}}
+
+/* ---------- less motion: one window tall, nothing travels ---------- */
+@media (prefers-reduced-motion:reduce){
+  .mt-timeline{height:auto}
+  .t2-pin{position:static}
+  .t2-mark,.t2-s{display:none}
+  .t2-stop,.t2-side{opacity:1!important;transform:none!important;transition:none!important}
+  .t2-seg,.t2-go,.t2-sd,.t2-sd p span,.t2-when,.t2-proof{transition:none}
+  .mt-timeline.is-set .t2-stop:hover{transform:none}
+}
+
+/* the note a stop without an address shows (the prototype's .bx-note) */
+.mt-note{position:fixed;left:50%;bottom:22px;z-index:20;transform:translate(-50%,16px);max-width:min(92vw,560px);padding:.75em 1.2em;border-radius:14px;background:#131416;color:#fff;font:500 14px/1.4 'FB Geist',-apple-system,sans-serif;box-shadow:0 18px 34px -12px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s,transform .3s}
+.mt-note.is-on{opacity:1;transform:translate(-50%,0)}

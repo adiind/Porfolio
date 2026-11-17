@@ -1,0 +1,68 @@
+/* ================= Selected work on the mat: one board, tiles of different sizes (2026-11-16) =================
+   Things lying on the mat, not a grid of cards: a big print with a strip of tape, wide strips, small chips. Each has
+   thickness (a stack of edges that falls with the sun's shadow, --sdx / --sdy set by sun.js), is put down from above as
+   it comes into view, and leans toward the pointer. The section paints no mat: it sits in .fb-second-plane, at the mat's
+   own slant with the timeline. Every class starts with wk- (the root is .mt-work). */
+.mt-work{position:relative;display:block;color:#fff;font-family:'FB Geist',-apple-system,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;
+  --paper:#fbf6ea;--edge:#e3d9c0;--edge2:#d3c8aa;--ink:#18204f;--ink2:#4a5180;--ink3:#646a92;--lime:#e4e84f;--fgs:#dfe6ff;--rad:max(10px,.9vw);
+  --disp:"Bricolage Grotesque",'FB Bricolage','FB Geist',-apple-system,"Helvetica Neue",Arial,sans-serif;--sdx:1;--sdy:1;--sc:2,10,44;
+  --row:clamp(104px,15.5vh,150px);--gap:clamp(10px,1.3vw,18px);
+  padding:clamp(28px,6vh,64px) clamp(20px,4.6vw,80px) clamp(56px,10vh,110px)}
+.mt-work *{box-sizing:border-box}
+.wk-top{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:6px 40px;margin-bottom:clamp(14px,2.6vh,26px)}
+.mt-work h2{margin:0;font-family:var(--disp);font-weight:750;font-size:clamp(28px,3.2vw,48px);line-height:1;letter-spacing:-.035em;
+  text-shadow:calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 4px rgba(var(--sc,2,10,44),.35)}
+.mt-work h2 em{font-style:normal;color:var(--lime)}
+.wk-sub{margin:0;font-size:clamp(14px,1.05vw,16px);line-height:1.4;color:var(--fgs)}
+
+/* six columns, four rows; every tile has its own place (see BENTO in WorkSection.tsx) */
+.wk-board{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:var(--row);gap:var(--gap);grid-auto-flow:dense}
+.wk-cell{min-width:0;min-height:0;perspective:1100px}
+@media (min-width:1101px){.wk-cell{grid-column:var(--c)/span var(--w);grid-row:var(--r)/span var(--h)}}
+@media (max-width:1100px){
+  .wk-board{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .wk-cell[data-w="1"]{grid-column:span 1}.wk-cell:not([data-w="1"]){grid-column:span 2}
+  .wk-cell[data-h="2"]{grid-row:span 2}
+}
+@media (max-width:640px){.wk-board{grid-template-columns:repeat(2,minmax(0,1fr))}.wk-cell:not([data-w="1"]){grid-column:span 2}}
+
+.wk-card{position:relative;display:block;width:100%;height:100%;color:var(--ink);text-decoration:none;border-radius:var(--rad);background:var(--paper);overflow:visible;
+  rotate:var(--t,0deg);
+  /* the tile's thickness: a few paper edges stacked under it, then the shadows the other blocks have */
+  box-shadow:
+    calc(var(--sdx,1)*-1px) calc(var(--sdy,1)*1px) 0 var(--edge),
+    calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*2px) 0 var(--edge2),
+    calc(var(--sdx,1)*-3px) calc(var(--sdy,1)*3px) 0 var(--edge),
+    calc(var(--sdx,1)*-9px) calc(var(--sdy,1)*11px) 14px -3px rgba(var(--sc,2,10,44),.34),
+    calc(var(--sdx,1)*-24px) calc(var(--sdy,1)*30px) 36px -10px rgba(var(--sc,2,10,44),.46);
+  /* not yet put down: held above the mat, large, its shadow far off */
+  opacity:0;transform:translate3d(0,-40px,60px) scale(1.06) rotateX(14deg);
+  transition:opacity .45s ease var(--d,0ms),transform .75s cubic-bezier(.2,.9,.25,1) var(--d,0ms),box-shadow .3s ease}
+.wk-card.is-down{opacity:1;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.wk-card.is-down:not(:hover){transition:transform .5s cubic-bezier(.2,.9,.25,1)}
+.wk-card.is-down:hover{transform:translate3d(0,-3px,18px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .14s ease-out,box-shadow .3s ease}
+
+/* the picture fills the tile; the name lies on it on a little paper label, as a name is written on a print */
+.wk-pic{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;border-radius:var(--rad);background:#e8e0cc}
+.wk-label{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);display:flex;flex-direction:column;gap:2px;padding:7px 11px 8px;border-radius:calc(var(--rad) - 3px);background:rgba(251,246,234,.96);
+  box-shadow:calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 8px -3px rgba(var(--sc,2,10,44),.5)}
+.wk-name{font-family:var(--disp);font-weight:750;font-size:clamp(15px,1.25vw,19px);line-height:1.05;letter-spacing:-.025em}
+.wk-rest{font-size:12px;font-weight:600;line-height:1.25;color:var(--ink2)}
+.wk-line{margin-top:3px;font-size:12.5px;line-height:1.4;color:var(--ink3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.wk-tag{position:absolute;top:9px;left:9px;padding:.26em .65em .3em;border-radius:99px;background:rgba(251,246,234,.94);color:var(--ink);font-size:11px;font-weight:650;letter-spacing:.01em;
+  box-shadow:0 4px 10px -5px rgba(var(--sc,2,10,44),.55)}
+
+/* the big print is taped to the mat: a short strip, a little askew, across its top edge */
+.wk-big::before{content:'';position:absolute;z-index:2;top:-9px;left:50%;width:84px;height:22px;margin-left:-42px;rotate:-3deg;border-radius:2px;
+  background:rgba(238,232,196,.86);box-shadow:0 1px 2px rgba(var(--sc,2,10,44),.3),inset 0 0 0 1px rgba(255,255,255,.35)}
+.wk-big .wk-label{left:12px;bottom:12px;max-width:min(60%,340px);padding:10px 14px 12px}
+.wk-big .wk-line{-webkit-line-clamp:2}
+.wk-big .wk-name{font-size:clamp(22px,2.2vw,32px)}
+
+/* a wide strip: its label runs along the lower left; a chip shows only its name */
+.wk-wide .wk-label{max-width:min(70%,360px)}
+.wk-chip .wk-label{left:6px;bottom:6px;padding:5px 9px 6px}
+.wk-chip .wk-name{font-size:clamp(13px,1.05vw,16px)}
+
+.wk-card:focus-visible{outline:2px solid #fff;outline-offset:4px}
+@media (prefers-reduced-motion:reduce){.wk-card{opacity:1;transform:none;transition:none}.wk-card.is-down:hover{transform:none}}

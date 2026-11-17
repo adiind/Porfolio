@@ -1,7 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
-import { X, Calendar, BookOpen, ArrowLeft } from 'lucide-react';
+import { Calendar, BookOpen } from 'lucide-react';
+import BackPill from './BackPill';
 import { BlogPost } from '../types/BlogPost';
 import { useDialogA11y } from '../hooks/useDialogA11y';
 import { useContentEngagement } from '../hooks/useContentEngagement';
@@ -296,19 +296,8 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
                 <div className="absolute bottom-[-30%] right-[-20%] w-[60%] h-[60%] bg-indigo-600/20 blur-[150px] rounded-full" />
             </div>
 
-            {/* Close Button */}
-            {ReactDOM.createPortal(
-                <button
-                    onClick={(e) => { e.stopPropagation(); handleManualClose(); }}
-                    onWheel={(e) => e.stopPropagation()}
-                    aria-label="Close article"
-                    className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 shadow-2xl"
-                >
-                    <X size={20} strokeWidth={2.5} />
-                    <span className="text-sm">Close</span>
-                </button>,
-                document.body
-            )}
+            {/* The one way out: Back, top left */}
+            <BackPill portal onClick={handleManualClose} ariaLabel="Back to writings" />
 
             {/* Main Content */}
             <div className="relative z-10 h-full overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
@@ -316,14 +305,6 @@ const BlogDetail: React.FC<Props> = ({ post, onClose }) => {
                     className="max-w-3xl mx-auto px-6 md:px-12 pt-24 md:pt-32 pb-16"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {/* Back Link */}
-                    <button
-                        onClick={handleManualClose}
-                        className="flex items-center gap-2 text-white/55 hover:text-white/70 transition-colors mb-8 text-sm"
-                    >
-                        <ArrowLeft size={16} />
-                        Back to Writings
-                    </button>
 
                     {/* Header */}
                     <header className="mb-12">

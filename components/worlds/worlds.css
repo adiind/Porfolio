@@ -136,3 +136,11 @@ svg.season{width:195px;height:195px;filter:drop-shadow(0 16px 12px #68433320)}
 .world-process-image figcaption strong{font-size:13px;font-weight:600}
 .world-process-image figcaption span{opacity:.55}
 @media(max-width:700px){.world-process-grid{grid-column:1/-1;grid-template-columns:1fr;margin:22px 0 8px;gap:30px}.world-process-image img{max-height:420px}.world-process-image figcaption strong{font-size:12px}.world-process-image figcaption span{font-size:10px}}
+/* The one way out, same pill as every page (components/BackPill.tsx, .fb-pill--back): dark "Back", top left.
+   The band grows so the pill sits inside it at top 18px (12px on phones); the wordmark stays centred. */
+.world-case .world-topbar{height:80px;justify-content:center}
+.world-case .world-topbar .world-back{position:absolute;left:22px;top:18px;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:#0b0e16;color:#fff;font:600 14px/1 var(--case-font);white-space:nowrap;cursor:pointer;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 8px 18px -10px rgba(0,0,0,.6);transition:transform .15s ease}
+.world-case .world-topbar .world-back>span{display:inline;font-size:14px}
+.world-case .world-topbar .world-back:hover{transform:translateY(-1px)}
+.world-case .world-topbar .world-back:focus-visible{outline:none;box-shadow:0 0 0 3px #fff,0 0 0 5px #0b0e16}
+@media(max-width:639px){.world-case .world-topbar{height:68px}.world-case .world-topbar .world-back{left:16px;top:12px}}

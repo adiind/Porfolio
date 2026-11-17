@@ -7,6 +7,7 @@ import ProjectDetail from './ProjectDetail';
 import { trackEvent } from '../lib/analytics';
 import { useProjects } from '../context/ProjectsContext';
 import { INITIAL_WORK_PROJECT_ID, resolveWorkProjectId } from '../lib/workRoutes';
+import { PROJECTS_BY_ID } from '../data/projects';
 import CuttingMatSurface from './ui/CuttingMatSurface';
 import { useContentEngagement } from '../hooks/useContentEngagement';
 
@@ -53,7 +54,9 @@ const ProjectsSection: React.FC = () => {
     // Deep link (/work/<id>): mount with the matching detail already open so a
     // fresh page load of e.g. /work/glyph goes straight to the case study.
     const [activeProject, setActiveProject] = useState<Project | null>(
-        () => (INITIAL_WORK_PROJECT_ID ? projects.find((p) => p.id === INITIAL_WORK_PROJECT_ID) ?? null : null)
+        () => (INITIAL_WORK_PROJECT_ID
+            ? projects.find((p) => p.id === INITIAL_WORK_PROJECT_ID) ?? PROJECTS_BY_ID.get(INITIAL_WORK_PROJECT_ID) ?? null
+            : null)
     );
     const [activeProjectSource, setActiveProjectSource] = useState(
         INITIAL_WORK_PROJECT_ID ? 'deep_link' : 'selected_work'

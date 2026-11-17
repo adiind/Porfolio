@@ -1,15 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, ExternalLink, Play, X } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, Play } from 'lucide-react';
 import { JournalEntry, SocialPost, TimelineItem } from '../types';
 import { TINKERVERSE_JOURNAL, TINKERVERSE_LOGO } from '../constants';
 import { Project } from '../types/Project';
 import { useProjects } from '../context/ProjectsContext';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { experiencePath } from '../lib/workRoutes';
 import CuttingMatSurface from './ui/CuttingMatSurface';
 import GlassSurface from './ui/GlassSurface';
 import ProjectDetail from './ProjectDetail';
+import BackPill from './BackPill';
 import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
@@ -98,7 +100,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
         onClose();
     };
 
-    const dialogRef = useDialogA11y(handleTopmostClose, { historyTag: 'tinkerverse' });
+    const dialogRef = useDialogA11y(handleTopmostClose, { historyTag: 'tinkerverse', historyPath: experiencePath(item.id) });
 
     const openProject = (entry: JournalEntry) => {
         if (!entry.projectId) return;
@@ -126,7 +128,7 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-1.5 sm:p-3 md:p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-1.5 pt-[64px] sm:p-3 sm:pt-[72px] md:p-6 md:pt-[80px]">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -148,6 +150,8 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
                 aria-hidden={activeProject ? true : undefined}
                 className={`relative h-full max-h-[96vh] w-full max-w-7xl overflow-hidden rounded-[1.7rem] shadow-2xl focus:outline-none md:rounded-[2.15rem] ${activeProject ? 'hidden' : ''}`}
             >
+                {/* The one way out: Back, top left (inside the dialog so Tab reaches it) */}
+                <BackPill onClick={handleTopmostClose} ariaLabel="Back" />
                 <CuttingMatSurface active={!activeProject} float={false} density="auto" className="p-2.5 sm:p-4 md:p-7">
                     <GlassSurface strength="strong" blur="strong" className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1.25rem] md:rounded-[1.6rem]">
                         <header className="relative z-10 flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-3 sm:px-5 md:px-7 md:py-4">
@@ -158,14 +162,6 @@ const TinkerVerseModal: React.FC<Props> = ({ item, onClose }) => {
                                 </div>
                                 <p className="mt-0.5 hidden text-xs text-white/65 sm:block"><span className="text-white/80">{item.title}</span> · {item.headline}</p>
                             </div>
-                            <button
-                                type="button"
-                                onClick={handleTopmostClose}
-                                aria-label="Close TinkerVerse"
-                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/25 text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0f18a]"
-                            >
-                                <X size={19} aria-hidden="true" />
-                            </button>
                         </header>
 
                         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-6 pt-4 custom-scrollbar sm:px-5 md:px-7 md:pb-8 md:pt-6">

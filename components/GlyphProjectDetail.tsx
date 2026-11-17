@@ -1,7 +1,8 @@
 import React, { useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import BackPill from './BackPill';
 import { Project } from '../types/Project';
 import { useDialogA11y } from '../hooks/useDialogA11y';
 import { projectPath } from '../lib/workRoutes';
@@ -256,15 +257,7 @@ const GlyphProjectDetail: React.FC<Props> = ({ project, onClose }) => {
                 }
             `}</style>
 
-            <button
-                type="button"
-                onClick={onClose}
-                aria-label={`Close ${project.hero.title}`}
-                className="fixed right-3 top-3 z-[9999] flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-[#efeee8] p-0 text-sm font-semibold text-black shadow-2xl transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff3b30] sm:w-auto sm:px-4 md:right-6 md:top-6"
-            >
-                <X size={18} strokeWidth={2.25} />
-                <span className="hidden sm:inline">Close</span>
-            </button>
+            <BackPill onClick={onClose} ariaLabel="Back to portfolio" />
 
             <div ref={scrollRef} className="h-full overflow-y-auto overflow-x-hidden overscroll-contain">
                 <div>

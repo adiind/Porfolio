@@ -1,0 +1,155 @@
+/* The two Google typefaces (Bricolage Grotesque for the headline, Instrument Serif for the one italic word) are asked
+   for by HeroOverlay.tsx with a <link>, not an @import here: an @import makes this whole stylesheet, and the chunk that
+   carries it, wait on another company's server before anything can be drawn. */
+/* Words laid over the full-window 3D scene. Every size is copied from review/home-cc-v30/hero.css, where it
+   was written in container units of the first-screen section; here the root is the container, so it is the
+   whole window. All classes start with mh- so nothing else in the app can clash. */
+.mh-root {
+  --mh-pad: clamp(20px, 4.6cqw, 80px);
+  --mh-ease: cubic-bezier(.16, .84, .24, 1);
+  --mh-line: rgba(255, 255, 255, .34);
+  --mh-sans: 'FB Geist', Geist, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --mh-disp: 'Bricolage Grotesque', 'FB Geist', Geist, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --mh-serif: 'Instrument Serif', 'Times New Roman', serif;
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  pointer-events: none;
+  z-index: 2;
+  font-family: var(--mh-sans);
+  font-size: 15px;
+  line-height: 1.4;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  opacity: 1;
+  transition: opacity 250ms ease-out;
+}
+.mh-root *, .mh-root *::before, .mh-root *::after { box-sizing: border-box; }
+.mh-root.mh-off { opacity: 0; pointer-events: none; }
+
+/* Each piece rises in on its own, 60 ms after the one before. */
+.mh-p {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 600ms ease-out calc(var(--mh-i, 0) * 60ms), transform 600ms ease-out calc(var(--mh-i, 0) * 60ms);
+}
+.mh-lit .mh-p { opacity: 1; transform: none; }
+
+/* Links only take clicks once their words are showing, and never while the layer is off. */
+.mh-a { pointer-events: none; color: inherit; text-decoration: none; cursor: pointer; }
+.mh-lit:not(.mh-off) .mh-a { pointer-events: auto; }
+.mh-a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* Top bar */
+.mh-nav {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: clamp(54px, 8cqh, 72px);
+  padding: 0 var(--mh-pad);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.mh-name { font-weight: 600; letter-spacing: -.01em; padding: 12px 0; }
+.mh-links { display: flex; gap: clamp(18px, 2.4cqw, 36px); }
+.mh-links .mh-a { padding: 12px 0; }
+.mh-links .mh-a:hover { color: #fff; }
+
+.mh-gh {
+  position: relative;
+  display: flex; align-items: center; gap: .9em;
+  height: 38px; padding: 0 14px 0 12px;
+  border-radius: 99px;
+  background: #f6f4ee; color: #18204f;
+  font-size: 12.5px; white-space: nowrap;
+  box-shadow: 0 1px 0 #d9d3c3, -8px 11px 14px -4px rgba(2, 10, 44, .55);
+}
+.mh-gh::after { content: ''; position: absolute; inset: -3px 0; } /* 44 px tall tap target */
+.mh-gh svg { flex: 0 0 auto; width: 18px; height: 18px; }
+.mh-gh-n b { margin-right: .28em; font-family: var(--mh-disp); font-weight: 750; font-size: 15px; letter-spacing: -.02em; }
+.mh-gh-grid { flex: 0 0 auto; display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 3px); grid-auto-columns: 3px; gap: 1px; }
+.mh-gh-grid i { border-radius: 1px; background: rgba(24, 32, 79, .13); }
+.mh-gh-grid i[data-l="1"] { background: #7bd88f; }
+.mh-gh-grid i[data-l="2"] { background: #40c463; }
+.mh-gh-grid i[data-l="3"] { background: #30a14e; }
+.mh-gh-grid i[data-l="4"] { background: #216e39; }
+
+/* Left column. Centred between the top bar and the timeline rail, exactly as in the prototype. */
+.mh-text {
+  position: absolute; left: var(--mh-pad);
+  top: calc((clamp(54px, 8cqh, 72px) + 100cqh - clamp(12px, 2.2cqh, 24px) - 44px) / 2);
+  transform: translateY(-50%);
+  width: 29.5cqw;
+}
+/* The portrait photo's space (it is drawn in 3D): same width, ratio and gap as the prototype. */
+.mh-gap {
+  height: calc(min(13.5cqw, 24cqh) * 1.06);
+  margin-bottom: clamp(12px, 2.6cqh, 26px);
+}
+@container (max-height: 690px) {
+  .mh-gap { height: calc(min(13.5cqw, 15cqh) * 1.06); margin-bottom: 10px; }
+}
+
+.mh-hi {
+  margin: 0; padding-bottom: .14em;
+  font-family: var(--mh-disp); font-weight: 750;
+  font-size: min(5.5cqw, 12.2cqh); line-height: 1;
+  letter-spacing: -.035em; word-spacing: .06em;
+  color: #fff;
+  text-shadow: -2px 3px 4px rgba(2, 10, 44, .35);
+}
+.mh-hi em { font-style: normal; font-weight: 750; letter-spacing: inherit; color: #0a0b10; }
+
+.mh-say {
+  margin: clamp(8px, 1.6cqh, 16px) 0 0;
+  height: 2.5em;
+  font-size: min(2.35cqw, 5.2cqh); line-height: 1.2; font-weight: 500; letter-spacing: -.025em;
+  color: #e3e9ff;
+}
+.mh-say b { font-family: var(--mh-serif); font-style: italic; font-weight: 400; font-size: 1.14em; letter-spacing: -.01em; color: #00ffb6; }
+
+.mh-facts { margin: clamp(14px, 2.8cqh, 28px) 0 0; padding: 0; list-style: none; }
+.mh-facts li {
+  position: relative; display: grid; grid-template-columns: 4.8em 1fr;
+  padding: clamp(7px, 1.25cqh, 11px) 0;
+  font-size: clamp(12.5px, 1.75cqh, 15px); color: #fff;
+}
+.mh-facts li::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--mh-line); }
+.mh-facts i { font-style: normal; color: #dfe44f; }
+.mh-facts b { font-weight: 600; }
+@container (max-height: 690px) {
+  .mh-facts { margin-top: 10px; }
+  .mh-facts li { padding-top: 5px; padding-bottom: 5px; }
+}
+
+.mh-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: clamp(14px, 2.8cqh, 28px); }
+@container (max-height: 690px) { .mh-cta { margin-top: 12px; } }
+.mh-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 48px; padding: 0 24px; border-radius: 999px;
+  background: #0b0c10; color: #fff; font-weight: 500;
+  box-shadow: -1px 2px 2px rgba(2, 10, 44, .4), -10px 13px 14px -3px rgba(2, 10, 44, .5);
+  transition: background .15s;
+}
+.mh-btn:hover { background: #000; }
+.mh-btn svg { transition: transform .3s var(--mh-ease); }
+.mh-btn:hover svg { transform: translateY(3px); }
+.mh-link { padding: 12px 0; text-decoration: underline; text-decoration-color: var(--mh-line); text-underline-offset: 5px; }
+.mh-link:hover { text-decoration-color: #fff; }
+
+/* Laid on the mat: on the 3D home every block of these words is drawn as a thing lying on the mat (lib/mat/wordStage.ts).
+   This layer stays as the real text and links, for screen readers and keyboards, but unseen and never in the pointer's way:
+   a click lands on the piece on the mat, and keyboard focus is shown as a ring round that piece (FlipBookApp). */
+.mh-root.mh-laid { opacity: 0; }
+.mh-root.mh-laid .mh-a, .mh-lit:not(.mh-off).mh-laid .mh-a { pointer-events: none; }
+
+/* Reduced motion: nothing moves, the words just fade in together. */
+@media (prefers-reduced-motion: reduce) {
+  .mh-root { transition-duration: 1ms; }
+  .mh-p { transform: none; transition: opacity 200ms linear; }
+  .mh-btn svg, .mh-btn:hover svg { transition: none; transform: none; }
+}
+
+/* The loading greeting (components/mat/hello.ts) is carried onto the headline: the headline waits in its exact place,
+   unmoved and unseen, while the greeting travels; once it lands the headline shows in that frame, with no rise. */
+.mh-greet-held .mh-hi, .mh-greet-landed .mh-hi { transform: none; transition: none; }
+.mh-greet-held .mh-hi { opacity: 0; }
+.mh-greet-landed .mh-hi { opacity: 1; }

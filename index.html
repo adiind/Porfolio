@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adi Agarwal — Tangible AI, Product Design &amp; Creative Technology</title>
-  <meta name="description" content="Adi Agarwal makes AI tangible through product design, creative technology, agentic systems, embedded intelligence, and physical prototyping." />
+  <title>Adi Agarwal: Product Manager, AI and Analytics</title>
+  <meta name="description" content="Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation." />
   <meta name="author" content="Adi Agarwal" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#050505" />
@@ -13,19 +13,36 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="manifest" href="/site.webmanifest" />
-  <link rel="preload" as="image" href="/images/adi_floating_avatar_workshop.png" fetchpriority="high" />
+  <!-- (ship layer, scripts/ship/main.patch) Which home this window gets, decided once, before anything is fetched. "mat": "/" or "/mat"
+       in a window the 3D home can take, at least 760 px wide and 1.15 times as wide as tall (the rule of lib/ship/frontDoor.ts and
+       components/flipbook/FlipBookApp.tsx); "/#writings" is the old home's. "book": /book/<slug>. "old": the old home, everywhere
+       else, except "/" and "/mat" in a window too small for the 3D home, which go to the flat home at /home-flat/. The head scripts below read window.__shipDoor. The old home's hero picture is preloaded for the old home only. -->
+  <script>
+    (function () {
+      var w = window.innerWidth || document.documentElement.clientWidth, h = window.innerHeight || document.documentElement.clientHeight, p = location.pathname;
+      var door = /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings' && w >= 760 && h > 0 && w / h >= 1.15 ? 'mat'
+        : /^\/book(?:\/[a-z0-9-]+)?\/?$/i.test(p) ? 'book' : /^\/studio\/?$/.test(p) ? 'studio' : 'old';
+      // "/" or "/mat" in a phone-sized, narrow or tall window: the flat home (public/home-flat), before anything else loads
+      if (door === 'old' && /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings') { location.replace('/home-flat/index.html' + location.hash); return; }
+      window.__shipDoor = door;
+      if (door !== 'old') return;
+      var hero = document.createElement('link');
+      hero.rel = 'preload'; hero.as = 'image'; hero.href = '/images/adi_floating_avatar_workshop.png'; hero.fetchPriority = 'high';
+      document.head.appendChild(hero);
+    })();
+  </script>
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Adi Agarwal" />
-  <meta property="og:title" content="Adi Agarwal — Tangible AI, Product Design &amp; Creative Technology" />
-  <meta property="og:description" content="Design fluency for technologists. Technical fluency for designers. Explore Adi Agarwal's work across tangible AI, products, and physical systems." />
+  <meta property="og:title" content="Adi Agarwal: Product Manager, AI and Analytics" />
+  <meta property="og:description" content="Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation." />
   <meta property="og:url" content="https://adidesign.org/" />
   <meta property="og:image" content="https://adidesign.org/images/portfolio_hero.png" />
-  <meta property="og:image:alt" content="Selected tangible AI and product design work by Adi Agarwal" />
+  <meta property="og:image:alt" content="Adi Agarwal's portfolio" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Adi Agarwal — Tangible AI, Product Design &amp; Creative Technology" />
-  <meta name="twitter:description" content="Making AI tangible across product design, creative technology, and physical systems." />
+  <meta name="twitter:title" content="Adi Agarwal: Product Manager, AI and Analytics" />
+  <meta name="twitter:description" content="Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation." />
   <meta name="twitter:image" content="https://adidesign.org/images/portfolio_hero.png" />
 
   <script type="application/ld+json">
@@ -36,37 +53,180 @@
       "alternateName": "Adi",
       "url": "https://adidesign.org/",
       "image": "https://adidesign.org/images/adi_floating_avatar_workshop.png",
-      "jobTitle": "Tangible AI Designer and Product Technologist",
-      "description": "A designer and technologist making artificial intelligence tangible, legible, and useful through products, prototypes, and physical systems.",
+      "jobTitle": "Product Manager",
+      "description": "Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. M.S. Engineering Design Innovation at Northwestern.",
       "sameAs": [
         "https://www.linkedin.com/in/adiind",
         "https://github.com/adiind"
       ],
       "knowsAbout": [
-        "Tangible AI",
-        "Product Design",
-        "Creative Technology",
+        "Product Management",
+        "Product Analytics",
+        "AI Product Development",
         "Agentic Systems",
         "Embedded Systems",
         "Rapid Prototyping"
       ]
     }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- port-home:BEGIN index-head (copied from SOURCE by scripts/ship/port-home.mjs: edit it there, not here) -->
+  <!-- The 3D home page (/mat) starts in a dark room: a bulb on its cord swings there while the app loads, then the app
+       switches it on (class is-on) and, once the room is lit, draws it up out of sight (is-away).
+       Drawn here, ahead of every script, so there is something alive on screen from the first moment. -->
+  <style>
+    #mat-bulb { position: fixed; left: 50%; top: 0; z-index: 30; width: min(16vh, 11vw); margin-left: calc(min(16vh, 11vw) / -2); pointer-events: none; mix-blend-mode: screen;
+      transform-origin: 50% 0; animation: mat-bulb-swing 2.6s ease-in-out infinite alternate; transition: translate 0.46s cubic-bezier(0.55, 0, 0.9, 0.35), opacity 0.34s ease-out; }
+    /* the picture is a lit bulb on black: blended as light, the black vanishes and only the bulb and its glow are added to the room */
+    #mat-bulb img { display: block; width: 100%; filter: brightness(0.4) saturate(0.55); transition: filter 0.16s ease; }
+    #mat-bulb.is-on img { filter: brightness(1.12) saturate(1.05); animation: mat-bulb-catch 0.3s steps(1, end) 1; }
+    #mat-bulb.is-away { translate: 0 -112%; opacity: 0; }
+    @keyframes mat-bulb-swing { from { transform: rotate(-6.5deg); } to { transform: rotate(6.5deg); } }
+    @keyframes mat-bulb-catch { 0% { filter: brightness(1.2); } 22% { filter: brightness(0.45); } 44% { filter: brightness(1.15); } 62% { filter: brightness(0.7); } 100% { filter: brightness(1.12) saturate(1.05); } }
+    @media (prefers-reduced-motion: reduce) { #mat-bulb { animation: none; transition: opacity 0.3s ease; } #mat-bulb.is-on img { animation: none; } #mat-bulb.is-away { translate: none; } }
+    /* "Hi, I'm Adi." under the bulb: the first words on screen. Lit only by the bulb, its shadow swings the other way as
+       the bulb swings. When the room lights up, components/mat/hello.ts carries it onto the cut card letters on the mat,
+       which are cut from this same typeface at this same spacing (lib/mat/wordPieces.ts GREETING: FB Bricolage 800,
+       letter spacing -2 px at 84 px), so it lands on them exactly. */
+    #mat-hello { position: fixed; left: 0; right: 0; top: 52vh; z-index: 29; text-align: center; pointer-events: none; }
+    #mat-hello span { display: inline-block; padding-bottom: .14em; transform-origin: 0 0;
+      font-family: 'FB Bricolage', sans-serif; font-weight: 800; font-size: clamp(44px, 7.2vw, 124px); line-height: 1;
+      letter-spacing: -.0238em; color: #f4e6c8;
+      opacity: 0; translate: 0 14px; filter: brightness(.62);
+      transition: opacity .5s ease-out, translate .5s ease-out, filter .16s ease;
+      animation: mat-hello-shade 2.6s ease-in-out infinite alternate; }
+    #mat-hello span em { font-style: normal; font-weight: 800; letter-spacing: inherit; color: #f4e6c8; }
+    #mat-hello.is-shown span { opacity: 1; translate: none; }
+    #mat-hello.is-on span { filter: brightness(1); }
+    @keyframes mat-hello-shade { from { text-shadow: 7px 12px 16px rgba(0, 0, 0, .7); } to { text-shadow: -7px 12px 16px rgba(0, 0, 0, .7); } }
+    @media (prefers-reduced-motion: reduce) { #mat-hello span { animation: none; translate: none; transition: opacity .3s ease; } }
+  </style>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            background: '#050505',
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          }
-        }
-      }
-    }
+    (function () {
+      // (ship layer, scripts/ship/overlays.mjs) "/" and "/mat" in a window the 3D home can take, as the door script above decided
+      if (window.__shipDoor !== 'mat') return;
+      // a phone or a narrow or tall window gets the flat page (FlipBookApp sends it there): no dark room on the way
+      if (innerWidth < 760 || innerWidth / innerHeight < 1.15) return;
+      document.documentElement.style.background = '#02070f';
+      var bulb = document.createElement('div');
+      bulb.id = 'mat-bulb';
+      bulb.setAttribute('aria-hidden', 'true');
+      var img = new Image();
+      img.fetchPriority = 'high'; img.decoding = 'async';
+      img.src = '/images/mat/bulb.webp';
+      img.alt = '';
+      bulb.appendChild(img);
+      document.documentElement.appendChild(bulb);
+      // the greeting, in the cut letters' own typeface (the same file lib/flipbook/pageArt.ts loads for the mat's cards, so
+      // it is fetched once); shown when the face has arrived, or after 3.5 s in whatever face there is (a slow line
+      // keeps the bulb alone a little longer rather than showing a stand-in face that then jumps). Once per visit: coming
+      // back to the mat from a project page, the bulb is enough.
+      var greeted = false;
+      try { greeted = sessionStorage.getItem('mat-greeted') === '1'; } catch (e) {}
+      if (greeted) return;
+      var hello = document.createElement('div');
+      hello.id = 'mat-hello';
+      hello.setAttribute('aria-hidden', 'true');
+      hello.innerHTML = '<span>Hi, I’m <em>Adi.</em></span>';
+      document.documentElement.appendChild(hello);
+      var shown = false, show = function () { if (shown) return; shown = true; requestAnimationFrame(function () { hello.classList.add('is-shown'); }); };
+      setTimeout(show, 3500);
+      if (window.FontFace && document.fonts) {
+        var face = new FontFace('FB Bricolage', 'url(/fonts/flipbook/Bricolage-800.ttf)', { weight: '800', style: 'normal', display: 'block' });
+        face.load().then(function (loaded) { document.fonts.add(loaded); show(); }, show);
+      } else show();
+    })();
+  </script>
+  <!-- Opening a project book from the home page's mat (/book/<slug>?from=...): draw the mat and the closed booklet exactly
+       where the home page had them, before the app has loaded, so the screen never goes dark between the two pages.
+       It sits in the head, ahead of the Tailwind script, because the browser paints while it waits for that script.
+       The same picture is drawn again by components/flipbook/FlipBookApp.tsx (.fb-held), which then takes this one away. -->
+  <script>
+    (function () {
+      if (!/^\/book(\/|$)/.test(location.pathname)) return;
+      var q = new URLSearchParams(location.search), n = function (k) { var v = parseFloat(q.get(k)); return isFinite(v) ? v : null; };
+      var from = q.get('from'), cv = q.get('cv') || '', bc = q.get('bc') || '';
+      var x = n('bx'), y = n('by'), w = n('bw'), t = n('bt') || 0, mx = n('mx'), my = n('my'), mw = n('mw'), mh = n('mh');
+      if (!from || !/^\/(?!\/)[\w\-./?=&%]*$/.test(from) || [x, y, w, mx, my, mw, mh].indexOf(null) >= 0 || w < 40 || w > 4000) return;
+      if (!/^\/(?!\/)[\w\-./]+\.(webp|jpe?g|png|svg)$/.test(cv)) cv = '';
+      if (!/^#[0-9a-f]{6}$/i.test(bc)) bc = '#2b160d';
+      t = Math.max(-30, Math.min(30, t));
+      var sun = null;
+      try { sun = sessionStorage.getItem('book-sun'); if (sun && sun.indexOf('data:image/') !== 0) sun = null; } catch (e) {}
+      var tile = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M0 12.5H120M0 36.5H120M0 84.5H120M0 108.5H120M12.5 0V120M36.5 0V120M84.5 0V120M108.5 0V120' stroke='%23fff' stroke-opacity='.13' stroke-width='1'/%3E%3Cpath d='M0 60.5H120M60.5 0V120' stroke='%23fff' stroke-opacity='.3' stroke-width='1'/%3E%3Ccircle cx='60.5' cy='60.5' r='7' fill='url(%23g)'/%3E%3Cpath d='M55 60.5H66M60.5 55V66' stroke='%23fff' stroke-opacity='.75' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E\")";
+      var e = w * 0.017, held = document.createElement('div');
+      held.id = 'book-held';
+      held.setAttribute('aria-hidden', 'true');
+      held.style.cssText = 'position:fixed;inset:0;overflow:hidden;background:#080b1a;z-index:1';
+      var mat = document.createElement('div');
+      mat.style.cssText = 'position:absolute;overflow:hidden;border-radius:clamp(16px,1.7vw,28px);background:' + tile + ' 0 0/120px 120px,#1b62d4;left:' + mx + 'px;top:' + my + 'px;width:' + mw + 'px;height:' + mh + 'px';
+      if (sun) { var s = new Image(); s.src = sun; s.alt = ''; s.style.cssText = 'position:absolute;width:100vw;height:100vh;mix-blend-mode:hard-light;left:' + (-mx) + 'px;top:' + (-my) + 'px'; mat.appendChild(s); }
+      held.appendChild(mat);
+      var book = document.createElement('div');
+      book.style.cssText = 'position:absolute;box-sizing:border-box;left:' + (x - w / 2 - e) + 'px;top:' + (y - w * 0.3 - e) + 'px;width:' + (w + 2 * e) + 'px;height:' + (w * 0.6 + 2 * e) + 'px;padding:' + e + 'px;transform:rotate(' + t + 'deg);background:' + bc + ';border-radius:0 ' + (w * 0.053) + 'px ' + (w * 0.053) + 'px 0;box-shadow:-1.5px 2px 2px rgba(2,10,44,.42),-7px 9px 12px -2px rgba(2,10,44,.36),-24px 30px 36px -9px rgba(2,10,44,.5)';
+      if (cv) { var c = new Image(); c.src = cv; c.alt = ''; c.style.cssText = 'display:block;width:100%;height:100%;object-fit:cover;border-radius:0 ' + (w * 0.036) + 'px ' + (w * 0.036) + 'px 0'; book.appendChild(c); }
+      held.appendChild(book);
+      // (in the head, before anything that can hold the page up: the body does not exist yet)
+      document.documentElement.appendChild(held);
+      document.documentElement.style.background = '#080b1a';
+    })();
+  </script>
+  <!-- port-home:END index-head -->
+  <!-- (ship layer, scripts/ship/main.patch) What each home needs first, asked for from here rather than once the entry has run: its
+       code (both homes are lazy chunks), written in by vite.config.ts (shipHeadPreloads) in a build, which knows the hashed names;
+       and on the 3D home the pictures its first lit frame waits for, written in by scripts/ship/port-home.mjs from SOURCE's data.
+       One after the other: the bulb, then the code, then the pictures. On a slow line each would otherwise share it with the one
+       before (measured at 1.6 Mbps: the bulb showed at 1.4 s instead of 0.8 s). The app later asks for the same addresses and gets
+       these copies. -->
+  <script>
+    (function () {
+      var door = window.__shipDoor;
+      var code = {};
+      var pictures = []; // the 3D home's first-frame pictures: filled in below by scripts/ship/port-home.mjs
+      // port-home:BEGIN first-frame (worked out from SOURCE's data by scripts/ship/ship-layer.mjs firstFramePictures: never edit it here)
+      pictures = [
+        '/images/mat/posters/self.webp',
+        '/images/mat/posters/zomato.webp',
+        '/images/mat/posters/design.webp',
+        '/images/mat/posters/rescue.webp',
+        '/images/mat/posters/snapdeal.webp',
+        '/images/mat/posters/photo.webp',
+        '/images/mat/food-rescue/bag.webp',
+        '/images/mat/food-rescue/zomato-wordmark.webp',
+        '/images/mat/food-rescue/offer.webp',
+        '/images/self-logo.svg',
+        '/images/mat/tool-marks.webp',
+        '/images/mat/resume-p1-small.webp',
+        '/images/flipbook/jarvis/cover/still.webp',
+        '/images/flipbook/muse/cover/still.webp',
+        '/images/flipbook/bambu/cover.svg',
+        '/images/flipbook/surya/cover/still.webp',
+        '/images/flipbook/surya/parts/product.webp',
+      ];
+      // port-home:END first-frame
+      var first = door === 'mat' || door === 'old' ? code[door] : null;
+      if (door !== 'mat') pictures = [];
+      var add = function (rel, href, as, cors) {
+        var link = document.createElement('link');
+        link.rel = rel; link.href = href; if (as) link.as = as; if (cors) link.crossOrigin = '';
+        document.head.appendChild(link);
+        return link;
+      };
+      var waiting = 0, started = false;
+      var addPictures = function () { for (var i = 0; i < pictures.length; i++) add('preload', pictures[i], 'image'); };
+      var settle = function () { if (--waiting === 0) addPictures(); };
+      var addCode = function () {
+        if (started) return;
+        started = true;
+        var js = first ? first.js : [], css = first ? first.css : [];
+        for (var j = 0; j < js.length; j++) { waiting++; var module = add('modulepreload', js[j], null, true); module.onload = module.onerror = settle; }
+        for (var k = 0; k < css.length; k++) add('preload', css[k], 'style', true);
+        if (!waiting) addPictures();
+      };
+      // the code once the bulb is in (or after a second at most), the pictures once the code is in
+      var bulb = document.querySelector('#mat-bulb img');
+      if (bulb && !bulb.complete) { bulb.addEventListener('load', addCode); bulb.addEventListener('error', addCode); window.setTimeout(addCode, 1000); }
+      else addCode();
+    })();
   </script>
   <style>
     body {
@@ -190,6 +350,25 @@
   <div id="root" style="position: relative; z-index: 10;"></div>
   <div class="bg-noise"></div>
   <script src="/shared/scroll-settle.js?v=3"></script>
+  <!-- Tailwind (and its config) sits here, not in the head: in the head it held up the first paint until it had arrived
+       (the 3D home's dark room and bulb, and the old home's dark page). Here the browser paints the head's own styles and
+       scripts first. The app's module script still runs only after it, so no app content is ever drawn without Tailwind. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '#050505',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <script type="module" src="/index.tsx"></script>
 </body>
 

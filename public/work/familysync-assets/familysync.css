@@ -1358,3 +1358,19 @@ h2,.climax-copy h2,.scene-copy h2,.outcome h2{font-size:var(--h2);line-height:1.
   .rail a .tab-n{display:inline;font-size:10px;font-weight:400}
   .rail a.now,.rail.on-dark a.now{color:var(--fs);border-bottom-color:var(--fs)!important}
 }
+
+/* ═══════════ The one way out (2026-11-17): a single dark "Back" pill, top left, on every page ═══════════
+   Same pill as the 3D home's .fb-pill--back. The phone Close pill is gone; the top bar only holds the pill. */
+.case-top{background:none;border:0;height:0}
+.back-link{position:fixed;top:18px;left:22px;z-index:40;display:inline-flex;align-items:center;gap:8px;height:auto;min-height:44px;margin:0;padding:0 18px;border:0;border-radius:999px;background:#0b0e16;color:#fff;font:600 14px/1 var(--ui-font);white-space:nowrap;cursor:pointer;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 8px 18px -10px rgba(0,0,0,.6);transition:transform .15s ease}
+.back-link svg{width:16px;height:16px}
+.back-link:hover{transform:translateY(-1px)}
+.back-link:focus-visible{outline:none;box-shadow:0 0 0 3px #fff,0 0 0 5px #0b0e16}
+.case-close{display:none!important}
+@media(max-width:1023px){
+  .case-top{height:0;border:0}
+  /* inside the portfolio the pill sits in the fixed paper band (ends at 56px) above the sticky strip */
+  .back-link{top:12px;left:16px;height:auto;margin:0;font-size:14px}
+  /* a direct visit has no band: the pill scrolls away with the opening, as the old link did */
+  html:not(.fs-embedded) .back-link{position:absolute}
+}

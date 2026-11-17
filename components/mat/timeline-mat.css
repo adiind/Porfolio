@@ -1,0 +1,79 @@
+/* The timeline drawn on the mat (components/mat/TimelineMat.tsx). The cards are in the 3D scene; this is the HTML over
+   them: the title and its line, placed on the mat, and one clear link or button over each card and each print on
+   Tinker Verse (lib/mat/timelineLayer.ts moves them every frame). They hold the cards' words for screen readers. */
+
+/* the room the timeline takes on the page: empty; the mat holds still while the page scrolls through it */
+.tm-room { display: block; pointer-events: none; }
+
+.tm-layer {
+  position: fixed;
+  inset: 0;
+  /* above the second screen (.fb-second, z-index 3, which lies over the whole window): only the links take the pointer */
+  z-index: 4;
+  pointer-events: none;
+  color: #fff;
+  font-family: 'FB Geist', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: opacity 0.3s ease;
+}
+.tm-layer[data-shown='false'] { opacity: 0; visibility: hidden; }
+.tm-layer [data-mx] { position: absolute; left: 0; top: 0; margin: 0; white-space: nowrap; will-change: transform; }
+.tm-title {
+  translate: 0 -100%;
+  font-family: 'FB Bricolage', 'Bricolage Grotesque', 'FB Geist', sans-serif;
+  font-weight: 800;
+  font-size: calc(var(--k, 1) * 52px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-shadow: -2px 3px 4px rgba(2, 10, 44, 0.35);
+}
+.tm-title em { font-style: normal; color: #e4e84f; }
+.tm-sub, .tm-lab {
+  translate: 0 -100%;
+  font-size: calc(var(--k, 1) * 15px);
+  color: #dfe6ff;
+  text-shadow: -1px 1px 2px rgba(2, 10, 44, 0.35);
+}
+.tm-sub b, .tm-lab b { color: #fff; font-weight: 600; }
+.tm-lab { font-size: calc(var(--k, 1) * 13px); }
+.tm-lab b { margin-right: 0.35em; font-size: calc(var(--k, 1) * 15px); font-weight: 650; }
+.tm-lab-work { translate: -100% -100%; }
+
+.tm-cards, .tm-thumbs { margin: 0; padding: 0; list-style: none; }
+.tm-card, .tm-thumb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  will-change: transform;
+}
+.tm-thumb { border-radius: 8px; }
+.tm-card:focus-visible, .tm-thumb:focus-visible { outline: 3px solid #e4e84f; outline-offset: 3px; }
+.tm-card:focus:not(:focus-visible), .tm-thumb:focus:not(:focus-visible) { outline: none; }
+
+/* the words, for screen readers only */
+.tm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-layer { transition: none; }
+}
+/* nothing shows until the layer has put it where the cards are */
+.tm-layer:not([data-placed]) { visibility: hidden; }

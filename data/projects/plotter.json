@@ -1,11 +1,11 @@
 {
     "id": "plotter",
     "hero": {
-        "title": "Plotter – Speech-to-Draw Machine",
+        "title": "Plotter: Speech-to-Draw Machine",
         "oneLiner": "A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code."
     },
     "context": {
-        "text": "Most “voice” interfaces stop at transcription. I wanted voice to become a physical output, something you could hold and keep. The trigger was realizing that creative expression is often blocked by software skill and tooling. The constraint was to build a pipeline that felt magical but stayed understandable: speak, preview, plot, without expensive hardware or closed ecosystems."
+        "text": "Most “voice” interfaces stop at transcription. I wanted voice to become a physical output, something you could hold and keep. The trigger was realizing that creative expression is often blocked by software skill and tooling. The constraint was to build a pipeline that stayed understandable: speak, preview, plot, without expensive hardware or closed ecosystems."
     },
     "build": {
         "bullets": [
@@ -21,7 +21,7 @@
     "decisions": [
         {
             "decision": "Speech-to-text + plotting pipeline vs manual typing",
-            "why": "Made creation faster and more accessible, with a “speak it into existence” feel.",
+            "why": "Made creation faster and more accessible.",
             "tradeoff": "Needed error handling for transcription mistakes."
         },
         {
@@ -47,7 +47,7 @@
     },
     "outcome": {
         "status": "shipped",
-        "text": "The plotter reliably converted spoken input into plotted text and drawings, producing repeatable physical artifacts from voice. It became a platform for experimenting with typography, constraints, and computational art, not just a one-off build.",
+        "text": "The plotter reliably converted spoken input into plotted text and drawings, producing repeatable physical artifacts from voice.",
         "proof": "https://www.instagram.com/p/DOcq0bHjLHT/",
         "blocker": ""
     },

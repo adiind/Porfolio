@@ -1,0 +1,5 @@
+[
+ {"id":"role","kicker":"1 of 3 · The role","title":"Second analyst","lines":["I joined a seed-stage dating app before product-market fit.","My work spanned product, growth and user behavior."]},
+ {"id":"dashboards","kicker":"2 of 3 · Dashboards","title":"Building the first view","lines":["I set up the V0 top-down dashboards for creator management.","They gave the team an early way to see what was happening."]},
+ {"id":"testing","kicker":"3 of 3 · Testing","title":"Finding early signals","lines":["I tested early implementations and strategies to understand whether the concept had traction.","I also looked at individual user sessions to understand behavior."]}
+]

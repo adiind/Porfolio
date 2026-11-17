@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote, ExternalLink } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Utensils, Bike, User, Newspaper, Radio, Layers, Target, Terminal, Database, Palette, Settings, BarChart3, Quote, ExternalLink } from 'lucide-react';
 import { CaseStudy } from '../types';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import BackPill from './BackPill';
 import { useContentEngagement } from '../hooks/useContentEngagement';
 
 interface Props {
@@ -56,16 +57,10 @@ const CaseStudyModal: React.FC<Props> = ({ caseStudy, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/90 focus:outline-none"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 pt-[72px] md:p-8 md:pt-[80px] bg-black/90 focus:outline-none"
       onClick={onClose}
     >
-      <button
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
-        aria-label="Close case study"
-        className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 text-white transition-colors z-50"
-      >
-        <X size={24} />
-      </button>
+      <BackPill zClass="z-50" onClick={onClose} ariaLabel="Back" />
 
       <div
         className="relative w-full max-w-6xl aspect-video bg-white text-black rounded-lg shadow-2xl overflow-hidden flex flex-col font-sans"

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Project } from '../../types/Project';
-import { ArrowLeft } from 'lucide-react';
+import BackPill from '../BackPill';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
 import { projectPath } from '../../lib/workRoutes';
 
@@ -82,16 +82,9 @@ const McDonaldsProjectDetail: React.FC<{ project: Project; onClose: () => void }
   }, []);
 
   return (
-    <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={project.hero.title} className="fixed inset-0 z-[100] bg-[#050505] focus:outline-none">
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Back to portfolio"
-        className="absolute right-3 top-3 z-10 flex h-11 items-center justify-center gap-2 rounded-full border border-white/20 bg-black/80 px-4 text-sm font-semibold text-white shadow-2xl backdrop-blur-md transition hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505] sm:left-6 sm:right-auto sm:justify-start sm:top-6 max-sm:w-11 max-sm:px-0"
-      >
-        <ArrowLeft aria-hidden="true" size={18} strokeWidth={2.25} />
-        <span className="max-sm:hidden">Back to portfolio</span>
-      </button>
+    <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={project.hero.title} className="fixed inset-0 z-[100] bg-[#050505] focus:outline-none max-sm:bg-[linear-gradient(90deg,#f6e6c7_0%,#f7e7c9_50%,#f6eddc_100%)]">
+      {/* The one way out: Back, top left (same pill as every other page) */}
+      <BackPill zClass="z-[102]" onClick={onClose} ariaLabel="Back to portfolio" />
       <nav aria-label="Case study progress" className="fixed bottom-8 left-[22px] top-20 z-[101] hidden w-[150px] flex-col items-start gap-3 text-[#2b2119] lg:flex">
         <p className="m-0 text-[13px] font-semibold tracking-tight">Squad Up</p>
         <svg className="h-[42px] w-[92px] shrink-0" viewBox="0 0 168 78" aria-hidden="true">
@@ -134,7 +127,7 @@ const McDonaldsProjectDetail: React.FC<{ project: Project; onClose: () => void }
         ref={iframeRef}
         src="/work/squad-up-assets/story.html"
         title={project.hero.title}
-        className="h-full w-full border-0"
+        className="block h-full w-full border-0 max-sm:mt-[68px] max-sm:h-[calc(100%-68px)]"
       />
     </div>
   );

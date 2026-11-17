@@ -25,3 +25,9 @@ The P&G and Zero scroll stories bundle **Geist** (variable font) by The Geist Pr
 ## Zero story artwork
 
 The object cut-outs in `public/work/zero-assets/assets/art/` (brass, wood, felt and paper pieces) were generated for this story with an AI image tool from text descriptions only. The prompts and processing scripts are in `review/zero-story/`. The four persona portraits and the console screenshot come from the Zero project itself.
+
+<!-- port-home:BEGIN notices (copied from SOURCE by scripts/ship/port-home.mjs) -->
+## Flip book fonts
+
+The flip-book route (`/book`) loads Geist (Vercel), Bricolage Grotesque (Mathieu Triay) and Source Serif 4 (Adobe) from `public/fonts/`. All three are licensed under the SIL Open Font License 1.1.
+<!-- port-home:END notices -->
