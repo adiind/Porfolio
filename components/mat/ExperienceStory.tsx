@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { EXPERIENCE_STORIES, type ExperienceId } from './experienceStories';
 import './experience-story.css';
+import { STORY_ILLUSTRATIONS } from '../../lib/mat/storyIllustrations';
 
 type Props = { id: ExperienceId | null; onClose(): void };
 const FIGURES: Record<string, string[]> = {
@@ -31,7 +32,7 @@ export default function ExperienceStory({ id, onClose }: Props) {
       <div className="experience-cards" role="region" tabIndex={0} aria-label={`${story.title} story cards`}>
         {story.cards.map((card, index) => <article className="experience-card" key={card.id} data-card={card.id}>
           <p className="experience-kicker">{card.kicker}</p>
-          <div className="experience-figure" aria-hidden="true"><span>{String(index + 1).padStart(2, '0')}</span><div>{(FIGURES[`${id}:${card.id}`] ?? FIGURES[card.id] ?? [story.title]).map((label) => <b key={label}>{label}</b>)}</div></div>
+          {id && id in STORY_ILLUSTRATIONS ? <div className={`experience-figure experience-illustration illustration-${index}`} style={{ backgroundImage: `url(${STORY_ILLUSTRATIONS[id as keyof typeof STORY_ILLUSTRATIONS]})` }} role="img" aria-label="AI-generated conceptual illustration"><small>AI illustration</small></div> : <div className="experience-figure" aria-hidden="true"><span>{String(index + 1).padStart(2, '0')}</span><div>{(FIGURES[`${id}:${card.id}`] ?? FIGURES[card.id] ?? [story.title]).map((label) => <b key={label}>{label}</b>)}</div></div>}
           <h3>{card.title}</h3><div className="experience-copy">{card.lines.map((line) => <p key={line}>{line}</p>)}</div>
           {id === 'self' && card.id === 'vault' && <a href="https://agentvault.io/" target="_blank" rel="noopener noreferrer">Visit Agent Vault ↗</a>}
           <footer>{story.title}</footer>

@@ -1,3 +1,4 @@
+import { STORY_ILLUSTRATIONS } from '../../lib/mat/storyIllustrations';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut } from 'lucide-react';
 import { FLIP_BOOKS, FLIP_BOOKS_BY_SLUG } from '../../data/flipbooks';
@@ -194,7 +195,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // 'first' ones, the cards' own (Geist and Bricolage): the rest are only drawn inside the books and come later.
   const others = FLIP_BOOKS.filter((item) => item.slug !== active.slug);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
-  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage] = await Promise.all([
+  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, snapdealArt] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
     hasRescue ? Promise.all([loadPicture(RESCUE_SOURCES.bag), loadPicture(RESCUE_SOURCES.logo), loadPicture(RESCUE_SOURCES.offer)]) : Promise.resolve(null),
     Promise.all(others.map((item) => loadPicture(item.pages[0].art.src))),
@@ -205,6 +206,8 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     // ship kit's first-frame preloads read loadStage's literal pictures.) The design cards' pictures are not asked for
     // here at all: nothing of them shows until the poster is picked up (designPictures, once the room is lit).
     loadPicture('/images/mat/resume-p1-small.webp'),
+    loadPicture(STORY_ILLUSTRATIONS.self).catch(() => undefined),
+    loadPicture(STORY_ILLUSTRATIONS.snapdeal).catch(() => undefined),
     loadFlipbookFonts('first'),
   ]);
   const posters = STAGE_POSTERS.map((poster, index) => {
@@ -248,7 +251,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     const left = middle.x - (self.w * 5 + gap * 4) / 2 + self.w / 2;
     Object.assign(self, { open: { x: left, y: middle.y } });
     SELF_STORY.forEach((card, i) => story.push({
-      id: `self:${card.id}`, image: drawnOnce(`self:${i}`, [selfLogo], () => drawSelfStoryCard(i, selfLogo)), x: self.x, y: self.y,
+      id: `self:${card.id}`, image: drawnOnce(`self:${i}`, [selfLogo, selfArt], () => drawSelfStoryCard(i, selfLogo, selfArt)), x: self.x, y: self.y,
       w: self.w, h: self.h, radius: self.radius, dealtFrom: 'self',
       open: { x: left + (i + 1) * (self.w + gap), y: middle.y },
     }));
@@ -260,7 +263,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     const left = middle.x - (snapdeal.w * 5 + gap * 4) / 2 + snapdeal.w / 2;
     Object.assign(snapdeal, { open: { x: left, y: middle.y } });
     SNAPDEAL_STORY.forEach((card, i) => story.push({
-      id: `snapdeal:${card.id}`, image: drawnOnce(`snapdeal:${i}`, [], () => drawSnapdealStoryCard(i)), x: snapdeal.x, y: snapdeal.y,
+      id: `snapdeal:${card.id}`, image: drawnOnce(`snapdeal:${i}`, [snapdealArt], () => drawSnapdealStoryCard(i, snapdealArt)), x: snapdeal.x, y: snapdeal.y,
       w: snapdeal.w, h: snapdeal.h, radius: snapdeal.radius, dealtFrom: 'snapdeal',
       open: { x: left + (i + 1) * (snapdeal.w + gap), y: middle.y },
     }));

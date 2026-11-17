@@ -13,13 +13,18 @@
   function make(tag, cls, text) { var el = document.createElement(tag); el.className = cls; el.textContent = text; return el; }
   function render(cards, type) {
     track.replaceChildren();
-    cards.forEach(function (card) {
+    cards.forEach(function (card, index) {
       var article = make('article', 'self-story-card', '');
       article.dataset.card = card.id;
       article.dataset.kind = type;
       article.appendChild(make('p', 'self-story-kicker', card.kicker));
       var art = type === 'self' ? (card.id === 'vault' ? 'AGENT → CHECKOUT' : card.id === 'protect' ? 'STAND-IN → ENCLAVE → CHECKOUT' : card.id === 'role' ? 'DIRECTION · TESTING · WORKFLOWS' : 'Self × DeleteMe') : type === 'snapdeal' ? (card.id === 'ads' ? 'CPC · TRANSACTION · BANNERS' : card.id === 'result' ? '14% SELLER AD REVENUE' : card.id === 'warehouse' ? 'WAREHOUSE · INVENTORY · PROCUREMENT' : 'DATA · ANALYSIS · FINANCE') : card.kicker.split(' · ').pop().toUpperCase();
-      article.appendChild(make('div', 'self-story-art self-story-art-' + card.id, art));
+      if (['self', 'udaan', 'snapdeal', 'schmooze'].indexOf(type) >= 0) {
+        var visual = make('div', 'self-story-art self-story-illustration illustration-' + index, '');
+        visual.style.backgroundImage = 'url(/images/mat/story-art/' + type + '.webp)';
+        visual.setAttribute('role', 'img'); visual.setAttribute('aria-label', 'AI-generated conceptual illustration');
+        visual.appendChild(make('small', '', 'AI illustration')); article.appendChild(visual);
+      } else article.appendChild(make('div', 'self-story-art self-story-art-' + card.id, art));
       article.appendChild(make('h2', '', card.title));
       card.lines.forEach(function (line) { article.appendChild(make('p', 'self-story-copy', line)); });
       if (type === 'self' && card.id === 'vault') {

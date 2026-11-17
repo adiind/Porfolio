@@ -1,3 +1,4 @@
+import { drawStoryIllustration } from './storyIllustrations';
 // Source: Snapdeal role and project details in data/timeline.ts; 14% attribution in data/resume-2026.json.
 import snapdealStory from '../../public/data/snapdeal-story.json';
 export const SNAPDEAL_STORY = snapdealStory;
@@ -12,7 +13,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): strin
   if (line) out.push(line); return out;
 }
 function pill(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, c: string) { ctx.fillStyle = c; ctx.beginPath(); ctx.roundRect(x,y,w,h,20); ctx.fill(); }
-export function drawSnapdealStoryCard(index: number): HTMLCanvasElement {
+export function drawSnapdealStoryCard(index: number, illustration?: HTMLImageElement): HTMLCanvasElement {
   const card = SNAPDEAL_STORY[index]; if (!card) throw new Error('Unknown Snapdeal story card');
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const c = cv.getContext('2d'); if (!c) throw new Error('Canvas is unavailable');
   c.beginPath(); c.roundRect(0,0,W,H,79); c.clip(); c.fillStyle = BACK[index]; c.fillRect(0,0,W,H);
@@ -23,6 +24,7 @@ export function drawSnapdealStoryCard(index: number): HTMLCanvasElement {
   c.fillStyle='#bd243f'; c.textAlign='center';
   if (index === 1) { c.font=`750 174px ${DISPLAY}`; c.fillText('14%',W/2,390); c.font=`600 28px ${SANS}`; c.fillText('SELLER AD REVENUE',W/2,462); }
   else { const labels = index === 0 ? ['CPC','TRANSACTION','BANNERS'] : index === 2 ? ['WAREHOUSE','INVENTORY','PROCUREMENT'] : ['DATA','ANALYSIS','FINANCE']; labels.forEach((label,i)=>{ pill(c,125,205+i*100,370,70,'#ffffff'); c.fillStyle='#7f1c32'; c.font=`650 30px ${SANS}`; c.fillText(label,W/2,250+i*100); }); }
+  if (illustration) drawStoryIllustration(c, illustration, index, PAD, 158, W - PAD * 2, 418);
   c.textAlign='left'; c.fillStyle=dark?'#ffffff':'#171717'; let px=96; let title: string[]=[];
   do { c.font=`750 ${px}px ${DISPLAY}`; title=wrap(c,card.title,W-PAD*2); if(title.length<=3 && title.every(line => c.measureText(line).width <= W-PAD*2)) break; px-=4; } while(px>44);
   let y=680; title.forEach(line=>{c.fillText(line,PAD,y);y+=px*1.06;}); y+=30; c.fillStyle=dark?'#ffffff80':'#dbc7c7'; c.fillRect(PAD,y,W-2*PAD,2); y+=54;
