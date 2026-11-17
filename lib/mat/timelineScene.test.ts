@@ -4,7 +4,8 @@ import data from './timelineData.json';
 import { TINKER_THUMBS, matStops } from './timelineCards';
 import {
   GAP, OPEN_REDUCED_S, OPEN_S, TAPE, cardPose, cardSize, holdLength, introDue, introEnd, layoutCards, matScroll, openingOrder,
-  planFlights, pushedTops, rollRadius, rollY, scrollForStep, stepAt, stepOpen, type Hold, type PlacedCard,
+  PEN_MAX_SPEED, PEN_PARK, PEN_START, penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollY,
+  scrollForStep, stepAt, stepOpen, stepOpenTo, wantOpen, type Hold, type PlacedCard,
 } from './timelineScene';
 
 const cards = () => layoutCards(matStops());
@@ -165,5 +166,66 @@ describe('scrolling', () => {
     };
     const full = run(false); expect(full.t).toBeCloseTo(OPEN_S, 1); expect(full.open).toEqual([0, 1, 0]);
     expect(run(true).t).toBeCloseTo(OPEN_REDUCED_S, 1);
+  });
+});
+
+describe('the pen', () => {
+  const hold: Hold = { start: 900, view: 900, steps: 7 };
+  const steps = () => openingOrder(cards());
+
+  it('stops at each stop\'s year, always further down, never past its parking place', () => {
+    const rows = penRows(steps());
+    expect(rows).toHaveLength(7);
+    expect(rows[0]).toBeGreaterThan(PEN_START);
+    rows.forEach((r, i) => { if (i) expect(r).toBeGreaterThanOrEqual(rows[i - 1] + 14); expect(r).toBeLessThanOrEqual(PEN_PARK); });
+  });
+
+  it('waits at the top before the first step and reaches each stop\'s row while that step is in view', () => {
+    const rows = penRows(steps());
+    expect(penTarget(hold.start - 200, hold, rows)).toBe(PEN_START);
+    for (let i = 0; i < 7; i += 1) expect(penTarget(scrollForStep(i, hold), hold, rows)).toBeCloseTo(rows[i], 3);
+    expect(penTarget(hold.start + holdLength(hold) + 500, hold, rows)).toBe(rows[6]);
+    // a one-way scroll never asks it to roll back
+    let last = -Infinity;
+    for (let y = hold.start - 100; y < hold.start + holdLength(hold) + 100; y += 7) {
+      const t = penTarget(y, hold, rows); expect(t).toBeGreaterThanOrEqual(last - 1e-9); last = t;
+    }
+  });
+
+  it('rolls without overshooting, under its top speed, and settles within 2 s of the longest jump', () => {
+    const pen = { y: PEN_START, v: 0 }; const target = PEN_PARK; let t = 0; let peak = 0;
+    while (penStep(pen, target, 1 / 60, false)) {
+      t += 1 / 60; peak = Math.max(peak, Math.abs(pen.v));
+      expect(pen.y).toBeLessThanOrEqual(target);
+      if (t > 5) break;
+    }
+    expect(pen.y).toBe(target);
+    expect(peak).toBeLessThanOrEqual(PEN_MAX_SPEED);
+    expect(t).toBeLessThan(2);
+    // reduced motion: it is simply there
+    const still = { y: PEN_START, v: 0 }; penStep(still, 400, 1 / 60, true); expect(still.y).toBe(400);
+  });
+
+  it('opens the stop whose row it has reached', () => {
+    const rows = [200, 300, 400];
+    expect(penStop(PEN_START, rows)).toBe(-1);
+    expect(penStop(199.6, rows)).toBe(0);
+    expect(penStop(350, rows)).toBe(1);
+    expect(penStop(900, rows)).toBe(2);
+  });
+
+  it('keeps one open stop per lane: a pointed-at stop in the pen\'s lane folds the pen\'s stop', () => {
+    const lane = (i: number): 0 | 1 => (i % 2 ? 1 : 0);
+    expect(wantOpen(4, 0, -1, lane)).toEqual([1, 0, 0, 0]);
+    expect(wantOpen(4, 0, 1, lane)).toEqual([1, 1, 0, 0]);
+    expect(wantOpen(4, 0, 2, lane)).toEqual([0, 0, 1, 0]);
+    expect(wantOpen(4, -1, 3, lane)).toEqual([0, 0, 0, 1]);
+  });
+
+  it('opens and folds toward what is wanted in OPEN_S', () => {
+    const open = [1, 0, 0]; let t = 0;
+    while (stepOpenTo(open, [0, 1, 1], 1 / 120, false)) t += 1 / 120;
+    expect(open).toEqual([0, 1, 1]);
+    expect(t + 1 / 120).toBeCloseTo(OPEN_S, 1);
   });
 });

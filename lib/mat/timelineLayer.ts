@@ -8,15 +8,16 @@
  * only, no layout reads).
  */
 import {
-  CanvasTexture, ClampToEdgeWrapping, CylinderGeometry, Group, LinearFilter, LinearMipmapLinearFilter, Mesh, NoColorSpace,
-  PlaneGeometry, ShaderMaterial, Vector2, Vector3, type BufferGeometry, type PerspectiveCamera,
+  BoxGeometry, CanvasTexture, ClampToEdgeWrapping, CylinderGeometry, Group, LatheGeometry, LinearFilter, LinearMipmapLinearFilter, Mesh,
+  NoColorSpace, PlaneGeometry, ShaderMaterial, SphereGeometry, Vector2, Vector3, type BufferGeometry, type PerspectiveCamera,
 } from 'three';
 import { PROP_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_VERTEX } from '../flipbook/shaders';
 import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
-import { drawFace, drawTape, faceCanvas, thumbRects, type MatStop, type Pictures } from './timelineCards';
+import { beatRects, drawFace, drawSheet, drawTape, faceCanvas, sheetSize, thumbRects, type MatStop, type Pictures } from './timelineCards';
 import {
-  ROLL, TAPE, cardPose, cardSize, introDue, introEnd, layoutCards, openingOrder, planFlights, pushedTops, rollRadius,
-  rollTop, rollY, stepAt, stepOpen, yOf, type Flight, type Hold, type PlacedCard,
+  PEN, PEN_START, ROLL, TAPE, cardPose, cardSize, clamp01, holdLength, introDue, introEnd, layoutCards, openingOrder, outCubic,
+  penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollTop, rollY, smooth, stepOpenTo, wantOpen, yOf,
+  type Flight, type Hold, type PlacedCard,
 } from './timelineScene';
 
 /* ---------- shaders ---------- */
@@ -31,6 +32,11 @@ const CARD_FRAGMENT = PROP_FRAGMENT
   .replace('uniform sampler2D tMap;', 'uniform sampler2D tMap;\nuniform sampler2D tOpen;\nuniform vec2 uCrop;\nuniform float uAnchor;\nuniform float uOpen;')
   .replace('vec4 tex = texture2D(tMap, vUv);', `vec2 at = vec2(uAnchor > 0.5 ? 1.0 - (1.0 - vUv.x) * uCrop.x : vUv.x * uCrop.x, 1.0 - (1.0 - vUv.y) * uCrop.y);
   vec4 tex = vec4(mix(texture2D(tMap, at).rgb, texture2D(tOpen, at).rgb, step(0.06, uOpen)), 1.0);`);
+
+/** The sheet a picked-up stop turns into: the posters' own shader, darkened as it turns away from the window. */
+const SHEET_FRAGMENT = PROP_FRAGMENT
+  .replace('uniform float uDawn;', 'uniform float uDawn;\nuniform float uShade;')
+  .replace('col = mix(col, lit, 0.2) * dawnLight();', 'col = mix(col, lit, 0.2) * dawnLight() * uShade;');
 
 const TAPE_VERTEX = /* glsl */ `
 varying vec2 vUv; varying float vY;
@@ -85,8 +91,76 @@ void main() {
   vec3 lit = mix(2.0 * col * sun, 1.0 - 2.0 * (1.0 - col) * (1.0 - sun), step(0.5, sun));
   gl_FragColor = vec4(mix(col, lit, 0.3), 1.0);
 }`;
+/** How long picking a stop up and turning it over takes, and putting it back. */
+const PICK_S = 0.9;
+const PICK_BACK_S = 0.7;
+/** The turn hands over from the card to its back a little short of edge-on (79 degrees), so it never vanishes for a frame. */
+const EDGE_ON = Math.PI * 0.44;
 /** The window's light comes from the top right (shadows fall down and to the left). */
 const LIGHT = new Vector3(0.35, 0.45, 0.9).normalize();
+
+/* ---------- the pen ---------- */
+
+const PEN_VERTEX = /* glsl */ `
+varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+void main() {
+  vUv = uv; vN = normalize(mat3(modelMatrix) * normal);
+  vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz;
+  gl_Position = projectionMatrix * viewMatrix * w;
+}`;
+/**
+ * The marker's plastic and steel, lit by the same window as everything on the mat: its colour (and the barrel's print),
+ * a soft diffuse from the top right, a highlight that stays under the window while the barrel turns (the light and the
+ * eye are fixed, only the normal turns), a little of the blue mat bounced into its underside, and the window's dappled
+ * sunlight laid over it as on the cards.
+ */
+const PEN_FRAGMENT = /* glsl */ `
+uniform vec3 uColor; uniform float uShine; uniform float uGloss; uniform sampler2D tPrint; uniform float uPrint;
+uniform sampler2D tSun; uniform vec2 uScreen; uniform vec3 uLight; uniform float uAlpha;
+varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+void main() {
+  vec3 col = uColor;
+  if (uPrint > 0.5) { vec4 p = texture2D(tPrint, vUv); col = mix(col, p.rgb, p.a); }
+  vec3 N = normalize(vN);
+  if (!gl_FrontFacing) N = -N;
+  float diff = max(dot(N, uLight), 0.0);
+  float under = clamp(-N.z, 0.0, 1.0);
+  vec3 V = normalize(cameraPosition - vW);
+  vec3 H = normalize(uLight + V);
+  float nh = max(dot(N, H), 0.0);
+  float spec = pow(nh, uGloss) * uShine;
+  float sheen = pow(nh, 6.0) * uShine * 0.18;
+  vec3 c = col * (0.40 + 0.70 * diff) * (1.0 - 0.32 * under) + vec3(0.03, 0.07, 0.16) * under * 0.55;
+  c += vec3(1.0, 0.98, 0.94) * (spec + sheen);
+  vec3 sun = texture2D(tSun, gl_FragCoord.xy / uScreen).rgb;
+  vec3 lit = mix(2.0 * c * sun, 1.0 - 2.0 * (1.0 - c) * (1.0 - sun), step(0.5, sun));
+  gl_FragColor = vec4(mix(c, lit, 0.26), uAlpha);
+}`;
+
+/** The barrel's print: a thin ruled band and small navy lettering, wound round the barrel (u round it, v along it). */
+function drawPenPrint(): HTMLCanvasElement {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+  const ctx = c.getContext('2d')!;
+  ctx.clearRect(0, 0, c.width, c.height);
+  // (v runs along the barrel, from the cap end at the bottom of the picture to the end plug at its top; u runs round it)
+  ctx.fillStyle = 'rgba(24,32,79,0.92)';
+  ctx.fillRect(0, 452, 1024, 9);
+  ctx.fillRect(0, 470, 1024, 3);
+  // the lettering, along the barrel, on one side of it (a quarter of the way round)
+  ctx.save();
+  ctx.translate(300, 250); ctx.rotate(-Math.PI / 2);
+  ctx.font = '700 64px "FB Geist", Arial, sans-serif'; ctx.textBaseline = 'middle';
+  ctx.fillText('FINE', -150, 0);
+  ctx.font = '500 44px "FB Geist", Arial, sans-serif'; ctx.fillText('0.8 mm', 20, 2);
+  ctx.restore();
+  return c;
+}
+
+/** The pen's shape (mat pixels): a cap with a clip at one end, a cream barrel, an end plug. Along its local y axis. */
+const CAP_PROFILE: [number, number][] = [[0, -81], [5.6, -81], [8.3, -80.3], [9.3, -79.1], [9.6, -77.4], [9.6, -31.2], [9.35, -30.4], [9.0, -30.2]];
+const END_PROFILE: [number, number][] = [[9.0, 74], [8.75, 76.4], [8.2, 77.2], [7.9, 79.4], [7.0, 80.6], [4.5, 81], [0, 81]];
+/** The radius it rolls on (its cap). */
+const PEN_ROLL_R = 9.6;
 
 /* ---------- the layer ---------- */
 
@@ -110,6 +184,8 @@ export interface TimelineOverlay {
   /** elements with data-mx / data-my (mat pixels) are placed there, scaled by --k */
   words: HTMLElement[];
   root: HTMLElement;
+  /** Links lying over the rows on the back of a picked stop (by row), and the back itself */
+  sheet?: { box: HTMLElement | null; rows: HTMLElement[] };
 }
 
 interface CardMesh {
@@ -123,7 +199,19 @@ export interface TimelineLayer extends MatLayer {
   ready: Promise<void>;
   bindOverlay(overlay: TimelineOverlay | null): void;
   /** For review captures: the intro's clock and every stop's open amount. */
-  state(): { intro: number; introEnd: number; open: number[]; current: number };
+  state(): {
+    intro: number; introEnd: number; open: number[]; current: number;
+    pen: { y: number; target: number; angle: number }; hover: number; picked: string | null; pick: number;
+    tops: Record<string, number>;
+  };
+  /** Where the pointer is over the window (CSS px), or null when it has left. Hover follows its moves only. */
+  pointer(x: number, y: number): void;
+  pointerLeft(): void;
+  /** Picks a stop up and turns it over (its story on its back), or puts it back (null). */
+  pick(id: string | null): void;
+  readonly picked: string | null;
+  /** Called when the picked stop has landed or gone back (for the page's pills). */
+  onPick: ((id: string | null, settled: boolean) => void) | null;
 }
 
 export function createTimelineLayer(opts: {
@@ -136,6 +224,27 @@ export function createTimelineLayer(opts: {
   const plan = planFlights(cards);
   const endT = introEnd(plan);
   const open = steps.map(() => 0);
+  /* the pen: the row it stops at for each step, where it is, its speed, and how far it has turned */
+  const rows = penRows(steps);
+  const pen = { y: PEN_START, v: 0 };
+  let penTargetY = PEN_START;
+  let penAngle = 0;
+  /* hover: the step under the pointer (latched), and the one it may change to once the pointer has rested there */
+  let hover = -1;
+  let pending = -1; let pendingT = 0;
+  let pointerAt: { x: number; y: number } | null = null; let pointerMoved = false;
+  const rects = new Map<string, { l: number; t: number; w: number; h: number }>();
+  /* the stop picked up and turned over: which, and how far (0 lying in its place, 1 the sheet down in the middle) */
+  let pickedId: string | null = null; let pickTo = 0; let pickK = 0;
+  let pickFrom: { x: number; y: number; w: number; h: number; k: number } | null = null;
+  let onPick: ((id: string | null, settled: boolean) => void) | null = null;
+  let frozenWant: number[] | null = null; let lastWant: number[] = open.map(() => 0);
+  /** The step whose card is under a point of the window (CSS px), by where the cards are drawn now. */
+  const hitStep = (x: number, y: number): number => {
+    let hit = -1;
+    steps.forEach((card, i) => { const r = rects.get(card.stop.id); if (r && x >= r.l && x <= r.l + r.w && y >= r.t && y <= r.t + r.h) hit = i; });
+    return hit;
+  };
   let ctx: MatLayerContext | null = null;
   let introT = -1;
   let current = -1;
@@ -166,6 +275,11 @@ export function createTimelineLayer(opts: {
   let tapeShadow: Mesh | null = null; let tapeShade: ShaderMaterial | null = null;
   let roll: { group: Group; side: Mesh; endA: Mesh; endB: Mesh; core: Mesh; mats: ShaderMaterial[]; r: number } | null = null;
   let rollShadow: Mesh | null = null; let rollShade: ShaderMaterial | null = null;
+  let penParts: { group: Group; mats: ShaderMaterial[] } | null = null;
+  let penShadow: Mesh | null = null; let penShade: ShaderMaterial | null = null;
+  let sheetMesh: Mesh | null = null; let sheetMat: ShaderMaterial | null = null;
+  let sheetShadow: Mesh | null = null; let sheetShade: ShaderMaterial | null = null;
+  let sheetTex: CanvasTexture | null = null; let sheetFor: string | null = null;
   const tapeLen = TAPE.bot - TAPE.top;
 
   const shadowMaterial = (dawn: { value: number }, screen: Vector2): ShaderMaterial => {
@@ -214,13 +328,56 @@ export function createTimelineLayer(opts: {
     roll = { group, side, endA, endB, core, mats, r: -1 };
     rollShade = shadowMaterial(c.dawn, c.screenSize); rollShade.uniforms.uRadius.value = 8 * u;
     rollShadow = new Mesh(unitPlane, rollShade); rollShadow.frustumCulled = false; rollShadow.renderOrder = 4.5;
+    // the pen: one group that rolls (turned about the pen's own axis), holding the parts laid along that axis
+    const printTex = texture(drawPenPrint(), c.maxAnisotropy);
+    const penMat = (color: number[], shine: number, gloss: number, printed = false) => {
+      const m = new ShaderMaterial({
+        vertexShader: PEN_VERTEX, fragmentShader: PEN_FRAGMENT, depthTest: true, depthWrite: true, transparent: true,
+        uniforms: {
+          uColor: { value: new Vector3(...color) }, uShine: { value: shine }, uGloss: { value: gloss }, tPrint: { value: printTex },
+          uPrint: { value: printed ? 1 : 0 }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize }, uLight: { value: LIGHT }, uAlpha: { value: 0 },
+        },
+      });
+      disposables.push(m);
+      return m;
+    };
+    const navy = [0.094, 0.125, 0.31]; const cream = [0.955, 0.93, 0.87]; const steel = [0.74, 0.76, 0.8];
+    const penMats = [penMat(navy, 0.55, 60), penMat(cream, 0.4, 44, true), penMat(navy, 0.55, 60), penMat(steel, 1.1, 90)];
+    const lathe = (pts: [number, number][]) => new LatheGeometry(pts.map(([r, y]) => new Vector2(r, y)), 72);
+    const capGeo = lathe(CAP_PROFILE); const endGeo = lathe(END_PROFILE);
+    const barrelGeo = new CylinderGeometry(9.0, 9.0, 104.2, 72, 1, true); barrelGeo.translate(0, -30.2 + 104.2 / 2, 0);
+    // the clip: a steel strip standing off the top of the cap, a bridge where it is fixed, a small bead at its free end
+    const clipGeo = new BoxGeometry(3.4, 37, 1.25); clipGeo.translate(0, -57.5, 11.25);
+    const bridgeGeo = new BoxGeometry(3.4, 5.5, 2.4); bridgeGeo.translate(0, -74.6, 10.4);
+    const beadGeo = new SphereGeometry(1.15, 16, 12); beadGeo.scale(1.3, 1.6, 1); beadGeo.translate(0, -39.6, 10.35);
+    disposables.push(capGeo, endGeo, barrelGeo, clipGeo, bridgeGeo, beadGeo);
+    const penBody = new Group(); penBody.rotation.z = -Math.PI / 2; penBody.scale.setScalar(u);
+    const parts = [new Mesh(capGeo, penMats[0]), new Mesh(barrelGeo, penMats[1]), new Mesh(endGeo, penMats[2]),
+      new Mesh(clipGeo, penMats[3]), new Mesh(bridgeGeo, penMats[3]), new Mesh(beadGeo, penMats[3])];
+    parts.forEach((m) => { m.frustumCulled = false; m.renderOrder = 42; penBody.add(m); });
+    const penGroup = new Group(); penGroup.add(penBody);
+    penShade = shadowMaterial(c.dawn, c.screenSize); penShade.uniforms.uRadius.value = 8 * u;
+    penShadow = new Mesh(unitPlane, penShade); penShadow.frustumCulled = false; penShadow.renderOrder = 9.5;
+    penParts = { group: penGroup, mats: penMats };
+    // the sheet a stop turns into when it is picked up (its picture is drawn when it is picked)
+    sheetMat = new ShaderMaterial({
+      vertexShader: PROP_VERTEX, fragmentShader: SHEET_FRAGMENT, transparent: true, depthTest: false, depthWrite: false,
+      uniforms: {
+        tMap: { value: null }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize }, uSize: { value: new Vector2(1, 1) },
+        uRadius: { value: 16 * u }, uCutout: { value: 0 }, uAlpha: { value: 1 }, uDawn: c.dawn, uShade: { value: 1 },
+      },
+    });
+    disposables.push(sheetMat);
+    sheetMesh = new Mesh(unitPlane, sheetMat); sheetMesh.frustumCulled = false; sheetMesh.renderOrder = 60; sheetMesh.visible = false;
+    sheetShade = shadowMaterial(c.dawn, c.screenSize); sheetShade.uniforms.uRadius.value = 16 * u;
+    sheetShadow = new Mesh(unitPlane, sheetShade); sheetShadow.frustumCulled = false; sheetShadow.renderOrder = 55; sheetShadow.visible = false;
     // the cards: drawn and uploaded one at a time in quiet moments, so building them never holds a frame
     const queue = [...cards];
     const next = () => {
       if (!ctx) return;
       const placed = queue.shift();
       if (!placed) {
-        c.scene.add(tapeShadow!, tape!, rollShadow!, group);
+        c.scene.add(tapeShadow!, tape!, rollShadow!, group, penShadow!, penParts!.group, sheetShadow!, sheetMesh!);
         meshes.forEach((m) => c.scene.add(m.shadow, m.mesh));
         visible = true;
         c.invalidate();
@@ -288,6 +445,80 @@ export function createTimelineLayer(opts: {
     tapeShadow!.visible = len > 0.001;
   };
 
+  /* ---------- the pen on the tape ---------- */
+  const PEN_DROP_AT = 0.72; const PEN_DROP_S = 0.6;
+  const placePen = (T: number) => {
+    if (!penParts || !penShadow || !penShade) return;
+    // it drops onto the top of the tape once the roll has gone by (landed by 1.32 s, inside the 1.7 s intro)
+    const k = T < 0 ? 0 : reduced ? 1 : clamp01((T - PEN_DROP_AT) / PEN_DROP_S);
+    const drop = 1 - outCubic(k);
+    const bounce = k > 0.75 && k < 1 ? Math.sin(Math.PI * (k - 0.75) * 4) * 0.012 : 0;
+    const alpha = Math.min(1, k * 3);
+    const z = PEN_ROLL_R * u + 0.0015 + drop * 0.22 + bounce;
+    penParts.group.position.set(tx(TAPE.x), ty(pen.y), z);
+    // rolled, not slid: it turns by the distance it has travelled over its radius (and a little as it lands)
+    penParts.group.rotation.x = penAngle - drop * 1.2;
+    penParts.group.visible = alpha > 0.003;
+    penParts.mats.forEach((m) => { m.uniforms.uAlpha.value = alpha; });
+    const lift = (z - PEN_ROLL_R * u) / u; // mat px above resting
+    const R = PEN_ROLL_R * u; const sw = PEN.len * u * 0.98; const sh = R * 1.7; const reach = 60 * u;
+    penShadow.position.set(tx(TAPE.x) - (0.34 * R * 0.35 + lift * u * 0.3), ty(pen.y) - (0.44 * R * 0.35 + lift * u * 0.38), 0.0006);
+    penShadow.scale.set(sw + reach * 2, sh + reach * 2, 1);
+    const su = penShade.uniforms;
+    su.uSize.value.set(sw, sh); su.uSheet.value.set(sw + reach * 2, sh + reach * 2);
+    su.uLift.value = 0.55 + drop * 2.2; su.uAlpha.value = alpha * (1 - drop * 0.6);
+    penShadow.visible = alpha > 0.003;
+  };
+
+  /* ---------- a stop picked up and turned over ---------- */
+  /** Where the sheet lies (mat pixels): across the middle of the timeline's window, its top edge just under the title's
+   *  line (so it covers every folded stop, whatever its height). */
+  const SHEET_TOP = 164;
+  const sheetAt = (stop: MatStop) => ({ x: 720, y: SHEET_TOP + sheetSize(stop).h / 2 });
+  let SHEET_AT = { x: 720, y: 480 };
+  /** The first half of the turn is the card rising and turning away; the second, its back coming round as the sheet. */
+  const pickPhase = (k: number) => (k < 0.5 ? { half: 0, t: smooth(k / 0.5) } : { half: 1, t: smooth((k - 0.5) / 0.5) });
+  /** Halfway: lifted toward the eye (table units), on the way from the card's place to the sheet's. */
+  const pickPlace = (from: { x: number; y: number }, t: number, half: number) => {
+    const mid = { x: (from.x + SHEET_AT.x) / 2, y: (from.y + SHEET_AT.y) / 2 };
+    if (half === 0) return { x: from.x + (mid.x - from.x) * t, y: from.y + (mid.y - from.y) * t, z: 0.36 * Math.sin(t * Math.PI / 2) };
+    return { x: mid.x + (SHEET_AT.x - mid.x) * t, y: mid.y + (SHEET_AT.y - mid.y) * t, z: 0.36 + (0.055 - 0.36) * t };
+  };
+  const placeSheet = (): boolean => {
+    if (!sheetMesh || !sheetMat || !sheetShadow || !sheetShade || !ctx) return false;
+    const card = pickedId ? meshes.find((m) => m.placed.stop.id === pickedId) : null;
+    if (!card || pickK <= 0 || !pickFrom) { sheetMesh.visible = sheetShadow.visible = false; return false; }
+    if (sheetFor !== pickedId) {
+      sheetTex?.dispose();
+      sheetTex = texture(drawSheet(card.placed.stop, pictures), ctx.maxAnisotropy);
+      ctx.renderer.initTexture(sheetTex);
+      sheetMat.uniforms.tMap.value = sheetTex; sheetFor = pickedId;
+    }
+    const k = pickPhase(pickK);
+    if (k.half === 0) { sheetMesh.visible = sheetShadow.visible = false; return false; }
+    const at = pickPlace(pickFrom, k.t, 1);
+    // its back comes round at the card's size and grows to the sheet's as it comes down (brought closer to read)
+    const S = sheetSize(card.placed.stop);
+    const grow = pickFrom.h / S.h + (1 - pickFrom.h / S.h) * smooth(k.t / 0.8);
+    const W = S.w * u * grow; const H = S.h * u * grow;
+    sheetMesh.visible = sheetShadow.visible = true;
+    sheetMesh.position.set(tx(at.x), ty(at.y), 0.004 + at.z);
+    sheetMesh.scale.set(W, H, 1);
+    // its back comes round: from edge-on to flat, turning the same way the card turned away
+    const turn = (card.placed.lane === 0 ? -1 : 1) * (1 - k.t) * EDGE_ON;
+    sheetMesh.rotation.y = turn;
+    sheetMat.uniforms.uSize.value.set(W, H);
+    sheetMat.uniforms.uShade.value = 0.72 + 0.28 * Math.cos(turn);
+    const reach = 190 * u;
+    sheetShadow.position.set(tx(at.x - at.z / u * 0.3), ty(at.y + at.z / u * 0.38), 0.0007);
+    const cs = Math.cos(turn);
+    sheetShadow.scale.set(W * cs + reach * 2, H + reach * 2, 1);
+    const su = sheetShade.uniforms;
+    su.uSize.value.set(W * Math.max(0.02, cs), H); su.uSheet.value.set(W * cs + reach * 2, H + reach * 2);
+    su.uLift.value = 0.8 + at.z * 6; su.uAlpha.value = 0.95 * Math.sqrt(Math.max(0, cs));
+    return false;
+  };
+
   /* the HTML over the cards: placed from the camera, written only when it changed */
   const v3 = new Vector3();
   const lastBox = new Map<HTMLElement, string>();
@@ -300,6 +531,7 @@ export function createTimelineLayer(opts: {
     const c2 = project(camera, view, X, Y + H, z); const d = project(camera, view, X + W, Y, z);
     const l = Math.min(a.x, c2.x); const r = Math.max(b.x, d.x); const t = Math.min(a.y, d.y); const bt = Math.max(b.y, c2.y);
     const key = `${l.toFixed(1)},${t.toFixed(1)},${(r - l).toFixed(1)},${(bt - t).toFixed(1)}`;
+    const id = el.dataset.stop; if (id) rects.set(id, { l, t, w: r - l, h: bt - t });
     if (lastBox.get(el) === key) return;
     lastBox.set(el, key);
     el.style.transform = `translate(${l.toFixed(1)}px, ${t.toFixed(1)}px)`;
@@ -319,8 +551,38 @@ export function createTimelineLayer(opts: {
     if (introT >= 0 && introT < endT) { introT = Math.min(endT, introT + dt); moving = true; }
     const T = Math.max(0, introT);
     const done = introT >= endT;
-    current = done ? stepAt(scrollY, hold) : -1;
-    if (stepOpen(open, current, dt, reduced)) moving = true;
+    // the pen: its row follows the page's scroll (it waits at each stop, then rolls on); the stop it has reached opens
+    const leaving = scrollY > hold.start + holdLength(hold);
+    penTargetY = done && !pickedId ? penTarget(scrollY, hold, rows) : penTargetY;
+    const before = pen.y;
+    if (done && penStep(pen, penTargetY, dt, reduced)) moving = true;
+    penAngle += (pen.y - before) / PEN_ROLL_R;
+    current = done && !leaving ? penStop(pen.y, rows) : -1;
+    // hover: only the pointer's own moves change it (never a card moving under a still pointer), and only once the
+    // pointer has rested on the new card (or off every card) for a moment, so neighbours never flicker
+    if (!done || pickedId || leaving) { hover = -1; pending = -1; pendingT = 0; }
+    else {
+      if (pointerMoved) {
+        pointerMoved = false;
+        const under = pointerAt ? hitStep(pointerAt.x, pointerAt.y) : -1;
+        if (under === hover) { pending = hover; pendingT = 0; } else if (under !== pending) { pending = under; pendingT = 0; }
+      }
+      if (pending !== hover) {
+        pendingT += dt; moving = true;
+        if (pendingT >= (pending < 0 ? 0.2 : 0.12)) { hover = pending; pendingT = 0; }
+      }
+    }
+    const want = pickedId && frozenWant ? frozenWant : wantOpen(open.length, current, hover, (i) => steps[i].lane);
+    lastWant = want;
+    if (stepOpenTo(open, want, dt, reduced)) moving = true;
+    // picking a stop up and turning it over
+    if (pickK !== pickTo) {
+      const was = pickK;
+      pickK = pickTo > pickK ? Math.min(1, pickK + dt / (reduced ? 0.2 : PICK_S)) : Math.max(0, pickK - dt / (reduced ? 0.2 : PICK_BACK_S));
+      moving = true;
+      if (pickK === pickTo) onPick?.(pickTo ? pickedId : null, true);
+      if (was > 0 && pickK === 0) { pickedId = null; pickFrom = null; frozenWant = null; }
+    }
     placeRoll(introT < 0 ? rollTop() : reduced ? TAPE.bot - 4 : rollY(T));
     if (introT < 0) tapeMat!.uniforms.uEnd.value = 1e6;
     // sizes and places now (an open stop pushes the ones under it down)
@@ -354,8 +616,31 @@ export function createTimelineLayer(opts: {
       // one hopping lies over the mat and the tape
       const order = pose.under ? 5.6 + i * 0.001 : pose.flying ? 8 + i * 0.001 : 6 + i * 0.01;
       m.mesh.renderOrder = order; m.shadow.renderOrder = 5;
+      if (pickedId === p.stop.id && pickK > 0) {
+        // picked up: for the first half of the turn it is this card that rises and turns; then the sheet takes over
+        // (it keeps the size and face it had when it was clicked, while the others fold under it)
+        if (!pickFrom) pickFrom = { x: pose.x, y: pose.y, w: s.w, h: s.h, k: mu.uOpen.value };
+        const k = pickPhase(pickK);
+        if (k.half === 0) {
+          const at = pickPlace(pickFrom, k.t, 0);
+          const PW = pickFrom.w * u; const PH = pickFrom.h * u;
+          const turn = (p.lane === 0 ? 1 : -1) * k.t * EDGE_ON; const cs = Math.cos(turn);
+          m.mesh.position.set(tx(at.x), ty(at.y), 0.004 + at.z);
+          m.mesh.scale.set(PW, PH, 1); mu.uSize.value.set(PW, PH);
+          mu.uCrop.value.set(pickFrom.w / p.stop.openW, pickFrom.h / p.stop.openH); mu.uOpen.value = pickFrom.k;
+          m.mesh.rotation.y = turn;
+          m.mesh.renderOrder = 59;
+          m.shadow.position.set(tx(at.x - at.z / u * 0.3), ty(at.y + at.z / u * 0.38), 0.0005);
+          m.shadow.scale.set(PW * cs + reach * 2, PH + reach * 2, 1);
+          su.uSize.value.set(PW * Math.max(0.02, cs), PH); su.uSheet.value.set(PW * cs + reach * 2, PH + reach * 2);
+          su.uLift.value = 0.6 + at.z * 9; su.uAlpha.value = 0.9 * Math.sqrt(Math.max(0, cs));
+          m.shadow.renderOrder = 58;
+        } else { m.mesh.visible = false; m.shadow.visible = false; }
+      } else m.mesh.rotation.y = 0;
       if (pose.flying) moving = true;
     });
+    placePen(introT < 0 ? -1 : T);
+    if (placeSheet()) moving = true;
     // the links over the cards, and the words on the mat
     if (overlay) {
       camera.updateMatrixWorld();
@@ -371,6 +656,13 @@ export function createTimelineLayer(opts: {
           });
         }
       });
+      if (overlay.sheet?.box && pickedId && pickK === 1) {
+        const card = meshes.find((m) => m.placed.stop.id === pickedId);
+        const S = card ? sheetSize(card.placed.stop) : { w: 0, h: 0 };
+        const x0 = SHEET_AT.x - S.w / 2; const y0 = SHEET_AT.y - S.h / 2; const z = 0.004 + 0.055;
+        placeBox(overlay.sheet.box, camera, view, x0, y0, S.w, S.h, z);
+        if (card) beatRects(card.placed.stop).forEach((r, j) => { const el = overlay!.sheet!.rows[j]; if (el) placeBox(el, camera, view, x0 + r.x, y0 + r.y, r.w, r.h, z); });
+      }
       const a = project(camera, view, 0, 450); const b = project(camera, view, 1440, 450);
       const k = ((b.x - a.x) / 1440).toFixed(4);
       if (lastBox.get(overlay.root) !== k) { lastBox.set(overlay.root, k); overlay.root.style.setProperty('--k', k); }
@@ -391,7 +683,32 @@ export function createTimelineLayer(opts: {
     attach,
     update,
     bindOverlay(next) { overlay = next; lastBox.clear(); ctx?.invalidate(); },
-    state: () => ({ intro: introT, introEnd: endT, open: [...open], current }),
+    state: () => ({
+      intro: introT, introEnd: endT, open: [...open], current, hover, picked: pickedId, pick: pickK,
+      pen: { y: pen.y, target: penTargetY, angle: penAngle },
+      tops: Object.fromEntries([...rects.entries()].map(([id, r]) => [id, Math.round(r.t * 10) / 10])),
+    }),
+    pointer(x, y) { pointerAt = { x, y }; pointerMoved = true; ctx?.invalidate(); },
+    pointerLeft() { pointerAt = null; pointerMoved = true; ctx?.invalidate(); },
+    pick(id) {
+      if (id) {
+        if (pickedId && pickedId !== id) return;
+        if (!steps.some((c) => c.stop.id === id) || introT < endT) return;
+        // while it is up, every other stop folds, so the sheet lies over the whole timeline with nothing peeking out
+        pickedId = id; pickTo = 1; frozenWant = steps.map(() => 0);
+        SHEET_AT = sheetAt(steps.find((c) => c.stop.id === id)!.stop);
+        onPick?.(id, false);
+      } else if (pickedId) {
+        // on the way back the stop opens again (it lands as it was picked up), and the pen's stop in the other lane too
+        pickTo = 0; onPick?.(null, false);
+        const at = steps.findIndex((c) => c.stop.id === pickedId);
+        frozenWant = wantOpen(open.length, current, at, (i) => steps[i].lane);
+      }
+      ctx?.invalidate();
+    },
+    get picked() { return pickedId; },
+    get onPick() { return onPick; },
+    set onPick(fn) { onPick = fn; },
     dispose() {
       window.removeEventListener('scroll', onScroll);
       if (ctx) {
@@ -399,6 +716,9 @@ export function createTimelineLayer(opts: {
         meshes.forEach((m) => scene.remove(m.mesh, m.shadow));
         if (tape) scene.remove(tape); if (tapeShadow) scene.remove(tapeShadow); if (rollShadow) scene.remove(rollShadow);
         if (roll) { scene.remove(roll.group); [roll.side, roll.endA, roll.endB, roll.core].forEach((m) => m.geometry.dispose()); }
+        if (penParts) scene.remove(penParts.group); if (penShadow) scene.remove(penShadow);
+        if (sheetMesh) scene.remove(sheetMesh); if (sheetShadow) scene.remove(sheetShadow);
+        sheetTex?.dispose();
       }
       disposables.forEach((d) => d.dispose());
       ctx = null;

@@ -882,3 +882,7 @@
     transition: none;
   }
 }
+
+/* At the Zomato bag (lib/mat/zomatoBag.ts): never the engine's zoom glass. A hand over what can be clicked, the arrow elsewhere. */
+.fb-root[data-bag='true'] .fb-canvas { cursor: default !important; }
+.fb-root[data-bag='true'][data-bag-pointer='true'] .fb-canvas { cursor: pointer !important; }

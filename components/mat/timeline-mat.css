@@ -77,3 +77,19 @@
 }
 /* nothing shows until the layer has put it where the cards are */
 .tm-layer:not([data-placed]) { visibility: hidden; }
+
+/* A picked-up stop (the pen timeline, 2026-11-17). A clear catcher over the window puts it back on a click beside it;
+   the back's rows lie over it (links where a row has a page); the house's dark Back pill sits top left. */
+.tm-catch { position: fixed; inset: 0; pointer-events: auto; cursor: default; }
+.tm-sheet { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: auto; will-change: transform; }
+.tm-sheet[data-settled='false'] { visibility: hidden; }
+.tm-rows { margin: 0; padding: 0; list-style: none; }
+.tm-sheet-words[data-settled='false'] { visibility: hidden; }
+.tm-row { position: absolute; pointer-events: auto; left: 0; top: 0; width: 0; height: 0; border-radius: 10px; will-change: transform; }
+a.tm-row { cursor: pointer; }
+a.tm-row:hover { box-shadow: inset 0 0 0 2px rgba(24, 32, 79, 0.18); }
+a.tm-row:focus-visible { outline: 3px solid #e4e84f; outline-offset: 3px; }
+.tm-back { position: fixed; left: 24px; top: 22px; z-index: 6; pointer-events: auto; }
+.tm-back[data-shown='false'] { opacity: 0; pointer-events: none; }
+/* the lanes' labels lie under a picked-up stop: they go while it is up */
+.tm-layer[data-picked] .tm-lab { visibility: hidden; }

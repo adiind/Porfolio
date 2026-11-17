@@ -12,6 +12,8 @@
  * other. Tinker Verse has one face.
  */
 import data from './timelineData.json';
+import { EXPERIENCE_STORIES, type ExperienceId } from '../../components/mat/experienceStories';
+import { DESIGN_CARDS } from './designCards';
 
 export const PAPER = '#fbf6ea';
 export const PAPER2 = '#f1e9d6';
@@ -60,7 +62,7 @@ export interface MatStop {
   /** 0 Work, left of the tape; 1 School, right of it (Tinker Verse is "on the side" and lies in the School lane). */
   lane: 0 | 1;
   start: string; end: string; today: number;
-  look: { c: string; tab: string; tc: string; on: string; ton: string; num: string };
+  look: { c: string; tab: string; tc: string; on: string; ton: string; num: string; dp?: string };
   restW: number; restH: number; openW: number; openH: number;
   /** Tinker Verse: already open; it fills its lane between the card above and the card below (set by the layout). */
   fill?: boolean;
@@ -99,7 +101,7 @@ export function matStops(): MatStop[] {
   return items.map((it) => {
     const L = LOOK[it.id];
     const look = L
-      ? { c: L.c, tab: L.tab, tc: L.tc, on: L.on, ton: L.ton, num: L.num }
+      ? { c: L.c, tab: L.tab, tc: L.tc, on: L.on, ton: L.ton, num: L.num, dp: L.dp }
       : { c: it.c || PAPER, tab: it.c || PAPER2, tc: it.c || PAPER2, on: it.f || NAVY, ton: it.f || NAVY, num: it.f || NAVY };
     const item = L?.pic ? { ...it, pic: L.pic } : it;
     // the old timeline's words for a stop (TimelineSection.tsx): name, role, dates, where it goes
@@ -114,7 +116,7 @@ export function matStops(): MatStop[] {
     if (it.id === 'tinkerverse') {
       return { ...base, lane: 1, restW: 440, restH: 300, openW: 440, openH: 300, fill: true, thumbs: TINKER_THUMBS } as MatStop;
     }
-    return { ...base, lane: it.lane === 0 ? 0 : 1, restW: 440, restH: 84, openW: 560, openH: 250 } as MatStop;
+    return { ...base, lane: it.lane === 0 ? 0 : 1, restW: 440, restH: 84, openW: 560, openH: 280 } as MatStop;
   });
 }
 
@@ -123,7 +125,8 @@ export function stopPictures(stops: MatStop[]): string[] {
   const set = new Set<string>();
   stops.forEach((s) => {
     if (s.item.pic) set.add(s.item.pic);
-    (s.item.works || []).forEach((w) => { if (w.img) set.add(w.img); });
+    const pr = PRINTS[s.id]; if (pr?.rest) set.add(pr.rest); if (pr?.open) set.add(pr.open);
+    (s.item.works || []).forEach((w) => { const wp = workPic(w); if (wp) set.add(wp.img); });
     (s.thumbs || []).forEach((t) => set.add(t.src));
   });
   return [...set];
@@ -219,80 +222,145 @@ export function drawFace(canvas: HTMLCanvasElement, stop: MatStop, open: 0 | 1, 
   ctx.restore();
 }
 
+/**
+ * The pictures each stop shows (the pen timeline, review/home-mat-pen, 2026-11-17). Every one is his own photograph or a screen of his own
+ * work, already on the site. `rest` is the small print on the resting card (3:2), `open` the big print on the open card
+ * (4:3); `pos` is the focus of the crop. Changed from the real cards:
+ * - Udaan: his Udaan ID card in his hand (the old home's picture, /images/udaan_id.jpg), in place of a screenshot of
+ *   the Percept Insights page, whose words were cut ("uild Bette") at print size.
+ * - Snapdeal: the same photo of the Snapdeal sign, but cropped wide so the whole word shows (it read "snapdea").
+ * - Zomato: him on the "only the paranoid survive" stage (LOOK.pic) for both prints.
+ * - Schmooze: the old home's team photo (/images/schmooze_team.jpg) for the big print, whole.
+ */
+export const PRINTS: Record<string, { rest?: string; open?: string; pos?: string; posRest?: string }> = {
+  udaan: { rest: '/images/udaan_id.jpg', open: '/images/udaan_id.jpg', pos: '52% 48%', posRest: '52% 50%' },
+  snapdeal: { pos: '50% 45%', posRest: '50% 42%' },
+  zomato: { pos: '72% 50%', posRest: '78% 50%' },
+  // Schmooze: the old home's team photo, whole (it is 4:3, the open print's shape), so no one is cut at the edge
+  schmooze: { open: '/images/schmooze_team.jpg', pos: '50% 50%', posRest: '50% 35%' },
+  bits: { pos: '50% 60%', posRest: '50% 62%' },
+  'ms-edi': { pos: '50% 55%', posRest: '50% 55%' },
+};
+/** Work pictures cut afresh from the old home's own picture where the 2:1 cut cropped its words (Wondermart's header). */
+const WORK_PICS: Record<string, { img: string; pos: string }> = {
+  Wondermart: { img: '/images/udaan_wondermart.png', pos: '50% 0%' },
+};
+const workPic = (w: { t: string; img?: string; pos?: string }) => WORK_PICS[w.t] ?? (w.img ? { img: w.img, pos: w.pos } : undefined);
+const restPic = (stop: MatStop): string | undefined => PRINTS[stop.id]?.rest ?? stop.item.pic;
+const openPic = (stop: MatStop): string | undefined => PRINTS[stop.id]?.open ?? stop.item.pic;
+
+/** The largest size (down to `min`) at which the words wrap into `lines` lines without cutting a word. */
+function wrapFit(ctx: CanvasRenderingContext2D, text: string, max: number, lines: number, weight: number, size: number, min: number): { lines: string[]; size: number } {
+  for (let fs = size; fs >= min; fs -= 0.5) {
+    ctx.font = `${weight} ${fs}px ${SANS}`;
+    const out = wrapAll(ctx, text, max, lines);
+    if (out) return { lines: out, size: fs };
+  }
+  ctx.font = `${weight} ${min}px ${SANS}`;
+  return { lines: wrapAll(ctx, text, max, 9) ?? [text], size: min };
+}
+
+/** A print: the picture covering a rounded box, or a logo on the stop's colour. */
+function print(ctx: CanvasRenderingContext2D, stop: MatStop, src: string | undefined, x: number, y: number, w: number, h: number, r: number, pos: string | undefined, pics: Pictures, logoBg?: string) {
+  const img = src ? pics.get(src) : undefined;
+  ctx.save(); rr(ctx, x, y, w, h, r); ctx.clip();
+  if (stop.item.logo) {
+    ctx.fillStyle = logoBg ?? stop.look.c; ctx.fillRect(x, y, w, h);
+    if (img) { const s = Math.min(w, h) * (logoBg ? 0.5 : 0.62); ctx.drawImage(img, x + (w - s) / 2, y + (h - s) / 2, s, s); }
+  } else if (img) cover(ctx, img, x, y, w, h, pos);
+  else { ctx.fillStyle = mix(stop.look.on, stop.look.c, 0.88); ctx.fillRect(x, y, w, h); }
+  ctx.restore();
+  // a hairline round the print, as a photo lying on the card
+  ctx.save(); rr(ctx, x + 0.5, y + 0.5, w - 1, h - 1, r); ctx.strokeStyle = 'rgba(24,32,79,0.12)'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
+}
+
 function drawStop(ctx: CanvasRenderingContext2D, stop: MatStop, e: 0 | 1, x0: number, cw: number, pics: Pictures, fl: number) {
   const it = stop.item; const lk = stop.look;
   const ink = mix(NAVY, lk.on, fl); const ink2 = mix(INK2, lk.on, fl); const ink3 = mix(INK3, lk.on, fl);
-  // the photo, a plain rounded print
-  const ps = 64 + 36 * e; const pp = 10 + 6 * e;
-  const img = it.pic ? pics.get(it.pic) : undefined;
-  ctx.save(); rr(ctx, x0 + pp, pp, ps, ps, 8 + 2 * e); ctx.clip();
-  if (it.logo) {
-    ctx.fillStyle = mix(lk.c, '#ffffff', fl); ctx.fillRect(x0 + pp, pp, ps, ps);
-    if (img) ctx.drawImage(img, x0 + pp + ps * 0.18, pp + ps * 0.18, ps * 0.64, ps * 0.64);
-  } else if (img) cover(ctx, img, x0 + pp, pp, ps, ps, it.pos);
-  ctx.restore();
-  const tx = x0 + pp + ps + 14 + 2 * e; const tw = x0 + cw - tx - 12;
-  // name and role; the role is never cut: on one line if it fits, else on two (the name moves up to make room)
+  const P = PRINTS[stop.id] ?? {};
   const role = it.role || it.title;
-  let rl: string[]; let lift = 0;
-  ctx.font = `500 ${14 + e}px ${SANS}`;
-  if (ctx.measureText(role).width <= tw) rl = [role];
-  else { ctx.font = `500 ${12.5 + 2.5 * e}px ${SANS}`; rl = wrapAll(ctx, role, tw, 2) ?? [fit(ctx, role, tw)]; lift = 7 * (1 - e); }
-  ctx.fillStyle = ink; ctx.font = `800 ${22 + 8 * e}px ${DISP}`; ctx.fillText(it.short, tx, 39 + 13 * e - lift);
-  ctx.fillStyle = ink2; ctx.font = rl.length > 1 ? `500 ${12.5 + 2.5 * e}px ${SANS}` : `500 ${14 + e}px ${SANS}`;
-  rl.forEach((l, i) => ctx.fillText(l, tx, 61 + 17 * e - lift * 1.6 + i * (15 + 4 * e)));
-  if (!e) return;
-  // open: dates, a hairline, the numbers or tags, then the work itself
+  if (!e) {
+    // at rest: a small print (3:2), the name, the role (never cut: on two lines, a little smaller, if it must)
+    const pw = 96; const ph = 64; const pp = 10;
+    print(ctx, stop, restPic(stop), x0 + pp, pp, pw, ph, 7, P.posRest ?? it.pos, pics);
+    const tx = x0 + pp + pw + 14; const tw = x0 + cw - tx - 12;
+    ctx.font = `500 14px ${SANS}`;
+    let rl: string[]; let fs = 14; let lift = 0;
+    if (ctx.measureText(role).width <= tw) rl = [role];
+    else { const f = wrapFit(ctx, role, tw, 2, 500, 12.5, 11); rl = f.lines; fs = f.size; lift = 7; }
+    ctx.fillStyle = ink; ctx.font = `800 22px ${DISP}`; ctx.fillText(it.short, tx, 39 - lift);
+    ctx.fillStyle = ink2; ctx.font = `500 ${fs}px ${SANS}`;
+    rl.forEach((l, i) => ctx.fillText(l, tx, 61 - lift * 1.6 + i * (fs + 2.5)));
+    return;
+  }
+  // open: a big print (4:3) on the outer side, the name, role, dates and numbers beside it, then the work itself
+  const pp = 16; const pw = 160; const ph = 120;
+  print(ctx, stop, openPic(stop), x0 + pp, pp, pw, ph, 9, P.pos ?? it.pos, pics);
+  const tx = x0 + pp + pw + 16; const tw = x0 + cw - tx - 14;
+  ctx.fillStyle = ink; ctx.font = `800 28px ${DISP}`; ctx.fillText(it.short, tx, 44);
+  const rf = wrapFit(ctx, role, tw, 2, 500, 14.5, 12);
+  ctx.fillStyle = ink2; ctx.font = `500 ${rf.size}px ${SANS}`;
+  let y = 66;
+  rf.lines.forEach((l) => { ctx.fillText(l, tx, y); y += rf.size + 4; });
   const range = `${my(it.start)} – ${my(it.end)}`; const d = dur(it);
-  ctx.fillStyle = ink3; ctx.font = `500 13px ${SANS}`;
-  ctx.fillText(range + (d ? `  ·  ${d}` : ''), tx, 78 + 19 * (rl.length - 1) + 22);
-  const lx = x0 + 16; const lw = cw - 32;
-  ctx.fillStyle = mix(lk.on, lk.c, 0.7); ctx.fillRect(lx, 130, lw, 1);
-  let x = lx;
-  for (const p of it.proofs || []) {
-    if (p[0] === 'num') {
-      ctx.font = `800 24px ${DISP}`; const vw = ctx.measureText(p[1]).width;
-      ctx.font = `500 12px ${SANS}`; const lw2 = ctx.measureText(p[2] || '').width;
-      if (x + vw + 6 + lw2 > lx + lw) break;
-      ctx.fillStyle = lk.num; ctx.font = `800 24px ${DISP}`; ctx.fillText(p[1], x, 166);
-      ctx.fillStyle = ink2; ctx.font = `500 12px ${SANS}`; ctx.fillText(p[2] || '', x + vw + 6, 165);
-      x += vw + 6 + lw2 + 20;
-    } else {
-      ctx.font = `600 12px ${SANS}`; const tw2 = ctx.measureText(p[1]).width + 20;
-      if (x + tw2 > lx + lw) break;
-      rr(ctx, x, 146, tw2, 26, 13); ctx.strokeStyle = mix(lk.on, lk.c, 0.55); ctx.lineWidth = 1; ctx.stroke();
-      ctx.fillStyle = ink; ctx.fillText(p[1], x + 10, 163.5);
-      x += tw2 + 8;
+  ctx.fillStyle = ink3; ctx.font = `500 12.5px ${SANS}`;
+  ctx.fillText(range + (d ? `  ·  ${d}` : ''), tx, y + 2);
+  // the numbers or tags that fit whole in the text column, under the dates, level with the foot of the print
+  let x = tx; const nums = (it.proofs || []).filter((p) => p[0] === 'num'); const tags = (it.proofs || []).filter((p) => p[0] !== 'num');
+  if (nums.length) {
+    for (const p of nums) {
+      ctx.font = `800 23px ${DISP}`; const vw = ctx.measureText(p[1]).width;
+      ctx.font = `500 11.5px ${SANS}`; const lw2 = ctx.measureText(p[2] || '').width;
+      if (x + vw + 5 + lw2 > tx + tw) break;
+      ctx.fillStyle = lk.num; ctx.font = `800 23px ${DISP}`; ctx.fillText(p[1], x, pp + ph - 2);
+      ctx.fillStyle = ink2; ctx.font = `500 11.5px ${SANS}`; ctx.fillText(p[2] || '', x + vw + 5, pp + ph - 3);
+      x += vw + 5 + lw2 + 16;
+    }
+  } else {
+    const ty = pp + ph - 22;
+    for (const p of tags) {
+      ctx.font = `600 11.5px ${SANS}`; const w2 = ctx.measureText(p[1]).width + 18;
+      if (x + w2 > tx + tw) continue;
+      rr(ctx, x, ty, w2, 23, 11.5); ctx.strokeStyle = mix(lk.on, lk.c, 0.5); ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = ink; ctx.fillText(p[1], x + 9, ty + 15.5);
+      x += w2 + 6;
     }
   }
+  const lx = x0 + pp; const lw = cw - pp * 2;
+  ctx.fillStyle = mix(lk.on, lk.c, 0.72); ctx.fillRect(lx, 150, lw, 1);
   const works = it.works || [];
   if (works.length) {
-    const colW = lw / Math.max(2, works.length);
+    // the work, in three slots: its picture, its name, what he did there (each wrapped, never cut)
+    // (the work pictures are 2:1, as they were cut for the old timeline: shown whole, never cropped further)
+    const gap = 12; const sw = (lw - gap * 2) / 3; const th = Math.round(sw / 2); const wy = 160;
     works.slice(0, 3).forEach((wk, i) => {
-      const wx = lx + i * colW; const wy = 186;
-      ctx.save(); rr(ctx, wx, wy, 72, 48, 6); ctx.clip();
-      const im = wk.img ? pics.get(wk.img) : undefined;
-      if (im) cover(ctx, im, wx, wy, 72, 48, wk.pos);
+      const wx = lx + i * (sw + gap);
+      ctx.save(); rr(ctx, wx, wy, sw, th, 6); ctx.clip();
+      const wp = workPic(wk); const im = wp ? pics.get(wp.img) : undefined;
+      if (im) cover(ctx, im, wx, wy, sw, th, wp!.pos);
       else {
-        ctx.fillStyle = mix(lk.on, lk.c, 0.88); ctx.fillRect(wx, wy, 72, 48);
-        ctx.fillStyle = ink; ctx.font = `800 11px ${DISP}`; const t = wk.big || ''; ctx.fillText(t, wx + 36 - ctx.measureText(t).width / 2, wy + 28);
+        ctx.fillStyle = mix(lk.on, lk.c, 0.86); ctx.fillRect(wx, wy, sw, th);
+        ctx.fillStyle = ink; ctx.font = `800 15px ${DISP}`; const t = wk.big || ''; ctx.fillText(t, wx + sw / 2 - ctx.measureText(t).width / 2, wy + th / 2 + 5);
       }
       ctx.restore();
-      // its name and what he did there, wrapped, never cut (the smaller line is left off if it cannot fit whole)
-      const tw2 = colW - 86; let y = wy + 13;
-      let tl: string[] | null = null;
-      for (let fs = 12; fs >= 10.5 && !tl; fs -= 0.5) { ctx.font = `650 ${fs}px ${SANS}`; tl = wrapAll(ctx, wk.t, tw2, 2); }
-      ctx.fillStyle = ink; (tl || [wk.t]).forEach((l) => { ctx.fillText(l, wx + 80, y); y += 14; });
-      let rl2: string[] | null = null;
-      for (let f2 = 11.5; f2 >= 10.5 && !rl2; f2 -= 0.5) { ctx.font = `500 ${f2}px ${SANS}`; rl2 = wrapAll(ctx, wk.r, tw2, 3 - (tl ? tl.length : 1)); }
-      if (rl2) { ctx.fillStyle = ink2; rl2.forEach((l) => { ctx.fillText(l, wx + 80, y + 1); y += 13.5; }); }
+      const tl = wrapFit(ctx, wk.t, sw, 2, 650, 12, 10.5);
+      let yy = wy + th + 14;
+      ctx.fillStyle = ink; ctx.font = `650 ${tl.size}px ${SANS}`;
+      tl.lines.forEach((l) => { ctx.fillText(l, wx, yy); yy += tl.size + 2.5; });
+      if (tl.lines.length < 2) {
+        const r2 = wrapFit(ctx, wk.r, sw, 1, 500, 11.5, 10.5);
+        if (r2.lines.length === 1) { ctx.fillStyle = ink2; ctx.font = `500 ${r2.size}px ${SANS}`; ctx.fillText(r2.lines[0], wx, yy); }
+      }
     });
   } else if (it.notes && it.notes.length) {
-    ctx.font = `500 12.5px ${SANS}`; ctx.fillStyle = ink;
-    let y = 200;
+    let ny = 176;
     for (const n of it.notes.slice(0, 3)) {
-      ctx.beginPath(); ctx.arc(lx + 3, y - 4, 2.2, 0, Math.PI * 2); ctx.fill();
-      ctx.fillText(fit(ctx, n, lw - 14), lx + 12, y); y += 19;
+      const f = wrapFit(ctx, n, lw - 14, 2, 500, 12.5, 11.5);
+      if (ny + (f.lines.length - 1) * (f.size + 4) > 262) break;
+      ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(lx + 3, ny - 4, 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.font = `500 ${f.size}px ${SANS}`;
+      f.lines.forEach((l) => { ctx.fillText(l, lx + 12, ny); ny += f.size + 4; });
+      ny += 6;
     }
   }
 }
@@ -382,5 +450,137 @@ export function drawTape(w: number, len: number, years: { y: number; label: stri
     ctx.fillText(label, w / 2 - tw / 2, (y + next) / 2 + 3.8);
   });
   ctx.restore();
+  return c;
+}
+
+
+/* ---------- the back of a stop, turned over when it is clicked ---------- */
+
+/** The sheet's largest size, mat pixels: it lands in the middle of the timeline's window. */
+export const SHEET = { w: 1040, h: 660 } as const;
+const ROW_H = 101;
+/** One stop's sheet: as tall as its story and its numbers need, never more than SHEET.h. */
+export function sheetSize(stop: MatStop): { w: number; h: number } {
+  const n = Math.min(4, stopBeats(stop).length);
+  const right = 236 + n * ROW_H + 8;
+  const nums = (stop.item.proofs || []).filter((p) => p[0] === 'num').length; const tags = (stop.item.proofs || []).length - nums;
+  const left = 26 + Math.round((380 - 52) * 0.75) + 30 + Math.min(3, nums) * 62 + tags * 44 + 10;
+  return { w: SHEET.w, h: Math.min(SHEET.h, Math.max(right, left, 520)) };
+}
+
+interface Beat { kicker: string; title: string; lines: string[]; img?: string; pos?: string; href?: string; big?: string }
+/** Which work picture goes with which story card (the same piece of work, by its place in TL's works). */
+const BEAT_WORK: Record<string, Record<string, number>> = {
+  zomato: { home: 0, friends: 1, rescue: 2 },
+  udaan: { supply: 0, wondermart: 1, percept: 2 },
+  snapdeal: { ads: 0, warehouse: 1 },
+};
+/** BITS's two projects, in the old home's words (data/timeline.ts). */
+const BITS_LINES: Record<string, string> = {
+  'Modular Water Closet': 'Designed a modular water closet system adaptable to multiple settings, with a focus on efficiency and sustainability.',
+  Rightbiotic: 'Collaborated on a low-cost antimicrobial resistance testing system, to cut test turnaround from days to hours.',
+};
+
+/** What the back of a stop tells: its story on the mat (experienceStories), or for the two schools, their work. */
+export function stopBeats(stop: MatStop): Beat[] {
+  const it = stop.item;
+  if (stop.story) {
+    const story = EXPERIENCE_STORIES[stop.story as ExperienceId];
+    const map = BEAT_WORK[stop.story] ?? {};
+    return story.cards.map((c) => {
+      const w = map[c.id] !== undefined ? (it.works || [])[map[c.id]] : undefined;
+      const wp = w ? workPic(w) : undefined;
+      return { kicker: c.kicker.replace(/^\d+ of \d+ · /, ''), title: c.title, lines: c.lines, img: wp?.img, pos: wp?.pos };
+    });
+  }
+  if (stop.id === 'ms-edi') {
+    // the three studio projects, each a case study already on the site (the design poster's own words, lib/mat/designCards.ts)
+    const pics = (it.works || []).map((w) => w.img);
+    return DESIGN_CARDS.map((d, i) => ({ kicker: d.partner, title: d.title, lines: [d.line], img: pics[i], href: d.href }));
+  }
+  return (it.works || []).map((w) => ({ kicker: w.r, title: w.t, lines: [BITS_LINES[w.t] ?? ''], img: w.img, big: w.big }));
+}
+
+/** Where each beat lies on the sheet (mat pixels from its top left): for drawing and for the links over them. */
+export function beatRects(stop: MatStop): { x: number; y: number; w: number; h: number }[] {
+  const n = Math.min(4, stopBeats(stop).length);
+  const x = 412; const w = SHEET.w - x - 30; const top = 236;
+  return Array.from({ length: n }, (_, i) => ({ x, y: top + i * ROW_H, w, h: ROW_H - 10 }));
+}
+
+/** The back of a stop: a big print of the stop, its name, role and dates, the numbers, and its story in a few rows. */
+export function drawSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  const S = sheetSize(stop);
+  c.width = S.w * FACE_SCALE; c.height = S.h * FACE_SCALE;
+  const ctx = c.getContext('2d')!;
+  ctx.scale(FACE_SCALE, FACE_SCALE);
+  const it = stop.item; const lk = stop.look; const deep = lk.dp ?? NAVY;
+  const SH = S.h;
+  ctx.fillStyle = PAPER; ctx.fillRect(0, 0, SHEET.w, SH);
+  // a band of the stop's colour: the big print (4:3, whole), and under it the numbers or tags, large
+  const band = 380;
+  ctx.fillStyle = lk.c; ctx.fillRect(0, 0, band, SH);
+  if (lk.c.toLowerCase() === '#ffffff') { ctx.fillStyle = EDGE; ctx.fillRect(band - 1, 0, 1, SH); }
+  const P = PRINTS[stop.id] ?? {};
+  print(ctx, stop, openPic(stop), 26, 26, band - 52, Math.round((band - 52) * 0.75), 12, P.pos ?? it.pos, pics, PAPER);
+  let by = 26 + Math.round((band - 52) * 0.75) + 30;
+  const nums = (it.proofs || []).filter((p) => p[0] === 'num'); const tags = (it.proofs || []).filter((p) => p[0] !== 'num');
+  nums.slice(0, 3).forEach((p) => {
+    ctx.fillStyle = lk.num; ctx.font = `800 40px ${DISP}`; ctx.fillText(p[1], 28, by + 34);
+    const vw = ctx.measureText(p[1]).width;
+    const lf = wrapFit(ctx, p[3] || p[2] || '', band - 56 - vw - 14, 2, 550, 15, 13);
+    ctx.fillStyle = lk.on; ctx.font = `550 ${lf.size}px ${SANS}`;
+    lf.lines.forEach((l, i) => ctx.fillText(l, 28 + vw + 14, by + (lf.lines.length > 1 ? 16 + i * (lf.size + 3) : 30)));
+    by += 62;
+  });
+  ctx.font = `600 14px ${SANS}`;
+  tags.forEach((p) => {
+    const w2 = ctx.measureText(p[1]).width + 26;
+    if (by + 34 > SH - 8 || w2 > band - 56) return;
+    rr(ctx, 28, by, w2, 34, 17); ctx.strokeStyle = mix(lk.on, lk.c, 0.4); ctx.lineWidth = 1.4; ctx.stroke();
+    ctx.fillStyle = lk.on; ctx.fillText(p[1], 28 + 13, by + 22);
+    by += 44;
+  });
+  // the year tab and the name
+  const [y1, y2] = yearTab(it);
+  ctx.font = `800 20px ${DISP}`; const yw = ctx.measureText(y1 + (y2 ? ` ${y2}` : '')).width + 26;
+  rr(ctx, 412, 30, yw, 34, 17); ctx.fillStyle = lk.tab; ctx.fill();
+  ctx.fillStyle = lk.ton; ctx.fillText(y1 + (y2 ? ` ${y2}` : ''), 425, 54);
+  ctx.fillStyle = NAVY; ctx.font = `800 48px ${DISP}`; ctx.fillText(it.short, 410, 116);
+  const role = it.role || it.title;
+  const rf = wrapFit(ctx, role, SHEET.w - 442, 2, 550, 17, 14);
+  ctx.fillStyle = INK2; ctx.font = `550 ${rf.size}px ${SANS}`;
+  let y = 146; rf.lines.forEach((l) => { ctx.fillText(l, 412, y); y += rf.size + 5; });
+  const d = dur(it);
+  ctx.fillStyle = INK3; ctx.font = `500 14px ${SANS}`; ctx.fillText(`${my(it.start)} – ${my(it.end)}${d ? `  ·  ${d}` : ''}`, 412, y + 2);
+  ctx.fillStyle = EDGE; ctx.fillRect(412, 218, SHEET.w - 442, 1.5);
+  // the story, a row each: a small picture of that work when there is one, then what it was and what he did
+  const beats = stopBeats(stop).slice(0, 4);
+  beatRects(stop).forEach((r, i) => {
+    const b = beats[i];
+    let tx = r.x;
+    const ph = 58; const pw = 116;
+    if (b.img || b.big) {
+      ctx.save(); rr(ctx, r.x, r.y + 8, pw, ph, 7); ctx.clip();
+      const im = b.img ? pics.get(b.img) : undefined;
+      if (im) cover(ctx, im, r.x, r.y + 8, pw, ph, b.pos);
+      else { ctx.fillStyle = mix(deep, PAPER, 0.86); ctx.fillRect(r.x, r.y + 8, pw, ph); ctx.fillStyle = NAVY; ctx.font = `800 14px ${DISP}`; const t = b.big || ''; ctx.fillText(t, r.x + pw / 2 - ctx.measureText(t).width / 2, r.y + 8 + ph / 2 + 5); }
+      ctx.restore();
+      tx = r.x + pw + 14;
+    } else {
+      ctx.fillStyle = mix(deep, PAPER, 0.25); ctx.font = `800 30px ${DISP}`; ctx.fillText(String(i + 1).padStart(2, '0'), r.x, r.y + 36);
+      tx = r.x + 56;
+    }
+    const tw = r.x + r.w - tx;
+    ctx.fillStyle = deep; ctx.font = `700 11px ${SANS}`; ctx.fillText(b.kicker.toUpperCase(), tx, r.y + 13);
+    const title = b.title + (b.href ? '  ↗' : '');
+    ctx.fillStyle = NAVY; ctx.font = `800 19px ${DISP}`; ctx.fillText(title, tx, r.y + 34);
+    const room = Math.floor((r.h - 52) / 16.5) + 1;
+    const lf = wrapFit(ctx, b.lines.join(' '), tw, room, 500, 13.5, 12);
+    if (lf.lines.length > room) console.warn(`sheet ${stop.id}: beat ${i} needs ${lf.lines.length} lines, has room for ${room}`);
+    ctx.fillStyle = INK2; ctx.font = `500 ${lf.size}px ${SANS}`;
+    let ly = r.y + 53; lf.lines.forEach((l) => { ctx.fillText(l, tx, ly); ly += lf.size + 3.5; });
+  });
   return c;
 }

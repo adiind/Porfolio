@@ -1,5 +1,10 @@
 /**
- * The timeline on the mat ("Everything, in order."), as Adi picked it on 2026-11-16 (prototype G:
+ * The pen (Adi's pick, 2026-11-17, from review/home-mat-pen): after the intro a
+ * marker lies across the tape and rolls down the years as the page scrolls; a stop opens when the pen reaches the date
+ * it began (penRows / penTarget / penStep), and pointing at a stop opens it too (wantOpen). The gap between the lanes
+ * is wider (GAP 18 -> 46) so the pen has a channel of its own and never lies on any words.
+ *
+ * The timeline on the mat ("Timeline"), as Adi picked it on 2026-11-16 (prototype G:
  * review/home-mat-tape/?c=7, "Rolled, then multiplied", round 2).
  *
  * Everything here is plain numbers, so it can be tested without WebGL: where every card lies (in "mat pixels", a
@@ -25,7 +30,7 @@ export const RULE = { top: 170, bot: 850 } as const;
 /** The roll: its full radius, its cardboard core, its width across (one tape width), how far its ends stand out. */
 export const ROLL = { r0: 44, rc: 17, w: TAPE.w + 1, tele: 10 } as const;
 /** Gap between a card's inner edge and the tape. */
-export const GAP = 18;
+export const GAP = 46;
 /** The highest a card may lie, and the lowest an open card may reach. */
 const FIRST_TOP = 184;
 const LOWEST = 852;
@@ -275,4 +280,93 @@ export function scrollForStep(step: number, hold: Hold): number {
 export const INTRO_IN_VIEW = 0.6;
 export function introDue(scrollY: number, hold: Hold): boolean {
   return scrollY >= hold.start - (1 - INTRO_IN_VIEW) * hold.view;
+}
+
+
+/* ---------- the pen ---------- */
+
+/**
+ * The marker lying across the tape: its length (mat pixels, tip to end), its barrel's radius. It reaches 12 px over the
+ * inner edge of the year tabs on both sides, where they are blank (a tab's year is printed at least 15 px from that edge).
+ */
+export const PEN = { len: 162, r: 9.5 } as const;
+/** Where the pen lies before the first stop (just under the lanes' labels), and the lowest it goes (above the roll). */
+export const PEN_START = 178;
+export const PEN_PARK = TAPE.bot - 4 - ROLL.rc - PEN.r - 4;
+/** It never rolls faster than this (mat px a second): at 30 frames a second that is under 90 degrees a frame. */
+export const PEN_MAX_SPEED = 470;
+
+/** The row the pen stops at for each step: the date that stop began, on the tape's printed years (always further down). */
+export function penRows(steps: PlacedCard[]): number[] {
+  const rows: number[] = [];
+  let last = PEN_START;
+  steps.forEach((card) => {
+    const y = Math.min(PEN_PARK, Math.max(last + 14, yOf(Date.parse(card.stop.start))));
+    rows.push(y); last = y;
+  });
+  return rows;
+}
+
+/** Where on the hold (in steps) the pen arrives at row k, and how long (in steps) it rolls to get there. */
+const ARRIVE = 0.3; const ROLL_STEPS = 0.65;
+/** Where the pen should be at this scroll: it waits at each stop, then rolls to the next over most of a step. */
+export function penTarget(scrollY: number, hold: Hold, rows: number[]): number {
+  const q = (scrollY - hold.start) / stepPx(hold) - 0.3;
+  let prev = PEN_START;
+  for (let k = 0; k < rows.length; k += 1) {
+    if (q < k + ARRIVE) return prev + (rows[k] - prev) * smooth((q - (k + ARRIVE - ROLL_STEPS)) / ROLL_STEPS);
+    prev = rows[k];
+  }
+  return prev;
+}
+
+/**
+ * One frame of the pen's roll toward its target: a critically damped spring (it never overshoots, so a one-way scroll
+ * never rolls it back), held under PEN_MAX_SPEED. Returns true while it moves.
+ */
+export function penStep(pen: { y: number; v: number }, target: number, dt: number, reduced: boolean): boolean {
+  if (reduced || dt <= 0) { const moved = pen.y !== target && dt > 0; if (dt > 0) { pen.y = target; pen.v = 0; } return moved && !reduced; }
+  const w = 13;
+  let left = dt;
+  while (left > 1e-6) {
+    const h = Math.min(1 / 120, left); left -= h;
+    const a = w * w * (target - pen.y) - 2 * w * pen.v;
+    pen.v += a * h;
+    pen.v = Math.max(-PEN_MAX_SPEED, Math.min(PEN_MAX_SPEED, pen.v));
+    const next = pen.y + pen.v * h;
+    // (never past the target: the spring is damped, this only guards the speed cap's rounding)
+    if ((target - pen.y) * (target - next) < 0) { pen.y = target; pen.v = 0; } else pen.y = next;
+  }
+  if (Math.abs(target - pen.y) < 0.05 && Math.abs(pen.v) < 1) { pen.y = target; pen.v = 0; return false; }
+  return true;
+}
+
+/** The step the pen has reached (-1: none yet): a stop opens the moment the pen gets to its row. */
+export function penStop(y: number, rows: number[]): number {
+  let at = -1;
+  rows.forEach((r, i) => { if (y >= r - 0.5) at = i; });
+  return at;
+}
+
+/**
+ * Which stops should be open: the pen's, and the one the pointer rests on. One open card per lane, so a lane never runs
+ * off the window: pointing at a stop in the pen's lane folds the pen's stop until the pointer leaves.
+ */
+export function wantOpen(n: number, pen: number, hover: number, laneOf: (i: number) => 0 | 1): number[] {
+  const want = new Array<number>(n).fill(0);
+  if (pen >= 0) want[pen] = 1;
+  if (hover >= 0) { if (pen >= 0 && laneOf(pen) === laneOf(hover)) want[pen] = 0; want[hover] = 1; }
+  return want;
+}
+
+/** Moves every stop's open amount one frame towards what is wanted. */
+export function stepOpenTo(open: number[], want: number[], dt: number, reduced: boolean): boolean {
+  const rate = dt / (reduced ? OPEN_REDUCED_S : OPEN_S);
+  let moving = false;
+  for (let j = 0; j < open.length; j += 1) {
+    const was = open[j];
+    open[j] = want[j] > was ? Math.min(1, was + rate) : Math.max(0, was - rate);
+    if (open[j] !== want[j]) moving = true;
+  }
+  return moving;
 }

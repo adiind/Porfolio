@@ -26,6 +26,8 @@ import { GITHUB, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
 import { WORDS_BIG_BELOW, type GreetingSet } from '../../lib/mat/wordPieces';
 import { resumeSheetPicture, wordProps } from '../../lib/mat/wordStage';
 import { DESIGN_CARDS, DESIGN_PG_MARK, DESIGN_PICTURES, DESIGN_UNDER, drawDesignCard, drawDesignUnder } from '../../lib/mat/designCards';
+import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
+import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import LivePreview from './LivePreview';
 
 import './flipbook.css';
@@ -89,7 +91,30 @@ const bookPlace = (index: number) => {
 };
 // The printer is not on this stage (Adi, 2026-11-16: "Keep the booklet, remove the printer": Bambu is a booklet like the
 // others). Its picture stays in data/matStage.json for the flat page, which still has it.
-const STAGE_POSTERS = (matStage.posters as StagePoster[]).filter((poster) => poster.id !== 'printer');
+// Zomato is his red rider's bag (lib/mat/zomatoBag.ts), lying where the Zomato card was: it takes the place of the ~10M
+// card and of the Food Rescue card, which now comes out of it (Adi, 2026-11-17). Both pictures stay in data/matStage.json
+// for the flat page.
+const STAGE_POSTERS = (matStage.posters as StagePoster[]).filter((poster) => !['printer', 'zomato', 'rescue'].includes(poster.id));
+const ZOMATO_ID = 'zomato';
+/** The bag's close-up, as the poster close-up knows it (its place is the old Zomato card's). */
+const ZOMATO_LOOK: StagePoster = { ...(matStage.posters as StagePoster[]).find((poster) => poster.id === ZOMATO_ID)!, label: 'Zomato, Senior Product Analyst' };
+/** The bag's click target: an invisible prop the engine flies to and hit-tests (the layer draws the bag). One picture for
+ * the life of the page: the layer finds the engine's mesh for it by this very canvas, however often the stage is laid out. */
+let bagTargetPicture: HTMLCanvasElement | null = null;
+const bagTarget = () => { if (!bagTargetPicture) { bagTargetPicture = document.createElement('canvas'); bagTargetPicture.width = 8; bagTargetPicture.height = 8; } return bagTargetPicture; };
+/** The bag's spot, from its click target's centre (table units): the bag sits a little lower than the target. */
+const BAG_SHIFT = { x: 0, y: 74 / matStage.booklet.w };
+/** A poster's close-up by id: the résumé and the bag are not posters of the stage. */
+const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : STAGE_POSTERS.find((item) => item.id === id));
+/** What comes out of the bag, in the order it comes out (their pictures are the layer's; these are their names). */
+const BAG_THINGS: Array<{ id: BagItem; label: string }> = [
+  { id: 'receipt', label: 'The bill: his role and what he did' },
+  { id: 'press', label: 'Press clipping: Media Coverage' },
+  { id: 'photo', label: 'His photo at Zomato' },
+  { id: 'home', label: 'Homepage & Search Performance' },
+  { id: 'friends', label: 'Friends Recommendation' },
+  { id: 'rescue', label: 'Food Rescue (Waste Reduction)' },
+];
 
 /**
  * The home page's words lie on the mat as things (lib/mat/wordStage.ts, Adi's direction A, 2026-11-16): the name label,
@@ -194,6 +219,8 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the covers of the books lying closed. (One after another, each waited for the one before.) The typefaces are the
   // 'first' ones, the cards' own (Geist and Bricolage): the rest are only drawn inside the books and come later.
   const others = FLIP_BOOKS.filter((item) => item.slug !== active.slug);
+  // the Zomato bag's pictures start coming now, beside the stage's (not waited for: the bag is built when they are in)
+  void preloadZomatoBag().catch(() => undefined);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
   const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, snapdealArt] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
@@ -206,8 +233,8 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     // ship kit's first-frame preloads read loadStage's literal pictures.) The design cards' pictures are not asked for
     // here at all: nothing of them shows until the poster is picked up (designPictures, once the room is lit).
     loadPicture('/images/mat/resume-p1-small.webp'),
-    loadPicture(STORY_ILLUSTRATIONS.self).catch(() => undefined),
-    loadPicture(STORY_ILLUSTRATIONS.snapdeal).catch(() => undefined),
+    loadPicture(STORY_ILLUSTRATIONS.self),
+    loadPicture(STORY_ILLUSTRATIONS.snapdeal),
     loadFlipbookFonts('first'),
   ]);
   const posters = STAGE_POSTERS.map((poster, index) => {
@@ -307,9 +334,12 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     read: { minPx: RESUME_READ_PX, aside: sheetAside(windowWidth) + SHEET_ASIDE_RIGHT + 24 },
   });
   const pieces = words.props;
+  // the rider's bag lies where the Zomato card was; this invisible, bag-sized prop is what a click on it lands on
+  const bagSlot = { x: ZOMATO_LOOK.x + ZOMATO_LOOK.w / 2, y: ZOMATO_LOOK.y + ZOMATO_LOOK.h / 2 + 34 };
+  const bag = { id: ZOMATO_ID, image: bagTarget(), ...at(bagSlot.x, bagSlot.y - 50), w: 0.8, h: 1.2, radius: 0.05 };
   return {
     greeting: words.greeting,
-    props: [...posters, ...story, ...booklets, ...pieces, ...under],
+    props: [...posters, bag, ...story, ...booklets, ...pieces, ...under],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -407,6 +437,20 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   /** A booklet that was clicked and is being made the live book: open it as soon as it is. */
   const openAfter = useRef<string | null>(null);
   const [looking, setLooking] = useState<StagePoster | null>(null);
+  const lookingRef = useRef<string | null>(null);
+  lookingRef.current = looking?.id ?? null;
+  /**
+   * The Zomato bag (lib/mat/zomatoBag.ts), drawn in this engine's scene: one for the life of the engine. Picked up, it
+   * unpacks his Zomato work onto the mat; `busy` while it unpacks or packs (its Back waits), `open` the thing opened.
+   */
+  const bagRef = useRef<{ layer: BagLayer; engine: FlipBookEngine; remove(): void } | null>(null);
+  const [bagUi, setBagUi] = useState<{ open: BagItem | null; busy: boolean }>({ open: null, busy: false });
+  const bagUiRef = useRef(bagUi);
+  bagUiRef.current = bagUi;
+  /** The bag has been come down to and not yet left; each arrival or leaving counts one more. */
+  const bagIn = useRef(false);
+  const bagGen = useRef(0);
+  const bagTimer = useRef(0);
   const [wordsBox, setWordsBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const stageActs = useRef<{ prop(id: string | null): void; book(): void; hover(id: string | null): void }>({ prop() {}, book() {}, hover() {} });
   /** The live book has been set in the engine (its inside can be handed over as it lands), was picked up, is all drawn. */
@@ -563,6 +607,97 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const id = w.requestIdleCallback ? w.requestIdleCallback(() => { void askDesign(); }, { timeout: 3000 }) : window.setTimeout(() => { void askDesign(); }, 1500);
     return () => { if (w.requestIdleCallback && w.cancelIdleCallback) w.cancelIdleCallback(id); else window.clearTimeout(id); };
   }, [askDesign, lit, staged]);
+
+  // The Zomato bag: added to the engine once the stage is laid (it lies on its click target), built as its pictures come in.
+  useEffect(() => {
+    const engine = engineRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === ZOMATO_ID);
+    if (!staged || fallback || !engine || !target || bagRef.current?.engine === engine) return;
+    bagRef.current?.remove();
+    const layer = createBagLayer({ prop: { ...target, image: target.image as HTMLCanvasElement }, shift: BAG_SHIFT, reduced: reducedMotion });
+    bagRef.current = { layer, engine, remove: engine.addLayer(layer) };
+    if (debug) (window as unknown as { __bag?: unknown }).__bag = { get layer() { return layer; } };
+  }, [debug, fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { bagRef.current?.remove(); bagRef.current = null; window.clearTimeout(bagTimer.current); }, []);
+  /** Come down to the bag: it unpacks (Back waits until it has). */
+  const bagArrive = useCallback(() => {
+    const layer = bagRef.current?.layer;
+    if (!layer) return;
+    bagGen.current += 1;
+    bagIn.current = true;
+    layer.arrive();
+    setBagUi({ open: null, busy: true });
+    window.clearTimeout(bagTimer.current);
+    bagTimer.current = window.setTimeout(() => setBagUi((was) => ({ ...was, busy: false })), reducedMotion ? 120 : 3300);
+  }, [reducedMotion]);
+  /** Leave the bag: let it finish unpacking if it still is, put everything back, close it; then the camera can go up. */
+  const bagOut = useCallback(async () => {
+    const layer = bagRef.current?.layer;
+    if (!layer || !bagIn.current) return;
+    bagIn.current = false;
+    const gen = ++bagGen.current;
+    window.clearTimeout(bagTimer.current);
+    setBagUi({ open: null, busy: true });
+    const wait = (ms: number) => new Promise((ok) => window.setTimeout(ok, ms));
+    // (Back pressed while it unpacks: it finishes first, at most its own length; a hidden window starves frames, hence the clock)
+    const since = performance.now();
+    while (layer.state === 'in' && performance.now() - since < 3600) await wait(50);
+    if (layer.state === 'open') await Promise.race([layer.pack(), wait(reducedMotion ? 200 : 2200)]);
+    if (gen !== bagGen.current) return;
+    layer.leave();
+    setBagUi({ open: null, busy: false });
+  }, [reducedMotion]);
+  /** Open one thing from the bag (or close it, picked again). */
+  const bagOpen = useCallback((id: BagItem | null) => {
+    const layer = bagRef.current?.layer;
+    if (!layer || !bagIn.current || bagUiRef.current.busy) return;
+    layer.open(layer.opened === id ? null : id);
+    setBagUi({ open: layer.opened, busy: false });
+    if (layer.opened) trackEvent('mat_bag_item_opened', { item: layer.opened });
+  }, []);
+  /** Back, one level: out of an open thing to the bag, or out of the bag to the mat (the history step, which packs it). */
+  const bagBack = useCallback(() => {
+    if (bagUiRef.current.busy) return;
+    if (bagRef.current?.layer.opened) bagOpen(null);
+    else window.history.back();
+  }, [bagOpen]);
+  const bagActs = useRef({ arrive: bagArrive, out: bagOut, back: bagBack });
+  bagActs.current = { arrive: bagArrive, out: bagOut, back: bagBack };
+
+  // A click on something of the bag's is the bag's (the engine never sees it). The cursor over it: a hand over what can be
+  // clicked, the plain arrow elsewhere, never the engine's zoom glass (Adi: "no zoom cursor").
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const root = rootRef.current;
+    if (!staged || !canvas || !root) return undefined;
+    const on = () => modeRef.current === 'poster' && lookingRef.current === ZOMATO_ID && bagIn.current;
+    const at = (event: PointerEvent) => { const r = canvas.getBoundingClientRect(); return bagRef.current?.layer.hit(event.clientX - r.left, event.clientY - r.top, r) ?? null; };
+    const linkAt = (event: PointerEvent) => { const r = canvas.getBoundingClientRect(); return bagRef.current?.layer.linkAt(event.clientX - r.left, event.clientY - r.top, r) ?? null; };
+    let downOn: ReturnType<typeof at> = null;
+    const down = (event: PointerEvent) => { if (!on()) return; downOn = at(event); if (downOn) event.stopImmediatePropagation(); };
+    const up = (event: PointerEvent) => {
+      if (!on()) return;
+      const link = linkAt(event);
+      if (link) { event.stopImmediatePropagation(); downOn = null; window.open(link, '_blank', 'noopener'); return; }
+      const under = at(event);
+      if (downOn && under === downOn) { event.stopImmediatePropagation(); if (under !== 'bag') bagOpen(under); }
+      else if (downOn) event.stopImmediatePropagation();
+      downOn = null;
+    };
+    const move = (event: PointerEvent) => {
+      if (!on()) { if (root.dataset.bagPointer) delete root.dataset.bagPointer; return; }
+      const hand = !bagUiRef.current.busy && (!!linkAt(event) || at(event) !== null);
+      root.dataset.bagPointer = hand ? 'true' : 'false';
+    };
+    canvas.addEventListener('pointerdown', down, true);
+    canvas.addEventListener('pointerup', up, true);
+    canvas.addEventListener('pointermove', move);
+    return () => {
+      canvas.removeEventListener('pointerdown', down, true);
+      canvas.removeEventListener('pointerup', up, true);
+      canvas.removeEventListener('pointermove', move);
+    };
+  }, [bagOpen, staged]);
 
   useEffect(() => {
     if (!images) return;
@@ -852,6 +987,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const lookAt = (id: string, poster: StagePoster) => {
       setLooking(poster);
       setMode('poster');
+      // (the bag drops its lid and unpacks as the camera comes down to it)
+      if (id === ZOMATO_ID) bagActs.current.arrive();
       void fly(id);
     };
     /**
@@ -875,7 +1012,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         // (the close-up it is already at: a story over it has closed)
         if (modeRef.current === 'poster') return;
         // Forward, from the wide view, to a close-up
-        const poster = look === RESUME_ID ? RESUME_LOOK : STAGE_POSTERS.find((item) => item.id === look);
+        const poster = lookFor(look);
         if (modeRef.current === 'wide' && poster) {
           if (look === RESUME_ID) void askResume();
           lookAt(look, poster);
@@ -892,14 +1029,19 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       // close-up or a book again, and the view goes back down to it rather than leaving the address wrong)
       const up = () => { setMode('wide'); modeRef.current = 'wide'; toWide(); };
       if (modeRef.current === 'book') { openings += 1; setLanded(false); void engine.leave().then(up); }
-      else if (modeRef.current === 'poster') { void fly(null).then(() => { setLooking(null); up(); }); }
+      // (at the bag, everything goes back in and it zips shut before the camera goes up)
+      else if (modeRef.current === 'poster') { void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
       // the wide view on a step that names a close-up or a book (Forward to one that cannot be come back to as it was):
       // the address says what is on screen
       if (look || state?.mat === 'book') window.history.replaceState(null, '', window.location.pathname + window.location.hash);
     };
     stageActs.current = {
       prop(id) {
-        if (id === null) { if (modeRef.current === 'poster') window.history.back(); return; }
+        if (id === null) {
+          // (at the bag a click off it goes back one level: out of an open thing first)
+          if (modeRef.current === 'poster') { if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else window.history.back(); }
+          return;
+        }
         if (id.startsWith('book:')) {
           // another book: it becomes the live one where it lies, then opens
           if (modeRef.current !== 'wide') return;
@@ -927,7 +1069,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           return;
         }
         if (id === 'word:resume') id = RESUME_ID;
-        const poster = id === RESUME_ID ? RESUME_LOOK : STAGE_POSTERS.find((item) => item.id === id);
+        const poster = lookFor(id);
         if (!poster || modeRef.current !== 'wide') return;
         const go = () => {
           if (modeRef.current !== 'wide') return;
@@ -998,7 +1140,10 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       // on the stage the book's keys only work once you are in the book; Escape always steps back out
       if (staged && modeRef.current !== 'book') {
         // (a story open over the close-up closes itself on Escape, one step Back: not two)
-        if (event.key === 'Escape' && modeRef.current === 'poster' && !document.querySelector('dialog[open]')) { event.preventDefault(); window.history.back(); }
+        if (event.key === 'Escape' && modeRef.current === 'poster' && !document.querySelector('dialog[open]')) {
+          event.preventDefault();
+          if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else window.history.back();
+        }
         return;
       }
       if (staged && event.key === 'Escape' && !engineRef.current?.leaning) { event.preventDefault(); window.history.back(); return; }
@@ -1017,6 +1162,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     return () => window.removeEventListener('keydown', onKey);
   }, [count, goTo, page, staged]);
 
+  /** Down at the Zomato bag. */
+  const atBag = staged && mode === 'poster' && looking?.id === ZOMATO_ID;
   const portrait = viewport.w / viewport.h < 0.9;
   const flatSize = portrait ? { w: 1024, h: 1536 } : { w: 1536, h: 1024 };
   // the controls take their colours from the page on top when it has its own colour family
@@ -1036,7 +1183,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
 
   return (
     <>
-    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined}>
+    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined}>
       {/* first paint when coming from the home page: its mat and the closed book, exactly where they were, until the 3D scene takes over */}
       {homeLink && arrival && onMat && !fallback && (
         <div className="fb-held" aria-hidden="true">
@@ -1096,6 +1243,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       {staged && !fallback && (
         <ul className="fb-sr" aria-label="On the mat">
           {STAGE_POSTERS.map((poster) => <li key={poster.id}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(poster.id, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(poster.id); }}>{poster.label}</button></li>)}
+          <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(ZOMATO_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(ZOMATO_ID); }}>Zomato, Senior Product Analyst: a delivery rider's bag. Opens it and lays out his Zomato work.</button></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { void askResume(); ringOn(RESUME_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(RESUME_ID); }}>Résumé, one page. Opens it up close, with a download.</button></li>
           {/* the three case studies the design poster holds: their cards lie under it */}
           {DESIGN_CARDS.map((card) => (
@@ -1117,9 +1265,27 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         </a>
       )}
       {staged && looking && (
-        <button type="button" className="fb-pill fb-pill--back fb-exit" data-shown={mode === 'poster' ? 'true' : 'false'} tabIndex={mode === 'poster' ? 0 : -1} onClick={() => window.history.back()}><ArrowLeft size={16} aria-hidden="true" /><span>Back to the mat</span></button>
+        // (one Back, always here: at the bag it steps out of an open thing first, and waits while the bag unpacks or packs)
+        <button type="button" className="fb-pill fb-pill--back fb-exit" data-shown={mode === 'poster' && !(atBag && bagUi.busy) ? 'true' : 'false'} tabIndex={mode === 'poster' && !(atBag && bagUi.busy) ? 0 : -1} onClick={() => (atBag ? bagBack() : window.history.back())}><ArrowLeft size={16} aria-hidden="true" /><span>{atBag && bagUi.open ? 'Back to the bag' : 'Back to the mat'}</span></button>
       )}
-      {staged && looking && (
+      {/* the bag's things are pictures on the mat: here they are as text and buttons, unseen (the bag has no panel beside it) */}
+      {staged && atBag && (
+        <aside className="fb-sr" aria-live="polite">
+          <h2>{ZOMATO_LOOK.label}, {BAG_TEXT.team}, {BAG_TEXT.when}</h2>
+          <p>{BAG_TEXT.summary}</p>
+          <ul>
+            {BAG_THINGS.map((thing) => (
+              <li key={thing.id}><button type="button" tabIndex={mode === 'poster' && !bagUi.busy ? 0 : -1} aria-pressed={bagUi.open === thing.id} onClick={() => bagOpen(thing.id)}>{thing.label}</button></li>
+            ))}
+          </ul>
+          <ul>{BAG_TEXT.lines.map((line) => <li key={line}>{line}</li>)}</ul>
+          {(['home', 'friends', 'rescue'] as const).map((id) => (
+            <section key={id}><h3>{BAG_TEXT.projects[id].title}, {BAG_TEXT.projects[id].role}</h3><p>{BAG_TEXT.projects[id].lines.join(' ')} {BAG_TEXT.projects[id].foot}</p></section>
+          ))}
+          <ul>{BAG_TEXT.press.articles.map((article) => <li key={article.href}><a href={article.href} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' && !bagUi.busy ? 0 : -1}>{article.title} ({article.source})</a></li>)}</ul>
+        </aside>
+      )}
+      {staged && looking && !atBag && (
         <aside
           className="fb-look"
           data-shown={mode === 'poster' ? 'true' : 'false'}

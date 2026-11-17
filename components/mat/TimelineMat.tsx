@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import type { MatLayer } from '../../lib/flipbook/matLayer';
 import { loadFlipbookFonts } from '../../lib/flipbook/pageArt';
-import { matStops, stopPictures, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
+import { matStops, stopBeats, stopPictures, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
 import { createTimelineLayer, type TimelineLayer, type TimelinePlace } from '../../lib/mat/timelineLayer';
 import { holdLength, openingOrder, layoutCards, scrollForStep, type Hold } from '../../lib/mat/timelineScene';
 import ExperienceStory from './ExperienceStory';
 import { experienceIdFromHash, type ExperienceId } from './experienceStories';
 import './timeline-mat.css';
 
-/* The home page's timeline ("Everything, in order."), drawn on the mat itself (Adi's pick, 2026-11-16: prototype G in
+/* The home page's timeline ("Timeline"), drawn on the mat itself (Adi's pick, 2026-11-16: prototype G in
    review/home-mat-tape/?c=7). The cards, the tape and its roll are in the 3D scene (lib/mat/timelineLayer.ts); this file
    is the page around them:
    - TimelineMatRoom: the room the timeline takes on the page, in the second screen, before Work. While the page scrolls
@@ -16,7 +17,13 @@ import './timeline-mat.css';
    - TimelineMat: the HTML lying over the cards, in the order a reader goes through them: the title and its line, one link
      or button per card (the same words as the card) and per print on Tinker Verse. They are clicked and focused like the
      cards they cover; the layer moves them to where each card is drawn, every frame, without reading layout. Five stops
-     open their story on the mat (#experience-<id>, components/mat/ExperienceStory.tsx), as the old timeline did. */
+     open their story on the mat (#experience-<id>, components/mat/ExperienceStory.tsx) when the page is opened at that
+     address.
+   - The pen (Adi's pick, 2026-11-17, from review/home-mat-pen): a marker lies across the tape and rolls down the years
+     with the scroll, opening each stop as it reaches its year. Every pointer move is handed to the layer, which opens the
+     stop under it once the pointer rests (latched, no flicker). Clicking a stop picks it up and turns it over in the
+     middle of the mat (its story on its back), with the house's dark "Back to the timeline" pill top left; Esc, a click
+     beside it or a scroll put it back. The back's rows that have a page (Northwestern's three studio projects) are links. */
 
 /** Shared by the room (which measures where it lies) and the page's scroll handler (which holds the mat still). */
 export type HoldRef = MutableRefObject<Hold | null>;
@@ -80,13 +87,12 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
   const perUnitRef = useRef(perUnit);
   perUnitRef.current = perUnit;
   const [layer, setLayer] = useState<TimelineLayer | null>(null);
+  const [picked, setPicked] = useState<{ id: string; settled: boolean } | null>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const rowRefs = useRef<HTMLElement[]>([]);
 
   // the stories on the mat, exactly as the old timeline opened them (TimelineSection.tsx)
   const [experience, setExperience] = useState<ExperienceId | null>(() => experienceIdFromHash(window.location.hash));
-  const openExperience = useCallback((id: ExperienceId) => {
-    window.history.pushState({ ...window.history.state, matExperience: true }, '', `#experience-${id}`);
-    setExperience(id);
-  }, []);
   const closeExperience = useCallback(() => {
     if (window.history.state?.matExperience) window.history.back();
     else { window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search); setExperience(null); }
@@ -122,9 +128,40 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
   useEffect(() => {
     const root = rootRef.current;
     if (!layer || !root) return undefined;
-    layer.bindOverlay({ cards: cardRefs.current, thumbs: thumbRefs.current, words: [...root.querySelectorAll<HTMLElement>('[data-mx]')], root });
+    layer.bindOverlay({
+      cards: cardRefs.current, thumbs: thumbRefs.current, words: [...root.querySelectorAll<HTMLElement>('[data-mx]')], root,
+      sheet: { box: sheetRef.current, rows: rowRefs.current },
+    });
     return () => layer.bindOverlay(null);
+  }, [layer, shown, picked]);
+
+  // the pointer: every move goes to the layer, which decides what is under it (it opens that stop once the pointer rests)
+  useEffect(() => {
+    if (!layer || !shown) return undefined;
+    const move = (event: PointerEvent) => { if (event.pointerType !== 'touch') layer.pointer(event.clientX, event.clientY); };
+    const leave = () => layer.pointerLeft();
+    window.addEventListener('pointermove', move, { passive: true });
+    document.documentElement.addEventListener('pointerleave', leave);
+    return () => { window.removeEventListener('pointermove', move); document.documentElement.removeEventListener('pointerleave', leave); layer.pointerLeft(); };
   }, [layer, shown]);
+
+  // picking a stop up: the pills follow the layer; Esc, a click beside the sheet or a scroll put it back
+  useEffect(() => {
+    if (!layer) return undefined;
+    layer.onPick = (id, settled) => setPicked(id ? { id, settled } : null);
+    return () => { layer.onPick = null; };
+  }, [layer]);
+  useEffect(() => {
+    if (!layer || !picked) return undefined;
+    const y0 = window.scrollY;
+    const key = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); layer.pick(null); } };
+    const scroll = () => { if (Math.abs(window.scrollY - y0) > 24) layer.pick(null); };
+    window.addEventListener('keydown', key);
+    window.addEventListener('scroll', scroll, { passive: true });
+    return () => { window.removeEventListener('keydown', key); window.removeEventListener('scroll', scroll); };
+  }, [layer, picked]);
+  const pickedStop = picked ? stops.find((s) => s.id === picked.id) ?? null : null;
+  const pickedRows = pickedStop ? stopBeats(pickedStop) : [];
 
   // (links to #timeline are handled by the page, FlipBookApp: it scrolls to this timeline's room, id="timeline", by where
   // it lies, and leaves the address alone)
@@ -138,26 +175,28 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
   };
   const onCard = (stop: MatStop) => (event: React.MouseEvent<HTMLElement>) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    if (stop.story) { event.preventDefault(); openExperience(stop.story as ExperienceId); }
+    // every stop is picked up and turned over on the mat (no jump to another page)
+    if (layer && !stop.fill) { event.preventDefault(); layer.pick(stop.id); }
   };
 
   thumbRefs.current.length = 0;
+  rowRefs.current.length = 0;
   return <>
-    <div ref={rootRef} className="tm-layer" data-shown={shown ? 'true' : 'false'} inert={!shown}>
+    <div ref={rootRef} className="tm-layer" data-shown={shown ? 'true' : 'false'} data-picked={picked ? 'true' : undefined} inert={!shown}>
       <h2 className="tm-title" data-mx="128" data-my="92">Timeline</h2>
-      <p className="tm-sub" data-mx="130" data-my="122">Newest at the top. <b>Scroll</b> to travel back through the years. <b>Click</b> any stop to open its page.</p>
-      <p className="tm-lab tm-lab-work" data-mx="680" data-my="172"><b>Work</b> 5 roles · 2020 to 2026</p>
-      <p className="tm-lab" data-mx="760" data-my="172"><b>School</b> 2 universities · 2016 to 2027</p>
+      <p className="tm-sub" data-mx="130" data-my="122">Newest at the top. <b>Scroll</b> and the pen rolls back through the years. <b>Click</b> a stop to turn it over.</p>
+      <p className="tm-lab tm-lab-work" data-mx="634" data-my="172"><b>Work</b> 5 roles · 2020 to 2026</p>
+      <p className="tm-lab" data-mx="806" data-my="172"><b>School</b> 2 universities · 2016 to 2027</p>
       <ol className="tm-cards" aria-label="Timeline, newest first">
         {stops.map((stop) => {
           const words = <span className="tm-sr">{stop.label}</span>;
           const common = {
             ref: (el: HTMLElement | null) => { if (el) cardRefs.current.set(stop.id, el); else cardRefs.current.delete(stop.id); },
-            className: 'tm-card', onFocus: onFocus(stop), tabIndex: shown ? 0 : -1,
+            className: 'tm-card', onFocus: onFocus(stop), tabIndex: shown && !picked ? 0 : -1, 'data-stop': stop.id,
           };
           return <li key={stop.id}>
-            {stop.story
-              ? <button type="button" {...common} onClick={onCard(stop)}>{words}</button>
+            {!stop.fill
+              ? <button type="button" {...common} onClick={onCard(stop)} aria-haspopup="dialog">{words}</button>
               : <a {...common} href={stop.href ?? undefined}>{words}</a>}
             {stop.thumbs && <ul className="tm-thumbs" aria-label={`${stop.item.short}: what I built there`}>
               {stop.thumbs.map((thumb) => <li key={thumb.cap + thumb.href}>
@@ -169,7 +208,20 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
           </li>;
         })}
       </ol>
+      {picked && <div className="tm-catch" onClick={() => layer?.pick(null)} aria-hidden="true" />}
+      {picked && pickedStop && <div ref={sheetRef} className="tm-sheet" data-settled={picked.settled ? 'true' : 'false'} aria-hidden="true" />}
+      {picked && pickedStop && <div className="tm-sheet-words" role="dialog" aria-label={`${pickedStop.item.short}: its story`} data-settled={picked.settled ? 'true' : 'false'}>
+        <ul className="tm-rows">
+          {pickedRows.slice(0, 4).map((row, i) => <li key={row.title}>
+            {row.href
+              ? <a ref={(el) => { if (el) rowRefs.current[i] = el; }} className="tm-row" href={row.href}><span className="tm-sr">{row.title}: {row.lines.join(' ')}</span></a>
+              : <span ref={(el) => { if (el) rowRefs.current[i] = el; }} className="tm-row is-text"><span className="tm-sr">{row.kicker}. {row.title}. {row.lines.join(' ')}</span></span>}
+          </li>)}
+        </ul>
+      </div>}
     </div>
+    {picked && <button type="button" className="fb-pill fb-pill--back tm-back" data-shown={picked.settled ? 'true' : 'false'} onClick={() => layer?.pick(null)}>
+      <ArrowLeft size={16} aria-hidden="true" /><span>Back to the timeline</span></button>}
     <ExperienceStory id={experience} onClose={closeExperience} />
   </>;
 }
