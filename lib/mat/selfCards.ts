@@ -1,3 +1,4 @@
+import { drawStoryIllustration } from './storyIllustrations';
 // Four short cards for the Self mat poster. Product description: agentvault.io;
 // role and DeleteMe direction: Adi, 16 November 2026. Diagrams are explanatory.
 import selfStory from '../../public/data/self-story.json';
@@ -50,7 +51,7 @@ function diagram(ctx: CanvasRenderingContext2D, index: number) {
   ctx.restore();
 }
 
-export function drawSelfStoryCard(index: number, logo: HTMLImageElement): HTMLCanvasElement {
+export function drawSelfStoryCard(index: number, logo: HTMLImageElement, illustration?: HTMLImageElement): HTMLCanvasElement {
   const card = SELF_STORY[index];
   if (!card) throw new Error('Unknown Self story card');
   const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
@@ -60,7 +61,8 @@ export function drawSelfStoryCard(index: number, logo: HTMLImageElement): HTMLCa
   const glow = ctx.createRadialGradient(50, 0, 0, 50, 0, 850); glow.addColorStop(0, index === 2 ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,.5)'); glow.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
   const dark = index === 2;
   ctx.fillStyle = dark ? '#a5f4d4' : GREEN; ctx.font = `500 36px ${SANS}`; ctx.fillText(card.kicker, PAD, 108);
-  diagram(ctx, index);
+  if (illustration) drawStoryIllustration(ctx, illustration, index, PAD, 158, W - PAD * 2, 418);
+  else diagram(ctx, index);
   ctx.fillStyle = dark ? '#ffffff' : INK; let titleSize = 96; let title: string[] = [];
   do { ctx.font = `750 ${titleSize}px ${DISPLAY}`; title = wrap(ctx, card.title, W - 2 * PAD); if (title.length <= 3) break; titleSize -= 4; } while (titleSize > 64);
   let y = 680; title.forEach((line) => { ctx.fillText(line, PAD, y); y += titleSize * 1.06; });
