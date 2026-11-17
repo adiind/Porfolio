@@ -862,7 +862,9 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (!staged || !stageSpec || !wordsBox) return undefined;
     const perUnit = wordsBox.width / stageSpec.frame.w;
     const onScroll = () => {
-      const y = window.scrollY;
+      // (never above the page's top: a tablet's browser lets the page be pulled past it and reports a scroll below
+      // zero while it springs back. The whole window is already moving with that pull; the mat must not move twice.)
+      const y = Math.max(0, window.scrollY);
       scrolledRef.current = y;
       // The second screen is moved here too, in the same frame as the words and the 3D view (see "the second screen keeps
       // step" below). First, while the page's layout is still clean: set after the style writes below, the port made the
@@ -885,6 +887,17 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, [lit, staged, stageSpec, wordsBox]);
+
+  // Once the room is lit, what shows past the page's edges is the mat's blue, not the dark room. A tablet's browser lets
+  // the page be pulled past its top and its end; the strip it uncovers there was black (the dark room's colour), which
+  // read as the page blacking out on the way back up.
+  useEffect(() => {
+    if (!staged || !lit || fallback) return undefined;
+    const root = document.documentElement;
+    const was = root.style.background;
+    root.style.background = '#1b62d4';
+    return () => { root.style.background = was; };
+  }, [fallback, lit, staged]);
 
   // The second screen keeps step with the mat. Left to the browser, it scrolled on the browser's own clock, a frame
   // ahead of the 3D view and the words (which move from the scroll handler above): while the page moved, the timeline
