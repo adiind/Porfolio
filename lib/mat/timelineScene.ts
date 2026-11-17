@@ -170,7 +170,9 @@ export function stepOpen(open: number[], current: number, dt: number, reduced: b
   for (let j = 0; j < open.length; j += 1) {
     const want = j === current ? 1 : 0;
     const was = open[j];
-    open[j] = want > was ? Math.min(1, was + rate) : Math.max(0, was - rate);
+    // (a stop that is already where it should be stays there: stepping it "down" from fully open made an open card
+    // shrink and grow again on every frame, by more the slower the frames came)
+    open[j] = want > was ? Math.min(want, was + rate) : Math.max(want, was - rate);
     if (open[j] !== want) moving = true;
   }
   return moving;
@@ -365,7 +367,8 @@ export function stepOpenTo(open: number[], want: number[], dt: number, reduced: 
   let moving = false;
   for (let j = 0; j < open.length; j += 1) {
     const was = open[j];
-    open[j] = want[j] > was ? Math.min(1, was + rate) : Math.max(0, was - rate);
+    // (never past what is wanted, and a stop already there stays there: see stepOpen)
+    open[j] = want[j] > was ? Math.min(want[j], was + rate) : Math.max(want[j], was - rate);
     if (open[j] !== want[j]) moving = true;
   }
   return moving;

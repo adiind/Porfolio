@@ -18,6 +18,7 @@ import {
   beginDrag, createFlipState, endDrag, isSettled, setCurrent, stepFlip, updateDrag, type FlipState,
 } from './flipState';
 import { liveSceneFor, type LiveInput, type LivePage } from './live';
+import { pageBusy } from './quiet';
 import { composeBack, composePage, pageSources, type BookImages, type PageLayers } from './pageArt';
 import {
   LEAF_FRAGMENT, LEAF_VERTEX, PROP_ALPHA_SHADOW_FRAGMENT, PROP_CURL_VERTEX, PROP_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_VERTEX, SUN_FRAGMENT,
@@ -373,6 +374,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   let sunClock = opts.arrival?.sun ?? 40;
   const light = LIGHT.clone();
   let shadowSlant = SHADOW_SLANT;
+  /** Something has been drawn (before that there is nothing a resize could wipe). */
+  let drawnOnce = false;
   const draw = () => {
     if (onMat) {
       sunMaterial.uniforms.uT.value = sunClock;
@@ -382,6 +385,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       renderer.setRenderTarget(null);
     }
     renderer.render(scene, camera);
+    drawnOnce = true;
     // (the view as it was last drawn: screenPoint answers from it, never from a view resize() is part way through measuring)
     drawnView.copy(camera);
     retire();
@@ -999,7 +1003,10 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
    * and the room is lit.
    */
   const calm = (): boolean => !awayTween && !slide && !press && !frozen && isSettled(state)
-    && Math.abs(lean - leanTarget) < 1e-3 && (!stageSpec || dawnUniform.value >= 1) && performance.now() - scrolledAt > 200;
+    && Math.abs(lean - leanTarget) < 1e-3 && (!stageSpec || dawnUniform.value >= 1) && performance.now() - scrolledAt > 200
+    // (on the stage: not while a finger or the wheel is moving the page. Through the timeline's stops the mat holds
+    // still, so setScroll hears nothing of that scroll, and a page was drawn in the middle of it.)
+    && !(stageSpec && pageBusy());
   let pumping = false;
   let lastTried = '';
   const drawings: Array<{ key: string; at: number; ms: number }> = [];
@@ -1078,13 +1085,20 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     );
   };
 
+  /** The size the drawing was last set to. Setting it again, even to the same size, empties the view. */
+  let sizedW = 0; let sizedH = 0; let sizedRatio = 0;
   const resize = () => {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
     if (!w || !h) return;
     layerView.width = w; layerView.height = h;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(w, h, false);
+    // Only when the size really changed: setting a canvas's size wipes what is drawn on it, and this is also called to
+    // lay the stage out again (a new book, the stage's pieces, the greeting landing) with the window exactly as it was.
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const resized = w !== sizedW || h !== sizedH || ratio !== sizedRatio;
+    if (ratio !== sizedRatio) renderer.setPixelRatio(ratio);
+    if (w !== sizedW || h !== sizedH) renderer.setSize(w, h, false);
+    sizedW = w; sizedH = h; sizedRatio = ratio;
     const aspect = w / h;
     camera.aspect = aspect;
     camera.updateProjectionMatrix();
@@ -1189,7 +1203,10 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       }
       opts.onStageLayout?.({ left: l, top: t, width: r - l, height: b - t });
     }
-    invalidate();
+    // A view that changed size has just been emptied. Draw it again now, before the browser shows it: left to the next
+    // frame, the window showed one black frame at every change of size (a tablet's browser bar sliding in or out while
+    // the page scrolls, a window being dragged wider).
+    if (resized && drawnOnce && !disposed) renderNow(); else invalidate();
   };
 
   /* ---------- per-frame update ---------- */
@@ -1201,6 +1218,21 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     if (index === state.current) t = Math.max(t, peekForward + nudge);
     if (index === state.current - 1) t = Math.min(t, 1 - peekBack);
     return Math.min(1, Math.max(0, t));
+  };
+
+  /** The book, as the camera stands now, lies wholly outside the window (with a margin: its shadow, a page lifting). */
+  const offCorner = new Vector3();
+  const bookOffScreen = (): boolean => {
+    camera.updateMatrixWorld();
+    let left = true; let right = true; let above = true; let below = true;
+    for (const [x, y] of [[-1, -pageH / 2], [1, -pageH / 2], [-1, pageH / 2], [1, pageH / 2]]) {
+      offCorner.set(bookGroup.position.x + x, bookGroup.position.y + y, 0).project(camera);
+      if (offCorner.x > -1.15) left = false;
+      if (offCorner.x < 1.15) right = false;
+      if (offCorner.y < 1.15) above = false;
+      if (offCorner.y > -1.15) below = false;
+    }
+    return left || right || above || below;
   };
 
   const update = (dt: number): boolean => {
@@ -1453,6 +1485,11 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       u.uPop.value = popOverride ?? Math.max(0, leaf.pop);
     });
 
+    // On the home stage the book lies on the mat, and the page scrolls on past it. Once it is out of the window its
+    // moving pages are not painted: each paint redraws three sheets and sends them to the graphics card again, sixty
+    // times a second, which is what made the timeline stutter under a finger on a tablet.
+    const bookOut = stageSpec !== null && up > 0.5 && bookOffScreen();
+
     // live pages: redraw the ones in view, at most sixty times a second
     leaves.forEach((leaf, index) => {
       const live = leaf.live;
@@ -1461,7 +1498,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       const top = index === state.current && t < 0.05;
       if (top && !leaf.wasTop) live.enter();
       leaf.wasTop = top;
-      const inView = t < 0.97 && (index === state.current || index === state.current - 1
+      const inView = !bookOut && t < 0.97 && (index === state.current || index === state.current - 1
         || (index === state.current + 1 && effectiveT(state.current) > 0.004));
       if (!inView) return;
       if (opts.reducedMotion && leaf.liveHeld) return;

@@ -13,6 +13,7 @@ import {
 } from 'three';
 import { PROP_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_VERTEX } from '../flipbook/shaders';
 import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
+import { whenQuiet } from '../flipbook/quiet';
 import { beatRects, drawFace, drawSheet, drawTape, faceCanvas, sheetSize, thumbRects, type MatStop, type Pictures } from './timelineCards';
 import {
   PEN, PEN_START, ROLL, TAPE, cardPose, cardSize, clamp01, holdLength, introDue, introEnd, layoutCards, openingOrder, outCubic,
@@ -404,9 +405,11 @@ export function createTimelineLayer(opts: {
       const mesh = new Mesh(unitPlane, mat); mesh.frustumCulled = false;
       const shadow = new Mesh(unitPlane, shade); shadow.frustumCulled = false;
       meshes.push({ placed, flight: plan.get(placed)!, step: steps.indexOf(placed), rest, open: openTex, mesh, mat, shadow, shade });
-      idle(next);
+      idle(next, needed);
     };
-    idle(next);
+    // (needed once any of the timeline's window shows: its intro plays when most of it does)
+    const needed = () => { const hold = page.hold(); return Boolean(hold) && window.scrollY > hold!.start - hold!.view * 0.85; };
+    idle(next, needed);
     window.addEventListener('scroll', onScroll, { passive: true });
   };
   const onScroll = () => ctx?.invalidate();
@@ -726,9 +729,12 @@ export function createTimelineLayer(opts: {
   };
 }
 
-/** Run soon, in a quiet moment (or after a frame where there are none). */
-function idle(fn: () => void) {
-  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(fn, { timeout: 120 });
-  else window.setTimeout(fn, 16);
+/**
+ * Run soon, once the visitor has let go of the page (lib/flipbook/quiet.ts): drawing a card and sending it to the
+ * graphics card holds the page for a moment, and eight of them in a row under a moving finger was a visible stutter on
+ * the way down to the timeline. `needed` says the timeline is coming into view: then a card waits at most half a second.
+ */
+function idle(fn: () => void, needed: () => boolean) {
+  whenQuiet(fn, () => (needed() ? 500 : 6000));
 }
 

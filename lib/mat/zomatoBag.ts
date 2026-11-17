@@ -19,6 +19,7 @@ import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
 import {
   TEXT, BIND, RIDER_RED, board, clipping, fabric, insidePrint, kraftPaper, label, linerWith, paperBagFront, photoPrint, receipt, rescueSheets, riderFlap, riderFront, riderLidTop, riderPlain, riderRim, riderStrap, roundCorners, type ClipRegion, type ProjectId,
 } from './zomatoBagArt';
+import { whenQuiet } from '../flipbook/quiet';
 
 /** The bag's own pictures (public/images/mat/zomato), and Food Rescue's paper bag and offer (shared with the old card). */
 const BAG_PICTURES = [
@@ -198,10 +199,9 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
   let built = false;
   const later: Array<() => void> = [];
   let laterAsked = false;
-  const idle = (fn: () => void) => {
-    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
-    if (w.requestIdleCallback) w.requestIdleCallback(fn, { timeout: 1500 }); else window.setTimeout(fn, 120);
-  };
+  // (each of these holds the page for a moment: they wait until the visitor has let go of it, lib/flipbook/quiet.ts.
+  // A click on the bag before they are done builds them there and then, buildAll.)
+  const idle = (fn: () => void) => whenQuiet(fn, 8000);
   const buildSoon = () => { if (!later.length) return; idle(() => { if (!ctx) return; later.shift()?.(); buildSoon(); }); };
   const buildAll = () => { while (ctx && later.length) later.shift()!(); };
   let resolveReady!: () => void;

@@ -229,3 +229,24 @@ describe('the pen', () => {
     expect(t + 1 / 120).toBeCloseTo(OPEN_S, 1);
   });
 });
+
+describe('a stop that is open', () => {
+  it('holds still: its open amount does not shrink and grow again while nothing changes', () => {
+    // (a slow frame, as on a tablet: the slower the frame, the further it used to step back)
+    for (const dt of [1 / 120, 1 / 60, 1 / 30, 0.05]) {
+      const open = [0, 1, 0];
+      expect(stepOpenTo(open, [0, 1, 0], dt, false)).toBe(false);
+      expect(open).toEqual([0, 1, 0]);
+      const old = [0, 1, 0];
+      expect(stepOpen(old, 1, dt, false)).toBe(false);
+      expect(old).toEqual([0, 1, 0]);
+    }
+  });
+
+  it('still opens and closes all the way, without overshooting', () => {
+    const open = [1, 0];
+    let frames = 0;
+    while (stepOpenTo(open, [0, 1], 1 / 30, false) && frames < 200) { frames += 1; expect(open[0]).toBeGreaterThanOrEqual(0); expect(open[1]).toBeLessThanOrEqual(1); }
+    expect(open).toEqual([0, 1]);
+  });
+});
