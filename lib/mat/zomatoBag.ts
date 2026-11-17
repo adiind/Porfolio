@@ -742,6 +742,10 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
     // the click target (a poster-shaped prop the engine flies to) is never drawn: the bag itself is on the mat
     hidePoster = 1;
     const pm = propMesh.material as ShaderMaterial;
+    // How shown the engine wants this spot this frame (it deals the posters in, and sinks every poster but the one the
+    // camera flies to as a close-up comes down: the Self card, the résumé...). The bag follows it while it rests closed,
+    // so it goes with the others; once clicked it is the close-up itself and the engine keeps it at 1.
+    const engineShown = pm.uniforms.uAlpha.value;
     pm.uniforms.uAlpha.value *= 1 - hidePoster;
     if (propShadow) (propShadow.material as ShaderMaterial).uniforms.uAlpha.value *= 1 - hidePoster;
     group.visible = true;
@@ -792,8 +796,10 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
 
     // fade (the bag shows as it comes in)
     // the bag itself is never faded: it is there (opaque) or not drawn at all; only its shadow on the mat eases in and out
-    allMats.forEach((m) => { m.uniforms.uAlpha.value = 1; });
+    const away = state === 'rest' ? engineShown : 1;
+    allMats.forEach((m) => { m.uniforms.uAlpha.value = away; });
     bag.visible = true;
+    group.visible = away > 0.003;
     // the zip's pull tucks away as the lid lifts (it would otherwise dangle off the opened lid)
     pull.scale.setScalar(Math.max(0.0001, 1 - clamp01((Math.abs(bagLid.rotation.x) - 0.25) / 0.6)));
     // shadows: from each thing's real height
@@ -839,8 +845,8 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       u.uC.value = new Vector2(group.position.x + s.caster.c.x, group.position.y + s.caster.c.y);
       u.uAng.value = s.caster.ang; u.uHalf.value = s.caster.half; u.uR.value = s.caster.r;
       u.uB.value = s.caster.base; u.uT.value = Math.max(s.caster.base + 0.002, s.caster.top);
-      u.uAlpha.value = s.caster.on ? 1 : 0;
-      s.mesh.visible = s.caster.on;
+      u.uAlpha.value = s.caster.on ? away : 0;
+      s.mesh.visible = s.caster.on && away > 0.003;
       s.mesh.position.set(0, 0, 0.0008);
     });
 
