@@ -23,11 +23,18 @@ jobs:
       - name: Update Instagram Data
         env:
           APIFY_API_TOKEN: ${{ secrets.APIFY_API_TOKEN }}
-        run: node scripts/update-instagram-data.js
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          node scripts/update-instagram-data.js
 
       - name: Commit and Push if changed
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          git add data/instagram_posts.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update instagram data" && git push)
+          # Signed Instagram media URLs expire. The job stores MP4s and posters
+          # under public/media/tinkerverse/reels and commits only that durable set.
+          # The curated journal stays as the TinkerVerse story.
+          git checkout -- data/tinkerverse_journal.json || true
+          git add -- data/tinkerverse_reels.json public/media/tinkerverse/reels
+          git diff --cached --quiet || (git commit -m "chore: update tinkerverse reels" && git push)

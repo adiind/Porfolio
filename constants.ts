@@ -1,6 +1,7 @@
 
-import { JournalEntry, TimelineConfig, SocialPost } from './types';
+import { JournalEntry, TimelineConfig, SocialPost, TinkerVerseReel } from './types';
 import RAW_TINKERVERSE_JOURNAL from './data/tinkerverse_journal.json';
+import RAW_TINKERVERSE_REELS from './data/tinkerverse_reels.json';
 import { TIMELINE_DATA } from './data/timeline';
 import { USER_IMAGE_URL, REAL_USER_IMAGE, TINKERVERSE_LOGO } from './assets';
 
@@ -28,6 +29,8 @@ export const CONFIG: TimelineConfig = {
 };
 
 export const TINKERVERSE_JOURNAL: JournalEntry[] = RAW_TINKERVERSE_JOURNAL as JournalEntry[];
+
+export const TINKERVERSE_REELS: TinkerVerseReel[] = (RAW_TINKERVERSE_REELS as TinkerVerseReel[]).slice(0, 6);
 
 // Compatibility data for older timeline analytics/call sites. The durable
 // five-entry journal is the public source; the legacy caption archive remains

@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { selectReels } from './tinkerverse-reels.mjs';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, '..');
@@ -138,6 +139,73 @@ export function validateJournalEntries(entries, options = {}) {
   return errors;
 }
 
+function reelTime(value) {
+  if (typeof value !== 'string') return Number.NaN;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return Date.parse(`${value}T00:00:00.000Z`);
+  return Date.parse(value);
+}
+
+function looksLikeMp4(filePath) {
+  return fs.readFileSync(filePath).subarray(0, 32).includes(Buffer.from('ftyp'));
+}
+
+export function validateReelEntries(entries, options = {}) {
+  const root = options.root ?? ROOT;
+  const errors = [];
+  if (!Array.isArray(entries)) return ['Reel manifest must be an array.'];
+  if (entries.length > 6) errors.push('Reel manifest has more than 6 videos.');
+
+  const ids = new Set();
+  let previousTime = Number.POSITIVE_INFINITY;
+  entries.forEach((entry, index) => {
+    const prefix = `Reel ${index}`;
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      errors.push(`${prefix} must be an object.`);
+      return;
+    }
+    for (const field of ['id', 'instagramUrl', 'publishedAt', 'posterUrl', 'videoUrl', 'alt']) {
+      if (typeof entry[field] !== 'string' || entry[field].trim() === '') {
+        errors.push(`${prefix} is missing non-empty ${field}.`);
+      }
+    }
+    if (typeof entry.caption !== 'string') errors.push(`${prefix} caption must be a string.`);
+    if (typeof entry.id === 'string') {
+      if (ids.has(entry.id)) errors.push(`${prefix} duplicates id ${entry.id}.`);
+      ids.add(entry.id);
+    }
+    if (!isInstagramPostUrl(entry.instagramUrl)) {
+      errors.push(`${prefix} has a non-public Instagram post URL.`);
+    }
+    if (!Number.isFinite(reelTime(entry.publishedAt))) {
+      errors.push(`${prefix} publishedAt must be a date or ISO UTC timestamp.`);
+    } else if (reelTime(entry.publishedAt) > previousTime) {
+      errors.push(`${prefix} breaks newest-first ordering.`);
+    } else {
+      previousTime = reelTime(entry.publishedAt);
+    }
+    for (const field of ['posterUrl', 'videoUrl']) {
+      const value = entry[field];
+      if (typeof value !== 'string' || !value.startsWith('/media/tinkerverse/reels/')) {
+        errors.push(`${prefix} ${field} must use /media/tinkerverse/reels/.`);
+        continue;
+      }
+      if (/^https?:/i.test(value)) errors.push(`${prefix} ${field} must be a local file.`);
+      const mediaDirectory = path.resolve(root, 'public', 'media', 'tinkerverse', 'reels');
+      const localPath = path.resolve(root, 'public', value.replace(/^\//, ''));
+      if (!localPath.startsWith(`${mediaDirectory}${path.sep}`)) {
+        errors.push(`${prefix} ${field} escapes the reel directory.`);
+      } else if (!fs.existsSync(localPath) || !fs.statSync(localPath).isFile()) {
+        errors.push(`${prefix} local media is missing: ${value}.`);
+      } else if (field === 'videoUrl' && !looksLikeMp4(localPath)) {
+        errors.push(`${prefix} local video is not an MP4.`);
+      } else if (field === 'posterUrl' && !looksLikeImage(localPath)) {
+        errors.push(`${prefix} local poster is not a valid image.`);
+      }
+    }
+  });
+  return errors;
+}
+
 export function readAndValidateManifest(manifestPath = DEFAULT_MANIFEST, options = {}) {
   if (!fs.existsSync(manifestPath)) {
     throw new Error(`Journal manifest does not exist: ${manifestPath}`);
@@ -183,20 +251,42 @@ function createLastKnownGoodRoot() {
       alt: 'Sentinel image used to verify update safety.',
     },
   ]);
+  const reelDirectory = path.join(root, 'public', 'media', 'tinkerverse', 'reels');
+  fs.mkdirSync(reelDirectory, { recursive: true });
+  fs.writeFileSync(path.join(reelDirectory, 'sentinel-reel.mp4'), 'sentinel-reel');
+  fs.writeFileSync(path.join(reelDirectory, 'sentinel-poster.jpg'), 'sentinel-poster');
+  writeJson(path.join(root, 'data', 'tinkerverse_reels.json'), [
+    {
+      id: 'sentinel-reel',
+      instagramUrl: 'https://www.instagram.com/reel/SENTINEL/',
+      publishedAt: '2025-01-01',
+      caption: 'Last-known-good reel.',
+      posterUrl: '/media/tinkerverse/reels/sentinel-poster.jpg',
+      videoUrl: '/media/tinkerverse/reels/sentinel-reel.mp4',
+      alt: 'Sentinel reel used to verify update safety.',
+    },
+  ]);
   return root;
+}
+
+function directoryHashes(directory) {
+  if (!fs.existsSync(directory)) return {};
+  return Object.fromEntries(
+    fs.readdirSync(directory).sort().map((filename) => [
+      filename,
+      hashFile(path.join(directory, filename)),
+    ]),
+  );
 }
 
 function snapshotLastKnownGood(root) {
   const manifestPath = path.join(root, 'data', 'tinkerverse_journal.json');
-  const mediaDirectory = path.join(root, 'public', 'images', 'tinkerverse');
+  const reelManifestPath = path.join(root, 'data', 'tinkerverse_reels.json');
   return {
     manifestHash: hashFile(manifestPath),
-    mediaHashes: Object.fromEntries(
-      fs.readdirSync(mediaDirectory).sort().map((filename) => [
-        filename,
-        hashFile(path.join(mediaDirectory, filename)),
-      ]),
-    ),
+    mediaHashes: directoryHashes(path.join(root, 'public', 'images', 'tinkerverse')),
+    reelManifestHash: fs.existsSync(reelManifestPath) ? hashFile(reelManifestPath) : null,
+    reelHashes: directoryHashes(path.join(root, 'public', 'media', 'tinkerverse', 'reels')),
   };
 }
 
@@ -287,6 +377,30 @@ export function runSchemaTests() {
         throw new Error(`${schemaCase.name} did not fail with ${schemaCase.expected}: ${errors.join(' | ')}`);
       }
     }
+    const newest = Array.from({ length: 8 }, (_, index) => ({
+      shortCode: `VID${index}`,
+      url: `https://www.instagram.com/reel/VID${index}/`,
+      timestamp: `2026-01-${String(index + 1).padStart(2, '0')}T00:00:00.000Z`,
+      caption: index === 3 ? '' : `Reel ${index}`,
+      videoUrl: `https://cdn.example/${index}.mp4`,
+      type: 'Video',
+    }));
+    const selected = selectReels([
+      ...newest,
+      { shortCode: 'STILL', url: 'https://www.instagram.com/p/STILL/', timestamp: '2026-02-01T00:00:00.000Z', caption: 'Still', type: 'Image' },
+    ]);
+    if (selected.length !== 6) throw new Error(`Expected 6 reels, received ${selected.length}.`);
+    if (selected[0].id !== 'VID7' || selected[5].id !== 'VID2') {
+      throw new Error(`Reel selection was not the newest 6: ${selected.map((reel) => reel.id).join(', ')}`);
+    }
+    if (selected.some((reel) => reel.id === 'STILL')) throw new Error('Image posts were selected as reels.');
+    const dated = selectReels([
+      { shortCode: 'OLDER', url: 'https://www.instagram.com/p/OLDER/', date: '2026-03-01', caption: 'Older', videoUrl: 'https://cdn.example/older.mp4' },
+      { shortCode: 'NEWER', url: 'https://www.instagram.com/p/NEWER/', date: '2026-04-01', caption: '', videoUrl: 'https://cdn.example/newer.mp4' },
+    ]);
+    if (dated[0]?.id !== 'NEWER' || dated[0].caption !== '' || dated[1]?.caption !== 'Older') {
+      throw new Error('Date-only reel ordering or empty captions were not preserved.');
+    }
     console.log(`Instagram journal schema verified: ${cases.length} invalid fixture contracts were rejected.`);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -356,6 +470,15 @@ export function runSafetyTests() {
       expected: /interrupt/i,
     },
     {
+      name: 'reel download failure',
+      prepare: (root) => {
+        const fixturePath = path.join(root, 'reel-failure.json');
+        writeJson(fixturePath, [rawFixture({ videoUrl: 'http://127.0.0.1:9/reel.mp4' })]);
+        return ['--fixture', fixturePath];
+      },
+      expected: /Reel download failed/i,
+    },
+    {
       name: 'existing asset collision',
       prepare: (root) => {
         const fixturePath = path.join(root, 'collision.json');
@@ -412,9 +535,52 @@ export function runSafetyTests() {
     if (!fs.existsSync(path.join(successRoot, 'public', 'images', 'tinkerverse', 'sentinel.png'))) {
       throw new Error('Successful publish removed last-known-good media instead of preserving it.');
     }
+    const reelSnapshot = snapshotLastKnownGood(successRoot);
+    const reelBefore = JSON.parse(fs.readFileSync(path.join(successRoot, 'data', 'tinkerverse_reels.json'), 'utf8'));
+    if (reelBefore[0]?.id !== 'sentinel-reel' || !reelSnapshot.reelHashes['sentinel-reel.mp4']) {
+      throw new Error('Image-only publish replaced the last-known-good reels.');
+    }
     console.log('Instagram updater publish verified: validated media landed before atomic manifest replacement.');
   } finally {
     fs.rmSync(successRoot, { recursive: true, force: true });
+  }
+
+  const reelRoot = createLastKnownGoodRoot();
+  const tinyVideo = path.join(reelRoot, 'tiny.mp4');
+  try {
+    const encoded = spawnSync('ffmpeg', [
+      '-y', '-hide_banner', '-loglevel', 'error',
+      '-f', 'lavfi', '-i', 'color=c=black:s=64x64:d=0.4',
+      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-t', '0.4',
+      tinyVideo,
+    ], { encoding: 'utf8' });
+    if (encoded.status !== 0) throw new Error(encoded.stderr || 'Could not create the reel fixture video.');
+    const videoUrl = `data:video/mp4;base64,${fs.readFileSync(tinyVideo).toString('base64')}`;
+    const fixturePath = path.join(reelRoot, 'reel.json');
+    writeJson(fixturePath, [rawFixture({
+      shortCode: 'REALREEL1',
+      url: 'https://www.instagram.com/reel/REALREEL1/',
+      caption: 'A real fixture caption.',
+      videoUrl,
+    })]);
+    const before = snapshotLastKnownGood(reelRoot);
+    const result = runUpdater(reelRoot, ['--fixture', fixturePath]);
+    if (result.status !== 0) throw new Error(`Reel fixture publish failed: ${result.stderr || result.stdout}`);
+    const reels = JSON.parse(fs.readFileSync(path.join(reelRoot, 'data', 'tinkerverse_reels.json'), 'utf8'));
+    const reelErrors = validateReelEntries(reels, { root: reelRoot });
+    if (reelErrors.length) throw new Error(reelErrors.join(' | '));
+    if (reels.length !== 1 || reels[0].id !== 'REALREEL1' || reels[0].caption !== 'A real fixture caption.') {
+      throw new Error('Reel publish did not store the fixture caption and id.');
+    }
+    if (reels[0].videoUrl.startsWith('http') || reels[0].posterUrl.startsWith('http')) {
+      throw new Error('Reel publish kept a remote media URL.');
+    }
+    const after = snapshotLastKnownGood(reelRoot);
+    if (after.manifestHash === before.manifestHash) throw new Error('Reel fixture did not also publish the journal image.');
+    if (after.reelHashes['sentinel-reel.mp4']) throw new Error('Reel publish left the previous video in place.');
+    console.log('TinkerVerse reel publish verified: local MP4 and poster replaced the signed source URL.');
+  } finally {
+    fs.rmSync(reelRoot, { recursive: true, force: true });
   }
 }
 
@@ -430,6 +596,13 @@ if (isDirectRun) {
       const manifestPath = manifestArgument ? path.resolve(manifestArgument) : DEFAULT_MANIFEST;
       const entries = readAndValidateManifest(manifestPath);
       console.log(`Instagram journal verified: ${entries.length} entries in ${manifestPath}`);
+      const reelManifest = path.join(ROOT, 'data', 'tinkerverse_reels.json');
+      if (fs.existsSync(reelManifest)) {
+        const reels = JSON.parse(fs.readFileSync(reelManifest, 'utf8'));
+        const reelErrors = validateReelEntries(reels);
+        if (reelErrors.length) throw new Error(`Reel manifest is invalid:\n- ${reelErrors.join('\n- ')}`);
+        console.log(`TinkerVerse reels verified: ${reels.length} videos in ${reelManifest}`);
+      }
     }
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
