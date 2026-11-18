@@ -27,12 +27,19 @@ const SS = 3; // canvases are drawn at 3x
 const MARGIN = 8; // design px of soft shadow around every paper piece
 const eventEnd = (index: number) => journeySteps[index + 1]?.at ?? JOURNEY_END;
 
-const shopPoint = new Vector3(1.95, .10, 0);
+/**
+ * The streets: a small grid in the map's local coordinates. Two streets run across (Main, with the restaurant and the
+ * first customer on it, and Lower, with the buyer on it) and three run between them. Every house fronts a street, and the
+ * rider's routes run along them: out along Main, then down Cross to Lower.
+ */
+const MAIN_Y = -.05, LOWER_Y = -.63, WEST_X = 1.9, CROSS_X = 3.05, EAST_X = 4.25;
+const STREET_WIDTH = .09; // table units, the same whichever way a street runs
+const shopPoint = new Vector3(1.95, .14, 0);
 const originalHome = new Vector3(4.6, .24, 0);
 const nextDoor = new Vector3(3.95, .34, 0);
-const farHome = new Vector3(2.35, -.50, 0);
+const farHome = new Vector3(2.35, -.45, 0);
 const receiver = new Vector3(3.55, -.45, 0);
-const radarOrigin = new Vector3(3.05, 0, 0);
+const radarOrigin = new Vector3(CROSS_X, MAIN_Y, 0);
 /** the no-offer zone: a circle on the mat (radius in table units) around the first customer and the house next to it */
 const zone = { x: (originalHome.x + nextDoor.x) / 2, y: (originalHome.y + nextDoor.y) / 2, r: .74 };
 
@@ -177,11 +184,10 @@ export function createRescueScene(parent: Group, bagModel: Group, invalidate: ()
   for (const bag of [farBag, offerBag, mealBag]) { bag.visible = false; map.add(bag); }
 
   const curve = (points: number[][], z: number) => new CatmullRomCurve3(points.map(([x, y]) => new Vector3(x, y, z)));
-  const firstLeg = curve([[2.05,-.04],[2.4,-.065],[2.8,-.03],[3.05,0]], .017);
-  const cancelledLeg = curve([[3.05,0],[3.6,-.01],[4.1,.05],[4.6,.10]], .017);
-  const secondLeg = curve([[3.05,0],[3.0,-.2],[2.98,-.42],[3.0,-.63]], .023);
-  const roadMaterial = new MeshBasicMaterial({ color: '#70aee1', transparent: true, opacity: .34, depthWrite: false });
-  disposables.push(roadMaterial);
+  // the rider's three legs, each straight along a street
+  const firstLeg = curve([[2.05,MAIN_Y],[2.4,MAIN_Y],[2.8,MAIN_Y],[CROSS_X,MAIN_Y]], .017);
+  const cancelledLeg = curve([[CROSS_X,MAIN_Y],[3.6,MAIN_Y],[4.1,MAIN_Y],[4.6,MAIN_Y]], .017);
+  const secondLeg = curve([[CROSS_X,MAIN_Y],[CROSS_X,-.24],[CROSS_X,-.44],[CROSS_X,LOWER_Y]], .023);
   const tube = (route: CatmullRomCurve3, radius: number, material: MeshBasicMaterial) => {
     const geometry = new TubeGeometry(route, 72, radius, 8, false);
     disposables.push(geometry);
@@ -189,13 +195,56 @@ export function createRescueScene(parent: Group, bagModel: Group, invalidate: ()
     map.add(mesh);
     return mesh;
   };
-  [
-    [[1.4,-.04],[2.05,-.04],[2.4,-.065],[2.8,-.03],[3.05,0],[3.6,-.01],[4.1,.05],[4.6,.10],[5.0,.14]],
-    [[2.4,-.065],[2.37,-.3],[2.35,-.62],[2.33,-.74]],
-    [[3.6,-.01],[3.8,.1],[3.95,.2]],
-    [[3.05,0],[3.0,-.2],[2.98,-.42],[3.0,-.63],[3.6,-.64],[4.1,-.63],[4.95,-.58]],
-    [[4.6,.10],[4.52,-.15],[4.62,-.42],[4.4,-.62]],
-  ].forEach(points => tube(curve(points, .006), .034, roadMaterial));
+  // The streets are painted on one flat sheet lying on the mat, outside the map's stretch: painted once for the wide
+  // layout and once for the tall one, so a street is the same width whichever way it runs and crossings are drawn once.
+  const streetSheet = (() => {
+    const material = new MeshBasicMaterial({ transparent: true, opacity: .5, depthWrite: false });
+    const geometry = new PlaneGeometry(1, 1);
+    const mesh = new Mesh(geometry, material);
+    mesh.renderOrder = -1; // under the routes, rings, shadows and paper
+    root.add(mesh);
+    const paint = (lay: (typeof LAYOUT)[keyof typeof LAYOUT]) => {
+      const b = lay.bounds, ppu = 420; // canvas px per table unit
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round((b.x1 - b.x0) * ppu); canvas.height = Math.round((b.y1 - b.y0) * ppu);
+      const g = canvas.getContext('2d')!;
+      const X = (x: number) => (x - b.x0) * ppu, Y = (y: number) => (b.y1 - (lay.p + lay.s * y)) * ppu;
+      const lines = (segments: number[][]) => { g.beginPath(); for (const [x0, y0, x1, y1] of segments) { g.moveTo(X(x0), Y(y0)); g.lineTo(X(x1), Y(y1)); } g.stroke(); };
+      const grid = [
+        [b.x0 - .2, MAIN_Y, b.x1 + .2, MAIN_Y], [WEST_X, LOWER_Y, b.x1 + .2, LOWER_Y],
+        [WEST_X, MAIN_Y, WEST_X, LOWER_Y], [CROSS_X, MAIN_Y, CROSS_X, LOWER_Y], [EAST_X, MAIN_Y, EAST_X, LOWER_Y],
+      ];
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      // the roadway: one pale band (every street in one stroke, so crossings are not painted twice)
+      g.strokeStyle = 'rgba(206,226,255,.62)'; g.lineWidth = STREET_WIDTH * ppu; lines(grid);
+      // the path from Main to the door of the house that is set back from it
+      g.lineWidth = STREET_WIDTH * .55 * ppu; lines([[nextDoor.x, MAIN_Y, nextDoor.x, nextDoor.y - .16]]);
+      // a dashed centre line, as on a street map
+      g.strokeStyle = 'rgba(255,255,255,.95)'; g.lineWidth = .011 * ppu; g.lineCap = 'butt'; g.setLineDash([.06 * ppu, .055 * ppu]); lines(grid);
+      g.setLineDash([]);
+      // the streets run on out of the map: they fade at its left and right edges
+      g.globalCompositeOperation = 'destination-in';
+      const fade = g.createLinearGradient(0, 0, canvas.width, 0);
+      fade.addColorStop(0, 'rgba(0,0,0,0)'); fade.addColorStop(.07, 'rgba(0,0,0,1)'); fade.addColorStop(.93, 'rgba(0,0,0,1)'); fade.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = fade; g.fillRect(0, 0, canvas.width, canvas.height);
+      return { tex: texture(canvas), b };
+    };
+    let variants: ReturnType<typeof paint>[] | null = null;
+    let showing = -1;
+    disposables.push(material, geometry, { dispose: () => variants?.forEach(v => v.tex.dispose()) });
+    return {
+      use(narrow: boolean) {
+        variants ??= [paint(LAYOUT.wide), paint(LAYOUT.narrow)];
+        const i = narrow ? 1 : 0;
+        if (i === showing) return;
+        showing = i;
+        const { tex, b } = variants[i];
+        material.map = tex; material.needsUpdate = true;
+        mesh.scale.set(b.x1 - b.x0, b.y1 - b.y0, 1);
+        mesh.position.set((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, .004);
+      },
+    };
+  })();
   const routeGlow = (path: CatmullRomCurve3, color: string) => {
     const core = new MeshBasicMaterial({ color, transparent: true, depthWrite: false });
     const halo = new MeshBasicMaterial({ color, transparent: true, depthWrite: false });
@@ -634,6 +683,7 @@ export function createRescueScene(parent: Group, bagModel: Group, invalidate: ()
 
     // ---- numbered pins and paper tags (outside the stretch) ----
     for (const piece of pieces) piece.use(narrow);
+    streetSheet.use(narrow);
     const kT = lay.k, rPin = PIN / 2 * kT;
     pins.forEach((pin, i) => {
       const at = journeySteps[i].at;

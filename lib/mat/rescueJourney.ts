@@ -26,7 +26,10 @@ export interface JourneyStep {
   title: string;
   /** what happens */
   line: string;
-  /** the number or the product rule behind this event (null when the event needs none) */
+  /**
+   * The figure or the one product rule behind this event (null when the event needs none). A rule starts with "Rule:".
+   * Adi, 2026-11-17: "everything does not need to be ruled". Only the no-offer rule is a rule; it is shown in yellow.
+   */
   why: string | null;
   /** short label for the paper tag on the map, at the place the event happens */
   tag: string;
@@ -59,11 +62,11 @@ export const journeySteps: readonly JourneyStep[] = [
     tag: 'Offered nearby', tone: 'go', source: ['deck', 'fromHim', 'example'] }),
   step({ n: '05', at: 10.6, clock: '8:16 pm', title: 'A neighbour claims it',
     line: 'A ₹322 meal for ₹175, freshly made and sealed.',
-    why: 'Rule: the offer stays open for a few minutes only.',
+    why: null,
     tag: 'Claimed', tone: 'go', source: ['app', 'example'] }),
   step({ n: '06', at: 13.0, clock: '8:17 pm', title: 'Rider is rerouted',
-    line: 'A short detour to the new address.',
-    why: 'Rule: the rider is paid in full for the detour.',
+    line: 'A short detour to the new address. The rider is paid in full for it.',
+    why: null,
     tag: 'New address', tone: 'pay', source: ['deck', 'example'] }),
   step({ n: '07', at: 15.4, clock: '8:24 pm', title: 'Meal delivered',
     line: 'Eaten a few streets away, not thrown away.',
@@ -96,8 +99,12 @@ export const gains = [
 
 /** The result, at the foot of the board. */
 export const result = {
+  /** printed before the figure (Adi: "we should say that this led to") */
+  lead: 'This led to',
   figure: '~50%',
   caption: 'less food waste across India',
+  /** heading over the three gains (Adi: "the value proposition for buyer, restaurants right here") */
+  gainsTitle: 'The value for each side',
   press: 'Covered by Times of India, NDTV and Verdict Foodservice',
   source: ['resume', 'deck'],
 } as const;
@@ -119,19 +126,23 @@ export const neighbours = [
 ] as const;
 
 /**
- * Adi's part. Reworded from data/timeline.ts on his live site; Adi confirmed these three lines on 2026-11-17
- * ("my part is right"). While `confirmed` is false the sheet prints a small "Draft" mark; it is true, so no mark.
+ * Adi's part, in his words (chat, 2026-11-17): "I ran experiments and did A/B testing and did analytics to understand the
+ * customer preference and ... discount elasticity of this entire thing. Changing the MQTT times and the radius and adding
+ * in new rules, understanding fraud and all of that. My part is bigger than you think." MQTT is the messaging that sends
+ * the offer out to phones nearby; it is named once, in brackets. The second line is from his live site and he confirmed
+ * it the same day. While `confirmed` is false the sheet prints a small "Draft" mark; it is true, so no mark.
  */
 export const myPart = {
   title: 'My part',
   role: 'Lead Product Analyst, Zomato',
   confirmed: true,
   lines: [
-    'Worked out what discount to show, to whom, and for how long.',
-    'Ran experiments across cuisines, customer groups and times of day to see how price changed buying.',
-    'Helped set which cancelled orders qualify for rescue.',
+    "Ran experiments and A/B tests to learn what customers prefer and how the discount's size changes buying (discount elasticity).",
+    'Did the analytics behind what discount to show, to whom, and for how long.',
+    'Tuned how the offer is broadcast (over MQTT): the wait between waves and the radius it reaches.',
+    'Added new rules and studied fraud, so a cancelled order could not be turned into a discount.',
   ],
-  source: ['site'],
+  source: ['fromHim', 'site'],
 } as const;
 
 export const [, PICKUP, CANCELLED, OFFERS, ACCEPTED, REROUTED, DELIVERED] = journeySteps.map(({ at }) => at);

@@ -18,8 +18,8 @@ export const WIDE = {
   /** the map */
   MAP: { x0: 1.35, x1: 5.05, y0: -.88, y1: 1.45 } as Rect,
   /** the strip of mat under the map: the real app-screen print (left) and the "My part" sheet (right) */
-  PRINT: { x0: 1.4, x1: 2.7, y0: -2.12, y1: -1.07 } as Rect,
-  PART: { x0: 2.85, x1: 5.05, y0: -2.12, y1: -1.07 } as Rect,
+  PRINT: { x0: 1.4, x1: 2.42, y0: -2.12, y1: -1.07 } as Rect,
+  PART: { x0: 2.55, x1: 5.05, y0: -2.12, y1: -1.07 } as Rect,
   /** the order-log board: a paper sheet, 1100 x 2000 px, lying on the mat */
   BOARD: { x0: 5.25, x1: 7.15, y0: -1.97, y1: 1.485 } as Rect,
 } as const;
@@ -33,4 +33,4 @@ export const NARROW = {
 } as const;
 
 /** Board picture sizes in px (rescueBoard.ts draws these; rescueDesk.ts puts them on the sheets). */
-export const BOARD_PX = { wide: { w: 1100, h: 2000 }, narrow: { w: 1170, h: 1440 }, part: { w: 1500, h: 543 } } as const;
+export const BOARD_PX = { wide: { w: 1100, h: 2000 }, narrow: { w: 1170, h: 1440 }, part: { w: 1500, h: 630 } } as const;

@@ -38,6 +38,9 @@ const NOTE = 'rgba(35,26,26,0.55)';
 const RULE = 'rgba(35,26,26,0.14)';
 const GROUND = '#fffdfa';
 const TONE: Record<Tone, string> = { go: '#1f8a4c', stop: RED, pay: '#b97a10' };
+const RULE_BAR = '#e0a100';
+const RULE_TINT = 'rgba(245,190,20,0.18)';
+const isRule = (why: string | null) => !!why && why.startsWith('Rule:');
 const TONE_TINT: Record<Tone, string> = { go: 'rgba(31,138,76,0.09)', stop: 'rgba(226,55,68,0.09)', pay: 'rgba(185,122,16,0.11)' };
 const BRICO = `'FB Bricolage', 'FB Geist', system-ui, sans-serif`;
 const SANS = `'FB Geist', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif`;
@@ -153,7 +156,10 @@ interface WideRow { y: number; h: number; cy: number; lineLines: Run[][]; whyLin
 interface WideLayout {
   rows: WideRow[];
   rule1: number;
-  result: { y: number; figY: number; figPx: number; capX: number; capLines: Run[][]; capPx: number; capY: number; gainRows: { y: number; lines: Run[][] }[]; whoW: number; pressY: number; pressLines: Run[][] };
+  result: {
+    y: number; leadY: number; figY: number; figPx: number; capX: number; capLines: Run[][]; capPx: number; capY: number;
+    titleY: number; titleRuleY: number; gainRows: { y: number; lines: Run[][] }[]; whoW: number; pressY: number; pressLines: Run[][];
+  };
 }
 
 function layoutWide(g: G): WideLayout {
@@ -165,7 +171,7 @@ function layoutWide(g: G): WideLayout {
   const capX = PADX + figW + 34;
   const capPx = 40;
   const capLines = wrapNice(g, plain(result.caption), capPx, WW - PADX - capX);
-  const figH = 112;
+  const figH = 108;
   font(g, 800, 36, SANS);
   const whoW = Math.max(...gains.map((x) => g.measureText(x.who).width)) + 28;
   const gainRows: { y: number; lines: Run[][] }[] = [];
@@ -179,50 +185,45 @@ function layoutWide(g: G): WideLayout {
   const pressPx = 32;
   const pressLines = wrapNice(g, plain(result.press), pressPx, resultInner);
   const pressH = pressLines.length * 40;
-  const resultH = 30 + figH + 24 + gainsH + 18 + pressH + 38;
+  const LEAD_H = 44, TITLE_H = 46;
+  const resultH = 26 + LEAD_H + figH + 24 + TITLE_H + 16 + gainsH + 18 + pressH + 34;
   const resultY = WH - resultH;
 
-  // ----- log rows -----
+  // ----- log rows: the biggest gap that fits, never a hole -----
   const top = 290;
-  const logBottom = resultY - 30;
-  const trials: { whyPx: number; pad: number; gap: number }[] = [];
-  for (const whyPx of [36, 34]) for (const pad of [16, 12]) for (const gap of [26, 20, 14, 10]) trials.push({ whyPx, pad, gap });
-  let chosen: { rows: WideRow[]; end: number } | null = null;
-  for (let ti = 0; ti < trials.length + 1; ti++) {
-    const t = trials[Math.min(ti, trials.length - 1)];
+  const logBottom = resultY - 52;
+  const lineW = TEXT_R - TEXT_X;
+  const whyW = lineW - 8 - 20 - 20;
+  const build = (whyPx: number, pad: number, gap: number) => {
     const rows: WideRow[] = []; let y = top;
-    const lineW = TEXT_R - TEXT_X;
-    const whyW = lineW - 8 - 20 - 20;
     for (const s of journeySteps) {
       const lineLines = wrapNice(g, plain(s.line), LINE_PX, lineW);
       const lineY = y + HEAD_H + 6;
       let h = HEAD_H + 6 + lineLines.length * LINE_LH;
       let whyLines: Run[][] | null = null; let whyH = 0; let whyY = 0;
       if (s.why) {
-        whyLines = wrapNice(g, whyWords(s.why), t.whyPx, whyW);
-        const lh = Math.round(t.whyPx * 1.22);
-        whyH = t.pad * 2 + whyLines.length * lh;
-        whyY = y + h + 10; h += 10 + whyH;
+        whyLines = wrapNice(g, whyWords(s.why), whyPx, whyW);
+        const lh = Math.round(whyPx * 1.22);
+        whyH = pad * 2 + whyLines.length * lh;
+        whyY = y + h + 12; h += 12 + whyH;
       }
-      rows.push({ y, h, cy: y + HEAD_H / 2, lineLines, whyLines, whyPx: t.whyPx, whyH, lineY, whyY });
-      y += h + t.gap;
+      rows.push({ y, h, cy: y + HEAD_H / 2, lineLines, whyLines, whyPx, whyH, lineY, whyY });
+      y += h + gap;
     }
-    const end = y - t.gap;
-    chosen = { rows, end };
-    if (end <= logBottom) break;
-  }
-  const rows = chosen!.rows;
-  // spread leftover room into the gaps (never more than 18 px extra each)
-  const slack = logBottom - chosen!.end;
-  if (slack > 0) {
-    const extra = Math.min(18, Math.floor(slack / (rows.length - 1)));
-    rows.forEach((r, i) => { const dy = extra * i; r.y += dy; r.cy += dy; r.lineY += dy; r.whyY += dy; });
-  }
+    return { rows, end: y - gap };
+  };
+  let chosen = build(36, 16, 20);
+  const sumH = chosen.rows.reduce((t, r) => t + r.h, 0);
+  const gapFit = Math.floor((logBottom - top - sumH) / (journeySteps.length - 1));
+  if (gapFit < 20) chosen = build(34, 12, Math.max(10, gapFit)); else chosen = build(36, 16, Math.min(52, gapFit));
+  const rows = chosen.rows;
+  const R0 = resultY + 26;
   const res = {
-    y: resultY, figY: resultY + 30 + figH, figPx, capX, capLines, capPx,
-    capY: resultY + 30 + (figH - capLines.length * capPx * 1.15) / 2 + 2,
-    gainRows: gainRows.map((r) => ({ y: resultY + 30 + figH + 24 + r.y, lines: r.lines })), whoW,
-    pressY: resultY + 30 + figH + 24 + gainsH + 18, pressLines,
+    y: resultY, leadY: R0 + 30, figY: R0 + LEAD_H + figH, figPx, capX, capLines, capPx,
+    capY: R0 + LEAD_H + (figH - capLines.length * capPx * 1.15) / 2 + 2,
+    titleY: R0 + LEAD_H + figH + 24 + 32, titleRuleY: R0 + LEAD_H + figH + 24 + TITLE_H,
+    gainRows: gainRows.map((r) => ({ y: R0 + LEAD_H + figH + 24 + TITLE_H + 16 + r.y, lines: r.lines })), whoW,
+    pressY: R0 + LEAD_H + figH + 24 + TITLE_H + 16 + gainsH + 18, pressLines,
   };
   return { rows, rule1: 262, result: res };
 }
@@ -303,9 +304,9 @@ function drawWide(g: G, st: BoardState, L: WideLayout, resultAlpha: number) {
     drawRuns(g, r.lineLines, LINE_PX, TEXT_X, r.lineY + dy, LINE_LH, BODY);
     if (r.whyLines) {
       const bx = TEXT_X, bw = TEXT_R - TEXT_X, by = r.whyY + dy;
-      roundRect(g, bx, by, bw, r.whyH, 14); g.fillStyle = TONE_TINT[s.tone]; g.fill();
+      roundRect(g, bx, by, bw, r.whyH, 14); g.fillStyle = isRule(s.why) ? RULE_TINT : TONE_TINT[s.tone]; g.fill();
       g.save(); roundRect(g, bx, by, bw, r.whyH, 14); g.clip();
-      g.fillStyle = tone; g.fillRect(bx, by, 8, r.whyH); g.restore();
+      g.fillStyle = isRule(s.why) ? RULE_BAR : tone; g.fillRect(bx, by, 8, r.whyH); g.restore();
       const lh = Math.round(r.whyPx * 1.22);
       const pad = (r.whyH - r.whyLines.length * lh) / 2;
       drawRuns(g, r.whyLines, r.whyPx, bx + 8 + 20, by + pad, lh, INK);
@@ -319,8 +320,11 @@ function drawWide(g: G, st: BoardState, L: WideLayout, resultAlpha: number) {
   if (resultAlpha > 0) {
     const dy = (1 - resultAlpha) * SLIDE;
     g.globalAlpha = resultAlpha;
+    fillTextAt(g, result.lead, PADX, R.leadY + dy, 400, 34, SANS, NOTE);
     fillTextAt(g, result.figure, PADX, R.figY + dy, 800, R.figPx, BRICO, RED);
     drawRuns(g, R.capLines, R.capPx, R.capX, R.capY + dy, Math.round(R.capPx * 1.15), INK);
+    fillTextAt(g, result.gainsTitle, PADX, R.titleY + dy, 800, 36, SANS, INK);
+    g.fillStyle = RULE; g.fillRect(PADX, R.titleRuleY + dy + 6, WW - PADX * 2, 2);
     gains.forEach((gn, i) => {
       const row = R.gainRows[i];
       fillTextAt(g, gn.who, PADX, row.y + dy + 36 * 0.82 + 2, 800, 36, SANS, INK);
@@ -417,8 +421,8 @@ function drawNarrow(g: G, st: BoardState, art: BoardArt, resultAlpha: number, hi
     if (s.why) {
       const wl = wrapNice(g, whyWords(s.why), 42, W - 8 - 24 - 24);
       const lh = 56, pad = 24, bh = pad * 2 + wl.length * lh;
-      roundRect(g, NPAD, y + dy, W, bh, 18); g.fillStyle = TONE_TINT[s.tone]; g.fill();
-      g.save(); roundRect(g, NPAD, y + dy, W, bh, 18); g.clip(); g.fillStyle = tone; g.fillRect(NPAD, y + dy, 10, bh); g.restore();
+      roundRect(g, NPAD, y + dy, W, bh, 18); g.fillStyle = isRule(s.why) ? RULE_TINT : TONE_TINT[s.tone]; g.fill();
+      g.save(); roundRect(g, NPAD, y + dy, W, bh, 18); g.clip(); g.fillStyle = isRule(s.why) ? RULE_BAR : tone; g.fillRect(NPAD, y + dy, 10, bh); g.restore();
       drawRuns(g, wl, 42, NPAD + 10 + 24, y + dy + pad, lh, INK);
       y += bh + 28;
     }
@@ -470,49 +474,55 @@ function drawNarrow(g: G, st: BoardState, art: BoardArt, resultAlpha: number, hi
     g.globalAlpha = resultAlpha;
     const dy = (1 - resultAlpha) * SLIDE;
     let y = AREA_Y + 4 + dy;
-    // result
-    const figPx = 132;
+    // result: "This led to", the figure and caption
+    const LH = 46, PX = 39;
+    fillTextAt(g, result.lead, NPAD, y + PX * 0.82, 400, PX, SANS, NOTE);
+    y += 46;
+    const figPx = 124;
     font(g, 800, figPx, BRICO);
     const figW = g.measureText(result.figure).width;
     fillTextAt(g, result.figure, NPAD, y + figPx * 0.82, 800, figPx, BRICO, RED);
     const capX = NPAD + figW + 36;
     const cl = wrapNice(g, plain(result.caption), 44, NW - NPAD - capX);
-    const ch = cl.length * 56;
-    drawRuns(g, cl, 44, capX, y + (figPx * 0.95 - ch) / 2 + 4, 56, INK);
-    y += figPx * 0.95 + 26;
-    // gains (short form: the long text does not fit beside the other two blocks at 39 px or more)
-    font(g, 800, 42, SANS);
+    const ch = cl.length * 54;
+    drawRuns(g, cl, 44, capX, y + (figPx * 0.95 - ch) / 2 + 4, 54, INK);
+    y += figPx * 0.95 + 14;
+    // what each side gets (short form: the long text does not fit beside "My part" at 39 px or more)
+    fillTextAt(g, result.gainsTitle, NPAD, y + PX * 0.82, 800, PX, SANS, INK);
+    y += 54;
+    font(g, 800, PX, SANS);
     const whoW = Math.max(...gains.map((x) => g.measureText(x.who).width)) + 26;
     for (const gn of gains) {
-      fillTextAt(g, gn.who, NPAD, y + 42 * 0.82, 800, 42, SANS, INK);
-      const l = wrapNice(g, plain(gn.short), 42, W - whoW);
-      drawRuns(g, l, 42, NPAD + whoW, y, 54, BODY);
-      y += l.length * 54 + 8;
+      fillTextAt(g, gn.who, NPAD, y + PX * 0.82, 800, PX, SANS, INK);
+      const l = wrapNice(g, plain(gn.short), PX, W - whoW);
+      drawRuns(g, l, PX, NPAD + whoW, y, LH, BODY);
+      y += l.length * LH + 4;
     }
-    y += 14;
-    // My part
-    g.fillStyle = RULE; g.fillRect(NPAD, y, W, 3); y += 28;
-    fillTextAt(g, myPart.title, NPAD, y + 60, 800, 70, BRICO, INK);
+    y += 10;
+    // My part: title and role on one line, then the lines
+    g.fillStyle = RULE; g.fillRect(NPAD, y, W, 3); y += 16;
+    fillTextAt(g, myPart.title, NPAD, y + 56, 800, 64, BRICO, INK);
     if (!myPart.confirmed) {
       font(g, 800, 39, SANS);
       const dw = g.measureText('Draft').width + 44;
       const dx = NW - NPAD - dw;
-      roundRect(g, dx, y + 10, dw, 62, 31); g.fillStyle = 'rgba(185,122,16,0.12)'; g.fill();
+      roundRect(g, dx, y + 4, dw, 62, 31); g.fillStyle = 'rgba(185,122,16,0.12)'; g.fill();
       g.strokeStyle = 'rgba(185,122,16,0.7)'; g.lineWidth = 3; g.stroke();
-      fillTextAt(g, 'Draft', dx + dw / 2, y + 10 + 43, 800, 39, SANS, '#8a5a08', 'center');
+      fillTextAt(g, 'Draft', dx + dw / 2, y + 4 + 43, 800, 39, SANS, '#8a5a08', 'center');
     }
-    y += 82;
-    fillTextAt(g, myPart.role, NPAD, y + 42 * 0.82, 400, 42, SANS, NOTE);
-    y += 60;
+    font(g, 400, 39, SANS);
+    fillTextAt(g, myPart.role, NW - NPAD - (myPart.confirmed ? 0 : 160), y + 52, 400, 39, SANS, NOTE, 'right');
+    y += 76;
     for (const ln of myPart.lines) {
-      const l = wrapNice(g, plain(ln), 40, W - 44);
-      g.fillStyle = RED; g.beginPath(); g.arc(NPAD + 10, y + 27, 8, 0, Math.PI * 2); g.fill();
-      drawRuns(g, l, 40, NPAD + 44, y, 50, BODY);
-      y += l.length * 50 + 10;
+      const l = wrapNice(g, plain(ln), PX, W - 40);
+      g.fillStyle = RED; g.beginPath(); g.arc(NPAD + 9, y + 26, 7, 0, Math.PI * 2); g.fill();
+      drawRuns(g, l, PX, NPAD + 40, y, LH, BODY);
+      y += l.length * LH + 8;
     }
+    // the press line goes last, and only when it still fits above the bottom margin
     if (result.press) {
       const pl = wrapNice(g, plain(result.press), 39, W);
-      y += 8; drawRuns(g, pl, 39, NPAD, y, 48, NOTE); y += pl.length * 48;
+      if (y + 6 + pl.length * 46 <= NH - 56) { y += 6; drawRuns(g, pl, 39, NPAD, y, 46, NOTE); y += pl.length * 46; }
     }
     g.globalAlpha = 1;
     narrowEnd = y;
@@ -590,35 +600,37 @@ export function createPartSheet(): RescueSheet {
       if (painted === key) return false; painted = key;
       paintPaper(g, w, h);
       g.save(); roundRect(g, 0, 0, w, h, RADIUS); g.clip();
-      const PX = 72;
+      const PX = 62;
       // top line: title left, role right (quiet)
-      fillTextAt(g, myPart.title, PX, 130, 800, 84, BRICO, INK);
+      fillTextAt(g, myPart.title, PX, 128, 800, 88, BRICO, INK);
       let titleRight = w - PX;
       if (!myPart.confirmed) {
         font(g, 800, 34, SANS);
         const dw = g.measureText('Draft').width + 48, dh = 56;
-        const dx = w - PX - dw, dy = 76;
+        const dx = w - PX - dw, dy = 74;
         roundRect(g, dx, dy, dw, dh, dh / 2); g.fillStyle = 'rgba(185,122,16,0.12)'; g.fill();
         g.strokeStyle = 'rgba(185,122,16,0.7)'; g.lineWidth = 3; g.stroke();
         fillTextAt(g, 'Draft', dx + dw / 2, dy + 39, 800, 34, SANS, '#8a5a08', 'center');
         titleRight = dx - 30;
       }
       const rpx = fitOne(g, myPart.role, 400, SANS, titleRight - (PX + 480), 42, 36);
-      fillTextAt(g, myPart.role, titleRight, 128, 400, rpx, SANS, NOTE, 'right');
-      g.fillStyle = RULE; g.fillRect(PX, 164, w - PX * 2, 3);
+      fillTextAt(g, myPart.role, titleRight, 124, 400, rpx, SANS, NOTE, 'right');
+      g.fillStyle = RULE; g.fillRect(PX, 150, w - PX * 2, 3);
       // the three lines across the full width, as large as they fit
-      const top = 190, bottom = h - 52, lw = w - PX * 2 - 70;
-      let px = 50, blocks: Run[][][] = [], lh = 0, gap = 0, total = 0;
-      for (; px >= 44; px -= 2) {
-        blocks = myPart.lines.map((l) => wrapNice(g, plain(l), px, lw));
-        lh = Math.round(px * 1.2); gap = 18;
-        total = blocks.reduce((t, b) => t + b.length * lh, 0) + gap * (blocks.length - 1);
-        if (total <= bottom - top) break;
+      const top = 172, bottom = h - 36, lw = w - PX * 2 - 58;
+      let px = 44, blocks: Run[][][] = [], lh = 0, gap = 0, total = 0, fitted = false;
+      search: for (const k of [1.2, 1.14, 1.1, 1.06]) for (let t = 50; t >= 44; t -= 2) {
+        const bl = myPart.lines.map((l) => wrapNice(g, plain(l), t, lw));
+        const l2 = Math.round(t * k), g2 = k >= 1.2 ? 16 : 10;
+        const tot = bl.reduce((s2, b2) => s2 + b2.length * l2, 0) + g2 * (bl.length - 1);
+        px = t; blocks = bl; lh = l2; gap = g2; total = tot;
+        if (tot <= bottom - top) { fitted = true; break search; }
       }
+      void fitted;
       let y = top + (bottom - top - total) / 2;
       blocks.forEach((b, i) => {
         fillTextAt(g, String(i + 1), PX, y + px * 0.82 + 1, 800, px, BRICO, RED);
-        drawRuns(g, b, px, PX + 70, y, lh, INK);
+        drawRuns(g, b, px, PX + 58, y, lh, INK);
         y += b.length * lh + gap;
       });
       partPx = px;
