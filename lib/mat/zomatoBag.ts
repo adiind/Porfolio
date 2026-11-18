@@ -20,6 +20,9 @@ import {
   TEXT, BIND, RIDER_RED, board, clipping, fabric, insidePrint, kraftPaper, label, linerWith, paperBagFront, photoPrint, receipt, rescueSheets, riderFlap, riderFront, riderLidTop, riderPlain, riderRim, riderStrap, roundCorners, type ClipRegion, type ProjectId,
 } from './zomatoBagArt';
 import { whenQuiet } from '../flipbook/quiet';
+import { createRescueScene } from './rescueScene';
+import { createRescueDesk } from './rescueDesk';
+import { NARROW, NARROW_BELOW_ASPECT, WIDE } from './rescueLayout';
 
 /** The bag's own pictures (public/images/mat/zomato), and Food Rescue's paper bag and offer (shared with the old card). */
 const BAG_PICTURES = [
@@ -181,6 +184,12 @@ export interface BagLayer extends MatLayer {
   itemView(id: ItemId | null, open?: number, zoom?: number, pitch?: number): void;
   readonly opened: ItemId | null;
   readonly state: string;
+  /** The Food Rescue journey (time, seek), once the bag's things are built: for the page's keys and clicks on the order log. */
+  readonly rescue: ReturnType<typeof createRescueScene> | null;
+  /** Food Rescue: which event's row of the order log is under a point of the window, or null (only while Food Rescue is open). */
+  rescueStepAt(x: number, y: number, rect: DOMRect): number | null;
+  /** Debug: the screen boxes (CSS px from the canvas corner) of the log board, the print, "My part" and the map for the current layout. */
+  rescueRects(rect: DOMRect): Record<'board' | 'print' | 'part' | 'map', { x0: number; y0: number; x1: number; y1: number }>;
   /** What lies under a point of the window (CSS px from the canvas corner), when the bag is open. */
   hit(x: number, y: number, rect: DOMRect): ItemId | 'bag' | null;
   /** The link under a point when the press clipping is open (its headline's address), else null. */
@@ -210,6 +219,11 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
   // the scene's state
   let state: 'rest' | 'in' | 'open' | 'packing' | 'out' = 'rest';
   let clock = 0;
+  // Food Rescue (lib/mat/rescueScene.ts the 3D map, rescueDesk.ts the paper beside it): built with the bag's other things
+  let rescueScene: ReturnType<typeof createRescueScene> | null = null;
+  let rescueDesk: ReturnType<typeof createRescueDesk> | null = null;
+  let stageBook: Object3D | null = null;
+  let rescueAspect = 0;
   let follow = 0;           // 0 the engine's camera, 1 this layer's
   let hidePoster = 0;
   let opened: ItemId | null = null;
@@ -558,6 +572,12 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
         upright.position.set(0, baseDepth / 2, -Yw(bottomY));
         upright.add(body, pivot);
         const angledBag = new Group(); angledBag.rotation.z = -10 * Math.PI / 180; angledBag.add(upright); root.add(angledBag);
+        // Food Rescue's own view: one cancelled order on a small 3D map, with its order log on paper beside it
+        if (ctx) {
+          const live = ctx;
+          rescueScene = createRescueScene(group, angledBag, () => live.invalidate(), opts.reduced);
+          rescueDesk = createRescueDesk(group, rescueArt, live, opts.reduced);
+        }
         // the story sheets lie inside the bag until it opens, then slide out from under the folded top onto the mat beside it
         const sheets = rescueSheets(rescueArt.offer, mark);
         const at: Array<[number, number]> = [[0.76, 0.3], [1.8, 0.17], [2.84, 0.3], [0.76, -0.54], [1.55, -0.54]]; // (x, y) of each sheet's middle, in the bag's frame
@@ -657,7 +677,12 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
   const aimCamera = (camera: PerspectiveCamera, dur: number) => {
     camFrom.pos.copy(camNow.valid ? camNow.pos : camera.position); camFrom.quat.copy(camNow.valid ? camNow.quat : camera.quaternion);
     const it = opened ? items.find((i) => i.id === opened) : null;
-    if (it) { const [x, y, w, h] = itemFrame(it); frame(camera, x, y, w, h, 0.22, camTo); } else frame(camera, OVERVIEW.x, OVERVIEW.y, OVERVIEW.w, OVERVIEW.h, OVERVIEW.pitch, camTo);
+    if (it?.id === 'rescue') {
+      // (the map and its paper, laid out for a wide window or a tall one: rescueLayout.ts)
+      const { FRAME: f } = camera.aspect < NARROW_BELOW_ASPECT ? NARROW : WIDE;
+      frame(camera, f.cx, f.cy, f.w, f.h, f.pitch, camTo);
+      rescueAspect = camera.aspect;
+    } else if (it) { const [x, y, w, h] = itemFrame(it); frame(camera, x, y, w, h, 0.22, camTo); } else frame(camera, OVERVIEW.x, OVERVIEW.y, OVERVIEW.w, OVERVIEW.h, OVERVIEW.pitch, camTo);
     camT = 0; camDur = dur;
   };
   let wantAim = false; let aimDur = 0.8;
@@ -706,7 +731,7 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       it.lid.pivot.rotation.x = it.lid.openAngle * easeIO(it.open / 0.5);
       it.cards.forEach((cd, i) => {
         const s = easeIO((it.open - 0.25 - 0.07 * i) / 0.4);
-        cd.g.visible = s > 0.002;
+        cd.g.visible = s > 0.002 && it.id !== 'rescue'; // (Food Rescue opens onto its map, not its old sheets)
         // inside the bag, out through its far end, then across the mat to its place beside it
         const start = new Vector3(0, 0, mouthY - 0.14); const mid = new Vector3(0, 0, mouthY + 0.12);
         if (s < 0.4) {
@@ -790,9 +815,24 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       bag.position.z = 0; bagLid.rotation.x = 0; setZip(0);
       items.forEach((it) => { it.root.visible = false; });
     } else if (state === 'open') {
-      items.forEach((it) => { placeItem(it, 1, 0); it.root.visible = true; if (it.fold) it.fold.rotation.x = 0; });
+      items.forEach((it) => { placeItem(it, 1, 0); it.root.visible = opened !== 'rescue' || it.id === 'rescue'; if (it.fold) it.fold.rotation.x = 0; });
     }
     items.forEach((it) => { if (updateLid) updateLid(it, dt); if (Math.abs(it.open - it.openTarget) > 1e-4) moving = true; });
+
+    // Food Rescue: its clock runs here; the paper follows the same clock
+    const tall = camera.aspect < NARROW_BELOW_ASPECT;
+    if (rescueScene?.update(dt, tall)) moving = true;
+    if (rescueScene && rescueDesk?.update(rescueScene.time, tall)) moving = true;
+    if (state === 'open' && opened === 'rescue') {
+      // (the engine re-places its closed book at the top of every frame, and reads the book's place for its shadow after
+      // the layers have run: moving it here takes the book and its shadow out of this view for this frame only. On tall
+      // windows its corner would otherwise show under the order log.)
+      // (the book is the engine's group whose sheets carry the page shader's uCastAmt)
+      if (!stageBook) stageBook = ctx.scene.children.find((o) => o !== group && o instanceof Group && o.children.some((leaf) => !!((leaf as Mesh).material as ShaderMaterial | undefined)?.uniforms?.uCastAmt)) ?? null;
+      if (stageBook) stageBook.position.x += 500;
+      // (the window changed shape: frame the view again for it)
+      if (Math.abs(camera.aspect - rescueAspect) > 1e-3) { wantAim = true; aimDur = 0.01; }
+    }
 
     // fade (the bag shows as it comes in)
     // the bag itself is never faded: it is there (opaque) or not drawn at all; only its shadow on the mat eases in and out
@@ -886,12 +926,13 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
   return {
     attach,
     update: (dt, camera) => update(dt, camera),
-    dispose() { if (ctx) ctx.scene.remove(group); disposables.forEach((d) => d.dispose()); ctx = null; },
+    dispose() { rescueDesk?.dispose(); rescueScene?.dispose(); if (ctx) ctx.scene.remove(group); disposables.forEach((d) => d.dispose()); ctx = null; },
     ready,
     itemView(id: ItemId | null, open = 0, zoom = 1, pitch = 0.3) { dbgItem = id ? { id, open, zoom, pitch } : null; ctx?.invalidate(); },
     frontView(c: number | null = 0.9, elev = 0.27, zoom = 1) { dbg = c === null ? null : { clock: c, elev, zoom }; ctx?.invalidate(); },
     arrive() {
       buildAll();
+      rescueScene?.close(); rescueDesk?.close();
       dbg = null; state = 'in'; clock = 0; opened = null; camNow.valid = false; follow = 0;
       items.forEach((it) => { it.open = 0; it.openTarget = 0; });
       bag.position.z = 0; bagLid.rotation.x = 0;
@@ -900,6 +941,7 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       ctx?.invalidate();
     },
     pack() {
+      rescueScene?.close(); rescueDesk?.close();
       return new Promise<void>((resolve) => {
         const go = () => { state = 'packing'; clock = 0; packDone = resolve; ctx?.invalidate(); };
         const was = opened;
@@ -914,12 +956,38 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
     open(id: ItemId | null) {
       if (state !== 'open') return;
       opened = id;
+      if (id === 'rescue') { rescueScene?.open(); rescueDesk?.open(); } else { rescueScene?.close(); rescueDesk?.close(); }
       items.forEach((it) => { it.openTarget = it.id === id ? 1 : 0; if (opts.reduced) it.open = it.openTarget; });
-      wantAim = true; aimDur = opts.reduced ? 0.0001 : 0.8;
+      wantAim = true; aimDur = opts.reduced ? 0.0001 : id === 'rescue' ? 0.46 : 0.8;
       ctx?.invalidate();
     },
     get opened() { return opened; },
     get state() { return state; },
+    get rescue() { return rescueScene; },
+    rescueStepAt(x: number, y: number, rect: DOMRect) {
+      if (!lastCamera || state !== 'open' || opened !== 'rescue' || !rescueDesk) return null;
+      ray.setFromCamera(new Vector2((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1), lastCamera);
+      return rescueDesk.stepAt(ray);
+    },
+    rescueRects(rect: DOMRect) {
+      const out = {} as ReturnType<BagLayer['rescueRects']>;
+      if (!lastCamera) return out;
+      const L = lastCamera.aspect < NARROW_BELOW_ASPECT ? NARROW : WIDE;
+      const rects: Record<string, { x0: number; x1: number; y0: number; y1: number } | undefined> = { board: L.BOARD, map: L.MAP, print: 'PRINT' in L ? L.PRINT : undefined, part: 'PART' in L ? L.PART : undefined };
+      group.updateMatrixWorld(true); lastCamera.updateMatrixWorld(true);
+      const v = new Vector3();
+      for (const [k, r] of Object.entries(rects)) {
+        if (!r) continue;
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const [px, py] of [[r.x0, r.y0], [r.x1, r.y0], [r.x1, r.y1], [r.x0, r.y1]]) {
+          v.set(px, py, 0.012); group.localToWorld(v); v.project(lastCamera);
+          const sx = (v.x * .5 + .5) * rect.width; const sy = (-v.y * .5 + .5) * rect.height;
+          x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+        }
+        (out as Record<string, unknown>)[k] = { x0, y0, x1, y1 };
+      }
+      return out;
+    },
     linkAt(x: number, y: number, rect: DOMRect) {
       if (!lastCamera || state !== 'open' || opened !== 'press' || !pressMesh) return null;
       ray.setFromCamera(new Vector2((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1), lastCamera);

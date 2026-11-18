@@ -28,6 +28,7 @@ import { resumeSheetPicture, wordProps } from '../../lib/mat/wordStage';
 import { DESIGN_CARDS, DESIGN_PG_MARK, DESIGN_PICTURES, DESIGN_UNDER, drawDesignCard, drawDesignUnder } from '../../lib/mat/designCards';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
+import { JOURNEY_END, journeyAt, journeySteps } from '../../lib/mat/rescueJourney';
 import LivePreview from './LivePreview';
 
 import './flipbook.css';
@@ -673,10 +674,23 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const on = () => modeRef.current === 'poster' && lookingRef.current === ZOMATO_ID && bagIn.current;
     const at = (event: PointerEvent) => { const r = canvas.getBoundingClientRect(); return bagRef.current?.layer.hit(event.clientX - r.left, event.clientY - r.top, r) ?? null; };
     const linkAt = (event: PointerEvent) => { const r = canvas.getBoundingClientRect(); return bagRef.current?.layer.linkAt(event.clientX - r.left, event.clientY - r.top, r) ?? null; };
+    // Food Rescue: a click on a row of its order log replays the story from that event (and is not a click "Back")
+    const rowAt = (event: PointerEvent) => { if (bagUiRef.current.busy) return null; const r = canvas.getBoundingClientRect(); return bagRef.current?.layer.rescueStepAt(event.clientX - r.left, event.clientY - r.top, r) ?? null; };
     let downOn: ReturnType<typeof at> = null;
-    const down = (event: PointerEvent) => { if (!on()) return; downOn = at(event); if (downOn) event.stopImmediatePropagation(); };
+    let downRow: number | null = null;
+    const down = (event: PointerEvent) => {
+      if (!on()) return;
+      downRow = rowAt(event);
+      if (downRow !== null) { event.stopImmediatePropagation(); downOn = null; return; }
+      downOn = at(event); if (downOn) event.stopImmediatePropagation();
+    };
     const up = (event: PointerEvent) => {
       if (!on()) return;
+      if (downRow !== null) {
+        event.stopImmediatePropagation();
+        if (rowAt(event) === downRow) { bagRef.current?.layer.rescue?.seek(journeySteps[downRow].at); trackEvent('mat_rescue_event_replayed', { event: journeySteps[downRow].n }); }
+        downRow = null; downOn = null; return;
+      }
       const link = linkAt(event);
       if (link) { event.stopImmediatePropagation(); downOn = null; window.open(link, '_blank', 'noopener'); return; }
       const under = at(event);
@@ -686,7 +700,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     };
     const move = (event: PointerEvent) => {
       if (!on()) { if (root.dataset.bagPointer) delete root.dataset.bagPointer; return; }
-      const hand = !bagUiRef.current.busy && (!!linkAt(event) || at(event) !== null);
+      const hand = !bagUiRef.current.busy && (rowAt(event) !== null || !!linkAt(event) || at(event) !== null);
       root.dataset.bagPointer = hand ? 'true' : 'false';
     };
     canvas.addEventListener('pointerdown', down, true);
@@ -1156,6 +1170,15 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         if (event.key === 'Escape' && modeRef.current === 'poster' && !document.querySelector('dialog[open]')) {
           event.preventDefault();
           if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else window.history.back();
+        }
+        // Food Rescue's story, open from the bag: the arrows step through its seven events, Home and End jump to its ends
+        const story = modeRef.current === 'poster' && lookingRef.current === ZOMATO_ID && bagRef.current?.layer.opened === 'rescue' ? bagRef.current.layer.rescue : null;
+        if (story && !bagUiRef.current.busy) {
+          const here = journeyAt(story.time);
+          const to = event.key === 'ArrowRight' ? (here + 1 < journeySteps.length ? journeySteps[here + 1].at : JOURNEY_END)
+            : event.key === 'ArrowLeft' ? journeySteps[Math.max(0, here - 1)].at
+            : event.key === 'Home' ? 0 : event.key === 'End' ? JOURNEY_END : null;
+          if (to !== null) { event.preventDefault(); story.seek(to); }
         }
         return;
       }
