@@ -1,0 +1,171 @@
+/* Contest plate: a printed registration label, in the cutting-mat language.
+   No CSS filters. Motion is a background change only, and reduced motion removes it. */
+.jarvis-plate {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
+  width: min(380px, 100%);
+  margin: 0;
+  padding: 10px 12px 11px;
+  background: #f4efe4;
+  color: #1c1712;
+  text-decoration: none;
+  border: 1px solid rgba(28, 23, 18, 0.2);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+  line-height: 1.25;
+  text-align: left;
+}
+
+.jarvis-plate-crops {
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  background:
+    linear-gradient(#1c1712, #1c1712) left top / 9px 1px no-repeat,
+    linear-gradient(#1c1712, #1c1712) left top / 1px 9px no-repeat,
+    linear-gradient(#1c1712, #1c1712) right top / 9px 1px no-repeat,
+    linear-gradient(#1c1712, #1c1712) right top / 1px 9px no-repeat,
+    linear-gradient(#1c1712, #1c1712) left bottom / 9px 1px no-repeat,
+    linear-gradient(#1c1712, #1c1712) left bottom / 1px 9px no-repeat,
+    linear-gradient(#1c1712, #1c1712) right bottom / 9px 1px no-repeat,
+    linear-gradient(#1c1712, #1c1712) right bottom / 1px 9px no-repeat;
+}
+
+.jarvis-plate-rank {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  padding-right: 10px;
+  border-right: 1px solid rgba(28, 23, 18, 0.22);
+}
+
+.jarvis-plate-detail {
+  display: block;
+  min-width: 0;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+}
+
+.jarvis-plate-credit {
+  display: block;
+  margin-top: 2px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #3f372f;
+}
+
+.jarvis-plate-out {
+  margin-left: 0.3em;
+}
+
+.jarvis-plate--stage .jarvis-plate-rank {
+  font-size: 26px;
+}
+
+.jarvis-plate--stage .jarvis-plate-detail {
+  font-size: 13px;
+}
+
+.jarvis-plate--stage .jarvis-plate-credit {
+  font-size: 12px;
+}
+
+.jarvis-plate--card {
+  width: 100%;
+  padding: 8px 12px 9px 10px;
+  border: 0;
+  border-radius: 12px 12px 0 0;
+  box-shadow: none;
+  column-gap: 8px;
+}
+
+.jarvis-plate--card .jarvis-plate-rank {
+  font-size: 18px;
+  padding-right: 8px;
+}
+
+.jarvis-plate--card .jarvis-plate-detail {
+  font-size: 12px;
+}
+
+.jarvis-plate--card .jarvis-plate-credit {
+  font-size: 11px;
+}
+
+.jarvis-plate:hover {
+  background: #fbf7ef;
+}
+
+.jarvis-plate:focus-visible,
+.world-case .jarvis-plate:focus-visible {
+  outline: 2px solid #e5e55a;
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .jarvis-plate--card {
+    padding: 6px 10px 7px 8px;
+  }
+
+  .jarvis-plate--card .jarvis-plate-rank {
+    font-size: 16px;
+    padding-right: 8px;
+  }
+
+  .jarvis-plate--card .jarvis-plate-detail {
+    font-size: 11px;
+  }
+
+  .jarvis-plate--card .jarvis-plate-credit {
+    display: inline;
+    font-size: 11px;
+  }
+
+  .jarvis-plate--stage {
+    width: 100%;
+    margin-top: 2px;
+    padding: 9px 11px 10px;
+  }
+
+  .jarvis-plate--stage .jarvis-plate-rank {
+    font-size: 22px;
+  }
+
+  .jarvis-plate--stage .jarvis-plate-detail {
+    font-size: 12px;
+  }
+
+  .jarvis-plate--stage .jarvis-plate-credit {
+    font-size: 11px;
+  }
+
+  /* The plate sits in the hero's open black field. Drop the illustration
+     so the label and the waveform do not occupy the same pixels. */
+  .world-jarvis .world-camera {
+    top: 408px;
+  }
+}
+
+@media (max-width: 700px) and (max-height: 740px) {
+  .world-jarvis .world-camera {
+    top: 372px;
+  }
+
+  .jarvis-plate--stage .jarvis-plate-rank {
+    font-size: 18px;
+  }
+
+  .jarvis-plate--stage .jarvis-plate-detail,
+  .jarvis-plate--stage .jarvis-plate-credit {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jarvis-plate,
+  .jarvis-plate:hover {
+    transition: none;
+  }
+}
