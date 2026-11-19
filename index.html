@@ -170,6 +170,54 @@
       document.documentElement.style.background = '#080b1a';
     })();
   </script>
+  <!-- Arriving at a case study from a clipboard on the home page's mat: the splash in the project's colour that covered
+       the mat (lib/mat/caseStudyHandoff.ts) is drawn again first thing, so the screen never goes black or white between
+       the two pages, then lifts away once the case study has drawn itself. -->
+  <script>
+    (function () {
+      if (!/^\/work\//.test(location.pathname)) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('case-splash') || 'null'); sessionStorage.removeItem('case-splash'); } catch (e) { s = null; }
+      if (!s || typeof s.at !== 'number' || Date.now() - s.at > 8000 || s.href !== location.pathname) return;
+      if (!/^#[0-9a-f]{6}$/i.test(s.c) || typeof s.t !== 'string' || typeof s.p !== 'string') return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var font = "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
+      var d = document.createElement('div');
+      d.id = 'case-splash';
+      d.setAttribute('aria-hidden', 'true');
+      d.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;pointer-events:none;background:' + s.c + ';transition:transform .62s cubic-bezier(.7,0,.25,1)';
+      var box = document.createElement('div');
+      box.style.cssText = 'text-align:center;color:#fff;padding:0 24px;font-family:' + font + ';transition:transform .62s cubic-bezier(.7,0,.25,1),opacity .3s ease';
+      var name = document.createElement('div');
+      name.textContent = s.t.slice(0, 80);
+      name.style.cssText = 'font-weight:700;font-size:clamp(34px,5.4vw,78px);line-height:1.05;letter-spacing:-.02em';
+      var by = document.createElement('div');
+      by.textContent = s.p.slice(0, 80);
+      by.style.cssText = 'margin-top:12px;font-weight:600;font-size:clamp(14px,1.4vw,19px);letter-spacing:.06em;text-transform:uppercase;opacity:.86';
+      box.appendChild(name); box.appendChild(by); d.appendChild(box);
+      // (in the head, before anything that can hold the page up: the body does not exist yet)
+      document.documentElement.appendChild(d);
+      document.documentElement.style.background = s.c;
+      var gone = false, start = Date.now();
+      function lift() {
+        if (gone) return;
+        gone = true;
+        document.documentElement.style.background = '';
+        requestAnimationFrame(function () { requestAnimationFrame(function () {
+          d.style.transform = 'translateY(-100%)';
+          box.style.transform = 'translateY(30vh)';
+          box.style.opacity = '0';
+        }); });
+        setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 900);
+      }
+      function drawn() { var r = document.getElementById('root'); return !!r && (r.textContent || '').replace(/\s+/g, '').length > 60; }
+      (function wait() {
+        if (drawn()) { setTimeout(lift, 90); return; }
+        if (Date.now() - start > 3500) { lift(); return; }
+        setTimeout(wait, 50);
+      })();
+    })();
+  </script>
   <!-- port-home:END index-head -->
   <!-- (ship layer, scripts/ship/main.patch) What each home needs first, asked for from here rather than once the entry has run: its
        code (both homes are lazy chunks), written in by vite.config.ts (shipHeadPreloads) in a build, which knows the hashed names;
@@ -185,12 +233,15 @@
       // port-home:BEGIN first-frame (worked out from SOURCE's data by scripts/ship/ship-layer.mjs firstFramePictures: never edit it here)
       pictures = [
         '/images/mat/posters/self.webp',
-        '/images/mat/posters/design.webp',
         '/images/mat/posters/snapdeal.webp',
         '/images/mat/posters/photo.webp',
         '/images/self-logo.svg',
         '/images/mat/tool-marks.webp',
         '/images/mat/resume-p1-small.webp',
+        '/images/familysync_jpmorgan_chase.webp',
+        '/images/mcdonalds_order.webp',
+        '/images/pg/rooms/room-hero.webp',
+        '/images/pg/pg-logo-official.svg',
         '/images/mat/story-art/self.webp',
         '/images/mat/story-art/snapdeal.webp',
         '/images/flipbook/jarvis/cover/still.webp',

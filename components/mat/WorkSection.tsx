@@ -13,15 +13,19 @@ import { layBento } from './workBento';
  */
 
 /**
- * The three human-centered design case studies (FamilySync, Squad Up, P&G) are dealt as cards from the design poster on the mat,
- * so Selected work does not list them a second time (Adi, 2026-11-16: "in projects remove the ones i remade", then, asked which:
- * FamilySync, Squad Up for McDonald's and P&G, "their pages were perfect to begin with"). Only this board hides them: their
- * /work/<id> pages and the old home page still have them, so data/projects.ts keeps them.
+ * The three human-centered design case studies (FamilySync, Squad Up, P&G). They lie on the mat as three clipboards, and
+ * they are on this board too, first (Adi, 2026-11-18: "start adding all of these to the bottom selected ... work as well").
+ * (From 2026-11-16 to 2026-11-18 the board left them out, when they were only dealt from the design poster.)
  */
 export const REMADE = ['familysync-jpmorgan', 'mcdonalds-interaction-design', 'pg-haircare'];
-/** Also left out of Selected work (Adi, 2026-11-17: "Surya needs to be removed... DIY Jarvis needs to be removed"): their books are on the mat. */
-export const LEFT_OUT = [...REMADE, 'surya', 'jarvis', 'lawn'];
+/** Left out of Selected work (Adi, 2026-11-17: "Surya needs to be removed... DIY Jarvis needs to be removed"): their books are on the mat. */
+export const LEFT_OUT = ['surya', 'jarvis', 'lawn'];
 const PROJECTS = ALL_PROJECTS.filter((project) => !LEFT_OUT.includes(project.id));
+/**
+ * A project whose tile shows another picture than its page's hero. P&G: the illustrated room from its public story page,
+ * the same picture its clipboard shows (lib/mat/designCards.ts: never the project photographs on a home-page tile).
+ */
+const PICTURE: Record<string, string> = { 'pg-haircare': '/images/pg/rooms/room-hero.webp' };
 
 /** "Glyph: A Body for AI" becomes the name "Glyph" and the rest "A Body for AI". */
 function splitTitle(title: string): { name: string; rest: string } {
@@ -97,7 +101,7 @@ export default function WorkSection() {
           return (
             <li key={project.id} className="wk-cell" data-w={place.w} data-h={place.h} style={{ '--c': place.c, '--r': place.r, '--w': place.w, '--h': place.h } as React.CSSProperties}>
               <a className={`wk-card wk-${size}`} href={projectPath(project.id)} style={{ '--t': `${TURN[index % TURN.length]}deg`, '--d': `${(index % 4) * 80}ms` } as React.CSSProperties} aria-label={`${project.hero.title}. ${project.hero.oneLiner} Opens the project.`}>
-                {project.heroImage ? <img className="wk-pic" src={project.heroImage} alt="" loading="lazy" decoding="async" /> : <span className="wk-pic" />}
+                {(PICTURE[project.id] ?? project.heroImage) ? <img className="wk-pic" src={PICTURE[project.id] ?? project.heroImage} alt="" loading="lazy" decoding="async" /> : <span className="wk-pic" />}
                 <span className="wk-label">
                   <span className="wk-name">{name}</span>
                   {rest && size !== 'chip' && <span className="wk-rest">{rest}</span>}

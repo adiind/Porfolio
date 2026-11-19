@@ -1,6 +1,6 @@
 /* The timeline drawn on the mat (components/mat/TimelineMat.tsx). The cards are in the 3D scene; this is the HTML over
-   them: the title and its line, placed on the mat, and one clear link or button over each card and each print on
-   Tinker Verse (lib/mat/timelineLayer.ts moves them every frame). They hold the cards' words for screen readers. */
+   them: the title and its line, placed on the mat, and one clear button over each card (Tinker Verse's pile of prints
+   too; lib/mat/timelineLayer.ts moves them every frame). They hold the cards' words for screen readers. */
 
 /* the room the timeline takes on the page: empty; the mat holds still while the page scrolls through it */
 .tm-room { display: block; pointer-events: none; }
@@ -39,8 +39,8 @@
 .tm-lab b { margin-right: 0.35em; font-size: calc(var(--k, 1) * 15px); font-weight: 650; }
 .tm-lab-work { translate: -100% -100%; }
 
-.tm-cards, .tm-thumbs { margin: 0; padding: 0; list-style: none; }
-.tm-card, .tm-thumb {
+.tm-cards { margin: 0; padding: 0; list-style: none; }
+.tm-card {
   position: absolute;
   left: 0;
   top: 0;
@@ -55,9 +55,8 @@
   pointer-events: auto;
   will-change: transform;
 }
-.tm-thumb { border-radius: 8px; }
-.tm-card:focus-visible, .tm-thumb:focus-visible { outline: 3px solid #e4e84f; outline-offset: 3px; }
-.tm-card:focus:not(:focus-visible), .tm-thumb:focus:not(:focus-visible) { outline: none; }
+.tm-card:focus-visible { outline: 3px solid #e4e84f; outline-offset: 3px; }
+.tm-card:focus:not(:focus-visible) { outline: none; }
 
 /* the words, for screen readers only */
 .tm-sr {

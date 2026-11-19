@@ -25,7 +25,9 @@ import { SNAPDEAL_STORY, drawSnapdealStoryCard } from '../../lib/mat/snapdealCar
 import { GITHUB, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
 import { WORDS_BIG_BELOW, type GreetingSet } from '../../lib/mat/wordPieces';
 import { resumeSheetPicture, wordProps } from '../../lib/mat/wordStage';
-import { DESIGN_CARDS, DESIGN_PG_MARK, DESIGN_PICTURES, DESIGN_UNDER, drawDesignCard, drawDesignUnder } from '../../lib/mat/designCards';
+import { DESIGN_CARDS } from '../../lib/mat/designCards';
+import { openCaseStudy } from '../../lib/mat/caseStudyHandoff';
+import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { JOURNEY_END, journeyAt, journeySteps } from '../../lib/mat/rescueJourney';
@@ -95,7 +97,9 @@ const bookPlace = (index: number) => {
 // Zomato is his red rider's bag (lib/mat/zomatoBag.ts), lying where the Zomato card was: it takes the place of the ~10M
 // card and of the Food Rescue card, which now comes out of it (Adi, 2026-11-17). Both pictures stay in data/matStage.json
 // for the flat page.
-const STAGE_POSTERS = (matStage.posters as StagePoster[]).filter((poster) => !['printer', 'zomato', 'rescue'].includes(poster.id));
+const STAGE_POSTERS = (matStage.posters as StagePoster[]).filter((poster) => !['printer', 'zomato', 'rescue', 'design'].includes(poster.id));
+// (The design poster is gone from the stage too: its three case studies lie on the mat as three clipboards, each opening
+// its own page in one click. Adi, 2026-11-18. Its picture stays in data/matStage.json for the flat page.)
 const ZOMATO_ID = 'zomato';
 /** The bag's close-up, as the poster close-up knows it (its place is the old Zomato card's). */
 const ZOMATO_LOOK: StagePoster = { ...(matStage.posters as StagePoster[]).find((poster) => poster.id === ZOMATO_ID)!, label: 'Zomato, Senior Product Analyst' };
@@ -140,7 +144,9 @@ const RESUME_LOOK: StagePoster = { id: RESUME_ID, label: 'Résumé', src: RESUME
 const sheetAside = (windowWidth: number) => Math.round(Math.min(340, Math.max(220, windowWidth * 0.22)));
 const SHEET_ASIDE_RIGHT = 40;
 /** The résumé is read at its close-up with its body text at least about 11 CSS pixels: the sheet at least this tall. */
-const RESUME_READ_PX = 960;
+// (tall enough that its body type is about 15 px on a laptop: it does not fit the window then, and the reader moves down
+// it with the wheel, a finger or the arrow keys. It was 960, which put the type at 11 px. Adi, 2026-11-17.)
+const RESUME_READ_PX = 1280;
 
 /** Pictures asked for, by address: each is loaded once, and picking up another book hands back the very same picture. */
 const pictures = new Map<string, Promise<HTMLImageElement>>();
@@ -199,14 +205,6 @@ function bookletPicture(cover: HTMLImageElement, board: string): HTMLCanvasEleme
 }
 
 /** The stage as seen from one book: that book is the live one at the middle of the table's map, the others lie as closed booklets. */
-/** The design cards are the design poster's size (page pixels). */
-const designCardSize = () => {
-  const poster = STAGE_POSTERS.find((item) => item.id === 'design');
-  return { w: poster?.w ?? 260, h: poster?.h ?? 296.4, r: poster?.radius ?? 15.9 };
-};
-/** Asked for once, after the room is lit (or the moment the design poster is picked up): the cards' pictures and P&G's mark. */
-let designAsked: Promise<HTMLImageElement[]> | null = null;
-const designPictures = () => (designAsked ??= Promise.all([...DESIGN_PICTURES, DESIGN_PG_MARK].map((src) => loadPicture(src))));
 /** Asked for once, when the résumé is about to be read (the pointer rests on it or its tab, or it is opened). */
 let resumeAsked: Promise<HTMLImageElement> | null = null;
 const fullResume = () => (resumeAsked ??= loadPicture(RESUME_PAGE));
@@ -223,7 +221,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the Zomato bag's pictures start coming now, beside the stage's (not waited for: the bag is built when they are in)
   void preloadZomatoBag().catch(() => undefined);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
-  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, snapdealArt] = await Promise.all([
+  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, snapdealArt, clipPictures] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
     hasRescue ? Promise.all([loadPicture(RESCUE_SOURCES.bag), loadPicture(RESCUE_SOURCES.logo), loadPicture(RESCUE_SOURCES.offer)]) : Promise.resolve(null),
     Promise.all(others.map((item) => loadPicture(item.pages[0].art.src))),
@@ -231,11 +229,13 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     loadPicture('/images/mat/tool-marks.webp'),
     // The résumé sheet is about 120 px wide in the wide view: it lies with a small copy of the page (17 KB), and the full
     // page (RESUME_PAGE, 215 KB) is swapped in when it is about to be read (fullResume). (Written out, not a constant: the
-    // ship kit's first-frame preloads read loadStage's literal pictures.) The design cards' pictures are not asked for
-    // here at all: nothing of them shows until the poster is picked up (designPictures, once the room is lit).
+    // ship kit's first-frame preloads read loadStage's literal pictures.)
     loadPicture('/images/mat/resume-p1-small.webp'),
     loadPicture(STORY_ILLUSTRATIONS.self),
     loadPicture(STORY_ILLUSTRATIONS.snapdeal),
+    // the three clipboards' pictures and P&G's mark: they lie on the mat from the first light, so they come with the stage
+    // (the same pictures as lib/mat/designCards.ts DESIGN_PICTURES and DESIGN_PG_MARK, written out for the ship kit)
+    Promise.all([loadPicture('/images/familysync_jpmorgan_chase.webp'), loadPicture('/images/mcdonalds_order.webp'), loadPicture('/images/pg/rooms/room-hero.webp'), loadPicture('/images/pg/pg-logo-official.svg')]),
     loadFlipbookFonts('first'),
   ]);
   const posters = STAGE_POSTERS.map((poster, index) => {
@@ -296,31 +296,17 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
       open: { x: left + (i + 1) * (snapdeal.w + gap), y: middle.y },
     }));
   }
-  // The design poster holds Adi's three human-centered design case studies (FamilySync with JPMorgan Chase, Squad Up for
-  // McDonald's, P&G hair care packaging). At rest their cards lie under it, their edges showing; picked up, it deals them
-  // out in a row like the other sets, and a card opens its case study.
-  const design = posters.find((poster) => poster.id === 'design');
-  const under: StageSpec['props'] = [];
-  if (design) {
-    const gap = design.w * 0.13;
-    const middle = at(matStage.ref.w / 2, matStage.ref.h / 2);
-    const left = middle.x - (design.w * (DESIGN_CARDS.length + 1) + gap * DESIGN_CARDS.length) / 2 + design.w / 2;
-    Object.assign(design, { open: { x: left, y: middle.y } });
-    const { w: wPx, h: hPx, r: rPx } = designCardSize();
-    DESIGN_CARDS.forEach((card, i) => {
-      // (without its picture for now: its place in the project's colour; the card is drawn again once it has come in)
-      const image = drawnOnce(`design:${i}`, [wPx, hPx, rPx], () => drawDesignCard(i, null, null, wPx, hPx, rPx));
-      story.push({
-        id: `design:${card.id}`, image, x: design.x, y: design.y, w: design.w, h: design.h, radius: design.radius,
-        dealtFrom: 'design', pick: true, open: { x: left + (i + 1) * (design.w + gap), y: middle.y },
-      });
-      const lie = DESIGN_UNDER[i];
-      under.push({
-        id: `design:under:${card.id}`, image: drawnOnce(`design:under:${i}`, [image, wPx, hPx, lie.dy], () => drawDesignUnder(image, wPx, hPx, lie.dy)), x: design.x + lie.dx / px, y: design.y - lie.dy / px,
-        w: design.w, h: design.h, radius: design.radius, turn: lie.turn, under: 'design',
-      });
-    });
-  }
+  // Adi's three human-centered design case studies (FamilySync with JPMorgan Chase, Squad Up for McDonald's, P&G hair care
+  // packaging) lie on the mat as three clipboards, side by side and a little over one another, where the design poster
+  // was. A click on one opens its case study: there is no close-up and nothing is dealt (lib/mat/designClipboards.ts).
+  const clipboards: StageSpec['props'] = DESIGN_CARDS.map((card, i) => {
+    const lay = CLIPBOARD_LAY[i];
+    const shade = clipboardShade(i);
+    return {
+      id: `design:${card.id}`, image: drawnOnce(`clipboard:${i}`, [clipPictures[i], clipPictures[3], shade?.from, shade?.top, shade?.bottom], () => drawClipboard(i, clipPictures[i], clipPictures[3], shade)),
+      ...at(lay.x, lay.y), w: CLIPBOARD.w / px, h: CLIPBOARD.h / px, radius: 0, cutout: true, alphaShadow: true, turn: lay.turn,
+    };
+  });
   const booklets = others.map((item, index) => {
     const spot = place(item.slug);
     const board = item.board ?? '#2b160d';
@@ -340,7 +326,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   const bag = { id: ZOMATO_ID, image: bagTarget(), ...at(bagSlot.x, bagSlot.y - 50), w: 0.8, h: 1.2, radius: 0.05 };
   return {
     greeting: words.greeting,
-    props: [...posters, bag, ...story, ...booklets, ...pieces, ...under],
+    props: [...posters, ...clipboards, bag, ...story, ...booklets, ...pieces],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -439,6 +425,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const openAfter = useRef<string | null>(null);
   const [looking, setLooking] = useState<StagePoster | null>(null);
   const lookingRef = useRef<string | null>(null);
+  /** At the résumé: how far down the sheet the reader is (0 its top, 1 its foot). */
+  const [readAt, setReadAt] = useState(0);
   lookingRef.current = looking?.id ?? null;
   /**
    * The Zomato bag (lib/mat/zomatoBag.ts), drawn in this engine's scene: one for the life of the engine. Picked up, it
@@ -567,22 +555,14 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     return () => window.clearTimeout(soon);
   }, [fallback, staged, viewport]);
 
-  // Pictures that come after the stage is laid: the design cards' photographs and the full résumé page. Each is put on its
+  // A picture that comes after the stage is laid: the full résumé page. It is put on its
   // piece only while the camera is still (a flight in progress puts it on when it ends), so no change is seen mid-motion.
   const flying = useRef(0);
-  /** The design poster was picked up before its cards' pictures were in: they are being waited for (at most 1.2 s). */
-  const dealWait = useRef(false);
-  const late = useRef<{ design: HTMLImageElement[] | null; resume: HTMLImageElement | null; put: Set<string> }>({ design: null, resume: null, put: new Set() });
+  const late = useRef<{ resume: HTMLImageElement | null; put: Set<string> }>({ resume: null, put: new Set() });
   const putLate = useCallback(() => {
     const engine = engineRef.current;
     if (!engine || !stageSpec || flying.current > 0) return;
-    const { design, resume, put } = late.current;
-    if (design && !put.has('design')) {
-      const [fsPic, mcdPic, pgPic, pgMark] = design;
-      const { w, h, r } = designCardSize();
-      DESIGN_CARDS.forEach((card, i) => engine.setPropImage(`design:${card.id}`, drawnOnce(`design:${i}:pictured`, [[fsPic, mcdPic, pgPic][i], pgMark, w, h, r], () => drawDesignCard(i, [fsPic, mcdPic, pgPic][i], pgMark, w, h, r))));
-      put.add('design');
-    }
+    const { resume, put } = late.current;
     if (resume && !put.has('resume')) {
       // (one picture for each size of type: the sheet's label is drawn larger for narrow windows, wordStage)
       const big = window.innerWidth < WORDS_BIG_BELOW;
@@ -599,15 +579,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     flying.current += 1;
     return engine.focusOn(id).finally(() => { flying.current -= 1; putLateRef.current(); });
   }, []);
-  const askDesign = useCallback(() => designPictures().then((pictures) => { late.current.design = pictures; putLateRef.current(); }, () => undefined), []);
   const askResume = useCallback(() => fullResume().then((page) => { late.current.resume = page; putLateRef.current(); }, () => undefined), []);
-  // the design cards' pictures: once the room is lit and the page is idle, at low priority
-  useEffect(() => {
-    if (!staged || !lit) return undefined;
-    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
-    const id = w.requestIdleCallback ? w.requestIdleCallback(() => { void askDesign(); }, { timeout: 3000 }) : window.setTimeout(() => { void askDesign(); }, 1500);
-    return () => { if (w.requestIdleCallback && w.cancelIdleCallback) w.cancelIdleCallback(id); else window.clearTimeout(id); };
-  }, [askDesign, lit, staged]);
 
   // The Zomato bag: added to the engine once the stage is laid (it lies on its click target), built as its pictures come in.
   useEffect(() => {
@@ -620,6 +592,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (debug) (window as unknown as { __bag?: unknown }).__bag = { get layer() { return layer; } };
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { bagRef.current?.remove(); bagRef.current = null; window.clearTimeout(bagTimer.current); }, []);
+
   /** Come down to the bag: it unpacks (Back waits until it has). */
   const bagArrive = useCallback(() => {
     const layer = bagRef.current?.layer;
@@ -974,7 +947,23 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       const look = target?.closest?.('.fb-look');
       return Boolean(target?.closest?.('dialog') || (look && look.scrollHeight > look.clientHeight + 1));
     };
-    const hold = (event: Event) => { if (event.cancelable && !own(event)) event.preventDefault(); };
+    // At the résumé the same wheel, finger and keys move the reader down the sheet instead (engine.readBy): it is taller
+    // than the window, so that its type can be read.
+    const reading = () => modeRef.current === 'poster' && lookingRef.current === RESUME_ID;
+    const read = (px: number) => { const now = engineRef.current?.readBy(px); if (now?.can) setReadAt(now.at); };
+    let fingerY: number | null = null;
+    const hold = (event: Event) => {
+      if (own(event)) return;
+      if (event.cancelable) event.preventDefault();
+      if (!reading()) return;
+      if (event instanceof WheelEvent) read(event.deltaMode === 1 ? event.deltaY * 32 : event.deltaMode === 2 ? event.deltaY * window.innerHeight : event.deltaY);
+      else if (typeof TouchEvent !== 'undefined' && event instanceof TouchEvent && event.touches.length === 1) {
+        const y = event.touches[0].clientY;
+        if (fingerY !== null) read(fingerY - y);
+        fingerY = y;
+      }
+    };
+    const finger = (event: TouchEvent) => { fingerY = event.touches.length === 1 ? event.touches[0].clientY : null; };
     const keys = new Set([' ', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown']);
     const holdKeys = (event: KeyboardEvent) => {
       const element = event.target as HTMLElement | null;
@@ -982,13 +971,21 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       // (a button pressed with Space still presses; on a link Space only scrolls)
       if (event.key === ' ' && element?.tagName === 'BUTTON') return;
       event.preventDefault();
+      if (!reading()) return;
+      const page = window.innerHeight * 0.8;
+      if (event.key === 'Home' || event.key === 'End') { const now = engineRef.current?.readTo(event.key === 'Home' ? 0 : 1); if (now?.can) setReadAt(now.at); }
+      else read(event.key === 'ArrowDown' ? 90 : event.key === 'ArrowUp' ? -90 : event.key === 'PageUp' || (event.key === ' ' && event.shiftKey) ? -page : page);
     };
     window.addEventListener('wheel', hold, { passive: false });
     window.addEventListener('touchmove', hold, { passive: false });
+    window.addEventListener('touchstart', finger, { passive: true });
+    window.addEventListener('touchend', finger, { passive: true });
     window.addEventListener('keydown', holdKeys);
     return () => {
       window.removeEventListener('wheel', hold);
       window.removeEventListener('touchmove', hold);
+      window.removeEventListener('touchstart', finger);
+      window.removeEventListener('touchend', finger);
       window.removeEventListener('keydown', holdKeys);
     };
   }, [mode, reducedMotion, staged]);
@@ -1013,6 +1010,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     /** Come down to a poster's close-up (from the wide view). */
     const lookAt = (id: string, poster: StagePoster) => {
       setLooking(poster);
+      setReadAt(0);
       setMode('poster');
       // (the bag drops its lid and unpacks as the camera comes down to it)
       if (id === ZOMATO_ID) bagActs.current.arrive();
@@ -1088,11 +1086,13 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           trackEvent('mat_piece_clicked', { piece: id.replace(/^(word|piece):/, '') });
           return;
         }
-        // a design card, picked up from the open row: its case study
+        // one of the three clipboards: its case study, under a splash in the project's colour that grows out of the
+        // clipboard (lib/mat/caseStudyHandoff.ts; index.html lifts the same splash off the case study)
         const card = DESIGN_CARDS.find((item) => id === `design:${item.id}`);
         if (card) {
           trackEvent('mat_case_study_opened', { project: card.id });
-          window.location.assign(card.href);
+          const rect = engineRef.current?.screenRect(id);
+          openCaseStudy(card, rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null, reducedMotion);
           return;
         }
         if (id === 'word:resume') id = RESUME_ID;
@@ -1105,14 +1105,6 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           lookAt(id, poster);
         };
         if (id === RESUME_ID) void askResume();
-        // the design poster deals its cards: their pictures first, if they are not in yet (but never more than 1.2 s:
-        // then it deals with the pictures' places in each card's colour, and they fill in once it is still)
-        if (id === 'design' && !late.current.design) {
-          if (dealWait.current) return;
-          dealWait.current = true;
-          void Promise.race([askDesign(), new Promise((ok) => window.setTimeout(ok, 1200))]).then(() => { dealWait.current = false; go(); });
-          return;
-        }
         go();
       },
       book() {
@@ -1281,9 +1273,9 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           {STAGE_POSTERS.map((poster) => <li key={poster.id}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(poster.id, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(poster.id); }}>{poster.label}</button></li>)}
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(ZOMATO_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(ZOMATO_ID); }}>Zomato, Senior Product Analyst: a delivery rider's bag. Opens it and lays out his Zomato work.</button></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { void askResume(); ringOn(RESUME_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(RESUME_ID); }}>Résumé, one page. Opens it up close, with a download.</button></li>
-          {/* the three case studies the design poster holds: their cards lie under it */}
+          {/* the three design case studies: each lies on the mat as a clipboard */}
           {DESIGN_CARDS.map((card) => (
-            <li key={card.id}><a href={card.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(`design:under:${card.id}`, event)} onBlur={ringOff}>{card.title}, {card.partner}. {card.line} Open the case study.</a></li>
+            <li key={card.id}><a href={card.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(`design:${card.id}`, event)} onBlur={ringOff}>{card.title}, {card.partner}. {card.line} Open the case study.</a></li>
           ))}
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn('book', event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.book(); }}>{book.title}, a flip book. {book.meta}. Opens the book.</button></li>
           {FLIP_BOOKS.filter((item) => item.slug !== book.slug).map((item) => (
@@ -1325,7 +1317,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         <aside
           className="fb-look"
           data-shown={mode === 'poster' ? 'true' : 'false'}
-          data-set={['rescue', 'self', 'snapdeal', 'design'].includes(looking.id) ? 'true' : 'false'}
+          data-set={['rescue', 'self', 'snapdeal'].includes(looking.id) ? 'true' : 'false'}
           data-profile={looking.id === 'photo' ? 'true' : 'false'}
           data-sheet={looking.id === RESUME_ID ? 'true' : 'false'}
           // the résumé is read on the left: its words take a narrower column at the right (the engine keeps that room clear)
@@ -1347,10 +1339,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
             {(POSTER_LINKS[looking.id] ?? []).map((link) => <a key={link.href} className="fb-pill fb-pill--open" href={link.href}>{link.label} <ArrowUpRight size={16} aria-hidden="true" /></a>)}
             {looking.id === 'self' && <a className="fb-pill fb-pill--open" href="https://agentvault.io/" target="_blank" rel="noopener noreferrer">Visit Agent Vault <ArrowUpRight size={16} aria-hidden="true" /></a>}
             {looking.id === RESUME_ID && <a className="fb-pill fb-pill--open" href={RESUME_PDF} download>Download PDF <Download size={16} aria-hidden="true" /></a>}
-            {/* the dealt case-study cards are pictures: here they are as links, each ringed on the mat while it has focus */}
-            {looking.id === 'design' && DESIGN_CARDS.map((card) => (
-              <a key={card.id} className="fb-sr" href={card.href} tabIndex={mode === 'poster' ? 0 : -1} onFocus={(event) => ringOn(`design:${card.id}`, event)} onBlur={ringOff}>{card.title}, {card.partner}. {card.line} Open the case study.</a>
-            ))}
+            {/* how to read on, and how far down the page the reader is */}
+            {looking.id === RESUME_ID && <p className="fb-look-read"><span>Scroll to read down the page</span><i aria-hidden="true"><b style={{ transform: `translateY(${(readAt * 200).toFixed(1)}%)` }} /></i></p>}
           </div>}
         </aside>
       )}

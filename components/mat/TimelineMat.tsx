@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObjec
 import { ArrowLeft } from 'lucide-react';
 import type { MatLayer } from '../../lib/flipbook/matLayer';
 import { loadFlipbookFonts } from '../../lib/flipbook/pageArt';
-import { matStops, stopBeats, stopPictures, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
+import { TINKER_POSTS, matStops, stopBeats, stopPictures, tinkerLinks, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
 import { createTimelineLayer, type TimelineLayer, type TimelinePlace } from '../../lib/mat/timelineLayer';
 import { holdLength, openingOrder, layoutCards, scrollForStep, type Hold } from '../../lib/mat/timelineScene';
 import ExperienceStory from './ExperienceStory';
@@ -14,16 +14,18 @@ import './timeline-mat.css';
    is the page around them:
    - TimelineMatRoom: the room the timeline takes on the page, in the second screen, before Work. While the page scrolls
      through it the mat holds still and each step opens the next stop (lib/mat/timelineScene.ts matScroll / stepAt).
-   - TimelineMat: the HTML lying over the cards, in the order a reader goes through them: the title and its line, one link
-     or button per card (the same words as the card) and per print on Tinker Verse. They are clicked and focused like the
-     cards they cover; the layer moves them to where each card is drawn, every frame, without reading layout. Five stops
-     open their story on the mat (#experience-<id>, components/mat/ExperienceStory.tsx) when the page is opened at that
-     address.
+   - TimelineMat: the HTML lying over the cards, in the order a reader goes through them: the title and its line, one
+     button per card (the same words as the card), Tinker Verse's pile of prints included. They are clicked and focused
+     like the cards they cover; the layer moves them to where each card is drawn, every frame, without reading layout.
+     Five stops open their story on the mat (#experience-<id>, components/mat/ExperienceStory.tsx) when the page is
+     opened at that address.
    - The pen (Adi's pick, 2026-11-17, from review/home-mat-pen): a marker lies across the tape and rolls down the years
      with the scroll, opening each stop as it reaches its year. Every pointer move is handed to the layer, which opens the
      stop under it once the pointer rests (latched, no flicker). Clicking a stop picks it up and turns it over in the
      middle of the mat (its story on its back), with the house's dark "Back to the timeline" pill top left; Esc, a click
-     beside it or a scroll put it back. The back's rows that have a page (Northwestern's three studio projects) are links. */
+     beside it or a scroll put it back. The back's rows that have a page (Northwestern's three studio projects) are links.
+   - Tinker Verse (2026-11-17) is picked up the same way; its back is a contact sheet whose prints link to each build's
+     page here (same tab), with the matching Instagram posts and his Instagram itself opening in a new tab. */
 
 /** Shared by the room (which measures where it lies) and the page's scroll handler (which holds the mat still). */
 export type HoldRef = MutableRefObject<Hold | null>;
@@ -83,7 +85,6 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
   const steps = useMemo(() => openingOrder(layoutCards(matStops())).map((card) => card.stop.id), []);
   const rootRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef(new Map<string, HTMLElement>());
-  const thumbRefs = useRef<HTMLElement[]>([]);
   const perUnitRef = useRef(perUnit);
   perUnitRef.current = perUnit;
   const [layer, setLayer] = useState<TimelineLayer | null>(null);
@@ -129,7 +130,7 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
     const root = rootRef.current;
     if (!layer || !root) return undefined;
     layer.bindOverlay({
-      cards: cardRefs.current, thumbs: thumbRefs.current, words: [...root.querySelectorAll<HTMLElement>('[data-mx]')], root,
+      cards: cardRefs.current, words: [...root.querySelectorAll<HTMLElement>('[data-mx]')], root,
       sheet: { box: sheetRef.current, rows: rowRefs.current },
     });
     return () => layer.bindOverlay(null);
@@ -161,7 +162,9 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
     return () => { window.removeEventListener('keydown', key); window.removeEventListener('scroll', scroll); };
   }, [layer, picked]);
   const pickedStop = picked ? stops.find((s) => s.id === picked.id) ?? null : null;
-  const pickedRows = pickedStop ? stopBeats(pickedStop) : [];
+  const pickedRows = pickedStop && !pickedStop.fill ? stopBeats(pickedStop) : [];
+  // (measured with the sheet's fonts, which are loaded before any stop can be picked)
+  const pickedLinks = pickedStop?.fill ? tinkerLinks() : [];
 
   // (links to #timeline are handled by the page, FlipBookApp: it scrolls to this timeline's room, id="timeline", by where
   // it lies, and leaves the address alone)
@@ -175,11 +178,10 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
   };
   const onCard = (stop: MatStop) => (event: React.MouseEvent<HTMLElement>) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    // every stop is picked up and turned over on the mat (no jump to another page)
-    if (layer && !stop.fill) { event.preventDefault(); layer.pick(stop.id); }
+    // every stop is picked up and turned over on the mat (no jump to another page), Tinker Verse's pile too
+    if (layer) { event.preventDefault(); layer.pick(stop.id); }
   };
 
-  thumbRefs.current.length = 0;
   rowRefs.current.length = 0;
   return <>
     <div ref={rootRef} className="tm-layer" data-shown={shown ? 'true' : 'false'} data-picked={picked ? 'true' : undefined} inert={!shown}>
@@ -195,27 +197,30 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
             className: 'tm-card', onFocus: onFocus(stop), tabIndex: shown && !picked ? 0 : -1, 'data-stop': stop.id,
           };
           return <li key={stop.id}>
-            {!stop.fill
-              ? <button type="button" {...common} onClick={onCard(stop)} aria-haspopup="dialog">{words}</button>
-              : <a {...common} href={stop.href ?? undefined}>{words}</a>}
-            {stop.thumbs && <ul className="tm-thumbs" aria-label={`${stop.item.short}: what I built there`}>
-              {stop.thumbs.map((thumb) => <li key={thumb.cap + thumb.href}>
-                <a ref={(el) => { if (el) thumbRefs.current.push(el); }} className="tm-thumb" href={thumb.href} onFocus={onFocus(stop)} tabIndex={shown ? 0 : -1}>
-                  <span className="tm-sr">{thumb.cap}</span>
-                </a>
-              </li>)}
-            </ul>}
+            <button type="button" {...common} onClick={onCard(stop)} aria-haspopup="dialog">{words}</button>
           </li>;
         })}
       </ol>
       {picked && <div className="tm-catch" onClick={() => layer?.pick(null)} aria-hidden="true" />}
       {picked && pickedStop && <div ref={sheetRef} className="tm-sheet" data-settled={picked.settled ? 'true' : 'false'} aria-hidden="true" />}
-      {picked && pickedStop && <div className="tm-sheet-words" role="dialog" aria-label={`${pickedStop.item.short}: its story`} data-settled={picked.settled ? 'true' : 'false'}>
+      {picked && pickedStop && !pickedStop.fill && <div className="tm-sheet-words" role="dialog" aria-label={`${pickedStop.item.short}: its story`} data-settled={picked.settled ? 'true' : 'false'}>
         <ul className="tm-rows">
           {pickedRows.slice(0, 4).map((row, i) => <li key={row.title}>
             {row.href
               ? <a ref={(el) => { if (el) rowRefs.current[i] = el; }} className="tm-row" href={row.href}><span className="tm-sr">{row.title}: {row.lines.join(' ')}</span></a>
               : <span ref={(el) => { if (el) rowRefs.current[i] = el; }} className="tm-row is-text"><span className="tm-sr">{row.kicker}. {row.title}. {row.lines.join(' ')}</span></span>}
+          </li>)}
+        </ul>
+      </div>}
+      {/* Tinker Verse's back: its prints (each to that build's page here), the posts and his Instagram (new tabs) */}
+      {picked && pickedStop?.fill && <div className="tm-sheet-words" role="dialog" aria-label={`${pickedStop.item.short}: its prints`} data-settled={picked.settled ? 'true' : 'false'}>
+        <p className="tm-sr">{pickedStop.item.short}. {pickedStop.item.pin}. {new Date(pickedStop.item.start).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} to now. {TINKER_POSTS} posts on Instagram.</p>
+        <ul className="tm-rows">
+          {pickedLinks.map((link, i) => <li key={`${link.href}-${i}`}>
+            <a ref={(el) => { if (el) rowRefs.current[i] = el; }} className={link.newTab ? 'tm-row tm-row--out' : 'tm-row tm-row--print'} href={link.href}
+              {...(link.newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+              <span className="tm-sr">{link.text}</span>
+            </a>
           </li>)}
         </ul>
       </div>}

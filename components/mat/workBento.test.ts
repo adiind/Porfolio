@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { REMADE } from './WorkSection';
+import { LEFT_OUT, REMADE } from './WorkSection';
 import { COLUMNS, SHAPE, boardIsFull, layBento } from './workBento';
 import { PROJECTS } from '../../data/projects';
 
@@ -10,17 +10,19 @@ describe('Selected work board', () => {
     const places = layBento(KNOWN);
     expect(Object.keys(places).sort()).toEqual([...KNOWN].sort());
     expect(boardIsFull(places)).toBe(true);
-    expect(Math.max(...Object.values(places).map((p) => p.r + p.h - 1))).toBe(4);
+    expect(Math.max(...Object.values(places).map((p) => p.r + p.h - 1))).toBe(6);
   });
 
   it('lays them with no gap without Lawn (a build whose project list has none)', () => {
     const places = layBento(KNOWN.filter((id) => id !== 'lawn'));
     expect('lawn' in places).toBe(false);
     expect(boardIsFull(places)).toBe(true);
-    expect(places.glyph).toMatchObject({ c: 1, r: 1 });
+    // the three design case studies lead the board, side by side; Glyph starts the row under them
+    REMADE.forEach((id, index) => expect(places[id], id).toEqual({ c: 1 + index * 2, r: 1, w: 2, h: 2 }));
+    expect(places.glyph).toMatchObject({ c: 1, r: 3 });
   });
 
-  it('never leaves a hole or an overlap whichever projects are missing (all 511 sets)', () => {
+  it('never leaves a hole or an overlap whichever projects are missing (all 4095 sets)', () => {
     for (let mask = 1; mask < 1 << KNOWN.length; mask += 1) {
       const ids = KNOWN.filter((_, index) => mask & (1 << index));
       const places = layBento(ids);
@@ -42,8 +44,9 @@ describe('Selected work board', () => {
     expect(boardIsFull(places)).toBe(true);
   });
 
-  it('lays the projects this build really has with no gap, leaving out the three design case studies', () => {
-    const ids = PROJECTS.filter((project) => !REMADE.includes(project.id)).map((project) => project.id);
+  it('lays the projects this build really has with no gap, the three design case studies among them', () => {
+    const ids = PROJECTS.filter((project) => !LEFT_OUT.includes(project.id)).map((project) => project.id);
+    REMADE.forEach((id) => expect(ids, id).toContain(id));
     expect(boardIsFull(layBento(ids))).toBe(true);
   });
 });

@@ -57,7 +57,9 @@ export const PIECE_SIZE = {
 } as const;
 
 /** The résumé page that lies on the mat: page 1 of the PDF, rasterised to WebP (1240 by 1754). */
-export const RESUME_PAGE = '/images/mat/resume-p1.webp';
+// (1800 px wide: read up close the sheet is about 900 CSS pixels wide, twice that on a sharp screen. The 1240 px page
+// went soft there. Rendered from public/Adi_Agarwal_Resume_2026.pdf with Quick Look, 2026-11-17.)
+export const RESUME_PAGE = '/images/mat/resume-p1-1800.webp';
 export const RESUME_PDF = '/Adi_Agarwal_Resume_2026.pdf';
 
 /** A piece to lay on the stage: its picture and its size in page pixels. */

@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import data from './timelineData.json';
-import { TINKER_THUMBS, matStops } from './timelineCards';
+import posts from '../../data/instagram_posts.json';
+import { PROJECTS_BY_ID } from '../../data/projects';
+import { TINKER_INSTAGRAM, TINKER_POSTS, TINKER_PRINTS, matStops, pieceCorners, pileLayout } from './timelineCards';
 import {
   GAP, OPEN_REDUCED_S, OPEN_S, TAPE, cardPose, cardSize, holdLength, introDue, introEnd, layoutCards, matScroll, openingOrder,
   PEN_MAX_SPEED, PEN_PARK, PEN_START, penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollY,
@@ -32,11 +34,59 @@ describe('the timeline data', () => {
     expect(stops.filter((s) => s.story).map((s) => s.story)).toEqual(['self', 'zomato', 'udaan', 'schmooze', 'snapdeal']);
   });
 
-  it('gives Tinker Verse six prints of his own builds, each going to its page', () => {
-    expect(TINKER_THUMBS.map((t) => [t.cap, t.href])).toEqual([
-      ['Surya', '/book/surya'], ['Jarvis', 'https://github.com/adiind/diy-jarvis'], ['Helios', '/work/helios'], ['Muse', '/book/muse'], ['Zero', '/work/zero-my-ai'], ['Laser cut', '/book/surya'],
+  it('gives Tinker Verse six prints of his own builds, each going to its page on this site', () => {
+    expect(TINKER_PRINTS.map((t) => [t.name, t.href])).toEqual([
+      ['Surya', '/book/surya'], ['Surya\'s front layer', '/book/surya'], ['Muse', '/book/muse'], ['Zero', '/work/zero-my-ai'],
+      ['Helios', '/work/helios'], ['Jarvis', '/book/jarvis'],
     ]);
-    TINKER_THUMBS.forEach((t) => expect(() => readFileSync(new URL(`../../public${t.src}`, import.meta.url))).not.toThrow());
+    // every picture is in the repo; every page is on this site (a book that exists, or a project the /work route knows)
+    const books = readFileSync(new URL('../../data/flipbooks.ts', import.meta.url), 'utf8');
+    TINKER_PRINTS.forEach((t) => {
+      expect(() => readFileSync(new URL(`../../public${t.src}`, import.meta.url))).not.toThrow();
+      expect(t.href.startsWith('/')).toBe(true);
+      const book = /^\/book\/([a-z0-9-]+)$/.exec(t.href); const work = /^\/work\/([a-z0-9-]+)$/.exec(t.href);
+      if (book) expect(books).toMatch(new RegExp(`slug: '${book[1]}'`));
+      else expect(work && PROJECTS_BY_ID.has(work[1])).toBe(true);
+    });
+  });
+
+  it('ties a print to an Instagram post only where the site\'s own data does, and counts the posts truly', () => {
+    const urls = new Set((posts as { url: string }[]).map((p) => p.url));
+    expect(TINKER_POSTS).toBe(urls.size);
+    expect(TINKER_POSTS).toBe((posts as unknown[]).length);
+    TINKER_PRINTS.filter((t) => t.post).forEach((t) => {
+      expect(urls.has(t.post!)).toBe(true);
+      const project = readFileSync(new URL(`../../data/projects/${t.id}.json`, import.meta.url), 'utf8');
+      expect(project).toContain(`"proof": "${t.post}"`);
+    });
+    expect(TINKER_PRINTS.filter((t) => t.post).map((t) => t.id)).toEqual(['surya', 'helios', 'jarvis']);
+    expect(TINKER_INSTAGRAM).toBe('https://www.instagram.com/tinker_verse/');
+  });
+
+  it('lays the pile inside its stop, its prints clear of the label\'s words and the pen\'s side', () => {
+    const tv = cards().find((c) => c.stop.fill)!;
+    const pieces = pileLayout(tv.stop);
+    expect(pieces.map((p) => p.kind)).toEqual(['label', 'print', 'print', 'print', 'print', 'print', 'print', 'tape']);
+    expect(pieces[pieces.length - 2].print!.id).toBe('surya');
+    pieces.forEach((p) => pieceCorners(p).forEach(([x, y]) => {
+      expect(x).toBeGreaterThanOrEqual(0); expect(x).toBeLessThanOrEqual(tv.stop.restW);
+      expect(y).toBeGreaterThanOrEqual(0); expect(y).toBeLessThanOrEqual(tv.stop.restH);
+    }));
+    // nothing lies on the label's words (from its tab to about 226 px in), and the prints keep clear of the pen, which
+    // reaches 13 px into the lane
+    const label = pieces[0];
+    const words: [number, number][] = [[66, label.y - label.h / 2 + 6], [232, label.y - label.h / 2 + 6], [232, label.y + label.h / 2 - 4], [66, label.y + label.h / 2 - 4]];
+    const overlap = (a: [number, number][], b: [number, number][]) => [a, b].every((poly) => poly.every((_, i) => {
+      // (two convex shapes overlap only if no edge of either separates them)
+      const [x1, y1] = poly[i]; const [x2, y2] = poly[(i + 1) % poly.length]; const nx = y1 - y2; const ny = x2 - x1;
+      const span = (q: [number, number][]) => q.map(([x, y]) => x * nx + y * ny);
+      return Math.max(...span(a)) > Math.min(...span(b)) && Math.max(...span(b)) > Math.min(...span(a));
+    }));
+    expect(overlap(pieceCorners(label), words)).toBe(true);
+    pieces.slice(1).forEach((p) => {
+      expect(overlap(pieceCorners(p), words)).toBe(false);
+      pieceCorners(p).forEach(([x]) => expect(x).toBeGreaterThanOrEqual(30));
+    });
   });
 });
 

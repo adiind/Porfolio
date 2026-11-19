@@ -1019,7 +1019,7 @@ const bambuPhoto = '/images/flipbook/bambu/01-printer-wall.jpg';
 const guide = 'https://drive.google.com/file/d/145pRL8-cY6QNTtiyWkvXoO8g3F3i8G_Z/view?usp=drive_web';
 const bambuPage = (id: string, word: string, title: string, body: string, art: string, selfCaptioned = false): FlipPage => ({
   id, kicker: 'Bambu Lab · Northwestern', word, title, body, layout: 'poster', live: `bambu-${id}`,
-  selfCaptioned, tone: bambuTone, art: { src: art, w: 1600, h: 960, alt: title },
+  selfCaptioned, tone: bambuTone, art: { src: art, w: 1600, h: 960, alt: `${title}. ${body}` },
   ...(['resources','share'].includes(id) ? { cta: { label: 'Open the 3D Print Guide', href: guide } } : {}),
 });
 export const BAMBU_BOOK: FlipBook = {
@@ -1027,11 +1027,11 @@ export const BAMBU_BOOK: FlipBook = {
   theme: buildsTheme, solo: true, spread: true, surface: 'mat', board: '#21442f', plainBack: true,
   pages: [
     bambuPage('cover', 'Making together', 'The studio, the workshops, and a guide to take with you', 'Bambu Lab School Ambassador · Northwestern', '/images/flipbook/bambu/cover.svg', true),
-    bambuPage('studio', 'Studio', 'A room for making', 'The printer lab at Northwestern.', bambuPhoto, true),
+    bambuPage('studio', 'Studio', 'The print lab', 'I help run the print lab at Northwestern, with printers, filament and tools ready for making.', bambuPhoto, true),
     bambuPage('make', 'Make', 'A room for making', 'A shared space for 3D printing.', '/images/flipbook/bambu/make-still.png'),
-    bambuPage('workshops', 'Workshops', 'Learning together', 'Workshops with Corner Makery.', '/images/flipbook/bambu/13-adi-presenting.jpg', true),
+    bambuPage('workshops', 'Workshops', 'The workshops', 'Workshops with Corner Makery.', '/images/flipbook/bambu/13-adi-presenting.jpg', true),
     bambuPage('learn', 'Learn', 'Learning together', 'Preparing a model and getting started with printing.', '/images/flipbook/bambu/learn-still.png'),
-    bambuPage('resources', 'The guide', 'Something to take home', 'A condensed guide to the 3D Print Anything workshop.', '/images/flipbook/bambu/17-supports-preview.jpg', true),
+    bambuPage('resources', 'The guide', 'The guide', 'A condensed guide to the 3D Print Anything workshop.', '/images/flipbook/bambu/17-supports-preview.jpg', true),
     bambuPage('share', 'Share', 'Take the workshop with you', 'Open my 3D Print Guide.', '/images/flipbook/bambu/share-still.png'),
   ],
 };

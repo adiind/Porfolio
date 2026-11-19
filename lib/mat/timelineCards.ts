@@ -3,13 +3,16 @@
  * comes from TimelineSection.tsx's TL and LOOK (copied into ./timelineData.json; its test fails if they drift apart).
  *
  * The stops, as Adi asked on 2026-11-16: Self, Northwestern, Zomato, Udaan, Schmooze, Snapdeal, BITS Pilani, and
- * Tinker Verse as one card that is already open, with small prints of his builds. Bambu Lab, Portfolio V2 and the
- * Jarvis competition are not on it.
+ * Tinker Verse. Bambu Lab, Portfolio V2 and the Jarvis competition are not on it.
  *
  * Each card has two faces, drawn once: at rest (cream, a colour year tab, photo, name, role) and open (its own colour
  * all over, with dates, facts and small pictures). Both are drawn into a canvas of the open size, laid from the card's
  * inner top corner (the corner by the tape), so the card can grow from that corner while one face gives way to the
- * other. Tinker Verse has one face.
+ * other.
+ *
+ * Tinker Verse (2026-11-17) is not a card but a small pile of instant prints of his builds, held by a strip of the
+ * same masking tape, beside a paper label with its year tab. Like every stop it is picked up and turned over; its back
+ * is a contact sheet of the prints, each going to that build's page on the site, and a row that opens his Instagram.
  */
 import data from './timelineData.json';
 import { EXPERIENCE_STORIES, type ExperienceId } from '../../components/mat/experienceStories';
@@ -37,24 +40,35 @@ const LOOK = (data as unknown as { look: Record<string, Look> }).look;
 const TODAY = Date.parse(TL.today);
 
 /**
- * Tinker Verse's prints: his own photographs and screenshots of what he built, already on the site. Each opens its
- * thing. `crop` is the part of the picture shown (x, y, w, h as fractions).
+ * Tinker Verse's prints: his own photographs (and one screenshot) of what he built, already on the site, each cut to
+ * the print's picture shape with the whole object inside (public/images/mat/timeline/tv-*.webp, 640 px, no camera
+ * data). The three print shapes are the instant-film ones: `mini` (portrait), `square`, `wide`.
+ * `name` and `line` are the site's own words: the second half of the project's title in data/projects/*.json, or the
+ * Surya book's words for its front layer. `href` is that build's page on this site (always same-tab, always "/...");
+ * `post` is the Instagram post the site's own data ties to that build (data/projects/<id>.json outcome.proof, also in
+ * data/instagram_posts.json). Builds with no picture of his own here are not on it (Plotter, SoloPump, Glyph).
  */
-export interface Thumb { src: string; cap: string; href: string; crop: [number, number, number, number] }
-export const TINKER_THUMBS: Thumb[] = [
-  // Surya on his wall: web copy of his phone photo IMG_1438 (lib/flipbook/live/suryaStory.ts, "Adi's own photographs")
-  { src: '/images/flipbook/surya/parts/wall.webp', cap: 'Surya', href: '/book/surya', crop: [0.17, 0.06, 0.52, 0.88] },
-  // Jarvis's printed case on his cutting mat, from hero-image.jpg in his diy-jarvis repo (scripts/flipbook/make-jarvis-parts.py)
-  { src: '/images/flipbook/jarvis/parts/case.webp', cap: 'Jarvis', href: 'https://github.com/adiind/diy-jarvis', crop: [0.05, 0.12, 0.9, 0.8] },
-  // Helios, printed and lit, on his mat: the site's own photo of it, cropped above its title lettering
-  { src: '/images/helios.jpg', cap: 'Helios', href: '/work/helios', crop: [0, 0, 1, 0.6] },
-  // Muse, printed, in his hand (HISTORY.md 2026-11-16: "his real photograph of the finished Muse")
-  { src: '/images/flipbook/muse/parts/muse-real.webp', cap: 'Muse', href: '/book/muse', crop: [0.08, 0.04, 0.84, 0.72] },
-  // Zero's workspace: a screenshot of the running app (HISTORY.md 2026-04-28: real screenshots of the local Zero runtime)
-  { src: '/images/zero_text_mode.webp', cap: 'Zero', href: '/work/zero-my-ai', crop: [0, 0, 0.7, 0.75] },
-  // Surya's engraved layer held up in the workshop (his photo IMG_9301)
-  { src: '/images/flipbook/surya/parts/held.webp', cap: 'Laser cut', href: '/book/surya', crop: [0.05, 0.08, 0.9, 0.8] },
+export type PrintFormat = 'mini' | 'square' | 'wide';
+export interface TinkerPrint { id: string; src: string; format: PrintFormat; name: string; line: string; href: string; post?: string }
+export const TINKER_PRINTS: TinkerPrint[] = [
+  // Surya on his wall: his phone photo IMG_1438 (via /images/flipbook/surya/parts/wall.webp, "Adi's own photographs")
+  { id: 'surya', src: '/images/mat/timeline/tv-surya.webp', format: 'square', name: 'Surya', line: 'Kinetic wall timepiece', href: '/book/surya', post: 'https://www.instagram.com/p/DPm6dEjjCmO/' },
+  // Surya's engraved front layer held up in the workshop: his photo IMG_9301 (via .../surya/parts/held.webp); the Surya
+  // book calls it "the front layer", data/projects/surya.json "laser-cut wood layers"
+  { id: 'surya-layer', src: '/images/mat/timeline/tv-surya-layer.webp', format: 'square', name: 'Surya\'s front layer', line: 'Laser-cut wood, engraved', href: '/book/surya' },
+  // Muse, printed, in his hand (via .../muse/parts/muse-real.webp; HISTORY.md 2026-11-16: "his real photograph of the finished Muse")
+  { id: 'muse', src: '/images/mat/timeline/tv-muse.webp', format: 'mini', name: 'Muse', line: 'A body for my desk AI', href: '/book/muse' },
+  // Zero's workspace: a screenshot of the running app (via /images/zero_text_mode.webp; HISTORY.md 2026-04-28: real screenshots of the local Zero runtime)
+  { id: 'zero', src: '/images/mat/timeline/tv-zero.webp', format: 'wide', name: 'Zero', line: 'Second brain AI assistant', href: '/work/zero-my-ai' },
+  // Helios, printed and lit, on his mat (via /images/helios.jpg, cut above the title lettering on that picture; the whole lamp is inside)
+  { id: 'helios', src: '/images/mat/timeline/tv-helios.webp', format: 'mini', name: 'Helios', line: 'Mechanical kinetic lamp', href: '/work/helios', post: 'https://www.instagram.com/p/DDqweMUT021/' },
+  // Jarvis's printed case on his cutting mat: hero-image.jpg in his diy-jarvis repo (via .../jarvis/parts/case.webp)
+  { id: 'jarvis', src: '/images/mat/timeline/tv-jarvis.webp', format: 'mini', name: 'Jarvis', line: 'Voice-controlled smart home assistant', href: '/book/jarvis', post: 'https://www.instagram.com/p/DCMjkgEMbsA/' },
 ];
+/** His Instagram, and how many posts data/instagram_posts.json holds (a test keeps this the file's own count). */
+export const TINKER_INSTAGRAM = 'https://www.instagram.com/tinker_verse/';
+export const TINKER_HANDLE = '@tinker_verse';
+export const TINKER_POSTS = 100;
 
 /** One stop as a card on the mat. Sizes are mat pixels. */
 export interface MatStop {
@@ -64,9 +78,9 @@ export interface MatStop {
   start: string; end: string; today: number;
   look: { c: string; tab: string; tc: string; on: string; ton: string; num: string; dp?: string };
   restW: number; restH: number; openW: number; openH: number;
-  /** Tinker Verse: already open; it fills its lane between the card above and the card below (set by the layout). */
+  /** Tinker Verse: a pile of prints that never grows; it fills its lane between the card above and the card below
+   *  (set by the layout). It is picked up and turned over like every stop, but is not a scroll step. */
   fill?: boolean;
-  thumbs?: Thumb[];
   /** What a screen reader hears, in the same words as the card (the old timeline's wording). */
   label: string;
   /** Where a click goes: a story on the mat (#experience-<id>), a page, or nothing yet (a note says so). */
@@ -114,7 +128,8 @@ export function matStops(): MatStop[] {
       id: it.id, item, start: it.start, end: it.end, today: TODAY, look, label, story, href: it.href ?? (story ? null : `/experience/${it.id}`),
     };
     if (it.id === 'tinkerverse') {
-      return { ...base, lane: 1, restW: 440, restH: 300, openW: 440, openH: 300, fill: true, thumbs: TINKER_THUMBS } as MatStop;
+      const words = `${it.short}: ${it.pin}, ${my(it.start)} to now, ${TINKER_HANDLE} on Instagram. Turns over to show its prints.`;
+      return { ...base, lane: 1, restW: 440, restH: 300, openW: 440, openH: 300, fill: true, label: words } as MatStop;
     }
     return { ...base, lane: it.lane === 0 ? 0 : 1, restW: 440, restH: 84, openW: 560, openH: 280 } as MatStop;
   });
@@ -127,7 +142,7 @@ export function stopPictures(stops: MatStop[]): string[] {
     if (s.item.pic) set.add(s.item.pic);
     const pr = PRINTS[s.id]; if (pr?.rest) set.add(pr.rest); if (pr?.open) set.add(pr.open);
     (s.item.works || []).forEach((w) => { const wp = workPic(w); if (wp) set.add(wp.img); });
-    (s.thumbs || []).forEach((t) => set.add(t.src));
+    if (s.fill) TINKER_PRINTS.forEach((p) => set.add(p.src));
   });
   return [...set];
 }
@@ -190,7 +205,7 @@ export function drawFace(canvas: HTMLCanvasElement, stop: MatStop, open: 0 | 1, 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.setTransform(FACE_SCALE, 0, 0, FACE_SCALE, 0, 0);
-  if (stop.fill) { drawTinker(ctx, stop, pics); return; }
+  if (stop.fill) { drawPile(ctx, stop, pics); return; }
   const W = stop.openW; const H = stop.openH;
   const w = open ? stop.openW : stop.restW; const h = open ? stop.openH : stop.restH;
   const lk = stop.look; const it = stop.item;
@@ -365,48 +380,182 @@ function drawStop(ctx: CanvasRenderingContext2D, stop: MatStop, e: 0 | 1, x0: nu
   }
 }
 
-/** Where Tinker Verse's prints lie on its card (mat pixels from its top left), for drawing and for their links. */
-export function thumbRects(stop: MatStop): { x: number; y: number; w: number; h: number }[] {
-  const thumbs = stop.thumbs || [];
-  const tabW = 66; const x0 = tabW; const cw = stop.restW - tabW; const pad = 14; const cols = 3; const gap = 10;
-  const tw = (cw - pad * 2 - gap * (cols - 1)) / cols;
-  const rows = Math.ceil(thumbs.length / cols);
-  const top = 70; const room = stop.restH - top - 12; const rowH = room / rows; const ph = Math.min(tw * 0.74, rowH - 22);
-  return thumbs.map((_, i) => ({ x: x0 + pad + (i % cols) * (tw + gap), y: top + Math.floor(i / cols) * rowH, w: tw, h: ph }));
+/* ---------- Tinker Verse: a pile of instant prints lying on the mat ---------- */
+
+/** An instant print's paper, in mm: 86 tall, its picture 62 tall and 6.5 from the top; the three shapes differ in width. */
+const PRINT_MM: Record<PrintFormat, { w: number; pw: number }> = { mini: { w: 54, pw: 46 }, square: { w: 72, pw: 62 }, wide: { w: 108, pw: 99 } };
+/** A print `h` mat pixels tall: its width, and where its picture lies on it. */
+export function printBox(format: PrintFormat, h: number): { w: number; h: number; px: number; py: number; pw: number; ph: number } {
+  const k = h / 86; const f = PRINT_MM[format];
+  return { w: f.w * k, h, px: ((f.w - f.pw) / 2) * k, py: 6.5 * k, pw: f.pw * k, ph: 62 * k };
+}
+
+/** One instant print, its top left corner at the current origin: the paper, the picture (whole), its gloss. */
+function drawInstant(ctx: CanvasRenderingContext2D, p: TinkerPrint, h: number, pics: Pictures) {
+  const b = printBox(p.format, h);
+  // the paper: warm white, a shade brighter toward the window (top right)
+  const g = ctx.createLinearGradient(0, b.h, b.w, 0);
+  g.addColorStop(0, '#ebe7dd'); g.addColorStop(1, '#fcfbf7');
+  rr(ctx, 0, 0, b.w, b.h, 1.8); ctx.fillStyle = g; ctx.fill();
+  // the picture (its file is cut to the picture's shape, so nothing of it is lost)
+  const img = pics.get(p.src);
+  ctx.save(); ctx.beginPath(); ctx.rect(b.px, b.py, b.pw, b.ph); ctx.clip();
+  if (img) cover(ctx, img, b.px, b.py, b.pw, b.ph);
+  else { ctx.fillStyle = '#30344a'; ctx.fillRect(b.px, b.py, b.pw, b.ph); }
+  // the glossy film catching the window: a faint wash from the top right
+  const s = ctx.createLinearGradient(b.px + b.pw, b.py, b.px, b.py + b.ph);
+  s.addColorStop(0, 'rgba(255,255,255,0.15)'); s.addColorStop(0.45, 'rgba(255,255,255,0.03)'); s.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = s; ctx.fillRect(b.px, b.py, b.pw, b.ph);
+  ctx.restore();
+  // the picture lies a hair under the paper: a fine line round it; and the paper's cut edge
+  ctx.strokeStyle = 'rgba(28,24,18,0.3)'; ctx.lineWidth = 0.7; ctx.strokeRect(b.px + 0.35, b.py + 0.35, b.pw - 0.7, b.ph - 0.7);
+  rr(ctx, 0.4, 0.4, b.w - 0.8, b.h - 0.8, 1.6); ctx.strokeStyle = 'rgba(70,58,36,0.2)'; ctx.lineWidth = 0.8; ctx.stroke();
+}
+
+/** A piece of the pile: its middle (mat px from the stop's top left), its size and its turn (radians), bottom first. */
+export interface PilePiece { kind: 'label' | 'print' | 'tape'; x: number; y: number; w: number; h: number; rot: number; r: number; print?: TinkerPrint }
+/** The prints on the mat are this tall (mat px); the label is the size of a resting card's words. */
+const PILE_PRINT_H = 150;
+const deg = (d: number): number => (d * Math.PI) / 180;
+const PRINT_BY_ID = new Map(TINKER_PRINTS.map((p) => [p.id, p] as const));
+
+/**
+ * The pile, from the bottom up: the paper label at the top of the lane (its year tab on the edge by the tape, in line
+ * with the other School cards' tabs and next to 2024 on the tape), the prints spread a little under and beside it so a
+ * part of every picture shows, Surya on top, and the strip of tape over the top print's top edge. Nothing lies on the
+ * label's words, and the prints keep 30 px from the edge by the tape (the pen lies 13 px into the lane).
+ */
+export function pileLayout(stop: MatStop): PilePiece[] {
+  const H = stop.restH;
+  const at = (id: string, x: number, y: number, d: number): PilePiece => {
+    const print = PRINT_BY_ID.get(id)!; const b = printBox(print.format, PILE_PRINT_H);
+    return { kind: 'print', x, y, w: b.w, h: b.h, rot: deg(d), r: 1.8, print };
+  };
+  // (y from the foot of the lane, so the prints stay in it whatever its height)
+  const pieces: PilePiece[] = [
+    { kind: 'label', x: 125, y: 55, w: 250, h: 106, rot: 0, r: 12 },
+    at('zero', 338, 84, 4),
+    at('muse', 90, H - 85, -9),
+    at('helios', 178, H - 81, 6),
+    at('jarvis', 376, H - 88, 11),
+    at('surya-layer', 266, H - 96, -7),
+    at('surya', 322, H - 146, 3.5),
+  ];
+  const top = pieces[pieces.length - 1];
+  pieces.push({ kind: 'tape', x: top.x + (Math.sin(top.rot) * top.h) / 2 - 3, y: top.y - (Math.cos(top.rot) * top.h) / 2, w: 26, h: 56, rot: deg(-14), r: 0 });
+  return pieces;
+}
+/** The corners of a piece (mat px), for keeping the pile inside its box. */
+export function pieceCorners(p: PilePiece): [number, number][] {
+  const c = Math.cos(p.rot); const s = Math.sin(p.rot);
+  return ([[-1, -1], [1, -1], [1, 1], [-1, 1]] as const).map(([a, b]) => {
+    const x = (a * p.w) / 2; const y = (b * p.h) / 2;
+    return [p.x + x * c - y * s, p.y + x * s + y * c];
+  });
 }
 
 /**
- * Tinker Verse, already open: cream like the other side builds (it has no brand colour in TL), its year tab, its name
- * and line, and small prints of what he built there, each with a word.
+ * The shadow the pieces cast, as one soft shape: the pieces' outlines (shrunk by `shrink`) are drawn far off the
+ * canvas and only their shadow, moved back, lands on it. `ox`, `oy` place the stop's box on the canvas (mat px).
  */
-function drawTinker(ctx: CanvasRenderingContext2D, stop: MatStop, pics: Pictures) {
-  const w = stop.restW; const h = stop.restH; const it = stop.item;
+function castShadow(ctx: CanvasRenderingContext2D, pieces: PilePiece[], scale: number, ox: number, oy: number,
+  o: { dx: number; dy: number; blur: number; alpha: number; shrink: number }) {
+  const FAR = 6000;
+  ctx.save();
+  ctx.beginPath();
+  for (const p of pieces) {
+    ctx.setTransform(scale, 0, 0, scale, ox * scale - FAR, oy * scale);
+    ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    const k = o.shrink;
+    ctx.roundRect(-p.w / 2 + k, -p.h / 2 + k, p.w - k * 2, p.h - k * 2, Math.max(0, p.r - k));
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.shadowColor = `rgba(0,0,0,${o.alpha})`; ctx.shadowBlur = o.blur * scale;
+  ctx.shadowOffsetX = FAR + o.dx * scale; ctx.shadowOffsetY = o.dy * scale;
+  ctx.fillStyle = '#000'; ctx.fill();
+  ctx.restore();
+}
+
+/** The label: a little cream card with the same year tab as the other cards, the name, its line and his handle. */
+function drawPileLabel(ctx: CanvasRenderingContext2D, stop: MatStop, w: number, h: number) {
+  const it = stop.item; const tabW = 66;
+  ctx.save(); rr(ctx, 0, 0, w, h, 12); ctx.clip();
   ctx.fillStyle = PAPER; ctx.fillRect(0, 0, w, h);
-  const tabW = 66;
-  ctx.fillStyle = PAPER2; ctx.fillRect(0, 0, tabW, h);
+  ctx.fillStyle = stop.look.tc; ctx.fillRect(0, 0, tabW, h);
   const [y1, y2] = yearTab(it);
-  ctx.fillStyle = NAVY; ctx.font = `800 17px ${DISP}`;
+  ctx.fillStyle = stop.look.ton; ctx.font = `800 17px ${DISP}`;
   const ax = (t: string): number => tabW - 11 - ctx.measureText(t).width;
   ctx.fillText(y1, ax(y1), 27);
   if (y2) { ctx.globalAlpha = 0.82; ctx.font = `650 14px ${SANS}`; ctx.fillText(y2, ax(y2), 45); ctx.globalAlpha = 1; }
-  ctx.fillStyle = NAVY; ctx.font = `800 22px ${DISP}`; ctx.fillText(it.short, tabW + 14, 34);
-  ctx.fillStyle = INK2; ctx.font = `500 14px ${SANS}`; ctx.fillText(it.pin || '', tabW + 14, 54);
-  thumbRects(stop).forEach((r, i) => {
-    const t = stop.thumbs![i];
-    const im = pics.get(t.src);
-    ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 8); ctx.clip();
-    ctx.fillStyle = EDGE; ctx.fillRect(r.x, r.y, r.w, r.h);
-    if (im) {
-      const iw = im.naturalWidth; const ih = im.naturalHeight;
-      const [cx, cy, cw2, ch] = t.crop; let sx = cx * iw; let sy = cy * ih; let sw = cw2 * iw; let sh = ch * ih;
-      // cover the print's shape from inside the crop
-      const want = r.w / r.h;
-      if (sw / sh > want) { const nw = sh * want; sx += (sw - nw) / 2; sw = nw; } else { const nh = sw / want; sy += (sh - nh) / 2; sh = nh; }
-      ctx.drawImage(im, sx, sy, sw, sh, r.x, r.y, r.w, r.h);
+  const x = tabW + 14; const tw = w - x - 12;
+  ctx.fillStyle = NAVY; ctx.font = `800 22px ${DISP}`; ctx.fillText(it.short, x, 34);
+  const f = wrapFit(ctx, it.pin || '', tw, 2, 500, 14, 12.5);
+  ctx.fillStyle = INK2; ctx.font = `500 ${f.size}px ${SANS}`;
+  let y = 55; f.lines.forEach((l) => { ctx.fillText(l, x, y); y += f.size + 3.5; });
+  ctx.fillStyle = NAVY; ctx.font = `650 13.5px ${SANS}`; ctx.fillText(TINKER_HANDLE, x, h - 13);
+  ctx.restore();
+  // its cut edge catching the light, as the cards' edges do
+  rr(ctx, 0.6, 0.6, w - 1.2, h - 1.2, 11.4); ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.1; ctx.stroke();
+}
+
+/** A short strip of the timeline's masking tape: cream, crinkled across, its long edges a shade darker, torn at both ends. */
+function drawTapeStrip(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const r = rnd(11);
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(0, 3);
+  tornEdge(ctx, 0, w, 3, -1, r, 2.4);
+  ctx.lineTo(w, h - 3);
+  tornEdge(ctx, w, 0, h - 3, 1, r, 2.4);
+  ctx.closePath(); ctx.clip();
+  // (a little see-through, as the long tape is)
+  ctx.fillStyle = 'rgba(251,246,234,0.88)'; ctx.fillRect(0, 0, w, h);
+  for (let y = 0; y < h; y += 2.2) { ctx.fillStyle = `rgba(150,130,90,${0.03 + r() * 0.04})`; ctx.fillRect(0, y, w, 0.8); }
+  ctx.fillStyle = 'rgba(214,200,166,0.7)'; ctx.fillRect(0, 0, 1, h); ctx.fillRect(w - 1, 0, 1, h);
+  ctx.restore();
+}
+
+/**
+ * The pile, drawn with see-through mat round it (the layer shows it as a cut-out). Each piece casts its own small
+ * shadow on the paper under it (only where there is paper); its shadow on the mat is drawPileShadow's, a sheet of its own.
+ */
+function drawPile(ctx: CanvasRenderingContext2D, stop: MatStop, pics: Pictures) {
+  const S = FACE_SCALE;
+  pileLayout(stop).forEach((p, i) => {
+    if (i > 0) {
+      ctx.save(); ctx.globalCompositeOperation = 'source-atop';
+      if (p.kind === 'tape') castShadow(ctx, [p], S, 0, 0, { dx: -0.4, dy: 0.7, blur: 1.4, alpha: 0.16, shrink: 0 });
+      else {
+        castShadow(ctx, [p], S, 0, 0, { dx: -3, dy: 4, blur: 8, alpha: 0.18, shrink: 1 });
+        castShadow(ctx, [p], S, 0, 0, { dx: -0.8, dy: 1.2, blur: 2, alpha: 0.34, shrink: 0 });
+      }
+      ctx.restore();
     }
+    ctx.save();
+    ctx.setTransform(S, 0, 0, S, 0, 0); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.translate(-p.w / 2, -p.h / 2);
+    if (p.kind === 'label') drawPileLabel(ctx, stop, p.w, p.h);
+    else if (p.kind === 'print') drawInstant(ctx, p.print!, p.h, pics);
+    else drawTapeStrip(ctx, p.w, p.h);
     ctx.restore();
-    ctx.fillStyle = NAVY; ctx.font = `650 12.5px ${SANS}`; ctx.fillText(t.cap, r.x + 2, r.y + r.h + 16);
   });
+}
+
+/** Room round the pile's shadow sheet (mat px): the shadows fall down and to the left. */
+export const PILE_PAD = { l: 72, r: 16, t: 16, b: 84 } as const;
+/**
+ * The pile's shadow on the mat, as its own sheet (only its darkness is used): the house's three shadows (tight,
+ * middle, long and soft, down and to the left: lib/flipbook/shaders.ts PROP_SHADOW_FRAGMENT) of the label and prints.
+ */
+export function drawPileShadow(stop: MatStop): HTMLCanvasElement {
+  const S = FACE_SCALE; const c = document.createElement('canvas');
+  c.width = Math.round((stop.restW + PILE_PAD.l + PILE_PAD.r) * S); c.height = Math.round((stop.restH + PILE_PAD.t + PILE_PAD.b) * S);
+  const ctx = c.getContext('2d');
+  if (!ctx) return c;
+  const pieces = pileLayout(stop).filter((p) => p.kind !== 'tape');
+  // (a canvas blur of b spreads about as far as the shader's smoothstep over 1.6 b)
+  ([[-1.5, 2, 2, 0.42, 0], [-8, 10, 12, 0.36, 2], [-30, 38, 40, 0.55, 10]] as const).forEach(([dx, dy, blur, alpha, shrink]) => {
+    castShadow(ctx, pieces, S, PILE_PAD.l, PILE_PAD.t, { dx, dy, blur: blur * 0.62, alpha, shrink });
+  });
+  return c;
 }
 
 /* ---------- the tape ---------- */
@@ -456,11 +605,13 @@ export function drawTape(w: number, len: number, years: { y: number; label: stri
 
 /* ---------- the back of a stop, turned over when it is clicked ---------- */
 
-/** The sheet's largest size, mat pixels: it lands in the middle of the timeline's window. */
+/** The sheet's largest size, mat pixels: it lands in the middle of the timeline's window. (Tinker Verse's contact
+ *  sheet is the one exception, 696 tall, TV.h below: its foot still ends inside a 1280 x 720 window.) */
 export const SHEET = { w: 1040, h: 660 } as const;
 const ROW_H = 101;
 /** One stop's sheet: as tall as its story and its numbers need, never more than SHEET.h. */
 export function sheetSize(stop: MatStop): { w: number; h: number } {
+  if (stop.fill) return { w: SHEET.w, h: TV.h };
   const n = Math.min(4, stopBeats(stop).length);
   const right = 236 + n * ROW_H + 8;
   const nums = (stop.item.proofs || []).filter((p) => p[0] === 'num').length; const tags = (stop.item.proofs || []).length - nums;
@@ -510,6 +661,7 @@ export function beatRects(stop: MatStop): { x: number; y: number; w: number; h: 
 
 /** The back of a stop: a big print of the stop, its name, role and dates, the numbers, and its story in a few rows. */
 export function drawSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
+  if (stop.fill) return drawTinkerSheet(stop, pics);
   const c = document.createElement('canvas');
   const S = sheetSize(stop);
   c.width = S.w * FACE_SCALE; c.height = S.h * FACE_SCALE;
@@ -582,5 +734,125 @@ export function drawSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
     ctx.fillStyle = INK2; ctx.font = `500 ${lf.size}px ${SANS}`;
     let ly = r.y + 53; lf.lines.forEach((l) => { ctx.fillText(l, tx, ly); ly += lf.size + 3.5; });
   });
+  return c;
+}
+
+/* ---------- Tinker Verse's back: a contact sheet of its prints ---------- */
+
+/**
+ * The sheet's measures (mat px): its height, the prints' height, the grid (three across, two down), and where the
+ * heading and the Instagram row lie. The words are the other sheets' sizes (names 19 px, lines 13.5 px).
+ */
+const TV = { h: 696, fh: 147, x0: 40, colW: 300, gap: 30, top: 170, rowH: 147 + 72 + 14 } as const;
+/** Each print lies on the sheet a little askew, as prints laid down by hand do (degrees). */
+const TV_TILT = [-1.2, 0.9, -0.7, 1, -0.9, 0.6];
+const TV_NAME = `800 19px ${DISP}`;
+const TV_LINE = `500 13.5px ${SANS}`;
+const TV_POST = `600 12.5px ${SANS}`;
+const TV_POST_WORDS = 'The post on Instagram  ↗';
+const TV_FOOT = ['See all of it on Instagram: ', `${TINKER_HANDLE}  ↗`] as const;
+const TV_FOOT_FONTS = [`550 16px ${SANS}`, `750 16px ${SANS}`] as const;
+
+/** Each print in the middle of its column, its words centred under it. */
+interface TinkerSlot { print: TinkerPrint; cx: number; frame: { x: number; y: number; w: number; h: number; rot: number }; nameY: number; lineY: number; postY: number | null }
+function tinkerSlots(): TinkerSlot[] {
+  return TINKER_PRINTS.map((print, i) => {
+    const cx = TV.x0 + (i % 3) * (TV.colW + TV.gap) + TV.colW / 2; const y = TV.top + Math.floor(i / 3) * TV.rowH;
+    const b = printBox(print.format, TV.fh);
+    return { print, cx, frame: { x: cx - b.w / 2, y, w: b.w, h: b.h, rot: deg(TV_TILT[i] ?? 0) }, nameY: y + TV.fh + 26, lineY: y + TV.fh + 46, postY: print.post ? y + TV.fh + 67 : null };
+  });
+}
+
+/** A link lying over the back of a stop (mat px from the sheet's top left). */
+export interface SheetLink { x: number; y: number; w: number; h: number; href: string; text: string; newTab: boolean }
+let tinkerLinkCache: SheetLink[] | null = null;
+/**
+ * The links on Tinker Verse's back, in reading order: each print (its picture, name and line) goes to that build's
+ * page on this site in the same tab; under it, where the site ties it to a post, "The post on Instagram" opens that
+ * post in a new tab; the row at the foot opens his Instagram in a new tab. None of them overlap. (Measured with the
+ * sheet's own fonts, so it is asked for only once they are loaded: when a stop is picked.)
+ */
+export function tinkerLinks(): SheetLink[] {
+  if (tinkerLinkCache) return tinkerLinkCache;
+  const ctx = document.createElement('canvas').getContext('2d')!;
+  const out: SheetLink[] = [];
+  tinkerSlots().forEach((s) => {
+    const p = s.print;
+    ctx.font = TV_NAME; const nw = ctx.measureText(`${p.name}  ↗`).width;
+    ctx.font = TV_LINE; const lw = ctx.measureText(p.line).width;
+    const wide = Math.max(s.frame.w, nw, lw);
+    out.push({ x: s.cx - wide / 2 - 6, y: s.frame.y - 6, w: wide + 12, h: s.lineY + 6 - (s.frame.y - 6), href: p.href, text: `${p.name}: ${p.line}. Opens its page.`, newTab: false });
+    if (s.postY !== null && p.post) {
+      ctx.font = TV_POST; const pw = ctx.measureText(TV_POST_WORDS).width;
+      out.push({ x: s.cx - pw / 2 - 4, y: s.postY - 14, w: pw + 8, h: 19, href: p.post, text: `${p.name}: the post on Instagram (opens in a new tab)`, newTab: true });
+    }
+  });
+  ctx.font = TV_FOOT_FONTS[0]; const a = ctx.measureText(TV_FOOT[0]).width;
+  ctx.font = TV_FOOT_FONTS[1]; const b = ctx.measureText(TV_FOOT[1]).width;
+  out.push({ x: TV.x0 - 6, y: TV.h - 30 - 20, w: a + b + 12, h: 28, href: TINKER_INSTAGRAM, text: `See all of it on Instagram: ${TINKER_HANDLE} (opens in a new tab)`, newTab: true });
+  tinkerLinkCache = out;
+  return out;
+}
+
+/** Where the links lie over a picked stop's back: its rows, or for Tinker Verse its prints and Instagram links. */
+export function sheetRects(stop: MatStop): { x: number; y: number; w: number; h: number }[] {
+  return stop.fill ? tinkerLinks() : beatRects(stop);
+}
+
+/**
+ * Tinker Verse's back: cream paper, the name with its year tab, its line, its dates and the number of posts, then the
+ * six prints laid out as a contact sheet, each whole, with its name and line under it (and the post where there is
+ * one), and at the foot a row to his Instagram.
+ */
+function drawTinkerSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
+  const S = sheetSize(stop);
+  const c = document.createElement('canvas');
+  c.width = S.w * FACE_SCALE; c.height = S.h * FACE_SCALE;
+  const ctx = c.getContext('2d')!;
+  ctx.scale(FACE_SCALE, FACE_SCALE);
+  const it = stop.item; const lk = stop.look;
+  ctx.fillStyle = PAPER; ctx.fillRect(0, 0, S.w, S.h);
+  // the name, and its year tab beside it
+  ctx.fillStyle = NAVY; ctx.font = `800 48px ${DISP}`; ctx.fillText(it.short, 38, 82);
+  const nameW = ctx.measureText(it.short).width;
+  const [y1, y2] = yearTab(it); const years = y1 + (y2 ? ` ${y2}` : '');
+  ctx.font = `800 20px ${DISP}`; const yw = ctx.measureText(years).width + 26; const px = 38 + nameW + 20;
+  rr(ctx, px, 50, yw, 34, 17); ctx.fillStyle = lk.tab; ctx.fill();
+  ctx.fillStyle = lk.ton; ctx.fillText(years, px + 13, 74);
+  // its line, its dates and how much is on Instagram
+  ctx.fillStyle = INK2; ctx.font = `550 17px ${SANS}`; ctx.fillText(it.pin || '', 40, 112);
+  ctx.fillStyle = INK3; ctx.font = `500 14px ${SANS}`; ctx.fillText(`${my(it.start)} to now  ·  ${TINKER_POSTS} posts on Instagram`, 40, 136);
+  ctx.fillStyle = EDGE; ctx.fillRect(40, 152, S.w - 80, 1.5);
+  // the prints
+  tinkerSlots().forEach((s) => {
+    const f = s.frame;
+    ctx.save();
+    ctx.translate(f.x + f.w / 2, f.y + f.h / 2); ctx.rotate(f.rot);
+    // lying on the sheet: a soft shadow down and to the left, and a tight one at its edge
+    ctx.save();
+    ctx.shadowColor = 'rgba(24,32,79,0.2)'; ctx.shadowBlur = 8 * FACE_SCALE; ctx.shadowOffsetX = -2.5 * FACE_SCALE; ctx.shadowOffsetY = 3.5 * FACE_SCALE;
+    rr(ctx, -f.w / 2, -f.h / 2, f.w, f.h, 1.8); ctx.fillStyle = '#efece4'; ctx.fill();
+    ctx.shadowColor = 'rgba(24,32,79,0.28)'; ctx.shadowBlur = 1.6 * FACE_SCALE; ctx.shadowOffsetX = -0.6 * FACE_SCALE; ctx.shadowOffsetY = 1 * FACE_SCALE;
+    ctx.fill();
+    ctx.restore();
+    ctx.translate(-f.w / 2, -f.h / 2);
+    drawInstant(ctx, s.print, f.h, pics);
+    ctx.restore();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = NAVY; ctx.font = TV_NAME; ctx.fillText(`${s.print.name}  ↗`, s.cx, s.nameY);
+    ctx.fillStyle = INK2; ctx.font = TV_LINE; ctx.fillText(s.print.line, s.cx, s.lineY);
+    if (s.postY !== null) {
+      ctx.fillStyle = INK3; ctx.font = TV_POST; ctx.fillText(TV_POST_WORDS, s.cx, s.postY);
+      const all = ctx.measureText(TV_POST_WORDS).width; const w = ctx.measureText(TV_POST_WORDS.replace(/\s+↗$/, '')).width;
+      ctx.fillStyle = 'rgba(100,106,146,0.55)'; ctx.fillRect(s.cx - all / 2, s.postY + 3, w, 1);
+    }
+    ctx.textAlign = 'left';
+  });
+  // the row at the foot: his Instagram
+  const fy = S.h - 30;
+  ctx.fillStyle = EDGE; ctx.fillRect(40, fy - 28, S.w - 80, 1.5);
+  ctx.fillStyle = INK2; ctx.font = TV_FOOT_FONTS[0]; ctx.fillText(TV_FOOT[0], 40, fy);
+  const aw = ctx.measureText(TV_FOOT[0]).width;
+  ctx.fillStyle = NAVY; ctx.font = TV_FOOT_FONTS[1]; ctx.fillText(TV_FOOT[1], 40 + aw, fy);
   return c;
 }

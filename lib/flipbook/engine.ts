@@ -179,6 +179,13 @@ export interface FlipBookEngine {
   /** The page has been scrolled: move the wide view that far down the mat (table units). */
   setScroll(units: number): void;
   /**
+   * Reading a sheet that is taller than the window (StageProp.read): move down (or up) it by this many CSS pixels, or
+   * `to` a place on it (0 its top, 1 its foot). Returns how far down it now is, 0 to 1, and whether there is anything
+   * to move through. Nothing happens when no such sheet is being read.
+   */
+  readBy(px: number): { at: number; can: boolean };
+  readTo(at: number): { at: number; can: boolean };
+  /**
    * Where a thing on the stage lies on screen just now, in CSS pixels from the canvas corner ('book' is the live book):
    * the keyboard's focus ring is drawn round it. Null when there is no such thing.
    */
@@ -473,6 +480,9 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   };
   let propMeshes: PropMesh[] = [];
   let focus: StageProp | null = null;
+  /** Reading a tall sheet: how far down it the reader has gone (0 its top, 1 its foot), where the view is on its way
+   *  there, and how many CSS pixels of the sheet lie beyond the window (0: it is seen whole). */
+  let readGoal = 0; let readNow = 0; let readRange = 0;
   /** When the poster flown to opens into a set of cards: the box that holds the whole set, for the camera. */
   let focusBox: { x: number; y: number; w: number; h: number } | null = null;
   let hoverProp: string | null = null;
@@ -1416,14 +1426,27 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       const H = Math.max(1, canvas.clientHeight);
       const whole = H * 0.94;
       const byWidth = ((W - focus.read.aside - W * 0.05) * focus.h) / (focus.w + Math.abs(Math.sin(((focus.turn ?? 0) * Math.PI) / 180)) * focus.h);
-      const tall = whole >= focus.read.minPx ? Math.min(whole, byWidth) : Math.min(byWidth, Math.max(focus.read.minPx, whole), whole * 1.5);
+      // (a sheet too tall to read whole is read from its top, at up to 1.6 window heights, and the reader moves down it:
+      // readBy / readTo. Adi, 2026-11-17: the résumé at 11 px type was too small to read; people liked how the bag's
+      // receipt fills the window.)
+      const tall = whole >= focus.read.minPx ? Math.min(whole, byWidth) : Math.min(byWidth, Math.max(focus.read.minPx, whole), whole * 1.6);
       viewDist = (focus.h * Math.cos(PITCH) * H) / (tall * 2 * viewTan);
       const halfH = viewDist * viewTan;
       const halfW = halfH * viewAspect;
       // (a turned sheet leans out at one side: the margin takes that in, so no corner leaves the window)
       const lean = (Math.abs(Math.sin(((focus.turn ?? 0) * Math.PI) / 180)) * tall) / 2 / W;
-      // (whole: its middle at the window's; from its top: its top edge just under the window's)
-      viewTarget.set(focus.x - focus.w / 2 + halfW * (0.95 - lean * 2), tall <= whole ? focus.y : focus.y + focus.h / 2 - halfH * 0.93, 0);
+      // (whole: its middle at the window's; from its top: its top edge just under the window's; at its foot: its bottom
+      // edge just over the window's)
+      readRange = tall <= whole ? 0 : Math.max(0, tall - H * 0.93);
+      if (readRange === 0) { readGoal = 0; readNow = 0; }
+      if (readNow !== readGoal && dt > 0) {
+        readNow = opts.reducedMotion ? readGoal : readNow + (readGoal - readNow) * Math.min(1, dt * 12);
+        if (Math.abs(readGoal - readNow) < 0.0005) readNow = readGoal;
+      }
+      if (readNow !== readGoal) moving = true;
+      const fromTop = focus.y + focus.h / 2 - halfH * 0.93;
+      const atFoot = focus.y - focus.h / 2 + halfH * 0.93;
+      viewTarget.set(focus.x - focus.w / 2 + halfW * (0.95 - lean * 2), tall <= whole ? focus.y : fromTop + (atFoot - fromTop) * readNow, 0);
     } else if (focus) {
       // flown down to a poster: it fills most of the window's height, a little left of the middle (its words sit to the right)
       viewDist = Math.max((focus.h * 1.05) / 0.66 / (2 * viewTan), (focus.w * 1.03) / 0.44 / (2 * viewTan * viewAspect));
@@ -1718,6 +1741,9 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       pointerUv = uv && uv.u > -0.04 && uv.u < 1.04 && uv.v > -0.04 && uv.v < 1.04 ? uv : null;
     }
     if (offBook()) {
+      // (a press that travels is a drag, not a click: reading down a sheet with a finger used to end as a tap, which
+      // closed the sheet)
+      if (press && press.id === event.pointerId && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 8) press.moved = true;
       if (stageSpec && event.pointerType === 'mouse') {
         const picked = focus ? pickHit(event.clientX, event.clientY) : null;
         const under = focus ? picked : stageHit(event.clientX, event.clientY);
@@ -2140,6 +2166,18 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       hoverProp = id;
       invalidate();
     },
+    readBy(px: number) {
+      if (!focus?.read || readRange <= 0) return { at: 0, can: false };
+      readGoal = Math.min(1, Math.max(0, readGoal + px / readRange));
+      invalidate();
+      return { at: readGoal, can: true };
+    },
+    readTo(at: number) {
+      if (!focus?.read || readRange <= 0) return { at: 0, can: false };
+      readGoal = Math.min(1, Math.max(0, at));
+      invalidate();
+      return { at: readGoal, can: true };
+    },
     setScroll(units: number) {
       if (units === stageScroll) return;
       stageScroll = units;
@@ -2174,6 +2212,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       const next = id ? stageSpec.props.find((prop) => prop.id === id) ?? null : null;
       if (next) {
         focus = next;
+        // (a sheet is always opened at its top)
+        readGoal = 0; readNow = 0;
         // does this card open into a set? Then the camera frames the whole set where it will lie
         const set = [next, ...stageSpec.props.filter((prop) => prop.dealtFrom === next.id)];
         if (set.length > 1) {

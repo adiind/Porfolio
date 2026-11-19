@@ -14,9 +14,11 @@ import {
 import { PROP_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_VERTEX } from '../flipbook/shaders';
 import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
 import { whenQuiet } from '../flipbook/quiet';
-import { beatRects, drawFace, drawSheet, drawTape, faceCanvas, sheetSize, thumbRects, type MatStop, type Pictures } from './timelineCards';
 import {
-  PEN, PEN_START, ROLL, TAPE, cardPose, cardSize, clamp01, holdLength, introDue, introEnd, layoutCards, openingOrder, outCubic,
+  PILE_PAD, drawFace, drawPileShadow, drawSheet, drawTape, faceCanvas, sheetRects, sheetSize, type MatStop, type Pictures,
+} from './timelineCards';
+import {
+  OPEN_REDUCED_S, PEN, PEN_START, ROLL, TAPE, cardPose, cardSize, clamp01, holdLength, introDue, introEnd, layoutCards, openingOrder, outCubic,
   penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollTop, rollY, smooth, stepOpenTo, wantOpen, yOf,
   type Flight, type Hold, type PlacedCard,
 } from './timelineScene';
@@ -33,6 +35,24 @@ const CARD_FRAGMENT = PROP_FRAGMENT
   .replace('uniform sampler2D tMap;', 'uniform sampler2D tMap;\nuniform sampler2D tOpen;\nuniform vec2 uCrop;\nuniform float uAnchor;\nuniform float uOpen;')
   .replace('vec4 tex = texture2D(tMap, vUv);', `vec2 at = vec2(uAnchor > 0.5 ? 1.0 - (1.0 - vUv.x) * uCrop.x : vUv.x * uCrop.x, 1.0 - (1.0 - vUv.y) * uCrop.y);
   vec4 tex = vec4(mix(texture2D(tMap, at).rgb, texture2D(tOpen, at).rgb, step(0.06, uOpen)), 1.0);`);
+
+/**
+ * Tinker Verse's pile of prints: the posters' own shader as a cut-out (the picture's own outline, the mat showing
+ * round the prints). Its picture is sent premultiplied, so the prints' edges stay clean where they meet the clear mat.
+ */
+const PILE_FRAGMENT = PROP_FRAGMENT.replace('vec4 tex = texture2D(tMap, vUv);', 'vec4 tex = texture2D(tMap, vUv);\n  tex.rgb /= max(tex.a, 0.0001);');
+/** The pile's shadow on the mat: its own soft shape, drawn once (timelineCards.ts drawPileShadow), in the colour and
+ *  light of every shadow on the mat. */
+const PILE_SHADOW_FRAGMENT = PROP_SHADOW_FRAGMENT
+  .replace('uniform vec2 uSize;', 'uniform sampler2D tMap;\nuniform vec2 uSize;')
+  .replace(/void main\(\) \{[\s\S]*\}\s*$/, `void main() {
+  float a = texture2D(tMap, vUv).a * uAlpha;
+  if (a < 0.003) discard;
+  gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), a);
+}
+`);
+/** How long the pile takes to rise a little under the pointer, or settle back. */
+const PILE_LIFT_S = 0.22;
 
 /** The sheet a picked-up stop turns into: the posters' own shader, darkened as it turns away from the window. */
 const SHEET_FRAGMENT = PROP_FRAGMENT
@@ -178,14 +198,14 @@ export interface TimelinePage {
   perUnit(): number | null;
 }
 
-/** The HTML lying over the cards: one link per card, one per print on Tinker Verse, and words placed on the mat. */
+/** The HTML lying over the cards: one button per card (Tinker Verse's pile too), and words placed on the mat. */
 export interface TimelineOverlay {
   cards: Map<string, HTMLElement>;
-  thumbs: HTMLElement[];
   /** elements with data-mx / data-my (mat pixels) are placed there, scaled by --k */
   words: HTMLElement[];
   root: HTMLElement;
-  /** Links lying over the rows on the back of a picked stop (by row), and the back itself */
+  /** Links lying over the rows on the back of a picked stop (by row; for Tinker Verse, its prints and Instagram links,
+   *  timelineCards.ts tinkerLinks), and the back itself */
   sheet?: { box: HTMLElement | null; rows: HTMLElement[] };
 }
 
@@ -204,6 +224,8 @@ export interface TimelineLayer extends MatLayer {
     intro: number; introEnd: number; open: number[]; current: number;
     pen: { y: number; target: number; angle: number }; hover: number; picked: string | null; pick: number;
     tops: Record<string, number>;
+    /** how far Tinker Verse's pile has risen under the pointer, 0 to 1 */
+    pile: number;
   };
   /** Where the pointer is over the window (CSS px), or null when it has left. Hover follows its moves only. */
   pointer(x: number, y: number): void;
@@ -240,6 +262,9 @@ export function createTimelineLayer(opts: {
   let pickFrom: { x: number; y: number; w: number; h: number; k: number } | null = null;
   let onPick: ((id: string | null, settled: boolean) => void) | null = null;
   let frozenWant: number[] | null = null; let lastWant: number[] = open.map(() => 0);
+  /* Tinker Verse's pile: it is not a scroll step (it never grows); under the pointer it rises a little */
+  const pileId = cards.find((c) => c.stop.fill)?.stop.id ?? null;
+  let pileLift = 0; let pileWant = 0;
   /** The step whose card is under a point of the window (CSS px), by where the cards are drawn now. */
   const hitStep = (x: number, y: number): number => {
     let hit = -1;
@@ -293,6 +318,21 @@ export function createTimelineLayer(opts: {
     });
     disposables.push(m);
     return m;
+  };
+  /** The pile's shadow: its drawn shape, with the same uniforms as the others so the shared code can set them. */
+  const pileShadowMaterial = (map: CanvasTexture, dawn: { value: number }, screen: Vector2): ShaderMaterial => {
+    const m = shadowMaterial(dawn, screen);
+    m.fragmentShader = PILE_SHADOW_FRAGMENT;
+    m.uniforms.tMap = { value: map };
+    m.needsUpdate = true;
+    return m;
+  };
+  /** Lays the pile's shadow sheet under it: (x, y) the pile's middle (mat px), `cs` how much of its width faces up. */
+  const pileShadowAt = (m: CardMesh, x: number, y: number, cs: number) => {
+    const st = m.placed.stop;
+    const SW = (st.restW + PILE_PAD.l + PILE_PAD.r) * u; const SH = (st.restH + PILE_PAD.t + PILE_PAD.b) * u;
+    m.shadow.position.set(tx(x + ((PILE_PAD.r - PILE_PAD.l) / 2) * cs), ty(y + (PILE_PAD.b - PILE_PAD.t) / 2), 0.0005);
+    m.shadow.scale.set(SW * Math.max(0.02, cs), SH, 1);
   };
 
   const attach = (c: MatLayerContext) => {
@@ -388,20 +428,24 @@ export function createTimelineLayer(opts: {
       const { stop } = placed;
       const restCanvas = faceCanvas(stop); drawFace(restCanvas, stop, 0, pictures);
       const rest = texture(restCanvas, c.maxAnisotropy);
+      // (the pile is a cut-out: its picture goes up premultiplied, PILE_FRAGMENT undoes it)
+      if (stop.fill) rest.premultiplyAlpha = true;
       let openTex: CanvasTexture | null = null;
       if (!stop.fill) { const oc = faceCanvas(stop); drawFace(oc, stop, 1, pictures); openTex = texture(oc, c.maxAnisotropy); }
+      const pileShadow = stop.fill ? texture(drawPileShadow(stop), c.maxAnisotropy) : null;
       c.renderer.initTexture(rest);
       if (openTex) c.renderer.initTexture(openTex);
+      if (pileShadow) c.renderer.initTexture(pileShadow);
       const mat = new ShaderMaterial({
-        vertexShader: PROP_VERTEX, fragmentShader: CARD_FRAGMENT, transparent: true, depthTest: false, depthWrite: false,
+        vertexShader: PROP_VERTEX, fragmentShader: stop.fill ? PILE_FRAGMENT : CARD_FRAGMENT, transparent: true, depthTest: false, depthWrite: false,
         uniforms: {
           tMap: { value: rest }, tOpen: { value: openTex ?? rest }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize },
-          uSize: { value: new Vector2(1, 1) }, uRadius: { value: 14 * u }, uCutout: { value: 0 }, uAlpha: { value: 0 }, uDawn: c.dawn,
+          uSize: { value: new Vector2(1, 1) }, uRadius: { value: 14 * u }, uCutout: { value: stop.fill ? 1 : 0 }, uAlpha: { value: 0 }, uDawn: c.dawn,
           uCrop: { value: new Vector2(1, 1) }, uAnchor: { value: placed.lane === 0 ? 1 : 0 }, uOpen: { value: 0 },
         },
       });
       disposables.push(mat);
-      const shade = shadowMaterial(c.dawn, c.screenSize);
+      const shade = pileShadow ? pileShadowMaterial(pileShadow, c.dawn, c.screenSize) : shadowMaterial(c.dawn, c.screenSize);
       const mesh = new Mesh(unitPlane, mat); mesh.frustumCulled = false;
       const shadow = new Mesh(unitPlane, shade); shadow.frustumCulled = false;
       meshes.push({ placed, flight: plan.get(placed)!, step: steps.indexOf(placed), rest, open: openTex, mesh, mat, shadow, shade });
@@ -563,10 +607,13 @@ export function createTimelineLayer(opts: {
     current = done && !leaving ? penStop(pen.y, rows) : -1;
     // hover: only the pointer's own moves change it (never a card moving under a still pointer), and only once the
     // pointer has rested on the new card (or off every card) for a moment, so neighbours never flicker
-    if (!done || pickedId || leaving) { hover = -1; pending = -1; pendingT = 0; }
+    if (!done || pickedId || leaving) { hover = -1; pending = -1; pendingT = 0; pileWant = 0; }
     else {
       if (pointerMoved) {
         pointerMoved = false;
+        // (the pile rises while the pointer is over it: it has no larger face to open into)
+        const pr = pileId ? rects.get(pileId) : undefined;
+        pileWant = pointerAt && pr && pointerAt.x >= pr.l && pointerAt.x <= pr.l + pr.w && pointerAt.y >= pr.t && pointerAt.y <= pr.t + pr.h ? 1 : 0;
         const under = pointerAt ? hitStep(pointerAt.x, pointerAt.y) : -1;
         if (under === hover) { pending = hover; pendingT = 0; } else if (under !== pending) { pending = under; pendingT = 0; }
       }
@@ -578,6 +625,12 @@ export function createTimelineLayer(opts: {
     const want = pickedId && frozenWant ? frozenWant : wantOpen(open.length, current, hover, (i) => steps[i].lane);
     lastWant = want;
     if (stepOpenTo(open, want, dt, reduced)) moving = true;
+    // (never past what is wanted, and still once there: no frame steps it back and forth)
+    if (pileLift !== pileWant) {
+      const r = dt / (reduced ? OPEN_REDUCED_S : PILE_LIFT_S);
+      pileLift = pileWant > pileLift ? Math.min(pileWant, pileLift + r) : Math.max(pileWant, pileLift - r);
+      moving = true;
+    }
     // picking a stop up and turning it over
     if (pickK !== pickTo) {
       const was = pickK;
@@ -614,6 +667,15 @@ export function createTimelineLayer(opts: {
       const su = m.shade.uniforms;
       su.uSize.value.set(W, H); su.uSheet.value.set(W + reach * 2, H + reach * 2);
       su.uLift.value = pose.lift + pose.drop * 2; su.uAlpha.value = pose.alpha * (1 - pose.drop);
+      if (p.stop.fill) {
+        // the pile: its own shadow sheet, moved further down and to the left the higher the pile is (hopping in, or
+        // risen under the pointer), and a little fainter
+        const L = smooth(pileLift);
+        m.mesh.position.z += L * 0.05;
+        const off = pose.lift * 1.6 + pose.drop * 3 + L * 0.9;
+        pileShadowAt(m, pose.x - off * 6, pose.y + off * 7.5, 1);
+        su.uAlpha.value = (pose.alpha * (1 - pose.drop) * (1 - 0.14 * L)) / (1 + 0.25 * pose.lift);
+      }
       m.mesh.visible = m.shadow.visible = pose.alpha > 0.003;
       // flat cards in lane order; one still coming out from under the card above it lies under every card already down;
       // one hopping lies over the mat and the tape
@@ -637,6 +699,11 @@ export function createTimelineLayer(opts: {
           m.shadow.scale.set(PW * cs + reach * 2, PH + reach * 2, 1);
           su.uSize.value.set(PW * Math.max(0.02, cs), PH); su.uSheet.value.set(PW * cs + reach * 2, PH + reach * 2);
           su.uLift.value = 0.6 + at.z * 9; su.uAlpha.value = 0.9 * Math.sqrt(Math.max(0, cs));
+          if (p.stop.fill) {
+            // the pile's own shadow, narrowing as it turns and fading as it rises
+            pileShadowAt(m, at.x - (at.z / u) * 0.3, at.y + (at.z / u) * 0.38, cs);
+            su.uAlpha.value = 0.9 * Math.sqrt(Math.max(0, cs)) * (1 - 0.45 * Math.min(1, at.z / 0.36));
+          }
           m.shadow.renderOrder = 58;
         } else { m.mesh.visible = false; m.shadow.visible = false; }
       } else m.mesh.rotation.y = 0;
@@ -652,19 +719,13 @@ export function createTimelineLayer(opts: {
         if (!el) return;
         const s = sizes.get(m.placed)!; const c = middle(m.placed);
         placeBox(el, camera, view, c.x - s.w / 2, c.y - s.h / 2, s.w, s.h, 0.004);
-        if (m.placed.stop.fill) {
-          thumbRects(m.placed.stop).forEach((r, j) => {
-            const t = overlay!.thumbs[j];
-            if (t) placeBox(t, camera, view, c.x - s.w / 2 + r.x, c.y - s.h / 2 + r.y, r.w, r.h + 20, 0.004);
-          });
-        }
       });
       if (overlay.sheet?.box && pickedId && pickK === 1) {
         const card = meshes.find((m) => m.placed.stop.id === pickedId);
         const S = card ? sheetSize(card.placed.stop) : { w: 0, h: 0 };
         const x0 = SHEET_AT.x - S.w / 2; const y0 = SHEET_AT.y - S.h / 2; const z = 0.004 + 0.055;
         placeBox(overlay.sheet.box, camera, view, x0, y0, S.w, S.h, z);
-        if (card) beatRects(card.placed.stop).forEach((r, j) => { const el = overlay!.sheet!.rows[j]; if (el) placeBox(el, camera, view, x0 + r.x, y0 + r.y, r.w, r.h, z); });
+        if (card) sheetRects(card.placed.stop).forEach((r, j) => { const el = overlay!.sheet!.rows[j]; if (el) placeBox(el, camera, view, x0 + r.x, y0 + r.y, r.w, r.h, z); });
       }
       const a = project(camera, view, 0, 450); const b = project(camera, view, 1440, 450);
       const k = ((b.x - a.x) / 1440).toFixed(4);
@@ -690,16 +751,19 @@ export function createTimelineLayer(opts: {
       intro: introT, introEnd: endT, open: [...open], current, hover, picked: pickedId, pick: pickK,
       pen: { y: pen.y, target: penTargetY, angle: penAngle },
       tops: Object.fromEntries([...rects.entries()].map(([id, r]) => [id, Math.round(r.t * 10) / 10])),
+      pile: pileLift,
     }),
     pointer(x, y) { pointerAt = { x, y }; pointerMoved = true; ctx?.invalidate(); },
     pointerLeft() { pointerAt = null; pointerMoved = true; ctx?.invalidate(); },
     pick(id) {
       if (id) {
         if (pickedId && pickedId !== id) return;
-        if (!steps.some((c) => c.stop.id === id) || introT < endT) return;
+        // (any stop, Tinker Verse's pile too, which is not one of the scroll steps)
+        const card = cards.find((c) => c.stop.id === id);
+        if (!card || introT < endT) return;
         // while it is up, every other stop folds, so the sheet lies over the whole timeline with nothing peeking out
         pickedId = id; pickTo = 1; frozenWant = steps.map(() => 0);
-        SHEET_AT = sheetAt(steps.find((c) => c.stop.id === id)!.stop);
+        SHEET_AT = sheetAt(card.stop);
         onPick?.(id, false);
       } else if (pickedId) {
         // on the way back the stop opens again (it lands as it was picked up), and the pen's stop in the other lane too

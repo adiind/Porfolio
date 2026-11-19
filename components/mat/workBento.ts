@@ -12,6 +12,9 @@ export const COLUMNS = 6;
 
 /** The shape each project likes, [columns across, rows down], in the order they are laid down. */
 export const SHAPE: Record<string, [number, number]> = {
+  'familysync-jpmorgan': [2, 2],
+  'mcdonalds-interaction-design': [2, 2],
+  'pg-haircare': [2, 2],
   glyph: [3, 2],
   lawn: [3, 2],
   surya: [2, 2],
