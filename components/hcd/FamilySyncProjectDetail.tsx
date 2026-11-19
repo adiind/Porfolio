@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Project } from '../../types/Project';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
 import { projectPath } from '../../lib/workRoutes';
+import { storyPageSrc } from '../../lib/mat/caseStudyHandoff';
 
 // The case study is a standalone document with its own run rail, so this
 // dialog only frames it and offers the way back.
@@ -30,7 +31,7 @@ const FamilySyncProjectDetail: React.FC<{ project: Project; onClose: () => void 
     <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={project.hero.title} className="fixed inset-0 z-[100] flex flex-col bg-white focus:outline-none">
       <iframe
         tabIndex={0}
-        src="/work/familysync-assets/story.html"
+        src={storyPageSrc('/work/familysync-assets/story')}
         title={project.hero.title}
         className="min-h-0 flex-1 w-full border-0"
       />

@@ -3,6 +3,7 @@ import { Project } from '../../types/Project';
 import BackPill from '../BackPill';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
 import { projectPath } from '../../lib/workRoutes';
+import { storyPageSrc } from '../../lib/mat/caseStudyHandoff';
 
 const sections = [
   { id: 'start', label: 'Start' },
@@ -125,7 +126,7 @@ const McDonaldsProjectDetail: React.FC<{ project: Project; onClose: () => void }
       </nav>
       <iframe
         ref={iframeRef}
-        src="/work/squad-up-assets/story.html"
+        src={storyPageSrc('/work/squad-up-assets/story')}
         title={project.hero.title}
         className="block h-full w-full border-0 max-sm:mt-[68px] max-sm:h-[calc(100%-68px)]"
       />

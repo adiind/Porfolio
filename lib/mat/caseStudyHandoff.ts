@@ -68,6 +68,71 @@ export function openCaseStudy(
   window.setTimeout(go, SPLASH_GROW_MS + 40);
 }
 
+/**
+ * The story pages two case studies show in a frame (Squad Up, FamilySync). Without ".html": the live site answers
+ * story.html with a redirect to this address, one more trip before the frame can start.
+ */
+export const CASE_STORY_PAGES = ['/work/squad-up-assets/story', '/work/familysync-assets/story'];
+
+type ShipCode = { old?: { js: string[]; css: string[] } };
+let warmed = false;
+
+/**
+ * Download what a case study needs while the home page sits idle, so a click on a clipboard finds it already here
+ * (Adi, 2026-11-19: "like a 6 second splash page between home page and squad up"). After the click a case study
+ * used to fetch its code, then its story page, then that page's styles and scripts, each waiting for the one before;
+ * on a slow line that chain is what held the splash up.
+ *
+ * It only downloads (fetch, body read to the end, into the browser's cache): nothing is run on the home page. The old
+ * home's code addresses come from index.html (window.__shipCode, written in by the build); the story pages are read for
+ * their stylesheets, scripts and first pictures. Two at a time, low priority, never on a data saver or a 2G line.
+ */
+export function warmCaseStudies(): void {
+  if (warmed) return;
+  warmed = true;
+  const net = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  if (net?.saveData || /2g$/.test(net?.effectiveType ?? '')) return;
+
+  const queue: string[] = [];
+  const seen = new Set<string>();
+  const add = (url: string) => {
+    const at = new URL(url, window.location.href);
+    if (at.origin !== window.location.origin || seen.has(at.href)) return;
+    seen.add(at.href);
+    queue.push(at.href);
+  };
+  const code = (window as Window & { __shipCode?: ShipCode }).__shipCode?.old;
+  code?.js.forEach(add);
+  code?.css.forEach(add);
+
+  let running = 0;
+  const pull = () => {
+    while (running < 2 && queue.length) {
+      const url = queue.shift() as string;
+      running++;
+      const page = CASE_STORY_PAGES.some((path) => url.endsWith(path));
+      fetch(url, { credentials: 'same-origin', priority: 'low' } as RequestInit)
+        .then(async (response) => { if (page && response.ok) readStoryPage(await response.text(), url); else await response.arrayBuffer(); })
+        .catch(() => { /* only a head start: the case study asks for it again anyway */ })
+        .finally(() => { running--; pull(); });
+    }
+  };
+  const readStoryPage = (html: string, base: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const at = (value: string | null) => { if (value) add(new URL(value, base).href); };
+    doc.querySelectorAll('link[rel="stylesheet"]').forEach((el) => at(el.getAttribute('href')));
+    doc.querySelectorAll('script[src]').forEach((el) => at(el.getAttribute('src')));
+    [...doc.querySelectorAll('img[src]')].slice(0, 4).forEach((el) => at(el.getAttribute('src')));
+  };
+  CASE_STORY_PAGES.forEach(add);
+  pull();
+}
+
+/** The address a case study's frame loads: the story page itself (the dev server only knows it with ".html"). */
+export function storyPageSrc(path: string): string {
+  return import.meta.env.DEV ? `${path}.html` : path;
+}
+
 /** The project's name and who it was with, white on its colour (index.html draws the same). */
 function splashWords(title: string, partner: string, rising: boolean): HTMLElement {
   const box = document.createElement('div');

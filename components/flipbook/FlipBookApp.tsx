@@ -26,7 +26,8 @@ import { GITHUB, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
 import { WORDS_BIG_BELOW, type GreetingSet } from '../../lib/mat/wordPieces';
 import { resumeSheetPicture, wordProps } from '../../lib/mat/wordStage';
 import { DESIGN_CARDS } from '../../lib/mat/designCards';
-import { openCaseStudy } from '../../lib/mat/caseStudyHandoff';
+import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
+import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
@@ -593,6 +594,14 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { bagRef.current?.remove(); bagRef.current = null; window.clearTimeout(bagTimer.current); }, []);
 
+  // The three clipboards' case studies: their code and story pages downloaded once the room is lit and the page is quiet,
+  // so a click lands on a case study that is already here (lib/mat/caseStudyHandoff.ts, warmCaseStudies)
+  // (a few seconds after, so they never share the line with the home's own pictures)
+  useEffect(() => {
+    if (!staged || fallback || !lit) return undefined;
+    const later = window.setTimeout(() => whenQuiet(() => warmCaseStudies(), 12000), 3000);
+    return () => window.clearTimeout(later);
+  }, [fallback, lit, staged]);
   /** Come down to the bag: it unpacks (Back waits until it has). */
   const bagArrive = useCallback(() => {
     const layer = bagRef.current?.layer;

@@ -210,7 +210,21 @@
         }); });
         setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 900);
       }
-      function drawn() { var r = document.getElementById('root'); return !!r && (r.textContent || '').replace(/\s+/g, '').length > 60; }
+      // drawn: the case study itself is on screen (the old home under it has text long before; the case study is drawn
+      // outside #root), and when it shows a
+      // story page in a frame, that page has its words and every stylesheet in
+      function words(el) { return !!el && (el.textContent || '').replace(/\s+/g, '').length > 60; }
+      function drawn() {
+        var box = document.querySelector('[role="dialog"][aria-modal="true"]');
+        if (!box) return false;
+        var frame = box.querySelector('iframe');
+        if (!frame) return words(box);
+        try {
+          var doc = frame.contentDocument;
+          if (!doc || !words(doc.body)) return false;
+          return doc.styleSheets.length >= doc.querySelectorAll('link[rel="stylesheet"]').length;
+        } catch (e) { return true; }
+      }
       (function wait() {
         if (drawn()) { setTimeout(lift, 90); return; }
         if (Date.now() - start > 3500) { lift(); return; }
@@ -251,6 +265,8 @@
         '/images/flipbook/surya/parts/product.webp',
       ];
       // port-home:END first-frame
+      // (also read by the 3D home, lib/mat/caseStudyHandoff.ts warmCaseStudies: the old home's code is what a case study needs)
+      window.__shipCode = code;
       var first = door === 'mat' || door === 'old' ? code[door] : null;
       if (door !== 'mat') pictures = [];
       var add = function (rel, href, as, cors) {
