@@ -1,9 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import data from './timelineData.json';
-import posts from '../../data/instagram_posts.json';
 import { PROJECTS_BY_ID } from '../../data/projects';
-import { TINKER_INSTAGRAM, TINKER_POSTS, TINKER_PRINTS, matStops, pieceCorners, pileLayout } from './timelineCards';
+import { TINKER_INSTAGRAM, TINKER_PRINTS, matStops, pieceCorners, pileLayout } from './timelineCards';
 import {
   GAP, OPEN_REDUCED_S, OPEN_S, TAPE, cardPose, cardSize, holdLength, introDue, introEnd, layoutCards, matScroll, openingOrder,
   PEN_MAX_SPEED, PEN_PARK, PEN_START, penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollY,
@@ -34,32 +33,19 @@ describe('the timeline data', () => {
     expect(stops.filter((s) => s.story).map((s) => s.story)).toEqual(['self', 'zomato', 'udaan', 'schmooze', 'snapdeal']);
   });
 
-  it('gives Tinker Verse six prints of his own builds, each going to its page on this site', () => {
-    expect(TINKER_PRINTS.map((t) => [t.name, t.href])).toEqual([
-      ['Surya', '/book/surya'], ['Surya\'s front layer', '/book/surya'], ['Muse', '/book/muse'], ['Zero', '/work/zero-my-ai'],
-      ['Helios', '/work/helios'], ['Jarvis', '/book/jarvis'],
-    ]);
-    // every picture is in the repo; every page is on this site (a book that exists, or a project the /work route knows)
-    const books = readFileSync(new URL('../../data/flipbooks.ts', import.meta.url), 'utf8');
+  it('gives Tinker Verse his eight latest posts as prints, newest first, each opening its post on Instagram', () => {
+    expect(TINKER_PRINTS).toHaveLength(8);
+    expect(new Set(TINKER_PRINTS.map((t) => t.id)).size).toBe(8);
+    const dates = TINKER_PRINTS.map((t) => Date.parse(t.date));
+    dates.forEach((d) => expect(Number.isNaN(d)).toBe(false));
+    expect([...dates].sort((a, b) => b - a)).toEqual(dates);
     TINKER_PRINTS.forEach((t) => {
+      // the post's own cover is in the repo, named after the post
+      expect(t.src).toBe(`/images/mat/timeline/ig-${t.id}.webp`);
       expect(() => readFileSync(new URL(`../../public${t.src}`, import.meta.url))).not.toThrow();
-      expect(t.href.startsWith('/')).toBe(true);
-      const book = /^\/book\/([a-z0-9-]+)$/.exec(t.href); const work = /^\/work\/([a-z0-9-]+)$/.exec(t.href);
-      if (book) expect(books).toMatch(new RegExp(`slug: '${book[1]}'`));
-      else expect(work && PROJECTS_BY_ID.has(work[1])).toBe(true);
+      expect(t.href).toBe(`https://www.instagram.com/p/${t.id}/`);
+      expect(t.name.length).toBeGreaterThan(2);
     });
-  });
-
-  it('ties a print to an Instagram post only where the site\'s own data does, and counts the posts truly', () => {
-    const urls = new Set((posts as { url: string }[]).map((p) => p.url));
-    expect(TINKER_POSTS).toBe(urls.size);
-    expect(TINKER_POSTS).toBe((posts as unknown[]).length);
-    TINKER_PRINTS.filter((t) => t.post).forEach((t) => {
-      expect(urls.has(t.post!)).toBe(true);
-      const project = readFileSync(new URL(`../../data/projects/${t.id}.json`, import.meta.url), 'utf8');
-      expect(project).toContain(`"proof": "${t.post}"`);
-    });
-    expect(TINKER_PRINTS.filter((t) => t.post).map((t) => t.id)).toEqual(['surya', 'helios', 'jarvis']);
     expect(TINKER_INSTAGRAM).toBe('https://www.instagram.com/tinker_verse/');
   });
 
@@ -67,7 +53,7 @@ describe('the timeline data', () => {
     const tv = cards().find((c) => c.stop.fill)!;
     const pieces = pileLayout(tv.stop);
     expect(pieces.map((p) => p.kind)).toEqual(['label', 'print', 'print', 'print', 'print', 'print', 'print', 'tape']);
-    expect(pieces[pieces.length - 2].print!.id).toBe('surya');
+    expect(pieces[pieces.length - 2].print!.id).toBe(TINKER_PRINTS[0].id);
     pieces.forEach((p) => pieceCorners(p).forEach(([x, y]) => {
       expect(x).toBeGreaterThanOrEqual(0); expect(x).toBeLessThanOrEqual(tv.stop.restW);
       expect(y).toBeGreaterThanOrEqual(0); expect(y).toBeLessThanOrEqual(tv.stop.restH);

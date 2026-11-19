@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObjec
 import { ArrowLeft } from 'lucide-react';
 import type { MatLayer } from '../../lib/flipbook/matLayer';
 import { loadFlipbookFonts } from '../../lib/flipbook/pageArt';
-import { TINKER_POSTS, matStops, stopBeats, stopPictures, tinkerLinks, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
+import { TINKER_FOLLOWERS, matStops, stopBeats, stopPictures, tinkerLinks, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
 import { createTimelineLayer, type TimelineLayer, type TimelinePlace } from '../../lib/mat/timelineLayer';
 import { holdLength, openingOrder, layoutCards, scrollForStep, type Hold } from '../../lib/mat/timelineScene';
 import ExperienceStory from './ExperienceStory';
@@ -212,9 +212,9 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
           </li>)}
         </ul>
       </div>}
-      {/* Tinker Verse's back: its prints (each to that build's page here), the posts and his Instagram (new tabs) */}
+      {/* Tinker Verse's back: his latest posts as prints, each opening on Instagram, and his Instagram (all new tabs) */}
       {picked && pickedStop?.fill && <div className="tm-sheet-words" role="dialog" aria-label={`${pickedStop.item.short}: its prints`} data-settled={picked.settled ? 'true' : 'false'}>
-        <p className="tm-sr">{pickedStop.item.short}. {pickedStop.item.pin}. {new Date(pickedStop.item.start).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} to now. {TINKER_POSTS} posts on Instagram.</p>
+        <p className="tm-sr">{pickedStop.item.short}. {pickedStop.item.pin}. {new Date(pickedStop.item.start).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} to now. My latest builds, as I posted them. {TINKER_FOLLOWERS} followers on Instagram.</p>
         <ul className="tm-rows">
           {pickedLinks.map((link, i) => <li key={`${link.href}-${i}`}>
             <a ref={(el) => { if (el) rowRefs.current[i] = el; }} className={link.newTab ? 'tm-row tm-row--out' : 'tm-row tm-row--print'} href={link.href}

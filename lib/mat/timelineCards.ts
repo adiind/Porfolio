@@ -40,35 +40,39 @@ const LOOK = (data as unknown as { look: Record<string, Look> }).look;
 const TODAY = Date.parse(TL.today);
 
 /**
- * Tinker Verse's prints: his own photographs (and one screenshot) of what he built, already on the site, each cut to
- * the print's picture shape with the whole object inside (public/images/mat/timeline/tv-*.webp, 640 px, no camera
- * data). The three print shapes are the instant-film ones: `mini` (portrait), `square`, `wide`.
- * `name` and `line` are the site's own words: the second half of the project's title in data/projects/*.json, or the
- * Surya book's words for its front layer. `href` is that build's page on this site (always same-tab, always "/...");
- * `post` is the Instagram post the site's own data ties to that build (data/projects/<id>.json outcome.proof, also in
- * data/instagram_posts.json). Builds with no picture of his own here are not on it (Plotter, SoloPump, Glyph).
+ * Tinker Verse's prints: his latest builds, as he posted them on Instagram (@tinker_verse). Adi, 2026-11-18: "I have so
+ * much recent data, recent reels that I've posted that people might be interested in". Each picture is the post's own
+ * cover, read from its public embed page and cut to the instant print's picture shape (46 by 62, the 3:4 his profile
+ * grid shows) with the subject whole (public/images/mat/timeline/ig-<shortcode>.webp, 640 px, no camera data).
+ * `name` and `line` are taken from his own caption on that post; `date` is the post's date. Each print opens the post
+ * on Instagram, in a new tab. Newest first.
  */
 export type PrintFormat = 'mini' | 'square' | 'wide';
-export interface TinkerPrint { id: string; src: string; format: PrintFormat; name: string; line: string; href: string; post?: string }
+export interface TinkerPrint { id: string; src: string; format: PrintFormat; name: string; line: string; date: string; href: string }
+const IG = (code: string) => `https://www.instagram.com/p/${code}/`;
+const igPic = (code: string) => `/images/mat/timeline/ig-${code}.webp`;
 export const TINKER_PRINTS: TinkerPrint[] = [
-  // Surya on his wall: his phone photo IMG_1438 (via /images/flipbook/surya/parts/wall.webp, "Adi's own photographs")
-  { id: 'surya', src: '/images/mat/timeline/tv-surya.webp', format: 'square', name: 'Surya', line: 'Kinetic wall timepiece', href: '/book/surya', post: 'https://www.instagram.com/p/DPm6dEjjCmO/' },
-  // Surya's engraved front layer held up in the workshop: his photo IMG_9301 (via .../surya/parts/held.webp); the Surya
-  // book calls it "the front layer", data/projects/surya.json "laser-cut wood layers"
-  { id: 'surya-layer', src: '/images/mat/timeline/tv-surya-layer.webp', format: 'square', name: 'Surya\'s front layer', line: 'Laser-cut wood, engraved', href: '/book/surya' },
-  // Muse, printed, in his hand (via .../muse/parts/muse-real.webp; HISTORY.md 2026-11-16: "his real photograph of the finished Muse")
-  { id: 'muse', src: '/images/mat/timeline/tv-muse.webp', format: 'mini', name: 'Muse', line: 'A body for my desk AI', href: '/book/muse' },
-  // Zero's workspace: a screenshot of the running app (via /images/zero_text_mode.webp; HISTORY.md 2026-04-28: real screenshots of the local Zero runtime)
-  { id: 'zero', src: '/images/mat/timeline/tv-zero.webp', format: 'wide', name: 'Zero', line: 'Second brain AI assistant', href: '/work/zero-my-ai' },
-  // Helios, printed and lit, on his mat (via /images/helios.jpg, cut above the title lettering on that picture; the whole lamp is inside)
-  { id: 'helios', src: '/images/mat/timeline/tv-helios.webp', format: 'mini', name: 'Helios', line: 'Mechanical kinetic lamp', href: '/work/helios', post: 'https://www.instagram.com/p/DDqweMUT021/' },
-  // Jarvis's printed case on his cutting mat: hero-image.jpg in his diy-jarvis repo (via .../jarvis/parts/case.webp)
-  { id: 'jarvis', src: '/images/mat/timeline/tv-jarvis.webp', format: 'mini', name: 'Jarvis', line: 'Voice-controlled smart home assistant', href: '/book/jarvis', post: 'https://www.instagram.com/p/DCMjkgEMbsA/' },
+  // "Lesssgoo first of many things today! The AR print pipeline works properly now."
+  { id: 'DfdHtmsC1SO', src: igPic('DfdHtmsC1SO'), format: 'mini', name: 'AR print pipeline', line: 'It works properly now', date: 'Nov 7, 2026', href: IG('DfdHtmsC1SO') },
+  // "He lives again! #jarvis"
+  { id: 'DfT98QLidK7', src: igPic('DfT98QLidK7'), format: 'mini', name: 'Jarvis', line: 'He lives again', date: 'Nov 3, 2026', href: IG('DfT98QLidK7') },
+  // "Before I update helios I needed a pipeline to review it, here's a glimpse of what was cooked!"
+  { id: 'DfOyiOeiY4m', src: igPic('DfOyiOeiY4m'), format: 'mini', name: 'Helios, taken apart', line: 'A pipeline to review it', date: 'Nov 1, 2026', href: IG('DfOyiOeiY4m') },
+  // "Helios v1.6 is done!"
+  { id: 'DfNXpR6GKfb', src: igPic('DfNXpR6GKfb'), format: 'mini', name: 'Helios v1.6', line: 'Done', date: 'Nov 1, 2026', href: IG('DfNXpR6GKfb') },
+  // "Finally a PCB of my own, printed in a cave with a box of scraps!!"
+  { id: 'DeqQjqUgasE', src: igPic('DeqQjqUgasE'), format: 'mini', name: 'A PCB of my own', line: 'Made from a box of scraps', date: 'Oct 18, 2026', href: IG('DeqQjqUgasE') },
+  // "In mere 24 hours we have a PCB"
+  { id: 'DeYDKmVM2MJ', src: igPic('DeYDKmVM2MJ'), format: 'mini', name: 'A PCB in 24 hours', line: 'Milled on the desktop CNC', date: 'Oct 11, 2026', href: IG('DeYDKmVM2MJ') },
+  // "Okay yes I bought a desktop CNC, it was an inevitability."
+  { id: 'DeQoU4jgnzN', src: igPic('DeQoU4jgnzN'), format: 'mini', name: 'Desktop CNC', line: 'It was an inevitability', date: 'Oct 8, 2026', href: IG('DeQoU4jgnzN') },
+  // "Exploring more of AR in my home lab!"
+  { id: 'Day4gskiAWH', src: igPic('Day4gskiAWH'), format: 'mini', name: 'AR in my home lab', line: 'Exploring more of it', date: 'Jul 14, 2026', href: IG('Day4gskiAWH') },
 ];
-/** His Instagram, and how many posts data/instagram_posts.json holds (a test keeps this the file's own count). */
+/** His Instagram, and his followers as his profile showed them on 2026-11-18. */
 export const TINKER_INSTAGRAM = 'https://www.instagram.com/tinker_verse/';
 export const TINKER_HANDLE = '@tinker_verse';
-export const TINKER_POSTS = 100;
+export const TINKER_FOLLOWERS = '2,000';
 
 /** One stop as a card on the mat. Sizes are mat pixels. */
 export interface MatStop {
@@ -434,12 +438,12 @@ export function pileLayout(stop: MatStop): PilePiece[] {
   // (y from the foot of the lane, so the prints stay in it whatever its height)
   const pieces: PilePiece[] = [
     { kind: 'label', x: 125, y: 55, w: 250, h: 106, rot: 0, r: 12 },
-    at('zero', 338, 84, 4),
-    at('muse', 90, H - 85, -9),
-    at('helios', 178, H - 81, 6),
-    at('jarvis', 376, H - 88, 11),
-    at('surya-layer', 266, H - 96, -7),
-    at('surya', 322, H - 146, 3.5),
+    at('DeQoU4jgnzN', 318, 84, 4),
+    at('DeqQjqUgasE', 90, H - 85, -9),
+    at('DfNXpR6GKfb', 172, H - 81, 6),
+    at('DfOyiOeiY4m', 376, H - 88, 9),
+    at('DfT98QLidK7', 250, H - 96, -6),
+    at('DfdHtmsC1SO', 318, H - 146, 3.5),
   ];
   const top = pieces[pieces.length - 1];
   pieces.push({ kind: 'tape', x: top.x + (Math.sin(top.rot) * top.h) / 2 - 3, y: top.y - (Math.cos(top.rot) * top.h) / 2, w: 26, h: 56, rot: deg(-14), r: 0 });
@@ -743,25 +747,27 @@ export function drawSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
  * The sheet's measures (mat px): its height, the prints' height, the grid (three across, two down), and where the
  * heading and the Instagram row lie. The words are the other sheets' sizes (names 19 px, lines 13.5 px).
  */
-const TV = { h: 696, fh: 147, x0: 40, colW: 300, gap: 30, top: 170, rowH: 147 + 72 + 14 } as const;
+const TV = { h: 696, fh: 166, x0: 40, colW: 222, gap: 24, top: 166, rowH: 166 + 64 + 6 } as const;
 /** Each print lies on the sheet a little askew, as prints laid down by hand do (degrees). */
-const TV_TILT = [-1.2, 0.9, -0.7, 1, -0.9, 0.6];
-const TV_NAME = `800 19px ${DISP}`;
+const TV_TILT = [-1.2, 0.9, -0.7, 1, -0.9, 0.6, 1.1, -0.8];
+const TV_NAME = `800 18px ${DISP}`;
 const TV_LINE = `500 13.5px ${SANS}`;
-const TV_POST = `600 12.5px ${SANS}`;
-const TV_POST_WORDS = 'The post on Instagram  ↗';
+const TV_DATE = `500 12px ${SANS}`;
 const TV_FOOT = ['See all of it on Instagram: ', `${TINKER_HANDLE}  ↗`] as const;
 const TV_FOOT_FONTS = [`550 16px ${SANS}`, `750 16px ${SANS}`] as const;
 
 /** Each print in the middle of its column, its words centred under it. */
-interface TinkerSlot { print: TinkerPrint; cx: number; frame: { x: number; y: number; w: number; h: number; rot: number }; nameY: number; lineY: number; postY: number | null }
+interface TinkerSlot { print: TinkerPrint; cx: number; frame: { x: number; y: number; w: number; h: number; rot: number }; nameY: number; lineY: number; dateY: number }
 function tinkerSlots(): TinkerSlot[] {
   return TINKER_PRINTS.map((print, i) => {
-    const cx = TV.x0 + (i % 3) * (TV.colW + TV.gap) + TV.colW / 2; const y = TV.top + Math.floor(i / 3) * TV.rowH;
+    const cx = TV.x0 + (i % 4) * (TV.colW + TV.gap) + TV.colW / 2; const y = TV.top + Math.floor(i / 4) * TV.rowH;
     const b = printBox(print.format, TV.fh);
-    return { print, cx, frame: { x: cx - b.w / 2, y, w: b.w, h: b.h, rot: deg(TV_TILT[i] ?? 0) }, nameY: y + TV.fh + 26, lineY: y + TV.fh + 46, postY: print.post ? y + TV.fh + 67 : null };
+    return { print, cx, frame: { x: cx - b.w / 2, y, w: b.w, h: b.h, rot: deg(TV_TILT[i] ?? 0) }, nameY: y + TV.fh + 22, lineY: y + TV.fh + 40, dateY: y + TV.fh + 56 };
   });
 }
+/** The words under a print: its name with the arrow, its line, and the post's date. */
+const tinkerName = (p: TinkerPrint) => `${p.name}  ↗`;
+const tinkerLine = (p: TinkerPrint) => p.line;
 
 /** A link lying over the back of a stop (mat px from the sheet's top left). */
 export interface SheetLink { x: number; y: number; w: number; h: number; href: string; text: string; newTab: boolean }
@@ -778,14 +784,10 @@ export function tinkerLinks(): SheetLink[] {
   const out: SheetLink[] = [];
   tinkerSlots().forEach((s) => {
     const p = s.print;
-    ctx.font = TV_NAME; const nw = ctx.measureText(`${p.name}  ↗`).width;
-    ctx.font = TV_LINE; const lw = ctx.measureText(p.line).width;
-    const wide = Math.max(s.frame.w, nw, lw);
-    out.push({ x: s.cx - wide / 2 - 6, y: s.frame.y - 6, w: wide + 12, h: s.lineY + 6 - (s.frame.y - 6), href: p.href, text: `${p.name}: ${p.line}. Opens its page.`, newTab: false });
-    if (s.postY !== null && p.post) {
-      ctx.font = TV_POST; const pw = ctx.measureText(TV_POST_WORDS).width;
-      out.push({ x: s.cx - pw / 2 - 4, y: s.postY - 14, w: pw + 8, h: 19, href: p.post, text: `${p.name}: the post on Instagram (opens in a new tab)`, newTab: true });
-    }
+    ctx.font = TV_NAME; const nw = ctx.measureText(tinkerName(p)).width;
+    ctx.font = TV_LINE; const lw = ctx.measureText(tinkerLine(p)).width;
+    const wide = Math.min(TV.colW + TV.gap - 4, Math.max(s.frame.w, nw, lw));
+    out.push({ x: s.cx - wide / 2 - 6, y: s.frame.y - 6, w: wide + 12, h: s.dateY + 6 - (s.frame.y - 6), href: p.href, text: `${p.name}: ${p.line}, posted ${p.date}. Opens the post on Instagram in a new tab.`, newTab: true });
   });
   ctx.font = TV_FOOT_FONTS[0]; const a = ctx.measureText(TV_FOOT[0]).width;
   ctx.font = TV_FOOT_FONTS[1]; const b = ctx.measureText(TV_FOOT[1]).width;
@@ -821,7 +823,7 @@ function drawTinkerSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
   ctx.fillStyle = lk.ton; ctx.fillText(years, px + 13, 74);
   // its line, its dates and how much is on Instagram
   ctx.fillStyle = INK2; ctx.font = `550 17px ${SANS}`; ctx.fillText(it.pin || '', 40, 112);
-  ctx.fillStyle = INK3; ctx.font = `500 14px ${SANS}`; ctx.fillText(`${my(it.start)} to now  ·  ${TINKER_POSTS} posts on Instagram`, 40, 136);
+  ctx.fillStyle = INK3; ctx.font = `500 14px ${SANS}`; ctx.fillText(`${my(it.start)} to now  ·  My latest builds, as I posted them  ·  ${TINKER_FOLLOWERS} followers on Instagram`, 40, 136);
   ctx.fillStyle = EDGE; ctx.fillRect(40, 152, S.w - 80, 1.5);
   // the prints
   tinkerSlots().forEach((s) => {
@@ -839,13 +841,9 @@ function drawTinkerSheet(stop: MatStop, pics: Pictures): HTMLCanvasElement {
     drawInstant(ctx, s.print, f.h, pics);
     ctx.restore();
     ctx.textAlign = 'center';
-    ctx.fillStyle = NAVY; ctx.font = TV_NAME; ctx.fillText(`${s.print.name}  ↗`, s.cx, s.nameY);
-    ctx.fillStyle = INK2; ctx.font = TV_LINE; ctx.fillText(s.print.line, s.cx, s.lineY);
-    if (s.postY !== null) {
-      ctx.fillStyle = INK3; ctx.font = TV_POST; ctx.fillText(TV_POST_WORDS, s.cx, s.postY);
-      const all = ctx.measureText(TV_POST_WORDS).width; const w = ctx.measureText(TV_POST_WORDS.replace(/\s+↗$/, '')).width;
-      ctx.fillStyle = 'rgba(100,106,146,0.55)'; ctx.fillRect(s.cx - all / 2, s.postY + 3, w, 1);
-    }
+    ctx.fillStyle = NAVY; ctx.font = TV_NAME; ctx.fillText(tinkerName(s.print), s.cx, s.nameY);
+    ctx.fillStyle = INK2; ctx.font = TV_LINE; ctx.fillText(tinkerLine(s.print), s.cx, s.lineY);
+    ctx.fillStyle = INK3; ctx.font = TV_DATE; ctx.fillText(s.print.date, s.cx, s.dateY);
     ctx.textAlign = 'left';
   });
   // the row at the foot: his Instagram
