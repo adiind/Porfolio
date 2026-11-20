@@ -3,6 +3,7 @@ import './work-section.css';
 import { PROJECTS as ALL_PROJECTS } from '../../data/projects';
 import { projectPath } from '../../lib/workRoutes';
 import { layBento } from './workBento';
+import { whenQuiet } from '../../lib/flipbook/quiet';
 
 /**
  * Selected work on the mat, as one board of things lying on it: every project the old home page listed, in tiles of
@@ -54,6 +55,14 @@ export default function WorkSection() {
       entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-down'); io?.unobserve(entry.target); } });
     }, { rootMargin: '0px 0px -6% 0px', threshold: 0.1 });
     if (io) tiles.forEach((tile) => io.observe(tile));
+    // The pictures are fetched ahead, at the first quiet moment a little after the board is built, and decoded then.
+    // Left to "lazy", a fast flick to the bottom reached the board before they had come: blank tiles, then each picture
+    // popping in with a slow frame (Adi, 2026-11-20: "jank if I am quickly scrolling to bottom").
+    let gone = false;
+    const warm = window.setTimeout(() => whenQuiet(() => {
+      if (gone) return;
+      sec.querySelectorAll<HTMLImageElement>('img.wk-pic').forEach((img) => { img.loading = 'eager'; img.decode?.().catch(() => undefined); });
+    }, 8000), 1500);
 
     // a tile leans toward the pointer, as a thick print lifts at one edge when it is touched (one frame at a time)
     let frame = 0;
@@ -79,6 +88,8 @@ export default function WorkSection() {
     const onLeave = () => { if (at) rest(at.tile); at = null; };
     if (canLean) { sec.addEventListener('pointermove', onMove); sec.addEventListener('pointerleave', onLeave); }
     return () => {
+      gone = true;
+      window.clearTimeout(warm);
       io?.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
       sec.removeEventListener('pointermove', onMove);

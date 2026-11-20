@@ -19,7 +19,7 @@ import {
 } from './timelineCards';
 import {
   OPEN_REDUCED_S, PEN, PEN_START, ROLL, TAPE, cardPose, cardSize, clamp01, holdLength, introDue, introEnd, layoutCards, openingOrder, outCubic,
-  penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollTop, rollY, smooth, stepOpenTo, wantOpen, yOf,
+  introRate, penRacing, penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollTop, rollY, smooth, stepOpenTo, wantOpen, yOf,
   type Flight, type Hold, type PlacedCard,
 } from './timelineScene';
 
@@ -252,6 +252,8 @@ export function createTimelineLayer(opts: {
   const pen = { y: PEN_START, v: 0 };
   let penTargetY = PEN_START;
   let penAngle = 0;
+  /** It is catching up with a page that ran ahead (see "while it catches up" in update). */
+  let chasing = false;
   /* hover: the step under the pointer (latched), and the one it may change to once the pointer has rested there */
   let hover = -1;
   let pending = -1; let pendingT = 0;
@@ -595,7 +597,8 @@ export function createTimelineLayer(opts: {
     let moving = false;
     // the intro: once the timeline is in view, it plays by itself
     if (introT < 0 && (introDue(scrollY, hold) || reduced)) introT = reduced ? endT : 0;
-    if (introT >= 0 && introT < endT) { introT = Math.min(endT, introT + dt); moving = true; }
+    // (a page that has run on into the stops, or past them, hurries it: see introRate)
+    if (introT >= 0 && introT < endT) { introT = Math.min(endT, introT + dt * (reduced ? 1 : introRate(scrollY, hold))); moving = true; }
     const T = Math.max(0, introT);
     const done = introT >= endT;
     // the pen: its row follows the page's scroll (it waits at each stop, then rolls on); the stop it has reached opens
@@ -603,8 +606,14 @@ export function createTimelineLayer(opts: {
     penTargetY = done && !pickedId ? penTarget(scrollY, hold, rows) : penTargetY;
     const before = pen.y;
     if (done && penStep(pen, penTargetY, dt, reduced)) moving = true;
-    penAngle += (pen.y - before) / PEN_ROLL_R;
-    current = done && !leaving ? penStop(pen.y, rows) : -1;
+    // (catching up fast, its turn per frame is held to a sixth of a turn, so the barrel never seems to spin backwards)
+    penAngle += Math.max(-Math.PI / 3, Math.min(Math.PI / 3, (pen.y - before) / PEN_ROLL_R));
+    // (while it catches up with a page that ran ahead, the stops it rushes past stay shut: only the one it is heading for
+    // opens. Once it has raced it counts as catching up until it is there, or the stops by the end of its glide, where it
+    // has slowed, would open one after another.)
+    if (penRacing(pen)) chasing = true;
+    if (pen.y === penTargetY) chasing = false;
+    current = done && !leaving ? penStop(chasing ? penTargetY : pen.y, rows) : -1;
     // hover: only the pointer's own moves change it (never a card moving under a still pointer), and only once the
     // pointer has rested on the new card (or off every card) for a moment, so neighbours never flicker
     if (!done || pickedId || leaving) { hover = -1; pending = -1; pendingT = 0; pileWant = 0; }

@@ -297,6 +297,27 @@ export const PEN_START = 178;
 export const PEN_PARK = TAPE.bot - 4 - ROLL.rc - PEN.r - 4;
 /** It never rolls faster than this (mat px a second): at 30 frames a second that is under 90 degrees a frame. */
 export const PEN_MAX_SPEED = 470;
+/**
+ * Except when the page has run ahead of it (a fast flick to the bottom): then it catches up within about this long
+ * (seconds), instead of crawling down the tape for almost two seconds after the page has stopped. Adi, 2026-11-20:
+ * "jank if I am quickly scrolling to bottom".
+ */
+export const PEN_CATCH_S = 0.15;
+/** Its top speed for a gap this far (mat px): the usual cap for a short roll, faster for a long one. */
+export const penTopSpeed = (gap: number): number => Math.max(PEN_MAX_SPEED, Math.abs(gap) / PEN_CATCH_S);
+/** It is catching up with a page that ran ahead (faster than its usual top speed). */
+export const penRacing = (pen: { v: number }): boolean => Math.abs(pen.v) > PEN_MAX_SPEED + 1;
+
+/**
+ * How fast the intro's clock runs. At its own pace while the page waits at the top of the timeline; when the page has
+ * already gone on into its stops (a fast scroll), it hurries, and more once the page is leaving the timeline, so the
+ * cards are down by the time anyone could read them, never still flying in as the timeline slides away.
+ */
+export function introRate(scrollY: number, hold: Hold): number {
+  // (eased in over one step's worth of scroll each time, so a steady scroll never sees the cards jump to a new pace)
+  const step = stepPx(hold);
+  return 1 + 3 * smooth((scrollY - hold.start - 0.3 * step) / step) + 4 * smooth((scrollY - hold.start - holdLength(hold)) / step);
+}
 
 /** The row the pen stops at for each step: the date that stop began, on the tape's printed years (always further down). */
 export function penRows(steps: PlacedCard[]): number[] {
@@ -324,17 +345,19 @@ export function penTarget(scrollY: number, hold: Hold, rows: number[]): number {
 
 /**
  * One frame of the pen's roll toward its target: a critically damped spring (it never overshoots, so a one-way scroll
- * never rolls it back), held under PEN_MAX_SPEED. Returns true while it moves.
+ * never rolls it back), held under its top speed for the gap left (penTopSpeed). Returns true while it moves.
  */
 export function penStep(pen: { y: number; v: number }, target: number, dt: number, reduced: boolean): boolean {
   if (reduced || dt <= 0) { const moved = pen.y !== target && dt > 0; if (dt > 0) { pen.y = target; pen.v = 0; } return moved && !reduced; }
-  const w = 13;
+  // (stiff enough that the last few px of a long catch-up do not trail on: 13 left it creeping for over a second)
+  const w = 20;
   let left = dt;
   while (left > 1e-6) {
     const h = Math.min(1 / 120, left); left -= h;
     const a = w * w * (target - pen.y) - 2 * w * pen.v;
     pen.v += a * h;
-    pen.v = Math.max(-PEN_MAX_SPEED, Math.min(PEN_MAX_SPEED, pen.v));
+    const top = penTopSpeed(target - pen.y);
+    pen.v = Math.max(-top, Math.min(top, pen.v));
     const next = pen.y + pen.v * h;
     // (never past the target: the spring is damped, this only guards the speed cap's rounding)
     if ((target - pen.y) * (target - next) < 0) { pen.y = target; pen.v = 0; } else pen.y = next;

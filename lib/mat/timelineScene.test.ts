@@ -5,7 +5,7 @@ import { PROJECTS_BY_ID } from '../../data/projects';
 import { TINKER_INSTAGRAM, TINKER_PRINTS, matStops, pieceCorners, pileLayout } from './timelineCards';
 import {
   GAP, OPEN_REDUCED_S, OPEN_S, TAPE, cardPose, cardSize, holdLength, introDue, introEnd, layoutCards, matScroll, openingOrder,
-  PEN_MAX_SPEED, PEN_PARK, PEN_START, penRows, penStep, penStop, penTarget, planFlights, pushedTops, rollRadius, rollY,
+  PEN_MAX_SPEED, PEN_PARK, PEN_START, introRate, penRows, penStep, penStop, penTopSpeed, penTarget, planFlights, pushedTops, rollRadius, rollY,
   scrollForStep, stepAt, stepOpen, stepOpenTo, wantOpen, type Hold, type PlacedCard,
 } from './timelineScene';
 
@@ -194,6 +194,16 @@ describe('scrolling', () => {
     expect(introDue(900 - 0.4 * 900, hold)).toBe(true);
   });
 
+  it('hurries the intro when the page runs on into the stops, and more once it leaves the timeline', () => {
+    const step = holdLength(hold) / (hold.steps + 0.6);
+    expect(introRate(900, hold)).toBe(1);
+    expect(introRate(900 + 1.3 * step, hold)).toBe(4);
+    expect(introRate(900 + holdLength(hold) + step, hold)).toBe(8);
+    // eased: never a sudden change of pace on the way down
+    let last = 1;
+    for (let y = 600; y < 900 + holdLength(hold) + 2 * step; y += 5) { const r = introRate(y, hold); expect(r).toBeGreaterThanOrEqual(last); expect(r - last).toBeLessThan(0.1); last = r; }
+  });
+
   it('opens a stop in 0.55 s and closes the one before in the same time (a 0.15 s fade with reduced motion)', () => {
     const run = (reduced: boolean) => {
       const open = [1, 0, 0]; let t = 0;
@@ -228,16 +238,25 @@ describe('the pen', () => {
     }
   });
 
-  it('rolls without overshooting, under its top speed, and settles within 2 s of the longest jump', () => {
-    const pen = { y: PEN_START, v: 0 }; const target = PEN_PARK; let t = 0; let peak = 0;
+  it('rolls a short way under its usual top speed, without overshooting', () => {
+    const pen = { y: PEN_START, v: 0 }; const target = PEN_START + 60; let peak = 0; let n = 0;
+    while (penStep(pen, target, 1 / 60, false) && n++ < 300) { peak = Math.max(peak, Math.abs(pen.v)); expect(pen.y).toBeLessThanOrEqual(target); }
+    expect(pen.y).toBe(target);
+    expect(peak).toBeLessThanOrEqual(PEN_MAX_SPEED);
+  });
+
+  it('catches up with a page that ran ahead: the longest jump is within 10 px in 0.6 s and still in 1 s, never overshooting (Adi, 2026-11-20)', () => {
+    const pen = { y: PEN_START, v: 0 }; const target = PEN_PARK; let t = 0; let close = -1;
     while (penStep(pen, target, 1 / 60, false)) {
-      t += 1 / 60; peak = Math.max(peak, Math.abs(pen.v));
+      t += 1 / 60;
+      if (close < 0 && target - pen.y < 10) close = t;
       expect(pen.y).toBeLessThanOrEqual(target);
+      expect(Math.abs(pen.v)).toBeLessThanOrEqual(penTopSpeed(target - PEN_START) + 1e-6);
       if (t > 5) break;
     }
     expect(pen.y).toBe(target);
-    expect(peak).toBeLessThanOrEqual(PEN_MAX_SPEED);
-    expect(t).toBeLessThan(2);
+    expect(close).toBeLessThan(0.6);
+    expect(t).toBeLessThan(1);
     // reduced motion: it is simply there
     const still = { y: PEN_START, v: 0 }; penStep(still, 400, 1 / 60, true); expect(still.y).toBe(400);
   });
