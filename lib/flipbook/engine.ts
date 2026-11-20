@@ -18,7 +18,10 @@ import {
   beginDrag, createFlipState, endDrag, isSettled, setCurrent, stepFlip, updateDrag, type FlipState,
 } from './flipState';
 import { liveSceneFor, type LiveInput, type LivePage } from './live';
-import { pageBusy } from './quiet';
+import { pageBusy, stillFor } from './quiet';
+
+/** On the stage, how long the page must have been left alone before the book draws a piece in the background (ms). */
+const STAGE_STILL_MS = 700;
 import { composeBack, composePage, pageSources, type BookImages, type PageLayers } from './pageArt';
 import {
   LEAF_FRAGMENT, LEAF_VERTEX, PROP_ALPHA_SHADOW_FRAGMENT, PROP_CURL_VERTEX, PROP_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_VERTEX, SUN_FRAGMENT,
@@ -1020,7 +1023,10 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     && Math.abs(lean - leanTarget) < 1e-3 && (!stageSpec || dawnUniform.value >= 1) && performance.now() - scrolledAt > 200
     // (on the stage: not while a finger or the wheel is moving the page. Through the timeline's stops the mat holds
     // still, so setScroll hears nothing of that scroll, and a page was drawn in the middle of it.)
-    && !(stageSpec && pageBusy());
+    && !(stageSpec && pageBusy())
+    // (and on the stage, only once the page has been left alone for most of a second: a piece takes up to 70 ms, and
+    // started in the short pause between two flicks of a trackpad it held the next flick. Adi, 2026-11-20.)
+    && !(stageSpec && !held && !stillFor(STAGE_STILL_MS));
   let pumping = false;
   let lastTried = '';
   const drawings: Array<{ key: string; at: number; ms: number }> = [];
@@ -1031,6 +1037,22 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   const idle = (fn: () => void) => {
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
     if (w.requestIdleCallback) w.requestIdleCallback(fn, { timeout: 250 }); else window.setTimeout(fn, 16);
+  };
+  /**
+   * A drawn page's picture still waiting to go to the graphics card. Left to the next frame that shows the book, it went
+   * up in the middle of whatever was moving then (a 50 ms frame, often mid-scroll); sent in a quiet moment of its own, it
+   * does not. (Three's own record of which version of a picture it holds.)
+   */
+  const waitingUpload = (): Texture | null => {
+    for (const leaf of leaves) {
+      const all = [leaf.flat, leaf.back, leaf.backHi, leaf.layered?.base, leaf.layered?.word, leaf.layered?.fg, leaf.layered?.shadow];
+      for (const t of all) {
+        if (!t || t.version === 0) continue;
+        const held = (renderer.properties.get(t) as { __version?: number }).__version;
+        if (held !== t.version) return t;
+      }
+    }
+    return null;
   };
   /**
    * One piece of drawing per idle moment, never two in a row: drawing a page takes a few tens of milliseconds, and back
@@ -1048,6 +1070,9 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       if (!calmSince) calmSince = now;
       // (let a motion that has just ended settle first: its last frames are the ones a stall would show)
       if (now - calmSince < 100 && !held) { pump(); return; }
+      // (a picture drawn by the piece before goes up first, as a piece of its own)
+      const up = stageSpec ? waitingUpload() : null;
+      if (up) { renderer.initTexture(up); pump(); return; }
       const work = nextDrawing();
       // (a piece that did not take the first time is not tried again and again; it is drawn when its page is turned to)
       if (work && work.key === lastTried) { console.warn(`Flip book: could not draw ${work.key} of ${book?.slug}.`); return; }

@@ -30,6 +30,26 @@ export function pageBusy(now: number = performance.now()): boolean {
   return fingerDown || now - lastTouched < QUIET_AFTER_MS;
 }
 
+/** The page has been left alone for at least this long (milliseconds): no finger down, no scroll, wheel or key since. */
+export function stillFor(ms: number, now: number = performance.now()): boolean {
+  listen();
+  return !fingerDown && now - lastTouched >= ms;
+}
+
+/**
+ * Runs `fn` once the page has been left alone for `ms` (milliseconds), however long that takes: for work nobody sees
+ * until they click (the click then does it there and then), which must never be forced through under a moving page.
+ */
+export function whenStill(fn: () => void, ms: number): void {
+  listen();
+  const look = () => {
+    if (!stillFor(ms)) { window.setTimeout(look, 150); return; }
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(() => (stillFor(ms) ? fn() : look()), { timeout: 120 }); else window.setTimeout(fn, 16);
+  };
+  look();
+}
+
 /** For tests: as if the page had just been touched, or never. */
 export function setTouchedForTest(at: number, down = false): void { listening = true; lastTouched = at; fingerDown = down; }
 

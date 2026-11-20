@@ -19,7 +19,7 @@ import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
 import {
   TEXT, BIND, RIDER_RED, board, clipping, fabric, insidePrint, kraftPaper, label, linerWith, paperBagFront, photoPrint, receipt, rescueSheets, riderFlap, riderFront, riderLidTop, riderPlain, riderRim, riderStrap, roundCorners, type ClipRegion, type ProjectId,
 } from './zomatoBagArt';
-import { whenQuiet } from '../flipbook/quiet';
+import { whenQuiet, whenStill } from '../flipbook/quiet';
 import { createRescueScene } from './rescueScene';
 import { createRescueDesk } from './rescueDesk';
 import { NARROW, NARROW_BELOW_ASPECT, WIDE } from './rescueLayout';
@@ -211,7 +211,11 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
   // (each of these holds the page for a moment: they wait until the visitor has let go of it, lib/flipbook/quiet.ts.
   // A click on the bag before they are done builds them there and then, buildAll.)
   const idle = (fn: () => void) => whenQuiet(fn, 8000);
-  const buildSoon = () => { if (!later.length) return; idle(() => { if (!ctx) return; later.shift()?.(); buildSoon(); }); };
+  // The things inside the bag are seen only once it is opened, and each takes 60 to 190 ms to make. They used to be made
+  // the moment the room lit (before the first scroll) or forced through after 8 s under a moving page: either way the
+  // visitor's scroll stuck. Now only after the page has been left alone for a second, never forced. (Adi, 2026-11-20.)
+  const BAG_STILL_MS = 1000;
+  const buildSoon = () => { if (!later.length) return; whenStill(() => { if (!ctx) return; later.shift()?.(); buildSoon(); }, BAG_STILL_MS); };
   const buildAll = () => { while (ctx && later.length) later.shift()!(); };
   let resolveReady!: () => void;
   const ready = new Promise<void>((r) => { resolveReady = r; });
