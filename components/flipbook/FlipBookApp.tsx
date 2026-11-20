@@ -366,6 +366,9 @@ function fetchWholeBook(slug: string): void {
 }
 
 /** The flat home page: what phones and browsers without 3D get in place of the stage. (Lives under review/ for now.) */
+/** Keys that scroll the page. */
+const SCROLL_KEYS = new Set(['ArrowDown', 'PageDown', 'End', ' ', 'Spacebar']);
+
 const FLAT_HOME = '/home-flat/index.html';
 const flatHomeForCurrentView = () => FLAT_HOME + (/^#experience-(self|zomato|udaan|schmooze|snapdeal)$/.test(window.location.hash) ? window.location.hash : '');
 
@@ -809,6 +812,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const showRef = useRef(showHello);
   showRef.current = showHello;
 
+  /** The visitor scrolled before the scene was drawn (see "a scroll before the scene is drawn" below). */
+  const scrolledEarly = useRef(false);
   // the opening: once the scene is drawn, in the dark, the light comes up
   useEffect(() => {
     if (!staged || !ready || fallback) return undefined;
@@ -817,7 +822,11 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const bulb = document.getElementById('mat-bulb');
     let away = 0;
     let gone = 0;
-    const start = window.setTimeout(() => {
+    let started = false;
+    const switchOn = () => {
+      if (started) return;
+      started = true;
+      window.clearTimeout(start);
       bulb?.classList.add('is-on');
       engineRef.current?.dawn();
       // the greeting travels onto the cut letters on the mat while the light comes up, and hands over to them once it is full
@@ -826,10 +835,36 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       // so it is never left hanging over a lit room
       away = window.setTimeout(() => bulb?.classList.add('is-away'), reducedMotion ? 0 : 330);
       gone = window.setTimeout(() => bulb?.remove(), reducedMotion ? 300 : 900);
-    }, reducedMotion ? 0 : Math.max(250, 1300 - performance.now()));
+    };
+    const start = window.setTimeout(switchOn, reducedMotion ? 0 : Math.max(250, 1300 - performance.now()));
+    // A visitor who scrolls while the bulb is up wants the page now: switch on at once and bring the light up in about a
+    // third of a second, so the scroll after that moves the page. (Adi, 2026-11-20: scrolling did nothing for about 3 s.)
+    const hurry = () => {
+      switchOn();
+      engineRef.current?.hurryDawn();
+      // (the bulb goes with it: left on its usual 0.33 s it would still be hanging over a room that is already lit)
+      window.clearTimeout(away);
+      away = window.setTimeout(() => bulb?.classList.add('is-away'), 60);
+      stopListening();
+    };
+    const onKey = (event: KeyboardEvent) => { if (SCROLL_KEYS.has(event.key)) hurry(); };
+    const stopListening = () => { window.removeEventListener('wheel', hurry); window.removeEventListener('touchmove', hurry); window.removeEventListener('keydown', onKey); };
+    if (!reducedMotion) {
+      // (a scroll that came before the scene was drawn counts too)
+      if (scrolledEarly.current) hurry();
+      else { window.addEventListener('wheel', hurry, { passive: true }); window.addEventListener('touchmove', hurry, { passive: true }); window.addEventListener('keydown', onKey); }
+    }
     const sure = window.setTimeout(() => { setLit(true); litGate.open(); dropHello(); showRef.current(); setGreeting((g) => (g === 'held' ? 'landed' : g)); }, reducedMotion ? 0 : 4200);
-    return () => { window.clearTimeout(start); window.clearTimeout(sure); window.clearTimeout(away); window.clearTimeout(gone); };
+    return () => { window.clearTimeout(start); window.clearTimeout(sure); window.clearTimeout(away); window.clearTimeout(gone); stopListening(); };
   }, [fallback, ready, reducedMotion, staged]);
+  // a scroll before the scene is drawn: remembered, so the opening hurries the moment it can
+  useEffect(() => {
+    if (!staged || ready || fallback) return undefined;
+    const early = () => { scrolledEarly.current = true; };
+    const onKey = (event: KeyboardEvent) => { if (SCROLL_KEYS.has(event.key)) early(); };
+    window.addEventListener('wheel', early, { passive: true }); window.addEventListener('touchmove', early, { passive: true }); window.addEventListener('keydown', onKey);
+    return () => { window.removeEventListener('wheel', early); window.removeEventListener('touchmove', early); window.removeEventListener('keydown', onKey); };
+  }, [fallback, ready, staged]);
 
   // "Work" and "See my work" lead to the Selected work section. The second screen is drawn in 3D, so the browser's own
   // jump to #work (which measures where the section is drawn, not where it lies) lands at the very bottom of the page.

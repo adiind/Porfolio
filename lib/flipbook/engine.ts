@@ -166,6 +166,8 @@ export interface FlipBookEngine {
   setStage(stage: StageSpec, lit?: boolean): void;
   /** Bring the light up (the opening). */
   dawn(): void;
+  /** The visitor is already scrolling: the light comes the rest of the way up in about a third of a second. */
+  hurryDawn(): void;
   /** How far the light has come up, 0 (dark room) to 1 (full): the shaders' uDawn (the loading greeting keeps time with it). */
   readonly dawnLevel: number;
   /** Fly down to one poster, or back up to the wide view (null). */
@@ -487,6 +489,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   let focusBox: { x: number; y: number; w: number; h: number } | null = null;
   let hoverProp: string | null = null;
   let dawning = false;
+  /** Seconds the light takes to come up: 1.3, or 0.35 once the visitor scrolls before it is full (hurryDawn). */
+  let dawnSeconds = 1.3;
   let litTold = false;
   let viewTan = 0.2;
   let viewAspect = 1.6;
@@ -1315,7 +1319,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     if (stageSpec) tableMaterial.uniforms.uMatOrigin.value.y = 2.5 - stageScroll / tableMaterial.uniforms.uCell.value;
     // the opening: the light comes up, and the posters settle onto the mat one after another
     if (dawning && dawnUniform.value < 1) {
-      dawnUniform.value = Math.min(1, dawnUniform.value + dt / 1.3);
+      dawnUniform.value = Math.min(1, dawnUniform.value + dt / dawnSeconds);
       moving = true;
     }
     if (dawnUniform.value >= 1 && !litTold && stageSpec) { litTold = true; opts.onLit?.(); }
@@ -2182,6 +2186,10 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       if (units === stageScroll) return;
       stageScroll = units;
       scrolledAt = performance.now();
+      invalidate();
+    },
+    hurryDawn() {
+      dawnSeconds = 0.35;
       invalidate();
     },
     dawn() {
