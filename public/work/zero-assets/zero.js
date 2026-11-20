@@ -74,7 +74,7 @@
       const show = span(u, 0.6, 0.9), pull = ease(span(u, 1.0, 1.38));
       chips.forEach((chip, i) => {
         const a = (i / chips.length) * Math.PI * 2 - Math.PI / 2 + 0.3;
-        const rx = tall ? vw * 0.36 : vw * 0.36, ry = tall ? vh * 0.24 : vh * 0.33;
+        const rx = tall ? vw * 0.27 : vw * 0.36, ry = tall ? vh * 0.27 : vh * 0.33;
         const sx = cx + Math.cos(a) * rx, sy = cy + Math.sin(a) * ry;
         const x = lerp(sx, cx, pull), y = lerp(sy, cy, pull);
         const appear = span(show, i * 0.06, i * 0.06 + 0.45);
