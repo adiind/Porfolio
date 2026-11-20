@@ -355,14 +355,18 @@ function useCoverFirst(book: FlipBook, staged: boolean, lit: React.MutableRefObj
   return state.slug === book.slug ? { images: state.images, error: state.error } : { images: null, error: null };
 }
 
-/** Books whose every picture has been asked for ahead of a click (each is asked for once). */
-const wholeBooks = new Set<string>();
-/** A closed booklet is likely to be picked up (the pointer rests on it, or it has keyboard focus): fetch all of it now. */
-function fetchWholeBook(slug: string): void {
+/** Books whose opening spread has been asked for ahead of a click (each is asked for once). */
+const openingSpreads = new Set<string>();
+/**
+ * A closed booklet is likely to be picked up (the pointer rests on it, or it has keyboard focus): fetch its opening
+ * spread now (pages 0 to 2). The rest of it follows when it is picked up (BookStage: "the inside of the live book").
+ * (Adi, 2026-11-20: ~17 MB downloaded in the first 6 s after the room lit, so a resting pointer no longer pulls whole books.)
+ */
+function fetchOpeningSpread(slug: string): void {
   const item = FLIP_BOOKS_BY_SLUG.get(slug);
-  if (!item || wholeBooks.has(slug)) return;
-  wholeBooks.add(slug);
-  fetchBookPages(item, item.pages.map((_, index) => index), () => undefined, () => undefined, 4);
+  if (!item || openingSpreads.has(slug)) return;
+  openingSpreads.add(slug);
+  fetchBookPages(item, [0, 1, 2].filter((index) => index < item.pages.length), () => undefined, () => undefined, 4);
 }
 
 /** The flat home page: what phones and browsers without 3D get in place of the stage. (Lives under review/ for now.) */
@@ -450,7 +454,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const [filled, setFilled] = useState<string | null>(null);
   /** The fetch of the live book's inside, while it runs. */
   const inside = useRef<PageFetch | null>(null);
-  /** The pointer resting on a booklet: after a moment its pictures are fetched (fetchWholeBook). */
+  /** The pointer resting on a booklet: after a moment its pictures are fetched (fetchOpeningSpread). */
   const intent = useRef(0);
   const onMat = book.surface === 'mat';
   // the home page's sunlight as it was at the moment of leaving (a small picture it put aside), for the first paint
@@ -739,16 +743,20 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     sheet.read.aside = sheetAside(viewport.w) + SHEET_ASIDE_RIGHT + 24;
   }, [staged, stageSpec, viewport]);
 
-  // The inside of the live book: once the room is lit, or the moment the book is picked up, page by page from the cover
-  // on (fetchBookPages: a few at a time, at low priority). Each page goes to the engine as it lands, and the engine draws it
-  // while nothing moves. The typefaces the pages draw with come first, so none is drawn in a stand-in one.
+  // The inside of the live book, page by page from the cover on (fetchBookPages: a few at a time, at low priority). Once
+  // the room is lit only the first spread (pages 1 and 2) is fetched; the rest comes the moment the book is picked up
+  // (openBook sets `wanted`, this effect runs again, and pages already fetched come from the shared store in pageArt.ts).
+  // (Adi, 2026-11-20: ~17 MB downloaded in the first 6 s after the room lit, 85% of it closed books' inside pages.)
+  // Each page goes to the engine as it lands, and the engine draws it while nothing moves. The typefaces the pages draw
+  // with come first, so none is drawn in a stand-in one.
   const insideNow = staged && setFor === book.slug && (lit || wanted === book.slug);
+  const insideAll = wanted === book.slug;
   useEffect(() => {
     if (!insideNow) return undefined;
     let live = true;
     const fonts = loadFlipbookFonts();
     const got: BookImages = new Map();
-    const fetch = fetchBookPages(book, book.pages.map((_, index) => index).slice(1), (_, pictures) => {
+    const fetch = fetchBookPages(book, book.pages.map((_, index) => index).slice(1, insideAll ? undefined : 3), (_, pictures) => {
       pictures.forEach((picture, src) => got.set(src, picture));
       void fonts.then(() => { if (live) engineRef.current?.addImages(book, got); }, () => undefined);
     }, () => undefined);
@@ -756,11 +764,19 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     // (picked up before its inside was asked for: the first spread goes first)
     if (wantedRef.current === book.slug) fetch.hurry(engineRef.current?.spread ? [1, 2] : [1]);
     return () => { live = false; fetch.stop(); if (inside.current === fetch) inside.current = null; };
-  }, [book, insideNow]);
+  }, [book, insideNow, insideAll]);
+
+  // On a page turn the pages just ahead are asked for first, ahead of the rest of the book's inside.
+  useEffect(() => {
+    if (mode !== 'book') return;
+    const first = spread ? page * 2 + 1 : page + 1;
+    const ahead = [0, 1, 2, 3].map((n) => first + n).filter((n) => n >= 1 && n < book.pages.length);
+    if (ahead.length) inside.current?.hurry(ahead);
+  }, [mode, page, spread, book]);
 
   // The other books on the mat. Once the live book is all drawn and the page has been idle, each one's cover and first
   // spread (not on a connection that asks to save data); the whole of one when the pointer rests on its booklet or it has
-  // keyboard focus (fetchWholeBook), and when it is picked up (it becomes the live book, cover first).
+  // keyboard focus (fetchOpeningSpread), and when it is picked up (it becomes the live book, cover first).
   useEffect(() => {
     if (!staged || filled !== book.slug) return undefined;
     if ((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) return undefined;
@@ -1127,7 +1143,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         // resting on a closed booklet for a moment: its pictures are fetched ahead of a click
         window.clearTimeout(intent.current);
         const slug = id?.startsWith('book:') ? id.slice(5) : null;
-        if (slug && slug !== book.slug) intent.current = window.setTimeout(() => fetchWholeBook(slug), 150);
+        if (slug && slug !== book.slug) intent.current = window.setTimeout(() => fetchOpeningSpread(slug), 150);
       },
     };
     // a reload always starts at the wide view
@@ -1288,7 +1304,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           ))}
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn('book', event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.book(); }}>{book.title}, a flip book. {book.meta}. Opens the book.</button></li>
           {FLIP_BOOKS.filter((item) => item.slug !== book.slug).map((item) => (
-            <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { fetchWholeBook(item.slug); ringOn(`book:${item.slug}`, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book. {item.meta}. Opens the book.</button></li>
+            <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { fetchOpeningSpread(item.slug); ringOn(`book:${item.slug}`, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book. {item.meta}. Opens the book.</button></li>
           ))}
         </ul>
       )}
