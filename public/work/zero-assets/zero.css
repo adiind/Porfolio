@@ -488,10 +488,8 @@ img { user-select: none; -webkit-user-drag: none; }
 .wave i { background: linear-gradient(90deg, #6e5326, #edd29a 45%, #8a6a33); box-shadow: 0 2px 4px rgba(0, 0, 0, .45); }
 
 /* Opening: nine apps are paper labels; the journey is a brass pipe. */
-.apps span { border: 0; border-radius: 0; background: url(./assets/art/slip.webp) center / 100% 100% no-repeat; color: var(--ink); font-weight: 600; padding: 12px 18px 12px 56px; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)); }
-.apps span img { position: absolute; left: -24px; top: 50%; width: 68px; height: 68px; transform: translateY(-50%) rotate(-5deg); filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .5)); pointer-events: none; }
-.apps span:nth-child(even) img { transform: translateY(-50%) rotate(4deg); }
-.apps span:nth-child(6) img { width: 76px; height: 76px; left: -26px; }
+.apps span { border: 0; border-radius: 0; background: url(./assets/art/slip.webp) center / 100% 100% no-repeat; color: var(--ink); font-weight: 600; padding: 12px 18px 12px 46px; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)); }
+.apps span img { position: absolute; left: -16px; top: 50%; width: 52px; height: 52px; transform: translateY(-50%); filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .5)); pointer-events: none; }
 .pipe { position: absolute; left: 9%; right: 9%; top: 43%; height: 0; opacity: 0; --t: 0; --sw: clamp(72px, 8.4vw, 124px); --ph: calc(var(--sw) * .17); }
 .pipe-base, .pipe-lit { position: absolute; left: -3%; right: -3%; top: 0; height: var(--ph); transform: translateY(-50%); background: url(./assets/art/pipe.webp) center / 100% 100% no-repeat; }
 .pipe-base { filter: brightness(.5) drop-shadow(0 10px 10px rgba(0, 0, 0, .5)); }
@@ -663,7 +661,6 @@ img { user-select: none; -webkit-user-drag: none; }
 
 /* Opening icons on narrow screens: smaller slips so the ring of nine still fits. */
 @media (max-width: 760px), (max-aspect-ratio: 4/5) {
-  .apps span { font-size: 12px; padding: 9px 12px 9px 40px; z-index: 2; }
-  .apps span img { left: -18px; width: 50px; height: 50px; }
-  .apps span:nth-child(6) img { width: 56px; height: 56px; left: -19px; }
+  .apps span { font-size: 12px; padding: 9px 12px 9px 36px; z-index: 2; }
+  .apps span img { left: -14px; width: 42px; height: 42px; }
 }
