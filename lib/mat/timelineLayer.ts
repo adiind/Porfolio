@@ -803,11 +803,17 @@ export function createTimelineLayer(opts: {
 }
 
 /**
- * Run soon, once the visitor has let go of the page (lib/flipbook/quiet.ts): drawing a card and sending it to the
- * graphics card holds the page for a moment, and eight of them in a row under a moving finger was a visible stutter on
- * the way down to the timeline. `needed` says the timeline is coming into view: then a card waits at most half a second.
+ * Run soon, preferably once the visitor has let go of the page (lib/flipbook/quiet.ts): drawing a card and sending it to
+ * the graphics card holds the page for a moment. But a card never waits long for that: the timeline shows only once all
+ * eight are drawn, and a visitor who scrolls on from the moment the room lights up never lets go. When each waited up
+ * to 6 s (half a second once the timeline was near) the whole timeline was missing all the way down (Adi, 2026-11-20:
+ * "it didn't even load while I scrolled"). A short hold under the finger is the lesser harm than an empty mat.
+ * `needed` says the timeline is coming into view: then a card does not wait for quiet at all.
  */
 function idle(fn: () => void, needed: () => boolean) {
-  whenQuiet(fn, () => (needed() ? 500 : 6000));
+  // (coming into view: one card straight after each frame, so all eight are down in about 0.15 s; a card takes 5 to 20
+  // ms to draw, so drawing them all at once would hold the page for a tenth of a second)
+  if (needed()) { requestAnimationFrame(() => window.setTimeout(fn, 0)); return; }
+  whenQuiet(fn, () => (needed() ? 0 : 250));
 }
 

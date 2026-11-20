@@ -62,7 +62,7 @@ export default function WorkSection() {
     const warm = window.setTimeout(() => whenQuiet(() => {
       if (gone) return;
       sec.querySelectorAll<HTMLImageElement>('img.wk-pic').forEach((img) => { img.loading = 'eager'; img.decode?.().catch(() => undefined); });
-    }, 8000), 1500);
+    }, 2000), 1500);
 
     // a tile leans toward the pointer, as a thick print lifts at one edge when it is touched (one frame at a time)
     let frame = 0;
