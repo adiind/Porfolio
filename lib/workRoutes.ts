@@ -12,7 +12,7 @@ import { TIMELINE_DATA } from '../data/timeline';
 import { BOOT } from './ship/boot';
 
 /** Friendly slugs that map onto canonical project ids. */
-const SLUG_ALIASES: Record<string, string> = {
+export const SLUG_ALIASES: Record<string, string> = {
     zero: 'zero-my-ai',
 };
 
