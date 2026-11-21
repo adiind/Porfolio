@@ -493,7 +493,9 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   let hoverProp: string | null = null;
   let dawning = false;
   /** Seconds the light takes to come up: 1.3, or 0.35 once the visitor scrolls before it is full (hurryDawn). */
-  let dawnSeconds = 1.3;
+  // (a quick pass of light over the room, started the moment the scene is ready: no fixed wait of its own. Adi, 2026-11-20:
+  // the bulb was a workaround and must not add time.)
+  let dawnSeconds = 0.6;
   let litTold = false;
   let viewTan = 0.2;
   let viewAspect = 1.6;

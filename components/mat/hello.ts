@@ -158,7 +158,7 @@ export function landHello(to: HelloLanding | null, reducedMotion: boolean): Prom
     for (let i = 0; i < 24; i += 1) { t = (lo + hi) / 2; const bx = 3 * (1 - t) ** 2 * t * 0.16 + 3 * (1 - t) * t * t * 0.24 + t ** 3; if (bx < x) lo = t; else hi = t; }
     return 3 * (1 - t) ** 2 * t * 0.84 + 3 * (1 - t) * t * t + t ** 3;
   };
-  const GLIDE = 1000;
+  const GLIDE = 650;
   return new Promise((resolve) => {
     let start = 0;
     let done = false;

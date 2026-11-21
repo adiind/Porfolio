@@ -77,12 +77,14 @@
     #mat-bulb { position: fixed; left: 50%; top: 0; z-index: 30; width: min(16vh, 11vw); margin-left: calc(min(16vh, 11vw) / -2); pointer-events: none; mix-blend-mode: screen;
       transform-origin: 50% 0; animation: mat-bulb-swing 2.6s ease-in-out infinite alternate; transition: translate 0.46s cubic-bezier(0.55, 0, 0.9, 0.35), opacity 0.34s ease-out; }
     /* the picture is a lit bulb on black: blended as light, the black vanishes and only the bulb and its glow are added to the room */
-    #mat-bulb img { display: block; width: 100%; filter: brightness(0.4) saturate(0.55); transition: filter 0.16s ease; }
-    #mat-bulb.is-on img { filter: brightness(1.12) saturate(1.05); animation: mat-bulb-catch 0.3s steps(1, end) 1; }
+    /* it fades in only after 0.7 s of real waiting: a fast load goes straight to the light and never shows it */
+    #mat-bulb img { display: block; width: 100%; filter: brightness(0.4) saturate(0.55); transition: filter 0.16s ease; opacity: 0; animation: mat-bulb-in 0.3s ease-out 0.7s forwards; }
+    #mat-bulb.is-on img { opacity: 1; filter: brightness(1.12) saturate(1.05); animation: mat-bulb-catch 0.3s steps(1, end) 1; }
+    @keyframes mat-bulb-in { to { opacity: 1; } }
     #mat-bulb.is-away { translate: 0 -112%; opacity: 0; }
     @keyframes mat-bulb-swing { from { transform: rotate(-6.5deg); } to { transform: rotate(6.5deg); } }
     @keyframes mat-bulb-catch { 0% { filter: brightness(1.2); } 22% { filter: brightness(0.45); } 44% { filter: brightness(1.15); } 62% { filter: brightness(0.7); } 100% { filter: brightness(1.12) saturate(1.05); } }
-    @media (prefers-reduced-motion: reduce) { #mat-bulb { animation: none; transition: opacity 0.3s ease; } #mat-bulb.is-on img { animation: none; } #mat-bulb.is-away { translate: none; } }
+    @media (prefers-reduced-motion: reduce) { #mat-bulb { animation: none; transition: opacity 0.3s ease; } #mat-bulb img { opacity: 1; animation: none; } #mat-bulb.is-on img { animation: none; } #mat-bulb.is-away { translate: none; } }
     /* "Hi, I'm Adi." under the bulb: the first words on screen. Lit only by the bulb, its shadow swings the other way as
        the bulb swings. When the room lights up, components/mat/hello.ts carries it onto the cut card letters on the mat,
        which are cut from this same typeface at this same spacing (lib/mat/wordPieces.ts GREETING: FB Bricolage 800,

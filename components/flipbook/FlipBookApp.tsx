@@ -843,16 +843,20 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       if (started) return;
       started = true;
       window.clearTimeout(start);
+      // (a load fast enough that the bulb never faded in (index.html waits 0.7 s): it is not switched on, it just goes)
+      const img = bulb?.querySelector('img');
+      if (bulb && img && Number(getComputedStyle(img).opacity) < 0.5) { bulb.remove(); }
       bulb?.classList.add('is-on');
       engineRef.current?.dawn();
       // the greeting travels onto the cut letters on the mat while the light comes up, and hands over to them once it is full
       void landHello(landingRef.current(), reducedMotion).then(() => setGreeting((g) => (g === 'held' ? 'landed' : g)));
       // it has done its job the moment the room starts to brighten: it goes up and fades while the light is still spreading,
       // so it is never left hanging over a lit room
-      away = window.setTimeout(() => bulb?.classList.add('is-away'), reducedMotion ? 0 : 330);
-      gone = window.setTimeout(() => bulb?.remove(), reducedMotion ? 300 : 900);
+      away = window.setTimeout(() => bulb?.classList.add('is-away'), reducedMotion ? 0 : 120);
+      gone = window.setTimeout(() => bulb?.remove(), reducedMotion ? 300 : 600);
     };
-    const start = window.setTimeout(switchOn, reducedMotion ? 0 : Math.max(250, 1300 - performance.now()));
+    // (the light comes up the moment the scene is drawn: the bulb only ever covers real loading time, never adds its own)
+    const start = window.setTimeout(switchOn, 0);
     // A visitor who scrolls while the bulb is up wants the page now: switch on at once and bring the light up in about a
     // third of a second, so the scroll after that moves the page. (Adi, 2026-11-20: scrolling did nothing for about 3 s.)
     const hurry = () => {
