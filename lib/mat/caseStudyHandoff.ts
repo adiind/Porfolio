@@ -16,7 +16,12 @@ export const SPLASH_GROW_MS = 560;
 /** The type on the splash, the same on both pages (the case study has none of the home page's fonts). */
 export const SPLASH_FONT = "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
 
-export interface CaseSplash { c: string; t: string; p: string; href: string; at: number }
+/** c colour, t title, p partner, i the project's id (picks its sponsor's logo), at when the clipboard was clicked */
+export interface CaseSplash { c: string; t: string; p: string; i?: string; href: string; at: number }
+
+/** index.html's builder for the sponsor's logo on the splash (one copy for both pages, see there). */
+type CaseMark = ((id: string, title: string, at: number) => HTMLElement | null) & { bg(id: string): string | null; done: number };
+const caseMark = () => (window as Window & { __caseMark?: CaseMark }).__caseMark;
 
 let leaving = false;
 
@@ -25,15 +30,17 @@ let leaving = false;
  * it; null grows it from the middle. With reduced motion it simply goes.
  */
 export function openCaseStudy(
-  card: { href: string; title: string; partner: string; band: string },
+  card: { id?: string; href: string; title: string; partner: string; band: string },
   from: { x: number; y: number } | null,
   reduced: boolean,
 ): void {
   if (leaving) return;
   const go = () => window.location.assign(card.href);
-  if (reduced || !/^#[0-9a-f]{6}$/i.test(card.band)) { go(); return; }
+  const mark = caseMark();
+  const colour = (card.id && mark?.bg(card.id)) || card.band;
+  if (reduced || !/^#[0-9a-f]{6}$/i.test(colour)) { go(); return; }
   leaving = true;
-  const splash: CaseSplash = { c: card.band, t: card.title, p: card.partner, href: card.href, at: Date.now() };
+  const splash: CaseSplash = { c: colour, t: card.title, p: card.partner, i: card.id, href: card.href, at: Date.now() };
   try { window.sessionStorage.setItem(CASE_SPLASH_KEY, JSON.stringify(splash)); } catch { /* the case study simply arrives without it */ }
 
   const w = window.innerWidth; const h = window.innerHeight;
@@ -45,10 +52,11 @@ export function openCaseStudy(
   el.setAttribute('aria-hidden', 'true');
   el.style.cssText = [
     'position:fixed', 'inset:0', 'z-index:2147483000', 'display:grid', 'place-items:center', 'pointer-events:auto',
-    `background:${card.band}`, `clip-path:circle(0px at ${x}px ${y}px)`,
+    `background:${colour}`, `clip-path:circle(0px at ${x}px ${y}px)`,
     `transition:clip-path ${SPLASH_GROW_MS}ms cubic-bezier(.7,0,.25,1)`,
   ].join(';');
-  el.appendChild(splashWords(card.title, card.partner, true));
+  const logo = card.id && mark ? mark(card.id, card.title, splash.at) : null;
+  el.appendChild(logo ?? splashWords(card.title, card.partner, true));
   document.body.appendChild(el);
 
   // Back from the case study can bring this page back as it was left (the browser keeps it): take the splash away then.
@@ -62,9 +70,11 @@ export function openCaseStudy(
 
   void el.offsetWidth;
   el.style.clipPath = `circle(${reach}px at ${x}px ${y}px)`;
-  const words = el.firstElementChild as HTMLElement;
-  words.style.opacity = '1';
-  words.style.transform = 'none';
+  if (!logo) {
+    const words = el.firstElementChild as HTMLElement;
+    words.style.opacity = '1';
+    words.style.transform = 'none';
+  }
   window.setTimeout(go, SPLASH_GROW_MS + 40);
 }
 
@@ -73,6 +83,8 @@ export function openCaseStudy(
  * story.html with a redirect to this address, one more trip before the frame can start.
  */
 export const CASE_STORY_PAGES = ['/work/squad-up-assets/story', '/work/familysync-assets/story'];
+/** The logos the splash shows (index.html), fetched ahead so they are there the moment it grows. */
+const SPONSOR_LOGOS = ['/images/sponsors/jpmorganchase.svg', '/images/pg/pg-logo-official.svg'];
 
 type ShipCode = { old?: { js: string[]; css: string[] } };
 let warmed = false;
@@ -125,6 +137,7 @@ export function warmCaseStudies(): void {
     [...doc.querySelectorAll('img[src]')].slice(0, 4).forEach((el) => at(el.getAttribute('src')));
   };
   CASE_STORY_PAGES.forEach(add);
+  SPONSOR_LOGOS.forEach(add);
   pull();
 }
 
