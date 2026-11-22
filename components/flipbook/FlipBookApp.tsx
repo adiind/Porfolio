@@ -31,6 +31,7 @@ import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
+import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
 import { JOURNEY_END, journeyAt, journeySteps } from '../../lib/mat/rescueJourney';
 import LivePreview from './LivePreview';
 
@@ -110,8 +111,31 @@ let bagTargetPicture: HTMLCanvasElement | null = null;
 const bagTarget = () => { if (!bagTargetPicture) { bagTargetPicture = document.createElement('canvas'); bagTargetPicture.width = 8; bagTargetPicture.height = 8; } return bagTargetPicture; };
 /** The bag's spot, from its click target's centre (table units): the bag sits a little lower than the target. */
 const BAG_SHIFT = { x: 0, y: 74 / matStage.booklet.w };
-/** A poster's close-up by id: the résumé and the bag are not posters of the stage. */
-const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : STAGE_POSTERS.find((item) => item.id === id));
+/**
+ * His presentations: a binder-clipped stack of printed decks in the empty corner between the name tag and the résumé
+ * (lib/mat/handoutsLayer.ts; Adi, 2026-11-21: "just a stack of ... presentations that I've already done, and it sits at
+ * the corner without taking much of visual attention"). Picked up, the clip comes off and the decks are dealt onto the
+ * mat; a dealt deck that has its own website opens it in a new tab. Bottom of the stack first; the top deck shows.
+ */
+const HANDOUTS_ID = 'handouts';
+/** Where the stack lies on the 1440 by 900 drawing; turn in degrees, clockwise as seen. */
+const HANDOUTS_AT = { x: 372, y: 118, turn: 4 };
+const HANDOUTS_DECKS: Array<{ slide: string; title: string; url?: string }> = [
+  // (titles and lines as the presentations page has them: review/presentations-2026-11-20c/tools/prepare.py)
+  { slide: 'squad', title: 'Squad Up, McDonald\'s × Northwestern, 2026' },
+  { slide: 'familysync', title: 'FamilySync, JPMorgan Chase × Northwestern, 2026' },
+  { slide: 'aibyadi', title: 'AI by A(d)i, AI workshop, 2026' },
+  { slide: 'bambu', title: '3D Print Anything, Bambu Lab workshop at Corner Makery, 2026', url: 'https://bambu.adidesign.org/#download-guide' },
+  { slide: 'sportband', title: 'Apple Watch Sport Band, a simplified life-cycle assessment', url: 'https://sport-band-lca.vercel.app/#/01' },
+  { slide: 'agentjam', title: 'Agent Jam #2, workshop, Nov 19, 2026', url: 'https://agent-jam-2.vercel.app/' },
+  { slide: 'acela', title: 'Acela Journey Assistant, Northwestern MPD 400, 2026', url: 'https://acela-journey.vercel.app/#1' },
+];
+/** The stack's close-up, as the poster close-up knows it (it has no panel: like the bag, the things on the mat are it). */
+const HANDOUTS_LOOK: StagePoster = { id: HANDOUTS_ID, label: 'Presentations', src: '', x: HANDOUTS_AT.x - 53, y: HANDOUTS_AT.y - 41, w: 106, h: 82, radius: 0, kind: 'layer' };
+let handoutsTargetPicture: HTMLCanvasElement | null = null;
+const handoutsTarget = () => { if (!handoutsTargetPicture) { handoutsTargetPicture = document.createElement('canvas'); handoutsTargetPicture.width = 8; handoutsTargetPicture.height = 8; } return handoutsTargetPicture; };
+/** A poster's close-up by id: the résumé, the bag and the stack are not posters of the stage. */
+const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : id === HANDOUTS_ID ? HANDOUTS_LOOK : STAGE_POSTERS.find((item) => item.id === id));
 /** What comes out of the bag, in the order it comes out (their pictures are the layer's; these are their names). */
 const BAG_THINGS: Array<{ id: BagItem; label: string }> = [
   { id: 'receipt', label: 'The bill: his role and what he did' },
@@ -325,9 +349,12 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the rider's bag lies where the Zomato card was; this invisible, bag-sized prop is what a click on it lands on
   const bagSlot = { x: ZOMATO_LOOK.x + ZOMATO_LOOK.w / 2, y: ZOMATO_LOOK.y + ZOMATO_LOOK.h / 2 + 34 };
   const bag = { id: ZOMATO_ID, image: bagTarget(), ...at(bagSlot.x, bagSlot.y - 50), w: 0.8, h: 1.2, radius: 0.05 };
+  // the presentations stack (its layer draws it): an unseen prop the size of the stack and its clip, for clicks and the
+  // fly-down (a cut-out, its shadow from its empty picture: otherwise the engine lays a card's dark slab under it)
+  const handouts = { id: HANDOUTS_ID, image: handoutsTarget(), ...at(HANDOUTS_AT.x, HANDOUTS_AT.y), w: 0.74, h: 0.6, radius: 0.01, turn: HANDOUTS_AT.turn, cutout: true, alphaShadow: true };
   return {
     greeting: words.greeting,
-    props: [...posters, ...clipboards, bag, ...story, ...booklets, ...pieces],
+    props: [...posters, ...clipboards, bag, handouts, ...story, ...booklets, ...pieces],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -448,6 +475,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const bagIn = useRef(false);
   const bagGen = useRef(0);
   const bagTimer = useRef(0);
+  /** The presentations stack (lib/mat/handoutsLayer.ts), drawn in this engine's scene: one for the life of the engine. */
+  const handoutsRef = useRef<{ layer: HandoutsLayer; engine: FlipBookEngine; remove(): void } | null>(null);
   const [wordsBox, setWordsBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const stageActs = useRef<{ prop(id: string | null): void; book(): void; hover(id: string | null): void }>({ prop() {}, book() {}, hover() {} });
   /** The live book has been set in the engine (its inside can be handed over as it lands), was picked up, is all drawn. */
@@ -600,6 +629,57 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (debug) (window as unknown as { __bag?: unknown }).__bag = { get layer() { return layer; } };
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { bagRef.current?.remove(); bagRef.current = null; window.clearTimeout(bagTimer.current); }, []);
+
+  // The presentations stack: the same, on its own click target in the corner above the résumé.
+  useEffect(() => {
+    const engine = engineRef.current;
+    const canvas = canvasRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === HANDOUTS_ID);
+    if (!staged || fallback || !engine || !canvas || !target || handoutsRef.current?.engine === engine) return;
+    handoutsRef.current?.remove();
+    // (a prop's turn is in degrees, clockwise as seen; a layer's is the scene's own, counter-clockwise)
+    const layer = createHandoutsLayer({
+      x: target.x, y: target.y, turn: -HANDOUTS_AT.turn, canvas, reduced: reducedMotion,
+      slides: HANDOUTS_DECKS.map((deck) => `/images/mat/handouts/${deck.slide}.webp`), links: HANDOUTS_DECKS.map((deck) => deck.url),
+    });
+    handoutsRef.current = { layer, engine, remove: engine.addLayer(layer) };
+    if (debug) (window as unknown as { __handouts?: unknown }).__handouts = { get layer() { return layer; } };
+  }, [debug, fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { handoutsRef.current?.remove(); handoutsRef.current = null; }, []);
+
+  // At the stack, once the decks are down: a click on one that has its own website opens it in a new tab (the engine never
+  // sees it, so it is not a click "Back"); a hand over those, the plain arrow elsewhere, never the zoom glass.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const root = rootRef.current;
+    if (!staged || !canvas || !root) return undefined;
+    const on = () => modeRef.current === 'poster' && lookingRef.current === HANDOUTS_ID;
+    const linkAt = (event: PointerEvent) => handoutsRef.current?.layer.linkAt(event.clientX, event.clientY) ?? null;
+    let downOn: string | null = null;
+    const down = (event: PointerEvent) => { downOn = on() ? linkAt(event) : null; if (downOn) event.stopImmediatePropagation(); };
+    const up = (event: PointerEvent) => {
+      if (!on() || !downOn) { downOn = null; return; }
+      event.stopImmediatePropagation();
+      const link = linkAt(event);
+      if (link === downOn) {
+        window.open(link, '_blank', 'noopener');
+        trackEvent('mat_presentation_opened', { deck: HANDOUTS_DECKS.find((deck) => deck.url === link)?.slide ?? link });
+      }
+      downOn = null;
+    };
+    const move = (event: PointerEvent) => {
+      if (!on()) { if (root.dataset.stackPointer) delete root.dataset.stackPointer; return; }
+      root.dataset.stackPointer = linkAt(event) ? 'true' : 'false';
+    };
+    canvas.addEventListener('pointerdown', down, true);
+    canvas.addEventListener('pointerup', up, true);
+    canvas.addEventListener('pointermove', move);
+    return () => {
+      canvas.removeEventListener('pointerdown', down, true);
+      canvas.removeEventListener('pointerup', up, true);
+      canvas.removeEventListener('pointermove', move);
+    };
+  }, [staged]);
 
   // The three clipboards' case studies: their code and story pages downloaded once the room is lit and the page is quiet,
   // so a click lands on a case study that is already here (lib/mat/caseStudyHandoff.ts, warmCaseStudies)
@@ -1078,6 +1158,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       setMode('poster');
       // (the bag drops its lid and unpacks as the camera comes down to it)
       if (id === ZOMATO_ID) bagActs.current.arrive();
+      // (the stack's clip comes off and its decks are dealt out as the camera comes down)
+      if (id === HANDOUTS_ID) handoutsRef.current?.layer.arrive();
       void fly(id);
     };
     /**
@@ -1119,7 +1201,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       const up = () => { setMode('wide'); modeRef.current = 'wide'; toWide(); };
       if (modeRef.current === 'book') { openings += 1; setLanded(false); void engine.leave().then(up); }
       // (at the bag, everything goes back in and it zips shut before the camera goes up)
-      else if (modeRef.current === 'poster') { void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
+      // (at the stack, the decks go back and the clip goes on as the camera goes up)
+      else if (modeRef.current === 'poster') { handoutsRef.current?.layer.leave(); void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
       // the wide view on a step that names a close-up or a book (Forward to one that cannot be come back to as it was):
       // the address says what is on screen
       if (look || state?.mat === 'book') window.history.replaceState(null, '', window.location.pathname + window.location.hash);
@@ -1256,6 +1339,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
 
   /** Down at the Zomato bag. */
   const atBag = staged && mode === 'poster' && looking?.id === ZOMATO_ID;
+  const atStack = staged && mode === 'poster' && looking?.id === HANDOUTS_ID;
   const portrait = viewport.w / viewport.h < 0.9;
   const flatSize = portrait ? { w: 1024, h: 1536 } : { w: 1536, h: 1024 };
   // the controls take their colours from the page on top when it has its own colour family
@@ -1275,7 +1359,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
 
   return (
     <>
-    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined}>
+    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined} data-stack={atStack ? 'true' : undefined}>
       {/* first paint when coming from the home page: its mat and the closed book, exactly where they were, until the 3D scene takes over */}
       {homeLink && arrival && onMat && !fallback && (
         <div className="fb-held" aria-hidden="true">
@@ -1336,6 +1420,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         <ul className="fb-sr" aria-label="On the mat">
           {STAGE_POSTERS.map((poster) => <li key={poster.id}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(poster.id, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(poster.id); }}>{poster.label}</button></li>)}
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(ZOMATO_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(ZOMATO_ID); }}>Zomato, Senior Product Analyst: a delivery rider's bag. Opens it and lays out his Zomato work.</button></li>
+          <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(HANDOUTS_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(HANDOUTS_ID); }}>Presentations: a clipped stack of his printed decks. Deals them out on the mat.</button></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { void askResume(); ringOn(RESUME_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(RESUME_ID); }}>Résumé, one page. Opens it up close, with a download.</button></li>
           {/* the three design case studies: each lies on the mat as a clipboard */}
           {DESIGN_CARDS.map((card) => (
@@ -1377,7 +1462,18 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           <ul>{BAG_TEXT.press.articles.map((article) => <li key={article.href}><a href={article.href} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' && !bagUi.busy ? 0 : -1}>{article.title} ({article.source})</a></li>)}</ul>
         </aside>
       )}
-      {staged && looking && !atBag && (
+      {/* the decks are pictures on the mat: here they are as text and links, unseen (the stack has no panel beside it) */}
+      {staged && atStack && (
+        <aside className="fb-sr" aria-live="polite">
+          <h2>Presentations, a stack of printed decks</h2>
+          <ul>
+            {HANDOUTS_DECKS.slice().reverse().map((deck) => (
+              <li key={deck.slide}>{deck.url ? <a href={deck.url} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' ? 0 : -1}>{deck.title}. Opens its website.</a> : deck.title}</li>
+            ))}
+          </ul>
+        </aside>
+      )}
+      {staged && looking && !atBag && !atStack && (
         <aside
           className="fb-look"
           data-shown={mode === 'poster' ? 'true' : 'false'}
