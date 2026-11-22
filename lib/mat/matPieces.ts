@@ -26,6 +26,16 @@ declare const __PORTFOLIO_GIT_ACTIVITY__: GitActivityDay[] | null;
 const BUILT_COUNT = typeof __PORTFOLIO_COMMIT_COUNT__ === 'number' && Number.isFinite(__PORTFOLIO_COMMIT_COUNT__) ? __PORTFOLIO_COMMIT_COUNT__ : null;
 const BUILT_DAYS = typeof __PORTFOLIO_GIT_ACTIVITY__ !== 'undefined' && Array.isArray(__PORTFOLIO_GIT_ACTIVITY__) && __PORTFOLIO_GIT_ACTIVITY__.length === 84
   ? __PORTFOLIO_GIT_ACTIVITY__ : null;
+declare const __PORTFOLIO_GIT_YEAR__: GitActivityDay[] | null;
+/**
+ * The last 350 days (50 columns of 7), oldest first, ending on the same day as the card's 12 weeks: the opened card's year
+ * (lib/mat/githubRiseLayer.ts). Its last 84 days are the card's own grid. Null when the build has no such history: the
+ * card then links straight to GitHub, as before.
+ */
+export const GITHUB_YEAR: GitActivityDay[] | null = typeof __PORTFOLIO_GIT_YEAR__ !== 'undefined' && Array.isArray(__PORTFOLIO_GIT_YEAR__)
+  && __PORTFOLIO_GIT_YEAR__.length === 350 && BUILT_DAYS && __PORTFOLIO_GIT_YEAR__[349].date === BUILT_DAYS[83].date
+  && __PORTFOLIO_GIT_YEAR__.some((day) => day.count > 0)
+  ? __PORTFOLIO_GIT_YEAR__ : null;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /** "2026-10-27" as "27 Oct 2026" */
 const dayName = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return `${d} ${MONTHS[m - 1] ?? ''} ${y}`; };

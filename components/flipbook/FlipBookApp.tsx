@@ -22,7 +22,7 @@ import { matScroll, type Hold } from '../../lib/mat/timelineScene';
 import { RESCUE_SCHEMES, RESCUE_SOURCES, RESCUE_STORY, drawRescueCard, drawRescueStoryCard, type NotchStyle, type RescueScheme } from '../../lib/mat/foodRescueCards';
 import { SELF_STORY, drawSelfStoryCard } from '../../lib/mat/selfCards';
 import { SNAPDEAL_STORY, drawSnapdealStoryCard } from '../../lib/mat/snapdealCards';
-import { GITHUB, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
+import { GITHUB, GITHUB_YEAR, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
 import { WORDS_BIG_BELOW, type GreetingSet } from '../../lib/mat/wordPieces';
 import { resumeSheetPicture, wordProps } from '../../lib/mat/wordStage';
 import { DESIGN_CARDS } from '../../lib/mat/designCards';
@@ -32,6 +32,7 @@ import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../l
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
+import { createGithubRiseLayer, type GithubRiseLayer } from '../../lib/mat/githubRiseLayer';
 import { JOURNEY_END, journeyAt, journeySteps } from '../../lib/mat/rescueJourney';
 import LivePreview from './LivePreview';
 
@@ -134,8 +135,23 @@ const HANDOUTS_DECKS: Array<{ slide: string; title: string; url?: string }> = [
 const HANDOUTS_LOOK: StagePoster = { id: HANDOUTS_ID, label: 'Presentations', src: '', x: HANDOUTS_AT.x - 53, y: HANDOUTS_AT.y - 41, w: 106, h: 82, radius: 0, kind: 'layer' };
 let handoutsTargetPicture: HTMLCanvasElement | null = null;
 const handoutsTarget = () => { if (!handoutsTargetPicture) { handoutsTargetPicture = document.createElement('canvas'); handoutsTargetPicture.width = 8; handoutsTargetPicture.height = 8; } return handoutsTargetPicture; };
-/** A poster's close-up by id: the résumé, the bag and the stack are not posters of the stage. */
-const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : id === HANDOUTS_ID ? HANDOUTS_LOOK : STAGE_POSTERS.find((item) => item.id === id));
+/**
+ * The GitHub card, opened where it lies (lib/mat/githubRiseLayer.ts; Adi, 2026-11-22: "a 3D GitHub thing that literally has
+ * progress of this portfolio", "1, squares rise", "i guess daily is better"): the year's squares rise out of it as a day-by-day
+ * print, with three flags at the home page's turning points. A click on its count opens the repository. Only when the build
+ * has the year's history (GITHUB_YEAR); otherwise the card links straight to GitHub.
+ */
+const GITHUB_ID = 'piece:github';
+/** The flags: a day of the print and the home page as it looked then (screenshots built from that day's code). */
+const GITHUB_FLAGS = [
+  { date: '2025-12-18', word: 'Dec', picture: '/images/mat/github/home-2025-12-30.jpg' },
+  { date: '2026-04-18', word: 'Apr', picture: '/images/mat/github/home-2026-04-18.jpg' },
+  { date: '2026-11-17', word: 'Nov', picture: '/images/mat/github/home-2026-11-17.jpg' },
+];
+/** The opened card's close-up, as the poster close-up knows it (no panel: the print on the mat is it). */
+const GITHUB_LOOK: StagePoster = { id: GITHUB_ID, label: 'GitHub', src: '', x: 0, y: 0, w: 0, h: 0, radius: 0, kind: 'layer' };
+/** A poster's close-up by id: the résumé, the bag, the stack and the GitHub card are not posters of the stage. */
+const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : id === HANDOUTS_ID ? HANDOUTS_LOOK : id === GITHUB_ID && GITHUB_YEAR ? GITHUB_LOOK : STAGE_POSTERS.find((item) => item.id === id));
 /** What comes out of the bag, in the order it comes out (their pictures are the layer's; these are their names). */
 const BAG_THINGS: Array<{ id: BagItem; label: string }> = [
   { id: 'receipt', label: 'The bill: his role and what he did' },
@@ -345,7 +361,9 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     resume: { w: matStage.pieces.resume.w, turn: matStage.pieces.resume.turn },
     read: { minPx: RESUME_READ_PX, aside: sheetAside(windowWidth) + SHEET_ASIDE_RIGHT + 24 },
   });
-  const pieces = words.props;
+  // (the GitHub card, when it can be opened, is a cut-out with its shadow from its own picture, so that its layer can hide
+  // it, shadow and all, by giving it an empty picture while it holds the card: lib/mat/githubRiseLayer.ts)
+  const pieces = GITHUB_YEAR ? words.props.map((prop) => (prop.id === GITHUB_ID ? { ...prop, cutout: true, alphaShadow: true } : prop)) : words.props;
   // the rider's bag lies where the Zomato card was; this invisible, bag-sized prop is what a click on it lands on
   const bagSlot = { x: ZOMATO_LOOK.x + ZOMATO_LOOK.w / 2, y: ZOMATO_LOOK.y + ZOMATO_LOOK.h / 2 + 34 };
   const bag = { id: ZOMATO_ID, image: bagTarget(), ...at(bagSlot.x, bagSlot.y - 50), w: 0.8, h: 1.2, radius: 0.05 };
@@ -477,6 +495,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const bagTimer = useRef(0);
   /** The presentations stack (lib/mat/handoutsLayer.ts), drawn in this engine's scene: one for the life of the engine. */
   const handoutsRef = useRef<{ layer: HandoutsLayer; engine: FlipBookEngine; remove(): void } | null>(null);
+  /** The GitHub card's opened print (lib/mat/githubRiseLayer.ts): one for each engine and card picture. */
+  const githubRef = useRef<{ layer: GithubRiseLayer; engine: FlipBookEngine; card: HTMLCanvasElement; remove(): void } | null>(null);
   const [wordsBox, setWordsBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const stageActs = useRef<{ prop(id: string | null): void; book(): void; hover(id: string | null): void }>({ prop() {}, book() {}, hover() {} });
   /** The live book has been set in the engine (its inside can be handed over as it lands), was picked up, is all drawn. */
@@ -641,11 +661,81 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const layer = createHandoutsLayer({
       x: target.x, y: target.y, turn: -HANDOUTS_AT.turn, canvas, reduced: reducedMotion,
       slides: HANDOUTS_DECKS.map((deck) => `/images/mat/handouts/${deck.slide}.webp`), links: HANDOUTS_DECKS.map((deck) => deck.url),
+      target: target.image as HTMLCanvasElement,
     });
     handoutsRef.current = { layer, engine, remove: engine.addLayer(layer) };
     if (debug) (window as unknown as { __handouts?: unknown }).__handouts = { get layer() { return layer; } };
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { handoutsRef.current?.remove(); handoutsRef.current = null; }, []);
+
+  // The GitHub card's opened print: built once the stage is laid and its few pictures are in (the tools' marks and the
+  // three flags' screenshots), on the card's own spot. It hides the stage's card while it holds it (an empty picture).
+  useEffect(() => {
+    const engine = engineRef.current;
+    const canvas = canvasRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === GITHUB_ID);
+    const year = GITHUB_YEAR;
+    if (!staged || fallback || !engine || !canvas || !target || !year) return undefined;
+    const card = target.image as HTMLCanvasElement;
+    if (githubRef.current?.engine === engine && githubRef.current.card === card) return undefined;
+    let gone = false;
+    const load = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image(); image.decoding = 'async';
+      image.onload = () => resolve(image); image.onerror = () => reject(new Error(`could not load ${src}`)); image.src = src;
+    });
+    const flags = GITHUB_FLAGS.map((flag) => ({ ...flag, day: year.findIndex((day) => day.date === flag.date) })).filter((flag) => flag.day >= 0);
+    void Promise.all([load('/images/mat/tool-marks.webp'), Promise.all(flags.map((flag) => load(flag.picture)))]).then(([marks, pictures]) => {
+      if (gone || engineRef.current !== engine) return;
+      githubRef.current?.remove();
+      const empty = document.createElement('canvas'); empty.width = 8; empty.height = 8;
+      const layer = createGithubRiseLayer({
+        card: { image: card, x: target.x, y: target.y, w: target.w, h: target.h, turn: target.turn ?? 0 },
+        data: {
+          days: year.map((day) => day.count), first: year.findIndex((day) => day.count > 0), commits: GITHUB.commits,
+          flags: flags.map((flag, i) => ({ day: flag.day, word: flag.word, picture: pictures[i] })), href: GITHUB.href,
+        },
+        marks, canvas, reduced: reducedMotion, levels: GITHUB.levels,
+        swap: (mine) => engine.setPropImage(GITHUB_ID, mine ? empty : card),
+      });
+      githubRef.current = { layer, engine, card, remove: engine.addLayer(layer) };
+      if (debug) (window as unknown as { __github?: unknown }).__github = { get layer() { return layer; } };
+    }, () => undefined);
+    return () => { gone = true; };
+  }, [debug, fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { githubRef.current?.remove(); githubRef.current = null; }, []);
+
+  // At the opened GitHub card: a click on its count opens the repository in a new tab (the engine never sees it, so it is
+  // not a click "Back"); a hand over it, the plain arrow elsewhere.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const root = rootRef.current;
+    if (!staged || !canvas || !root) return undefined;
+    const on = () => modeRef.current === 'poster' && lookingRef.current === GITHUB_ID;
+    const linkAt = (event: PointerEvent) => githubRef.current?.layer.linkAt(event.clientX, event.clientY) ?? null;
+    let downOn: string | null = null;
+    const down = (event: PointerEvent) => { downOn = on() ? linkAt(event) : null; if (downOn) event.stopImmediatePropagation(); };
+    const up = (event: PointerEvent) => {
+      if (!on() || !downOn) { downOn = null; return; }
+      event.stopImmediatePropagation();
+      if (linkAt(event) === downOn) {
+        window.open(downOn, '_blank', 'noopener');
+        trackEvent('mat_piece_clicked', { piece: 'github' });
+      }
+      downOn = null;
+    };
+    const move = (event: PointerEvent) => {
+      if (!on()) { if (root.dataset.githubPointer) delete root.dataset.githubPointer; return; }
+      root.dataset.githubPointer = linkAt(event) ? 'true' : 'false';
+    };
+    canvas.addEventListener('pointerdown', down, true);
+    canvas.addEventListener('pointerup', up, true);
+    canvas.addEventListener('pointermove', move);
+    return () => {
+      canvas.removeEventListener('pointerdown', down, true);
+      canvas.removeEventListener('pointerup', up, true);
+      canvas.removeEventListener('pointermove', move);
+    };
+  }, [staged]);
 
   // At the stack, once the decks are down: a click on one that has its own website opens it in a new tab (the engine never
   // sees it, so it is not a click "Back"); a hand over those, the plain arrow elsewhere, never the zoom glass.
@@ -1160,6 +1250,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       if (id === ZOMATO_ID) bagActs.current.arrive();
       // (the stack's clip comes off and its decks are dealt out as the camera comes down)
       if (id === HANDOUTS_ID) handoutsRef.current?.layer.arrive();
+      // (the GitHub card's year rises out of it as the camera comes down)
+      if (id === GITHUB_ID) githubRef.current?.layer.arrive();
       void fly(id);
     };
     /**
@@ -1202,7 +1294,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       if (modeRef.current === 'book') { openings += 1; setLanded(false); void engine.leave().then(up); }
       // (at the bag, everything goes back in and it zips shut before the camera goes up)
       // (at the stack, the decks go back and the clip goes on as the camera goes up)
-      else if (modeRef.current === 'poster') { handoutsRef.current?.layer.leave(); void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
+      else if (modeRef.current === 'poster') { handoutsRef.current?.layer.leave(); githubRef.current?.layer.leave(); void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
       // the wide view on a step that names a close-up or a book (Forward to one that cannot be come back to as it was):
       // the address says what is on screen
       if (look || state?.mat === 'book') window.history.replaceState(null, '', window.location.pathname + window.location.hash);
@@ -1226,7 +1318,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         // the words on the mat do what their links do (HeroOverlay's, by data-piece), without a fly-in: GitHub and LinkedIn
         // in a new tab, Work and "See my work" down to the work, Experience and Timeline down to the timeline, the name home.
         // The menu's Résumé flies down to the résumé sheet.
-        if (id !== 'word:resume' && isWordLink(id)) {
+        // (the GitHub card opens where it lies once its print is built: below, as a close-up)
+        if (id !== 'word:resume' && isWordLink(id) && !(id === GITHUB_ID && githubRef.current)) {
           if (modeRef.current !== 'wide') return;
           if (id === 'piece:github') window.open(GITHUB.href, '_blank', 'noopener,noreferrer');
           else document.querySelector<HTMLAnchorElement>(`a[data-piece="${id}"]`)?.click();
@@ -1340,6 +1433,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   /** Down at the Zomato bag. */
   const atBag = staged && mode === 'poster' && looking?.id === ZOMATO_ID;
   const atStack = staged && mode === 'poster' && looking?.id === HANDOUTS_ID;
+  const atGithub = staged && mode === 'poster' && looking?.id === GITHUB_ID;
   const portrait = viewport.w / viewport.h < 0.9;
   const flatSize = portrait ? { w: 1024, h: 1536 } : { w: 1536, h: 1024 };
   // the controls take their colours from the page on top when it has its own colour family
@@ -1359,7 +1453,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
 
   return (
     <>
-    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined} data-stack={atStack ? 'true' : undefined}>
+    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined} data-stack={atStack ? 'true' : undefined} data-github={atGithub ? 'true' : undefined}>
       {/* first paint when coming from the home page: its mat and the closed book, exactly where they were, until the 3D scene takes over */}
       {homeLink && arrival && onMat && !fallback && (
         <div className="fb-held" aria-hidden="true">
@@ -1473,7 +1567,15 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           </ul>
         </aside>
       )}
-      {staged && looking && !atBag && !atStack && (
+      {/* the opened GitHub card is a picture on the mat: here is what it says, unseen */}
+      {staged && atGithub && (
+        <aside className="fb-sr" aria-live="polite">
+          <h2>GitHub: {GITHUB.commits} commits to this portfolio</h2>
+          <p>The year's commits, one bar a day, with the home page as it looked in December, April and November.</p>
+          <a href={GITHUB.href} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' ? 0 : -1}>Open the repository on GitHub</a>
+        </aside>
+      )}
+      {staged && looking && !atBag && !atStack && !atGithub && (
         <aside
           className="fb-look"
           data-shown={mode === 'poster' ? 'true' : 'false'}

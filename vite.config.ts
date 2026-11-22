@@ -27,7 +27,17 @@ type PortfolioHistory = {
   revision: string | null;
   commitCount: number | null;
   activity: GitActivityDay[] | null;
+  /** The last 350 days (50 columns of 7) ending on the same day as `activity`: the GitHub card's opened year (lib/mat/githubRiseLayer.ts). */
+  year?: GitActivityDay[] | null;
 };
+
+/** The `length` days ending on `latest`, oldest first, each with its commit count. */
+const daysEnding = (counts: Map<string, number>, latest: Date, length: number): GitActivityDay[] => Array.from({ length }, (_, index) => {
+  const date = new Date(latest);
+  date.setUTCDate(latest.getUTCDate() - (length - 1 - index));
+  const key = date.toISOString().slice(0, 10);
+  return { date: key, count: counts.get(key) ?? 0 };
+});
 
 const getLocalPortfolioHistory = (): PortfolioHistory | null => {
   const revision = getPortfolioRevision();
@@ -50,13 +60,7 @@ const getLocalPortfolioHistory = (): PortfolioHistory | null => {
     dates.forEach((date) => counts.set(date, (counts.get(date) ?? 0) + 1));
 
     const latest = new Date(`${dates[0]}T00:00:00Z`);
-    const activity = Array.from({ length: 84 }, (_, index) => {
-      const date = new Date(latest);
-      date.setUTCDate(latest.getUTCDate() - (83 - index));
-      const key = date.toISOString().slice(0, 10);
-      return { date: key, count: counts.get(key) ?? 0 };
-    });
-    return { revision, commitCount, activity };
+    return { revision, commitCount, activity: daysEnding(counts, latest, 84), year: daysEnding(counts, latest, 350) };
   } catch {
     return null;
   }
@@ -88,13 +92,7 @@ const getGitHubPortfolioHistory = async (): Promise<PortfolioHistory | null> => 
   const counts = new Map<string, number>();
   dates.forEach((date) => counts.set(date, (counts.get(date) ?? 0) + 1));
   const latest = new Date(`${dates[0]}T00:00:00Z`);
-  const activity = Array.from({ length: 84 }, (_, index) => {
-    const date = new Date(latest);
-    date.setUTCDate(latest.getUTCDate() - (83 - index));
-    const key = date.toISOString().slice(0, 10);
-    return { date: key, count: counts.get(key) ?? 0 };
-  });
-  return { revision: commits[0].sha, commitCount: commits.length, activity };
+  return { revision: commits[0].sha, commitCount: commits.length, activity: daysEnding(counts, latest, 84), year: daysEnding(counts, latest, 350) };
 };
 
 /**
@@ -151,7 +149,7 @@ function shipHeadPreloads(): Plugin {
 
 export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, '.', '');
-  const portfolioHistory = await getGitHubPortfolioHistory()
+  const portfolioHistory: PortfolioHistory = await getGitHubPortfolioHistory()
     ?? getLocalPortfolioHistory()
     ?? sourceHistoryFallback;
   return {
@@ -206,6 +204,7 @@ export default defineConfig(async ({ mode }) => {
       __PORTFOLIO_REVISION__: JSON.stringify(portfolioHistory.revision),
       __PORTFOLIO_COMMIT_COUNT__: JSON.stringify(portfolioHistory.commitCount),
       __PORTFOLIO_GIT_ACTIVITY__: JSON.stringify(portfolioHistory.activity),
+      __PORTFOLIO_GIT_YEAR__: JSON.stringify(portfolioHistory.year ?? null),
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
     },

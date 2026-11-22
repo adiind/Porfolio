@@ -50,7 +50,7 @@ void main() {
 }`;
 /** Paper: matte. Lit side a touch brighter, far side a touch deeper, the window's light over it. */
 const PAPER_FRAGMENT = /* glsl */ `
-uniform sampler2D tMap; uniform vec3 uLight; uniform sampler2D tSun; uniform vec2 uScreen; uniform float uDawn;
+uniform sampler2D tMap; uniform vec3 uLight; uniform sampler2D tSun; uniform vec2 uScreen; uniform float uDawn; uniform float uAlpha;
 varying vec3 vN; varying vec2 vUv; varying vec3 vW;
 ${DAWN}
 void main() {
@@ -61,11 +61,11 @@ void main() {
   vec3 sun = texture2D(tSun, gl_FragCoord.xy / uScreen).rgb;
   vec3 lit = mix(2.0 * col * sun, 1.0 - 2.0 * (1.0 - col) * (1.0 - sun), step(0.5, sun));
   col = mix(col, lit, 0.2);
-  gl_FragColor = vec4(col * dawnLight(), 1.0);
+  gl_FragColor = vec4(col * dawnLight(), uAlpha);
 }`;
 /** Satin steel and wire: a broad soft sheen on faces turned to the window, never a mirror. */
 const METAL_FRAGMENT = /* glsl */ `
-uniform vec3 uColor; uniform float uShine; uniform vec3 uLight; uniform sampler2D tSun; uniform vec2 uScreen; uniform float uDawn;
+uniform vec3 uColor; uniform float uShine; uniform vec3 uLight; uniform sampler2D tSun; uniform vec2 uScreen; uniform float uDawn; uniform float uAlpha;
 varying vec3 vN; varying vec2 vUv; varying vec3 vW;
 ${DAWN}
 void main() {
@@ -79,7 +79,7 @@ void main() {
   vec3 sun = texture2D(tSun, gl_FragCoord.xy / uScreen).rgb;
   vec3 lit = mix(2.0 * col * sun, 1.0 - 2.0 * (1.0 - col) * (1.0 - sun), step(0.5, sun));
   col = mix(col, lit, 0.15);
-  gl_FragColor = vec4(col * dawnLight(), 1.0);
+  gl_FragColor = vec4(col * dawnLight(), uAlpha);
 }`;
 const SHADOW_VERTEX = /* glsl */ `
 varying vec2 vL;
@@ -293,11 +293,22 @@ export interface HandoutsLayer extends MatLayer {
 
 interface Lerp3 { x: number; y: number; z: number; turn: number }
 
-export function createHandoutsLayer(opts: { x: number; y: number; /** degrees, the scene's own (counter-clockwise) */ turn: number; /** slide pictures, bottom of the stack first */ slides: string[]; /** each deck's own website, if it has one (same order) */ links?: Array<string | undefined>; canvas: HTMLCanvasElement; reduced: boolean }): HandoutsLayer {
+export function createHandoutsLayer(opts: { x: number; y: number; /** degrees, the scene's own (counter-clockwise) */ turn: number; /** slide pictures, bottom of the stack first */ slides: string[]; /** each deck's own website, if it has one (same order) */ links?: Array<string | undefined>; canvas: HTMLCanvasElement; reduced: boolean; /** the stack's click target's picture: the stack sinks away with the other things on the mat when another close-up comes down (as the Zomato bag does) */ target?: HTMLCanvasElement }): HandoutsLayer {
   let ctx: MatLayerContext | null = null;
   let lastCamera: PerspectiveCamera | null = null;
   const linked: Array<{ mesh: Mesh; url: string }> = [];
   const ray = new Raycaster();
+  /** How shown the stack is: the engine's own fade for its click target while the stack rests (another close-up sinks it). */
+  const shown = { value: 1 };
+  let targetMesh: Mesh | null = null;
+  const findTarget = () => {
+    if (!ctx || !opts.target) return;
+    targetMesh = null;
+    ctx.scene.traverse((o) => {
+      const m = (o as Mesh).material as ShaderMaterial | undefined;
+      if (m?.uniforms?.tMap?.value?.image === opts.target && m.uniforms.uAlpha && m.uniforms.uSize) targetMesh = o as Mesh;
+    });
+  };
   let group: Group | null = null;
   const disposables: Array<{ dispose(): void }> = [];
   const shadows: Mesh[] = [];
@@ -332,7 +343,7 @@ export function createHandoutsLayer(opts: { x: number; y: number; /** degrees, t
       t.colorSpace = NoColorSpace; t.wrapS = t.wrapT = ClampToEdgeWrapping; t.magFilter = LinearFilter; t.minFilter = LinearMipmapLinearFilter;
       t.anisotropy = c.maxAnisotropy; t.generateMipmaps = true; disposables.push(t); return t;
     };
-    const shared = { uLight: { value: LIGHT }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize }, uDawn: c.dawn };
+    const shared = { uLight: { value: LIGHT }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize }, uDawn: c.dawn, uAlpha: shown };
     const paper = (map: CanvasTexture) => { const m = new ShaderMaterial({ vertexShader: VERTEX, fragmentShader: PAPER_FRAGMENT, transparent: true, depthTest: true, depthWrite: true, uniforms: { ...shared, tMap: { value: map } } }); disposables.push(m); return m; };
     const metal = (rgb: [number, number, number], shine: number) => { const m = new ShaderMaterial({ vertexShader: VERTEX, fragmentShader: METAL_FRAGMENT, transparent: true, depthTest: true, depthWrite: true, uniforms: { ...shared, uColor: { value: new Vector3(...rgb) }, uShine: { value: shine } } }); disposables.push(m); return m; };
     const solid = (geo: BufferGeometry, mat: ShaderMaterial | ShaderMaterial[]) => { disposables.push(geo); const m = new Mesh(geo, mat); m.frustumCulled = false; m.renderOrder = 40; return m; };
@@ -351,7 +362,7 @@ export function createHandoutsLayer(opts: { x: number; y: number; /** degrees, t
     const cast = (s: ReturnType<typeof caster>, lx: number, ly: number, lturn: number, foot: number, top: number, strength: number) => {
       const w = onMat(lx, ly);
       s.u.uC.value.copy(w); s.mesh.position.set(w.x, w.y, 0.0006);
-      s.u.uAng.value = turn + lturn; s.u.uB.value = foot; s.u.uT.value = top; s.u.uStrength.value = strength;
+      s.u.uAng.value = turn + lturn; s.u.uB.value = foot; s.u.uT.value = top; s.u.uStrength.value = strength * shown.value;
     };
 
     group = new Group(); group.position.set(opts.x, opts.y, 0); group.rotation.z = turn;
@@ -435,7 +446,7 @@ export function createHandoutsLayer(opts: { x: number; y: number; /** degrees, t
       clip.position.set(cx, cy, cz); clip.rotation.set(0.25 * arc, -0.15 * arc, cturn);
       front.rotation.x = down > 0 ? FRONT_UP + (FRONT_DOWN - FRONT_UP) * down : FRONT_LIE + (FRONT_UP - FRONT_LIE) * up;
       back.rotation.x = BACK_LIE + (BACK_UP - BACK_LIE) * up + (BACK_LIE - BACK_UP) * down;
-      shadeMat.uniforms.uA.value = 0.22 * (1 - up);
+      shadeMat.uniforms.uA.value = 0.22 * (1 - up) * shown.value;
       cast(clipShadow, cx, cy + CLIP.back * 0.5, cturn, cz, cz + top1, 0.9);
 
       // the decks, dealt off the top one after another
@@ -482,6 +493,11 @@ export function createHandoutsLayer(opts: { x: number; y: number; /** degrees, t
     update(dt, camera) {
       lastCamera = camera;
       if (!pose) return false;
+      // (resting, it goes with the engine's own fade for its spot; opened, it is the close-up and stays)
+      if (opts.target && (!targetMesh || !targetMesh.parent)) findTarget();
+      const engineShown = targetMesh ? ((targetMesh.material as ShaderMaterial).uniforms.uAlpha.value as number) : 1;
+      const now = clock === 0 && target === 0 ? engineShown : 1;
+      if (Math.abs(now - shown.value) > 1e-4) { shown.value = now; if (group) group.visible = now > 0.003; pose(clock); }
       const moving = clock !== target;
       if (moving) {
         clock = target > clock ? Math.min(target, clock + dt) : Math.max(target, clock - dt * CLOSE_SPEED);
