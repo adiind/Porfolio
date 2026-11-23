@@ -12,7 +12,7 @@
  *
  * Sizes are the card's: 340 by 40 page pixels on the 1440 by 900 drawing, 58 by 6.8 cm on the mat. One bar a day on its
  * own square (about 5 by 4 mm), 3 mm tall and taller with the day's commits (48 mm for the busiest day); pins 2.4 mm
- * wood, 96 mm; flags 68 by 56 mm card.
+ * wood, 96 mm; flags 68 by 56 mm card. The play takes 1.9 s.
  *
  * Units: table units. The mat is the xy plane, z is up.
  */
@@ -23,7 +23,7 @@ import {
 } from 'three';
 import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
 
-export const GITHUB_RISE_END = 1.7;
+export const GITHUB_RISE_END = 1.9;
 const END = GITHUB_RISE_END;
 const CLOSE_SPEED = 3;
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -469,12 +469,17 @@ export function createGithubRiseLayer(opts: {
       marksMesh.position.y = (CARD.h / 2 - nowY) * unit - ay * unit;
       // the blocks rise out of their squares: the card's own grid first (the far end), then back through the year; several at
       // once, each quick, settling on a long soft tail
+      // (Adi, 2026-11-22: "need better wave like animation", then "B, swell"): once the camera is down, a swell rolls along
+      // the print from its far end on a slanted front (the back row a beat behind the front); each day lifts a little past
+      // its height on the crest (14 mm, whatever its own height) and settles back on a long soft tail, one smooth hump
       bars.forEach((bar, i) => {
-        const col = Math.floor(bar.j / 7);
-        const from = 0.1 + ((cols - 1 - col) / (cols - 1)) * 0.62;
-        const k = glide(between(t, from, from + 0.5));
+        const col = Math.floor(bar.j / 7), row = bar.j % 7;
+        const p = (cols - 1 - col + row * 0.6) / (cols - 1 + 6 * 0.6);
+        const from = 0.28 + p * 0.95;
+        const u = between(t, from, from + 0.6);
+        const height = bar.h * glide(u) + 14 * MM * Math.sin(Math.PI * u) * (1 - u) * 1.9;
         const at = local(bar.x + bar.size / 2, bar.y + bar.depth / 2);
-        m4.makeScale(bar.size * unit, bar.depth * unit, Math.max(1e-5, bar.h * k)).setPosition(at.x, at.y, 0);
+        m4.makeScale(bar.size * unit, bar.depth * unit, Math.max(1e-5, height)).setPosition(at.x, at.y, 0);
         inst.setMatrixAt(i, m4);
       });
       inst.instanceMatrix.needsUpdate = true;
