@@ -21,7 +21,9 @@ import { POSTER_LINKS } from '../../lib/mat/posterLinks';
 import { matScroll, type Hold } from '../../lib/mat/timelineScene';
 import { RESCUE_SCHEMES, RESCUE_SOURCES, RESCUE_STORY, drawRescueCard, drawRescueStoryCard, type NotchStyle, type RescueScheme } from '../../lib/mat/foodRescueCards';
 import { SELF_STORY, drawSelfStoryCard } from '../../lib/mat/selfCards';
-import { SNAPDEAL_STORY, drawSnapdealStoryCard } from '../../lib/mat/snapdealCards';
+import { createMailerLayer, type MailerLayer } from '../../lib/mat/snapdeal/mailerLayer';
+import { MAILER } from '../../lib/mat/snapdeal/mailerArt';
+import { PAGE as SNAPDEAL_PAGE } from '../../lib/mat/snapdeal/pageWords';
 import { GITHUB, GITHUB_YEAR, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
 import { WORDS_BIG_BELOW, type GreetingSet } from '../../lib/mat/wordPieces';
 import { resumeSheetPicture, wordProps } from '../../lib/mat/wordStage';
@@ -30,6 +32,7 @@ import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
 import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
 import { RECORD, RECORD_DIVE_FRAC, RECORD_EMBED_SRC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, soundSpin, storeRecordDive } from '../../lib/mat/soundRecord';
+import { createSoundRecordRing, type SoundRecordRing } from '../../lib/mat/soundRecordRing';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
@@ -101,9 +104,18 @@ const bookPlace = (index: number) => {
 // Zomato is his red rider's bag (lib/mat/zomatoBag.ts), lying where the Zomato card was: it takes the place of the ~10M
 // card and of the Food Rescue card, which now comes out of it (Adi, 2026-11-17). Both pictures stay in data/matStage.json
 // for the flat page.
-const STAGE_POSTERS = (matStage.posters as StagePoster[]).filter((poster) => !['printer', 'zomato', 'rescue', 'design'].includes(poster.id));
+const STAGE_POSTERS = (matStage.posters as StagePoster[]).filter((poster) => !['printer', 'zomato', 'rescue', 'design', 'snapdeal'].includes(poster.id));
 // (The design poster is gone from the stage too: its three case studies lie on the mat as three clipboards, each opening
 // its own page in one click. Adi, 2026-11-18. Its picture stays in data/matStage.json for the flat page.)
+// Snapdeal is his red courier bag (lib/mat/snapdeal/mailerLayer.ts), lying where the Snapdeal card was: torn open it lays out
+// the invoice, the team shirt and tag and a stock box, each clickable to read (Adi, 2026-11-20 to 23). The card and its four
+// dealt story cards are gone from the stage; their picture stays in data/matStage.json for the flat page.
+const SNAPDEAL_ID = 'snapdeal';
+/** Where the courier bag lies, on the 1440 by 900 drawing. */
+const SNAPDEAL_AT = { x: 625, y: 662, turn: 4 };
+const SNAPDEAL_LOOK: StagePoster = { ...(matStage.posters as StagePoster[]).find((poster) => poster.id === SNAPDEAL_ID)!, label: 'Snapdeal, Data Analyst' };
+let snapdealTargetPicture: HTMLCanvasElement | null = null;
+const snapdealTarget = () => { if (!snapdealTargetPicture) { snapdealTargetPicture = document.createElement('canvas'); snapdealTargetPicture.width = 8; snapdealTargetPicture.height = 8; } return snapdealTargetPicture; };
 const ZOMATO_ID = 'zomato';
 /** The bag's close-up, as the poster close-up knows it (its place is the old Zomato card's). */
 const ZOMATO_LOOK: StagePoster = { ...(matStage.posters as StagePoster[]).find((poster) => poster.id === ZOMATO_ID)!, label: 'Zomato, Senior Product Analyst' };
@@ -152,7 +164,7 @@ const GITHUB_FLAGS = [
 /** The opened card's close-up, as the poster close-up knows it (no panel: the print on the mat is it). */
 const GITHUB_LOOK: StagePoster = { id: GITHUB_ID, label: 'GitHub', src: '', x: 0, y: 0, w: 0, h: 0, radius: 0, kind: 'layer' };
 /** A poster's close-up by id: the résumé, the bag, the stack and the GitHub card are not posters of the stage. */
-const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : id === HANDOUTS_ID ? HANDOUTS_LOOK : id === GITHUB_ID && GITHUB_YEAR ? GITHUB_LOOK : STAGE_POSTERS.find((item) => item.id === id));
+const lookFor = (id: string): StagePoster | undefined => (id === RESUME_ID ? RESUME_LOOK : id === ZOMATO_ID ? ZOMATO_LOOK : id === SNAPDEAL_ID ? SNAPDEAL_LOOK : id === HANDOUTS_ID ? HANDOUTS_LOOK : id === GITHUB_ID && GITHUB_YEAR ? GITHUB_LOOK : STAGE_POSTERS.find((item) => item.id === id));
 /** What comes out of the bag, in the order it comes out (their pictures are the layer's; these are their names). */
 const BAG_THINGS: Array<{ id: BagItem; label: string }> = [
   { id: 'receipt', label: 'The bill: his role and what he did' },
@@ -263,7 +275,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the Zomato bag's pictures start coming now, beside the stage's (not waited for: the bag is built when they are in)
   void preloadZomatoBag().catch(() => undefined);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
-  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, snapdealArt, clipPictures] = await Promise.all([
+  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, clipPictures] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
     hasRescue ? Promise.all([loadPicture(RESCUE_SOURCES.bag), loadPicture(RESCUE_SOURCES.logo), loadPicture(RESCUE_SOURCES.offer)]) : Promise.resolve(null),
     Promise.all(others.map((item) => loadPicture(item.pages[0].art.src))),
@@ -274,7 +286,6 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     // ship kit's first-frame preloads read loadStage's literal pictures.)
     loadPicture('/images/mat/resume-p1-small.webp'),
     loadPicture(STORY_ILLUSTRATIONS.self),
-    loadPicture(STORY_ILLUSTRATIONS.snapdeal),
     // the three clipboards' pictures and P&G's mark: they lie on the mat from the first light, so they come with the stage
     // (the same pictures as lib/mat/designCards.ts DESIGN_PICTURES and DESIGN_PG_MARK, written out for the ship kit)
     Promise.all([loadPicture('/images/familysync_jpmorgan_chase.webp'), loadPicture('/images/mcdonalds_order.webp'), loadPicture('/images/pg/rooms/room-hero.webp'), loadPicture('/images/pg/pg-logo-official.svg')]),
@@ -326,18 +337,6 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
       open: { x: left + (i + 1) * (self.w + gap), y: middle.y },
     }));
   }
-  const snapdeal = posters.find((poster) => poster.id === 'snapdeal');
-  if (snapdeal) {
-    const gap = snapdeal.w * 0.13;
-    const middle = at(matStage.ref.w / 2, matStage.ref.h / 2);
-    const left = middle.x - (snapdeal.w * 5 + gap * 4) / 2 + snapdeal.w / 2;
-    Object.assign(snapdeal, { open: { x: left, y: middle.y } });
-    SNAPDEAL_STORY.forEach((card, i) => story.push({
-      id: `snapdeal:${card.id}`, image: drawnOnce(`snapdeal:${i}`, [snapdealArt], () => drawSnapdealStoryCard(i, snapdealArt)), x: snapdeal.x, y: snapdeal.y,
-      w: snapdeal.w, h: snapdeal.h, radius: snapdeal.radius, dealtFrom: 'snapdeal',
-      open: { x: left + (i + 1) * (snapdeal.w + gap), y: middle.y },
-    }));
-  }
   // Adi's three human-centered design case studies (FamilySync with JPMorgan Chase, Squad Up for McDonald's, P&G hair care
   // packaging) lie on the mat as three clipboards, side by side and a little over one another, where the design poster
   // was. A click on one opens its case study: there is no close-up and nothing is dealt (lib/mat/designClipboards.ts).
@@ -375,10 +374,11 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   const bag = { id: ZOMATO_ID, image: bagTarget(), ...at(bagSlot.x, bagSlot.y - 50), w: 0.8, h: 1.2, radius: 0.05 };
   // the presentations stack (its layer draws it): an unseen prop the size of the stack and its clip, for clicks and the
   // fly-down (a cut-out, its shadow from its empty picture: otherwise the engine lays a card's dark slab under it)
+  const snapdealBag = { id: SNAPDEAL_ID, image: snapdealTarget(), ...at(SNAPDEAL_AT.x, SNAPDEAL_AT.y), w: MAILER.w, h: MAILER.h, radius: 0.03, turn: SNAPDEAL_AT.turn, cutout: true, alphaShadow: true };
   const handouts = { id: HANDOUTS_ID, image: handoutsTarget(), ...at(HANDOUTS_AT.x, HANDOUTS_AT.y), w: 0.74, h: 0.6, radius: 0.01, turn: HANDOUTS_AT.turn, cutout: true, alphaShadow: true };
   return {
     greeting: words.greeting,
-    props: [...posters, ...clipboards, soundRecord, bag, handouts, ...story, ...booklets, ...pieces],
+    props: [...posters, ...clipboards, soundRecord, bag, snapdealBag, handouts, ...story, ...booklets, ...pieces],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -502,7 +502,10 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const bagGen = useRef(0);
   const bagTimer = useRef(0);
   /** The presentations stack (lib/mat/handoutsLayer.ts), drawn in this engine's scene: one for the life of the engine. */
+  /** The Snapdeal courier bag (lib/mat/snapdeal/mailerLayer.ts): one for each engine. */
+  const snapdealRef = useRef<{ layer: MailerLayer; engine: FlipBookEngine; remove(): void } | null>(null);
   const handoutsRef = useRef<{ layer: HandoutsLayer; engine: FlipBookEngine; remove(): void } | null>(null);
+  const recordRingRef = useRef<{ layer: SoundRecordRing; engine: FlipBookEngine; remove(): void } | null>(null);
   /** The GitHub card's opened print (lib/mat/githubRiseLayer.ts): one for each engine and card picture. */
   const githubRef = useRef<{ layer: GithubRiseLayer; engine: FlipBookEngine; card: HTMLCanvasElement; remove(): void } | null>(null);
   const [wordsBox, setWordsBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
@@ -727,6 +730,33 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { handoutsRef.current?.remove(); handoutsRef.current = null; }, []);
 
+  // The words round the yellow record while it is hovered (lib/mat/soundRecordRing.ts), on the mat under it.
+  useEffect(() => {
+    const engine = engineRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === SOUND_RECORD_PROP);
+    if (!staged || fallback || !engine || !target || recordRingRef.current?.engine === engine) return;
+    recordRingRef.current?.remove();
+    const layer = createSoundRecordRing({ x: target.x, y: target.y, d: target.w, reduced: reducedMotion });
+    recordRingRef.current = { layer, engine, remove: engine.addLayer(layer) };
+  }, [fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { recordRingRef.current?.remove(); recordRingRef.current = null; }, []);
+
+  // The Snapdeal courier bag: added to the engine once the stage is laid (it lies on its click target; a prop's turn is in
+  // degrees, clockwise as seen, a layer's the scene's own, counter-clockwise).
+  useEffect(() => {
+    const engine = engineRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === SNAPDEAL_ID);
+    if (!staged || fallback || !engine || !target || snapdealRef.current?.engine === engine) return;
+    snapdealRef.current?.remove();
+    const layer = createMailerLayer({
+      x: target.x, y: target.y, turn: -SNAPDEAL_AT.turn, reduced: reducedMotion,
+      mark: '/images/mat/snapdeal/snapdeal-mark.png', word: '/images/mat/snapdeal/snapdeal-wordmark.png',
+    });
+    snapdealRef.current = { layer, engine, remove: engine.addLayer(layer) };
+    if (debug) (window as unknown as { __snapdeal?: unknown }).__snapdeal = { get layer() { return layer; } };
+  }, [debug, fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { snapdealRef.current?.remove(); snapdealRef.current = null; }, []);
+
   // The GitHub card's opened print: built once the stage is laid and its few pictures are in (the tools' marks and the
   // three flags' screenshots), on the card's own spot. It hides the stage's card while it holds it (an empty picture).
   useEffect(() => {
@@ -785,6 +815,44 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const move = (event: PointerEvent) => {
       if (!on()) { if (root.dataset.githubPointer) delete root.dataset.githubPointer; return; }
       root.dataset.githubPointer = linkAt(event) ? 'true' : 'false';
+    };
+    canvas.addEventListener('pointerdown', down, true);
+    canvas.addEventListener('pointerup', up, true);
+    canvas.addEventListener('pointermove', move);
+    return () => {
+      canvas.removeEventListener('pointerdown', down, true);
+      canvas.removeEventListener('pointerup', up, true);
+      canvas.removeEventListener('pointermove', move);
+    };
+  }, [staged]);
+
+  // At the opened courier bag: a click on the invoice, the shirt (its tag) or the stock box comes down over it to read; a
+  // click anywhere while reading draws back to the whole parcel (the engine never sees these, so none is a click "Back");
+  // a hand over the three, the plain arrow elsewhere, never the zoom glass.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const root = rootRef.current;
+    if (!staged || !canvas || !root) return undefined;
+    const on = () => modeRef.current === 'poster' && lookingRef.current === SNAPDEAL_ID;
+    const layer = () => snapdealRef.current?.layer ?? null;
+    const hitAt = (event: PointerEvent) => layer()?.hit(event.clientX, event.clientY, canvas.getBoundingClientRect()) ?? null;
+    let downOn: 'invoice' | 'tag' | 'box' | 'back' | null = null;
+    const down = (event: PointerEvent) => {
+      downOn = null;
+      if (!on() || !layer()) return;
+      downOn = layer()!.reading ? 'back' : hitAt(event);
+      if (downOn) event.stopImmediatePropagation();
+    };
+    const up = (event: PointerEvent) => {
+      if (!on() || !downOn) { downOn = null; return; }
+      event.stopImmediatePropagation();
+      const was = downOn; downOn = null;
+      if (was === 'back') { layer()?.read(null); return; }
+      if (hitAt(event) === was) { layer()?.read(was); trackEvent('mat_piece_clicked', { piece: `snapdeal-${was}` }); }
+    };
+    const move = (event: PointerEvent) => {
+      if (!on()) { if (root.dataset.snapdealPointer) delete root.dataset.snapdealPointer; return; }
+      root.dataset.snapdealPointer = !layer()?.reading && hitAt(event) ? 'true' : 'false';
     };
     canvas.addEventListener('pointerdown', down, true);
     canvas.addEventListener('pointerup', up, true);
@@ -1311,6 +1379,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       if (id === HANDOUTS_ID) handoutsRef.current?.layer.arrive();
       // (the GitHub card's year rises out of it as the camera comes down)
       if (id === GITHUB_ID) githubRef.current?.layer.arrive();
+      // (the courier bag tears open as the camera comes down)
+      if (id === SNAPDEAL_ID) snapdealRef.current?.layer.arrive();
       void fly(id);
     };
     /**
@@ -1353,7 +1423,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       if (modeRef.current === 'book') { openings += 1; setLanded(false); void engine.leave().then(up); }
       // (at the bag, everything goes back in and it zips shut before the camera goes up)
       // (at the stack, the decks go back and the clip goes on as the camera goes up)
-      else if (modeRef.current === 'poster') { handoutsRef.current?.layer.leave(); githubRef.current?.layer.leave(); void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
+      else if (modeRef.current === 'poster') { handoutsRef.current?.layer.leave(); githubRef.current?.layer.leave(); snapdealRef.current?.layer.leave(); void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
       // the wide view on a step that names a close-up or a book (Forward to one that cannot be come back to as it was):
       // the address says what is on screen
       if (look || state?.mat === 'book') window.history.replaceState(null, '', window.location.pathname + window.location.hash);
@@ -1362,7 +1432,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       prop(id) {
         if (id === null) {
           // (at the bag a click off it goes back one level: out of an open thing first)
-          if (modeRef.current === 'poster') { if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else window.history.back(); }
+          if (modeRef.current === 'poster') { if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else if (lookingRef.current === SNAPDEAL_ID && snapdealRef.current?.layer.reading) snapdealRef.current.layer.read(null); else window.history.back(); }
           return;
         }
         if (id.startsWith('book:')) {
@@ -1399,6 +1469,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         if (id === SOUND_RECORD_PROP) {
           const engine = engineRef.current;
           if (modeRef.current !== 'wide' || diving.current || !engine) return;
+          recordRingRef.current?.layer.hide();   // the dive shows the record alone
           diving.current = true;
           trackEvent('mat_case_study_opened', { project: SOUND_RECORD.id });
           const go = () => window.location.assign(SOUND_RECORD.href);
@@ -1479,6 +1550,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       },
       hover(id) {
         if (id === SOUND_RECORD_PROP) ensureEmbed();
+        recordRingRef.current?.layer.hover(id === SOUND_RECORD_PROP && modeRef.current === 'wide' && !diving.current);
         // resting on the résumé: its full page is fetched, so the close-up is sharp when it arrives
         if (id === RESUME_ID || id === 'word:resume') void askResume();
         // resting on a closed booklet for a moment: its pictures are fetched ahead of a click
@@ -1528,7 +1600,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         // (a story open over the close-up closes itself on Escape, one step Back: not two)
         if (event.key === 'Escape' && modeRef.current === 'poster' && !document.querySelector('dialog[open]')) {
           event.preventDefault();
-          if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else window.history.back();
+          if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else if (lookingRef.current === SNAPDEAL_ID && snapdealRef.current?.layer.reading) snapdealRef.current.layer.read(null); else window.history.back();
         }
         // Food Rescue's story, open from the bag: the arrows step through its seven events, Home and End jump to its ends
         const story = modeRef.current === 'poster' && lookingRef.current === ZOMATO_ID && bagRef.current?.layer.opened === 'rescue' ? bagRef.current.layer.rescue : null;
@@ -1561,6 +1633,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const atBag = staged && mode === 'poster' && looking?.id === ZOMATO_ID;
   const atStack = staged && mode === 'poster' && looking?.id === HANDOUTS_ID;
   const atGithub = staged && mode === 'poster' && looking?.id === GITHUB_ID;
+  const atSnapdeal = staged && mode === 'poster' && looking?.id === SNAPDEAL_ID;
   const portrait = viewport.w / viewport.h < 0.9;
   const flatSize = portrait ? { w: 1024, h: 1536 } : { w: 1536, h: 1024 };
   // the controls take their colours from the page on top when it has its own colour family
@@ -1580,7 +1653,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
 
   return (
     <>
-    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined} data-stack={atStack ? 'true' : undefined} data-github={atGithub ? 'true' : undefined}>
+    <main ref={rootRef} className="fb-root" style={style} data-solo={book.solo && !spread ? 'true' : 'false'} data-spread={spread ? 'true' : 'false'} data-reading={reading ? 'true' : 'false'} data-book={book.slug} data-ready={ready ? 'true' : 'false'} data-page={page} data-mode={fallback ? 'flat' : 'webgl'} data-surface={onMat ? 'mat' : 'table'} data-landed={landed ? 'true' : 'false'} data-stage={staged ? mode : undefined} data-lit={staged ? (lit ? 'true' : 'false') : undefined} data-inside={staged ? (filled === book.slug ? 'true' : 'false') : undefined} data-bag={atBag ? 'true' : undefined} data-stack={atStack ? 'true' : undefined} data-github={atGithub ? 'true' : undefined} data-snapdeal={atSnapdeal ? 'true' : undefined}>
       {/* first paint when coming from the home page: its mat and the closed book, exactly where they were, until the 3D scene takes over */}
       {homeLink && arrival && onMat && !fallback && (
         <div className="fb-held" aria-hidden="true">
@@ -1641,6 +1714,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         <ul className="fb-sr" aria-label="On the mat">
           {STAGE_POSTERS.map((poster) => <li key={poster.id}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(poster.id, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(poster.id); }}>{poster.label}</button></li>)}
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(ZOMATO_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(ZOMATO_ID); }}>Zomato, Senior Product Analyst: a delivery rider's bag. Opens it and lays out his Zomato work.</button></li>
+          <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(SNAPDEAL_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(SNAPDEAL_ID); }}>Snapdeal, Data Analyst: a courier bag. Tears open and lays out his Snapdeal work.</button></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(HANDOUTS_ID, event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(HANDOUTS_ID); }}>Presentations: a clipped stack of his printed decks. Deals them out on the mat.</button></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { void askResume(); ringOn(RESUME_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(RESUME_ID); }}>Résumé, one page. Opens it up close, with a download.</button></li>
           {/* the three design case studies: each lies on the mat as a clipboard */}
@@ -1665,7 +1739,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       )}
       {staged && looking && (
         // (one Back, always here: at the bag it steps out of an open thing first, and waits while the bag unpacks or packs)
-        <button type="button" className="fb-pill fb-pill--back fb-exit" data-shown={mode === 'poster' && !(atBag && bagUi.busy) ? 'true' : 'false'} tabIndex={mode === 'poster' && !(atBag && bagUi.busy) ? 0 : -1} onClick={() => (atBag ? bagBack() : window.history.back())}><ArrowLeft size={16} aria-hidden="true" /><span>{atBag && bagUi.open ? 'Back to the bag' : 'Back to the mat'}</span></button>
+        <button type="button" className="fb-pill fb-pill--back fb-exit" data-shown={mode === 'poster' && !(atBag && bagUi.busy) ? 'true' : 'false'} tabIndex={mode === 'poster' && !(atBag && bagUi.busy) ? 0 : -1} onClick={() => (atBag ? bagBack() : atSnapdeal && snapdealRef.current?.layer.reading ? snapdealRef.current.layer.read(null) : window.history.back())}><ArrowLeft size={16} aria-hidden="true" /><span>{atBag && bagUi.open ? 'Back to the bag' : 'Back to the mat'}</span></button>
       )}
       {/* the bag's things are pictures on the mat: here they are as text and buttons, unseen (the bag has no panel beside it) */}
       {staged && atBag && (
@@ -1723,7 +1797,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
             <ol className="fb-sr">{SELF_STORY.map((card) => <li key={card.id}>{card.kicker}. {card.title}. {card.lines.join(' ')}</li>)}</ol>
           )}
           {looking.id === 'snapdeal' && (
-            <ol className="fb-sr">{SNAPDEAL_STORY.map((card) => <li key={card.id}>{card.kicker}. {card.title}. {card.lines.join(' ')}</li>)}</ol>
+            <ol className="fb-sr"><li>{SNAPDEAL_PAGE.title}, {SNAPDEAL_PAGE.company}, {SNAPDEAL_PAGE.dates}. {SNAPDEAL_PAGE.headline}</li>{SNAPDEAL_PAGE.bullets.map((line) => <li key={line}>{line}</li>)}</ol>
           )}
           {looking.id !== 'photo' && <div className="fb-look-actions">
             {(POSTER_LINKS[looking.id] ?? []).map((link) => <a key={link.href} className="fb-pill fb-pill--open" href={link.href}>{link.label} <ArrowUpRight size={16} aria-hidden="true" /></a>)}
