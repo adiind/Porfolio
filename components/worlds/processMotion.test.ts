@@ -4,16 +4,18 @@ import { processFrame,processShots } from './processMotion';
 describe('source-photo scroll choreography',()=>{
   for(const [project,shots] of Object.entries(processShots)){
     it(`${project}: every scroll position has an image and reverses exactly`,()=>{
+      const down:ReturnType<typeof processFrame>[][]=[];
       for(let n=0;n<=400;n++){
-        const p=n/400;
-        const frames=shots.map((shot,i)=>processFrame(p,i,shot));
+        const frames=shots.map((shot,i)=>processFrame(n/400,i,shot));
         expect(frames.reduce((sum,f)=>sum+f.opacity,0)).toBeCloseTo(1,7);
-        frames.forEach((f,i)=>{
-          expect(f).toEqual(processFrame(p,i,shots[i]));
+        frames.forEach((f)=>{
           expect(Object.values(f).every(Number.isFinite)).toBe(true);
           expect(f.scale).toBeGreaterThanOrEqual(1);
         });
+        down.push(frames);
       }
+      // scrolling back up shows exactly what scrolling down showed
+      for(let n=400;n>=0;n--) expect(shots.map((shot,i)=>processFrame(n/400,i,shot))).toEqual(down[n]);
     });
     it(`${project}: phone zooms stay within the desktop camera travel`,()=>{
       shots.forEach((shot,i)=>{
