@@ -29,6 +29,7 @@ import { DESIGN_CARDS } from '../../lib/mat/designCards';
 import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
 import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
+import { RECORD, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord } from '../../lib/mat/soundRecord';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
@@ -348,6 +349,11 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
       ...at(lay.x, lay.y), w: CLIPBOARD.w / px, h: CLIPBOARD.h / px, radius: 0, cutout: true, alphaShadow: true, turn: lay.turn,
     };
   });
+  // A yellow record lies on the mat above the clipboards: the way in to the interactive 3D board (lib/mat/soundRecord.ts).
+  const soundRecord: StageSpec['props'][number] = {
+    id: SOUND_RECORD_PROP, image: drawnOnce('record:sound', [], () => drawSoundRecord()),
+    ...at(RECORD_LAY.x, RECORD_LAY.y), w: RECORD.d / px, h: RECORD.d / px, radius: 0, cutout: true, alphaShadow: true, turn: RECORD_LAY.turn,
+  };
   const booklets = others.map((item, index) => {
     const spot = place(item.slug);
     const board = item.board ?? '#2b160d';
@@ -372,7 +378,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   const handouts = { id: HANDOUTS_ID, image: handoutsTarget(), ...at(HANDOUTS_AT.x, HANDOUTS_AT.y), w: 0.74, h: 0.6, radius: 0.01, turn: HANDOUTS_AT.turn, cutout: true, alphaShadow: true };
   return {
     greeting: words.greeting,
-    props: [...posters, ...clipboards, bag, handouts, ...story, ...booklets, ...pieces],
+    props: [...posters, ...clipboards, soundRecord, bag, handouts, ...story, ...booklets, ...pieces],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -1335,6 +1341,13 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           openCaseStudy(card, rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null, reducedMotion);
           return;
         }
+        // the yellow record: the interactive 3D board, under a splash in the mat's blue that grows out of the record
+        if (id === SOUND_RECORD_PROP) {
+          trackEvent('mat_case_study_opened', { project: SOUND_RECORD.id });
+          const rect = engineRef.current?.screenRect(id);
+          openCaseStudy(SOUND_RECORD, rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null, reducedMotion);
+          return;
+        }
         if (id === 'word:resume') id = RESUME_ID;
         const poster = lookFor(id);
         if (!poster || modeRef.current !== 'wide') return;
@@ -1520,6 +1533,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           {DESIGN_CARDS.map((card) => (
             <li key={card.id}><a href={card.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(`design:${card.id}`, event)} onBlur={ringOff}>{card.title}, {card.partner}. {card.line} Open the case study.</a></li>
           ))}
+          <li><a href={SOUND_RECORD.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(SOUND_RECORD_PROP, event)} onBlur={ringOff}>{SOUND_RECORD.title}: a yellow record. Opens an interactive 3D board where you drag keys into records and layer real music.</a></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn('book', event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.book(); }}>{book.title}, a flip book. {book.meta}. Opens the book.</button></li>
           {FLIP_BOOKS.filter((item) => item.slug !== book.slug).map((item) => (
             <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { fetchOpeningSpread(item.slug); ringOn(`book:${item.slug}`, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book. {item.meta}. Opens the book.</button></li>

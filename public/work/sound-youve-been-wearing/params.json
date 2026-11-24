@@ -1,0 +1,130 @@
+{
+ "units": "metres; origin = board centre-bottom on the table, front face at z=0, +y up, +z toward the viewer of the front",
+ "board": {
+  "W": 0.96,
+  "sideH": 0.36,
+  "centerH": 0.51,
+  "T": 0.018,
+  "archPower": 1.6
+ },
+ "records": [
+  {
+   "id": "darkblue",
+   "x": -0.207,
+   "y": 0.34,
+   "d": 0.185,
+   "label": "#2b3f9e",
+   "led": "#3d7bff",
+   "key": {
+    "shape": "blob",
+    "color": "#2a3f9c",
+    "shaft": "black",
+    "size": 0.101
+   }
+  },
+  {
+   "id": "red",
+   "x": 0.099,
+   "y": 0.34,
+   "d": 0.193,
+   "label": "#d8312b",
+   "led": "#ff4d7a",
+   "key": {
+    "shape": "splat",
+    "color": "#e2352a",
+    "shaft": "black",
+    "size": 0.11
+   }
+  },
+  {
+   "id": "orange",
+   "x": -0.325,
+   "y": 0.139,
+   "d": 0.174,
+   "label": "#f07a22",
+   "led": "#ff9a4a",
+   "key": {
+    "shape": "burst",
+    "color": "#ee4b22",
+    "shaft": "blue",
+    "size": 0.108
+   }
+  },
+  {
+   "id": "yellow",
+   "x": -0.04,
+   "y": 0.134,
+   "d": 0.187,
+   "label": "#f5c518",
+   "led": "#ffd84a",
+   "key": {
+    "shape": "jag",
+    "color": "#f5c20e",
+    "shaft": "blue",
+    "size": 0.123
+   }
+  },
+  {
+   "id": "teal",
+   "x": 0.265,
+   "y": 0.109,
+   "d": 0.202,
+   "label": "#4fb3b0",
+   "led": "#46c8ff",
+   "key": {
+    "shape": "fuzz",
+    "color": "#5db3ad",
+    "shaft": "black",
+    "size": 0.11
+   }
+  }
+ ],
+ "recordZ": 0.032,
+ "bars": [
+  {
+   "for": "darkblue",
+   "x0": -0.28,
+   "x1": -0.09,
+   "y": 0.44
+  },
+  {
+   "for": "red",
+   "x0": 0.01,
+   "x1": 0.227,
+   "y": 0.442
+  },
+  {
+   "for": "orange",
+   "x0": -0.406,
+   "x1": -0.227,
+   "y": 0.229
+  },
+  {
+   "for": "yellow",
+   "x0": -0.121,
+   "x1": 0.062,
+   "y": 0.239
+  },
+  {
+   "for": "teal",
+   "x0": 0.17,
+   "x1": 0.384,
+   "y": 0.256
+  }
+ ],
+ "feet": {
+  "inset": 0.04,
+  "frontDepth": 0.14,
+  "frontH": 0.21,
+  "backDepth": 0.15,
+  "backH": 0.25
+ },
+ "note": {
+  "x": 0.33,
+  "y": 0.385,
+  "size": 0.076,
+  "rot": -0.12,
+  "color": "#ff9a3c"
+ },
+ "keyNote": "Key shapes and colours read from photos 01, 02 and 06; shaft colour per key is a guess (both black and blue shafts appear in 06)."
+}

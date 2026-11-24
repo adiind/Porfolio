@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sound You've Been Wearing · Adi Agarwal</title>
+<meta name="description" content="The Sound You've Been Wearing: an interactive 3D board. Drag keys into records, turn a record for volume, and layer real music.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1b62d4">
+<style>
+  /* the home mat's blue, so the screen stays blue from the home page's splash straight into this scene's own mat */
+  html, body { margin: 0; height: 100%; background: #1b62d4; overflow: hidden; }
+  canvas { display: block; }
+  /* the scene's HUD (orbit hint, "Download GLB") is not part of the portfolio version; the scene still looks it up, so it stays in the page, hidden */
+  #hud { display: none !important; }
+  /* Close: DESIGN.md's exit control. Top right, a solid chip in the page's canvas colour with its ink as text and a 1px ink border. */
+  #close { position: fixed; top: 24px; right: 24px; z-index: 50; box-sizing: border-box; min-width: 44px; min-height: 44px; padding: 0 16px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+    font: 600 15px/1 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; letter-spacing: .01em;
+    color: #ffffff; background: #1b62d4; border: 1px solid #ffffff; border-radius: 999px; }
+  #close:hover, #close:focus-visible { color: #1b62d4; background: #ffffff; outline: none; }
+  #close:focus-visible { box-shadow: 0 0 0 3px #1b62d4, 0 0 0 5px #ffffff; }
+  #close .x { font-size: 17px; line-height: 1; }
+  @media (max-width: 479px) { #close { top: 16px; right: 16px; width: 44px; padding: 0; } #close .label { display: none; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three/build/three.module.js",
+  "three/addons/": "./vendor/three/addons/"
+} }
+</script>
+<script>
+  /* Arriving from the home mat's record: the home page's splash (lib/mat/caseStudyHandoff.ts, kept in sessionStorage) is drawn
+     again first thing, so the screen never goes black or white between the two pages. It is lifted away once the scene is ready. */
+  (function () {
+    var s = null;
+    try { s = JSON.parse(sessionStorage.getItem('case-splash') || 'null'); sessionStorage.removeItem('case-splash'); } catch (e) { s = null; }
+    if (!s || typeof s.at !== 'number' || Date.now() - s.at > 8000 || s.href !== location.pathname) return;
+    if (!/^#[0-9a-f]{6}$/i.test(s.c) || typeof s.t !== 'string' || typeof s.p !== 'string') return;
+    var font = "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
+    var d = document.createElement('div');
+    d.id = 'case-splash';
+    d.setAttribute('aria-hidden', 'true');
+    d.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;pointer-events:none;background:' + s.c + ';transition:opacity .6s ease';
+    var box = document.createElement('div');
+    box.style.cssText = 'text-align:center;color:#fff;padding:0 24px;font-family:' + font;
+    var name = document.createElement('div');
+    name.textContent = s.t.slice(0, 80);
+    name.style.cssText = 'font-weight:700;font-size:clamp(34px,5.4vw,78px);line-height:1.05;letter-spacing:-.02em';
+    var by = document.createElement('div');
+    by.textContent = s.p.slice(0, 80);
+    by.style.cssText = 'margin-top:12px;font-weight:600;font-size:clamp(14px,1.4vw,19px);letter-spacing:.06em;text-transform:uppercase;opacity:.86';
+    box.appendChild(name); box.appendChild(by); d.appendChild(box);
+    document.documentElement.appendChild(d);
+    var gone = false, start = Date.now();
+    function lift() {
+      if (gone) return;
+      gone = true;
+      requestAnimationFrame(function () { requestAnimationFrame(function () { d.style.opacity = '0'; }); });
+      setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 800);
+    }
+    (function wait() {
+      if (window.__ready && Date.now() - start > 700) { setTimeout(lift, 120); return; }
+      if (Date.now() - start > 9000) { lift(); return; }
+      setTimeout(wait, 40);
+    })();
+    /* back from the board can bring the page that left for here back as it was: nothing of this splash is on that one */
+  })();
+</script>
+</head>
+<body>
+<div id="hud"><span>The Sound You've Been Wearing</span><button id="dl">Download GLB</button></div>
+<button type="button" id="close" aria-label="Close and return to the portfolio"><span class="x" aria-hidden="true">✕</span><span class="label">Close</span></button>
+<script>
+  (function () {
+    function close() { window.location.assign('/'); }
+    document.getElementById('close').addEventListener('click', close);
+    addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented) { e.preventDefault(); close(); } });
+  })();
+</script>
+<script type="module" src="./scene.js"></script>
+</body>
+</html>

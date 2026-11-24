@@ -60,6 +60,7 @@
       </a>
       <a class="bx-a bx-link" href="/Adi_Agarwal_Resume_2026.pdf" target="_blank" rel="noopener">Résumé</a>
       <a class="bx-a bx-link" href="https://www.linkedin.com/in/adiind" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a class="bx-a bx-link bx-rec" href="/work/sound-youve-been-wearing/" data-sound-record aria-label="The Sound You've Been Wearing, an interactive 3D board. Opens it."><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12.5" fill="#1c1b1e"/><circle cx="13" cy="13" r="9.6" fill="none" stroke="#141316" stroke-width=".8"/><circle cx="13" cy="13" r="7.4" fill="none" stroke="#141316" stroke-width=".8"/><circle cx="13" cy="13" r="5.6" fill="#facc15"/><path d="M11.6 10.9 15.4 13l-3.8 2.1z" fill="#16204a"/></svg><span>The Sound You’ve Been Wearing</span></a>
     </div>
   </div>
 
@@ -175,5 +176,21 @@
 <script src="work.js"></script>
 <script src="sun.js"></script>
 <script src="mat.js"></script>
+<script>
+/* The record link: the same splash as the 3D mat's record (lib/mat/caseStudyHandoff.ts), in the mat's blue; the board page draws it again on arrival. */
+(function(){var a=document.querySelector("[data-sound-record]");if(!a)return;a.addEventListener("click",function(e){
+if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return;
+if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+e.preventDefault();var href=a.getAttribute("href"),t="The Sound You've Been Wearing";
+try{sessionStorage.setItem("case-splash",JSON.stringify({c:"#1b62d4",t:t,p:"Interactive 3D board",href:href,at:Date.now()}))}catch(x){}
+var r=a.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,w=innerWidth,h=innerHeight,reach=Math.ceil(Math.hypot(Math.max(x,w-x),Math.max(y,h-y)))+4;
+var d=document.createElement("div");d.setAttribute("aria-hidden","true");
+d.style.cssText="position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;background:#1b62d4;clip-path:circle(0px at "+x+"px "+y+"px);transition:clip-path 560ms cubic-bezier(.7,0,.25,1)";
+var b=document.createElement("div");b.style.cssText="text-align:center;color:#fff;padding:0 24px;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;font-weight:700;font-size:clamp(34px,5.4vw,78px);line-height:1.05;letter-spacing:-.02em";b.textContent=t;
+var p=document.createElement("div");p.textContent="Interactive 3D board";p.style.cssText="margin-top:12px;font-weight:600;font-size:clamp(14px,1.4vw,19px);letter-spacing:.06em;text-transform:uppercase;opacity:.86";b.appendChild(p);d.appendChild(b);document.body.appendChild(d);
+addEventListener("pageshow",function(ev){if(ev.persisted&&d.parentNode)d.parentNode.removeChild(d)});
+void d.offsetWidth;d.style.clipPath="circle("+reach+"px at "+x+"px "+y+"px)";
+setTimeout(function(){location.assign(href)},600)})})();
+</script>
 </body>
 </html>
