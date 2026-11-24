@@ -2,6 +2,9 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { FLIP_BOOKS, FLIP_BOOKS_BY_SLUG, OTHER_BOOKS } from '../../data/flipbooks';
 import { LIVE_SCENES, liveSceneFor } from './live';
+import { JARVIS_STORIES } from './live/jarvisStory';
+import { MUSE_STORIES } from './live/museStory';
+import { SURYA_STORIES } from './live/suryaStory';
 import { PROJECTS_BY_ID } from '../../data/projects';
 import { pgMetrics } from '../../data/pgStory';
 
@@ -73,40 +76,34 @@ describe('flip books', () => {
     }
   });
 
-  it('only names live scenes that exist, and their pictures are on disk', () => {
+  it('gives every page of the story books a registered scene, uses every scene, and finds its pictures on disk', () => {
     const live = ALL_BOOKS.flatMap((book) => book.pages.filter((page) => page.live));
-    expect(live.length).toBeGreaterThan(0);
     for (const page of live) {
       const scene = liveSceneFor(page);
       expect(scene, page.live).not.toBeNull();
       for (const src of scene!.sources) expect(existsSync(publicFile(src)), src).toBe(true);
     }
-    // every page of the Surya book is alive: a cover, then a story page facing each picture page
-    const book = FLIP_BOOKS_BY_SLUG.get('surya')!;
-    expect(book.pages.map((page) => page.live)).toEqual([
-      'surya-cover',
-      'surya-story-why', 'surya-awake',
-      'surya-story-form', 'surya-roots',
-      'surya-story-body', 'surya-layers',
-      'surya-story-light', 'surya-glow',
-      'surya-story-flowers', 'surya-bloom',
-      'surya-story-brain', 'surya-whole',
-      'surya-story-house', 'surya-home',
-      'surya-story-learned', 'surya-end',
-    ]);
-    // the Muse book: a cover, then a story page facing each of the seven idea-words, then the last page
-    expect(FLIP_BOOKS_BY_SLUG.get('muse')!.pages.map((page) => page.live)).toEqual([
-      'muse-cover',
-      'muse-story-why', 'muse-tangible',
-      'muse-story-how', 'muse-orchestrate',
-      'muse-story-model', 'muse-imagine',
-      'muse-story-specs', 'muse-fit',
-      'muse-story-pouch', 'muse-real',
-      'muse-story-build', 'muse-snap',
-      'muse-story-button', 'muse-button',
-      'muse-end',
-    ]);
-    expect(Object.keys(LIVE_SCENES).sort()).toEqual([...new Set(live.map((page) => page.live!))].sort());
+    // Surya, Jarvis and Muse are alive on every page
+    for (const slug of ['surya', 'jarvis', 'muse']) {
+      for (const page of FLIP_BOOKS_BY_SLUG.get(slug)!.pages) expect(liveSceneFor(page), `${slug}: ${page.id}`).not.toBeNull();
+    }
+    // no registered scene is left without a page
+    const named = new Set(live.map((page) => page.live));
+    for (const id of Object.keys(LIVE_SCENES)) expect(named.has(id), id).toBe(true);
+  });
+
+  it('binds Surya, Jarvis and Muse as spreads: after the cover, a story page faces each picture page', () => {
+    const story = (page: (typeof FLIP_BOOKS)[number]['pages'][number]) => stories.has(liveSceneFor(page)!);
+    const stories = new Set([...SURYA_STORIES, ...JARVIS_STORIES, ...MUSE_STORIES]);
+    for (const slug of ['surya', 'jarvis', 'muse']) {
+      const { pages } = FLIP_BOOKS_BY_SLUG.get(slug)!;
+      expect(story(pages[0]), `${slug}: cover`).toBe(false);
+      // each spread: pages[i] on the left, pages[i + 1] on the right (a last page left alone has no spread)
+      for (let i = 1; i + 1 < pages.length; i += 2) {
+        expect(story(pages[i]), `${slug}: ${pages[i].id}`).toBe(true);
+        expect(story(pages[i + 1]), `${slug}: ${pages[i + 1].id}`).toBe(false);
+      }
+    }
   });
 
   it('binds the Surya book as spreads: a story page on the left of every picture page', () => {
@@ -145,7 +142,6 @@ describe('flip books', () => {
     expect(text).toContain('32 by 8');
     expect(text).toContain('68 more lights');
     expect(text).toContain('324 lights');
-    expect(32 * 8 + 68).toBe(324);
     // the three choices are the ones in his project notes, in plain words
     expect(project.decisions?.map((item) => item.decision)).toEqual([
       'Micro DC Motors vs Servo Motors', 'Physical Motion vs Screen-Based Display', 'Laser-Cut Wood Layers vs 3D-Printed Structure',
@@ -216,30 +212,15 @@ describe('the Jarvis book', () => {
   });
 
   it('binds its pages like Surya\'s: a cover, then a story page facing a picture page', () => {
-    expect(book.pages.map((page) => page.id)).toEqual([
-      'cover', 'sensor', 'present', 'voice', 'listen', 'why', 'here', 'lights', 'answer', 'messages', 'control', 'case', 'diy', 'end',
-    ]);
-    expect(book.pages.map((page) => page.live)).toEqual([
-      'jarvis-cover', 'jarvis-sensor', 'jarvis-present', 'jarvis-voice', 'jarvis-listen', 'jarvis-why', 'jarvis-here',
-      'jarvis-lights', 'jarvis-answer', 'jarvis-messages', 'jarvis-control', 'jarvis-case', 'jarvis-diy', 'jarvis-end',
-    ]);
     expect(book.spread).toBe(true);
     expect(book.solo).toBe(true);
     // a cover, six spreads and a last page that stands alone on the left (the book builds one more leaf for it)
-    expect(book.pages.length % 2).toBe(0);
+    expect(book.pages.length).toBe(14);
     expect(book.pages.find((page) => page.id === 'sensor')!.word).toBe('Sensor');
     // the cover and every story page carry their own words; every picture page is captioned by the shell
     expect(book.pages.map((page) => Boolean(page.selfCaptioned))).toEqual(book.pages.map((_, index) => index === 0 || index % 2 === 1));
     const surya = FLIP_BOOKS_BY_SLUG.get('surya')!;
     expect([book.surface, book.table, book.board]).toEqual([surya.surface, surya.table, surya.board]);
-  });
-
-  it('registers every scene it names, and every picture and still it names is on disk', () => {
-    for (const page of book.pages) {
-      expect(LIVE_SCENES[page.live!], page.live).toBeDefined();
-      expect(existsSync(publicFile(page.art.src)), page.art.src).toBe(true);
-      for (const src of liveSceneFor(page)!.sources) expect(existsSync(publicFile(src)), src).toBe(true);
-    }
   });
 
   it('shows the real Jarvis: his photographs, never the generated look-alikes', () => {

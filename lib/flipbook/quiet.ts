@@ -50,9 +50,6 @@ export function whenStill(fn: () => void, ms: number): void {
   look();
 }
 
-/** For tests: as if the page had just been touched, or never. */
-export function setTouchedForTest(at: number, down = false): void { listening = true; lastTouched = at; fingerDown = down; }
-
 /**
  * Runs `fn` at the next quiet moment. `patience` (milliseconds, asked again at every look) is the longest it may be
  * kept waiting by a visitor who never lets go: after that it runs anyway, because what it draws is needed.

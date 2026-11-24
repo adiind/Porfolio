@@ -1,5 +1,5 @@
 {
- "note": "A copy of TL and LOOK from components/mat/TimelineSection.tsx (unchanged), for the timeline drawn on the mat. lib/mat/timelineData.test.ts fails if the two drift apart.",
+ "note": "The timeline's stops (tl) and how each is drawn (look): read by components/mat/TimelineSection.tsx and by the mat's timeline (lib/mat/timelineCards.ts).",
  "tl": {
   "start": "2020-01-01",
   "all": "2016-06-01",
