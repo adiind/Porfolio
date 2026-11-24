@@ -32,6 +32,22 @@ const REPLAYS = [
     ],
   },
   {
+    fix: 'a933b6f7',
+    bug: 'the dialog does not ignore a popstate that lands on its own entry, so its child\'s close closes it too',
+    property: '4 a child never closes its parent',
+    edits: [
+      ['if (win.history.state?.modal === tag || childHistoryTags?.includes(win.history.state?.modal)) return;', 'if (childHistoryTags?.includes(win.history.state?.modal)) return;'],
+    ],
+  },
+  {
+    fix: 'a933b6f7',
+    bug: 'the cleanup leaves its popstate listener behind, so StrictMode\'s first effect still hears popstate',
+    property: '1 a dialog closes only on a user Back',
+    edits: [
+      ["    win.removeEventListener('popstate', handlePopState);\n", ''],
+    ],
+  },
+  {
     fix: 'feb77f50',
     bug: 'the parent does not ignore a popstate that lands on its child\'s entry',
     property: '1 a dialog closes only on a user Back',
