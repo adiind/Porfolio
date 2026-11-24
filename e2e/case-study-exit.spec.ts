@@ -194,7 +194,7 @@ function expectClearExit(layout: NonNullable<Layout>, where: string) {
 }
 
 /** Home: "/", or the flat home that index.tsx sends "/" to in a browser that cannot take the 3D home (headless Chromium). */
-const atHome = (url: URL) => url.pathname === '/' || url.pathname === '/home-flat/index.html';
+const atHome = (url: URL) => url.pathname === '/' || url.pathname === '/home-flat/';
 
 /**
  * Failures this test found on main when it was written (2026-11-24), left for the page owner to fix. Each case is marked
