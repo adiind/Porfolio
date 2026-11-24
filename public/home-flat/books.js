@@ -48,7 +48,7 @@
       a.style.setProperty('--bx', ((i % 2 ? 1 : -1) * 4) + '%');
       a.style.zIndex = String(i + 1);
     }
-    a.innerHTML = '<span class="bk-in"><img src="' + book.cover + '" alt="" decoding="sync"></span><span class="bk-tag"><b>' + book.title + '</b> · flip book</span>';
+    a.innerHTML = '<span class="bk-in"><img src="' + book.cover + '" alt="" loading="lazy" decoding="async"></span><span class="bk-tag"><b>' + book.title + '</b> · flip book</span>';
     zone.appendChild(a);
   });
 

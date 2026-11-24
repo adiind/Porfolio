@@ -12,6 +12,12 @@
   var end = function (it) { return it.end === 'Present' ? today : +new Date(it.end); };
   var el = function (tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
   var scale = function (a, b) { var t0 = +new Date(a), t1 = +new Date(b); return function (d) { return Math.max(0, Math.min(1, (d - t0) / (t1 - t0))) * 100; }; };
+  /* The pictures on the timeline cards sit far below the first screen: each is set only when its card is within about
+     two and a half screens of the view, so a first visit does not download them all up front. */
+  var bgIO = 'IntersectionObserver' in window ? new IntersectionObserver(function (en) {
+    en.forEach(function (e) { if (!e.isIntersecting) return; var n = e.target; n.style.backgroundImage = n.getAttribute('data-bg'); n.removeAttribute('data-bg'); bgIO.unobserve(n); });
+  }, { rootMargin: '2500px 0px' }) : null;
+  var setBg = function (node, url) { var v = 'url("' + url + '")'; if (!bgIO) { node.style.backgroundImage = v; return; } node.setAttribute('data-bg', v); bgIO.observe(node); };
   var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
   var smooth = function (a, b, v) { var u = clamp((v - a) / (b - a)); return u * u * (3 - 2 * u); };
   function years(it) {
@@ -85,8 +91,8 @@
     a.style.setProperty('--k', k);
     a.setAttribute('aria-label', it.short + ': ' + it.title + ', ' + my(it.start) + ' to ' + my(it.end) + '. Opens its page.');
     var pic = el('span', 'vt-pic' + (it.logo ? ' is-logo' : '') + (it.fit ? ' is-fit' : '') + (it.card ? ' is-card' : ''));
-    if (it.card) { var im0 = el('img'); im0.src = it.pic; im0.alt = ''; pic.appendChild(im0); }   // a real object (his staff ID card), shown whole
-    else { pic.style.backgroundImage = 'url("' + it.pic + '")'; if (it.pos) pic.style.backgroundPosition = it.pos; }
+    if (it.card) { var im0 = el('img'); im0.loading = 'lazy'; im0.decoding = 'async'; im0.src = it.pic; im0.alt = ''; pic.appendChild(im0); }   // a real object (his staff ID card), shown whole
+    else { setBg(pic, it.pic); if (it.pos) pic.style.backgroundPosition = it.pos; }
     if (it.c2) pic.style.setProperty('--c2', it.c2);
     a.appendChild(pic);
     var when = my(it.start) + ' to ' + my(it.end), d = dur(it), proofs = it.proofs || [];
@@ -120,7 +126,7 @@
       var wk = el('span', 'vt-works');
       it.works.forEach(function (w) {
         var c = el('span', 'vt-wk'), im = el('i', w.img ? '' : 'is-text', w.img ? null : w.big);
-        if (w.img) { im.style.backgroundImage = 'url("' + w.img + '")'; if (w.pos) im.style.backgroundPosition = w.pos; }
+        if (w.img) { setBg(im, w.img); if (w.pos) im.style.backgroundPosition = w.pos; }
         c.appendChild(im); c.appendChild(el('b', '', w.t)); c.appendChild(el('em', '', w.r)); wk.appendChild(c);
       });
       more.appendChild(wk);

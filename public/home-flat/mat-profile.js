@@ -5,7 +5,7 @@
   var dialog = document.createElement('dialog');
   dialog.className = 'mat-profile-dialog';
   dialog.setAttribute('aria-labelledby', 'mat-mobile-profile-title');
-  dialog.innerHTML = '<article><header><button type="button" class="profile-back" aria-label="Back from profile">← Back</button><span>PROFILE · ADI AGARWAL</span></header><img src="assets/adi.webp" alt="Adi Agarwal"><h2 id="mat-mobile-profile-title">Hello, I’m Adi.</h2><p class="profile-subtitle">Product Management · AI Product Development · Product Analytics</p><div class="profile-content"></div><h3>Core toolkit</h3><ul class="profile-skills"></ul><div class="profile-actions"></div></article>';
+  dialog.innerHTML = '<article><header><button type="button" class="profile-back" aria-label="Back from profile">← Back</button><span>PROFILE · ADI AGARWAL</span></header><img src="assets/adi.webp" alt="Adi Agarwal" decoding="async"><h2 id="mat-mobile-profile-title">Hello, I’m Adi.</h2><p class="profile-subtitle">Product Management · AI Product Development · Product Analytics</p><div class="profile-content"></div><h3>Core toolkit</h3><ul class="profile-skills"></ul><div class="profile-actions"></div></article>';
   document.body.appendChild(dialog);
   var cached = null;
   function node(tag, text) { var e = document.createElement(tag); e.textContent = text; return e; }
