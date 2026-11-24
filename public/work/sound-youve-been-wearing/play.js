@@ -445,6 +445,41 @@ export async function setup(C) {
   window.__teammates = teammates;
   window.__play = { engine, keys, spinners, shuffle: () => shuffle(), clickCard: (btn) => { const f = guide.userData.face; const [x, y, w, h] = BTN[btn]; return window.__proj(f.localToWorld(new THREE.Vector3((x + w / 2) / CPX * CW - CW / 2, CH / 2 - (y + h / 2) / CPY * CH, 0))); }, seat: (colour, take, record) => seat(keys.find((k) => k.colour === colour && k.take === take), spinners.find((sp) => sp.r.id === record)), home: (colour, take) => home(keys.find((k) => k.colour === colour && k.take === take)) };
 
+  /* ---------- sound after a page change: a browser lets sound start only after a click, and a click on the home page does not
+     carry over to this page every time. The intro plays without it; the drums start with the first click anywhere, and until then
+     a small note lies on the mat ("click anywhere for sound"). ---------- */
+  let hint = null;
+  const audioRunning = () => !!(window.Tone && window.Tone.context && window.Tone.context.state === 'running');
+  function wake() {
+    engine.unlock();
+    // (a key seated before the first click was only noted: start every layer that should be playing)
+    for (const l of LAYERS) { const sl = engine.L[l.id]; if (sl.present && !sl.on) engine.sync(sl); }
+    if (hint) hint.gone = true;
+  }
+  window.addEventListener('pointerdown', wake, { capture: true });
+  window.addEventListener('keydown', wake, { capture: true });
+  function showHint() {
+    if (hint || audioRunning()) return;
+    const W = 1500, H = 200;
+    const tex = canvasTex(W, H, (c, w) => {
+      c.clearRect(0, 0, w, H); c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = '800 80px system-ui, sans-serif'; if ('letterSpacing' in c) c.letterSpacing = '6px';
+      c.fillText('CLICK ANYWHERE FOR SOUND', w / 2, H / 2 + 4);
+    });
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.66 * H / W), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+    mesh.rotation.x = -Math.PI / 2; mesh.position.set(0, 0.0032, 0.82); mesh.renderOrder = 5;
+    C.scene.add(mesh);
+    hint = { mesh, gone: false, t0: performance.now() };
+  }
+  function hintFrame() {
+    if (!hint) return;
+    if (!hint.gone && audioRunning()) hint.gone = true;      // sound came without a click (the browser let it)
+    const age = (performance.now() - hint.t0) / 1000;
+    const target = hint.gone ? 0 : 0.5 + 0.2 * Math.sin(age * 2.6);
+    const m = hint.mesh.material; m.opacity += (target - m.opacity) * 0.12;
+    if (hint.gone && m.opacity < 0.01) { C.scene.remove(hint.mesh); m.map.dispose(); m.dispose(); hint.mesh.geometry.dispose(); hint = null; }
+  }
+
   /* ---------- intro (?intro=1): the home-mat moment. One record lies on the bare mat; click it, the camera dives in,
      the board grows up out of the mat round it, and the record flies into its socket and starts the drums ---------- */
   let intro = null;
@@ -496,7 +531,15 @@ export async function setup(C) {
     tag.rotation.x = -Math.PI / 2; tag.position.set(0, 0.003, 0.5); scene.add(tag);
     const play0 = { pos: camera.position.clone(), tgt: controls.target.clone() };
     const start = { pos: new THREE.Vector3(0, 0.86, 0.98), tgt: new THREE.Vector3(0, 0, 0.5) };
-    const dive = { pos: new THREE.Vector3(0, 0.3, 0.66), tgt: new THREE.Vector3(0, 0, 0.5) };
+    // Arriving from the home mat's record (index.html's head script left window.__dive): this scene opens on the shot the home
+    // camera ended on, so the cross-fade from its last frame reads as the same shot. That is straight over the record
+    // (9 degrees off vertical, as the home camera ends), the record centred and DIVE_FRAC of the window's height across
+    // (the same number as RECORD_DIVE_FRAC in lib/mat/soundRecord.ts). The record is already turning, and the intro starts by itself.
+    const dive = window.__dive || null, DIVE_FRAC = 0.7, DIVE_PITCH = 9 * Math.PI / 180;
+    if (dive && dive.frame) {
+      const away = (RR * BIG * 2) / (DIVE_FRAC * 2 * Math.tan(camera.fov * Math.PI / 360));
+      start.pos.set(0, away * Math.cos(DIVE_PITCH), 0.5 + away * Math.sin(DIVE_PITCH));
+    }
     camera.position.copy(start.pos); controls.target.copy(start.tgt); controls.enabled = false; controls.update();
     board.visible = false; ySp.g.visible = false; ySp.angle = 0;   // lands upright
     // props that arrive one after another (about 100 ms apart): the board rises first, then the rack, guide card, plaque, DPI block, name tent
@@ -515,7 +558,7 @@ export async function setup(C) {
     const camMid = start.pos.clone().lerp(play0.pos, 0.5); camMid.y *= 0.92;
     const camCurve = new THREE.CatmullRomCurve3([start.pos.clone(), camMid, play0.pos.clone()], false, 'centripetal');
     const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    intro = { t0: null, hov: 0, over: false, ang: 0, big: BIG, lone, tag, ySp, spin: 0.4, play0, start, dive, from: new THREE.Vector3(), q0: lone.quaternion.clone(), popGroups, rackKeys, camCurve, reduce, ripples, boardAt, RIP0, RIPV, RIPT, flat: new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)), zq: new THREE.Quaternion(), c1: new THREE.Vector3(), c2: new THREE.Vector3(), p3: new THREE.Vector3(), tmp: new THREE.Vector3() };
+    intro = { t0: null, hov: 0, over: false, ang: 0, big: BIG, lone, tag, ySp, spin: 0.4, play0, start, from: new THREE.Vector3(), q0: lone.quaternion.clone(), popGroups, rackKeys, camCurve, reduce, ripples, boardAt, RIP0, RIPV, RIPT, flat: new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)), zq: new THREE.Quaternion(), c1: new THREE.Vector3(), c2: new THREE.Vector3(), p3: new THREE.Vector3(), tmp: new THREE.Vector3() };
     const pickLone = (e) => { setNdc(e); ray.setFromCamera(ndc, camera); return ray.intersectObject(lone, true).length > 0; };
     // while the intro runs, it gets every click first (window capture runs before the canvas's own handlers)
     window.addEventListener('pointerdown', (e) => {
@@ -531,7 +574,7 @@ export async function setup(C) {
     const I = intro, L = I.lone;
     // idle: a slow turn. Hovered or clicked: the title turns upright and stays readable (no fast spin while it flies)
     I.spin += ((I.t0 === null ? (I.over ? 0 : 0.12) : 0) - I.spin) * Math.min(1, dt * 2);
-    if (I.over || I.t0 !== null) { const tgt = Math.round(I.ang / (Math.PI * 2)) * Math.PI * 2; I.ang += (tgt - I.ang) * Math.min(1, dt * 5); }   // title turns upright to be read
+    if (I.over || I.t0 !== null) { const tgt = Math.round(I.ang / (Math.PI * 2)) * Math.PI * 2; I.ang += (tgt - I.ang) * Math.min(1, dt * (window.__dive ? 2 : 5)); }   // title turns upright to be read
     else I.ang += I.spin * dt;
     // after the click it spins: three full turns that ease out exactly as it lands, so the title ends upright
     const spinA = I.t0 === null ? 0 : -Math.PI * 6 * (1 - Math.pow(1 - Math.min(1, (performance.now() - I.t0) / 2300), 3));
@@ -557,6 +600,7 @@ export async function setup(C) {
       camera.position.copy(I.play0.pos); controls.target.copy(I.play0.tgt); controls.enabled = true; controls.update();
       intro = null;
       seat(keys.find((k) => k.colour === 'yellow' && k.take === 0), I.ySp);     // its key drops in and the drums start
+      if (window.__dive) showHint();
     };
     if (I.reduce) {      // reduced motion: no move, a short fade through the colour of the mat, then straight to the end state
       if (!I.fade) { const f = document.createElement('div'); f.style.cssText = 'position:fixed;inset:0;background:#2a52c9;opacity:0;pointer-events:none;z-index:50;transition:opacity .15s linear'; document.body.appendChild(f); I.fade = f; requestAnimationFrame(() => { f.style.opacity = '1'; }); }
@@ -610,5 +654,23 @@ export async function setup(C) {
     controls.update();
     if (u > DONE) finish();
   }
-  return { frame: (t) => { if (intro) introFrame(Math.min(0.05, (performance.now() - (introFrame.last || performance.now())) / 1000)); introFrame.last = performance.now(); frame(t); } };
+  // Arrived from the home mat's record: once this scene's own first frame is drawn, the cover from the home page (index.html) fades
+  // out over it and the intro starts by itself, the record already turning as it was in the last frame the home page drew.
+  let begun = false;
+  function beginFromHome() {
+    const d = window.__dive;
+    if (!intro) { window.__diveFade && window.__diveFade(); return; }
+    intro.ang = -(d.frame ? d.ang || 0 : 0); intro.spin = 0;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!intro) return;
+      try { engine.unlock(); } catch (e) { /* needs a click: wake() on the first one */ }
+      intro.t0 = performance.now();
+      window.__diveFade && window.__diveFade();
+    }));
+  }
+  return { frame: (t) => {
+    if (intro) introFrame(Math.min(0.05, (performance.now() - (introFrame.last || performance.now())) / 1000));
+    introFrame.last = performance.now(); frame(t); hintFrame();
+    if (!begun && window.__dive) { begun = true; beginFromHome(); }
+  } };
 }

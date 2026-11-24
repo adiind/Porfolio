@@ -2,8 +2,10 @@
  * "The Sound You've Been Wearing" as a yellow record lying on the home mat (Adi, 2026-11-23): the way in to the interactive 3D
  * board at /work/sound-youve-been-wearing/ (public/work/sound-youve-been-wearing/). Drawn like the scene's own intro record:
  * black vinyl with its grooves, a yellow label, and the project's name printed round the label in navy. One click opens the
- * board through the same splash the clipboards use (lib/mat/caseStudyHandoff.ts), in the mat's blue, so the screen stays blue
- * from the home mat straight into the scene's own mat.
+ * board as one continuous camera move (Adi, 2026-11-23: "i dont want a splash page if we can avoid it"): the home camera flies
+ * straight down onto the record while it spins up (engine focusOn, StageProp.dive), the last frame is kept in sessionStorage,
+ * and the board's page paints that frame first thing (its head script) and cross-fades into its own scene, whose intro
+ * starts by itself with the record already turning. The clipboards keep the splash (lib/mat/caseStudyHandoff.ts).
  */
 
 /** The record's outside size on the home page, in page pixels (the stage's 1440 by 900 frame). */
@@ -21,8 +23,23 @@ export const SOUND_RECORD = {
 } as const;
 export const SOUND_RECORD_PROP = 'record:sound-youve-been-wearing';
 
+/** How much of the window's height the record fills when the home camera is over it. The board's own start camera is set to match (public/work/sound-youve-been-wearing/play.js, DIVE_FRAC). */
+export const RECORD_DIVE_FRAC = 0.7;
+/** What the home page leaves for the board page (read and cleared by its head script): who, when, the last frame, and how the record was turning. */
+export const RECORD_DIVE_KEY = 'record-dive';
+export const RECORD_DIVE_FRAME_KEY = 'record-dive-frame';
+/** Keep the hand-over for the board page. `frame`: the home canvas's last frame (null with reduced motion: a plain fade). */
+export function storeRecordDive(frame: string | null, ang: number, w: number): void {
+  try {
+    window.sessionStorage.removeItem(RECORD_DIVE_FRAME_KEY);
+    if (frame) window.sessionStorage.setItem(RECORD_DIVE_FRAME_KEY, frame);
+    window.sessionStorage.setItem(RECORD_DIVE_KEY, JSON.stringify({ from: 'home', at: Date.now(), href: SOUND_RECORD.href, frame: !!frame, ang, w, vw: window.innerWidth, vh: window.innerHeight }));
+  } catch { /* the board simply opens with its own click-to-start intro */ }
+}
+
 const NAVY = '#16204a';
-const YELLOW = '#facc15';
+/** The label's yellow as the 3D board's own record looks once lit and tone mapped (a pale, warm yellow), so the cross-fade into it does not change colour. */
+const YELLOW = '#f7c957';
 /** Drawn at 4 canvas pixels to the page pixel: sharp on a 2x screen, and when it lifts under the pointer. */
 const S = 4;
 
@@ -74,11 +91,11 @@ export function drawSoundRecord(): HTMLCanvasElement {
 
   // the vinyl: near black, fine grooves, four darker bands, a sheen across it
   ctx.fillStyle = '#1c1b1e'; ctx.beginPath(); ctx.arc(m, m, m - 0.5, 0, Math.PI * 2); ctx.fill();
-  for (let r = m * 0.46; r < m * 0.955; r += 0.45) {
+  for (let r = m * 0.58; r < m * 0.955; r += 0.45) {
     ctx.strokeStyle = random() < 0.5 ? `rgba(255,248,236,${0.02 + random() * 0.035})` : `rgba(0,0,0,${0.08 + random() * 0.1})`;
     ctx.lineWidth = 0.3; ctx.beginPath(); ctx.arc(m, m, r, 0, Math.PI * 2); ctx.stroke();
   }
-  for (const at of [0.56, 0.67, 0.79, 0.88]) {
+  for (const at of [0.66, 0.74, 0.82, 0.9]) {
     ctx.strokeStyle = '#141316'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(m, m, m * at, 0, Math.PI * 2); ctx.stroke();
   }
   ctx.save();
@@ -92,16 +109,17 @@ export function drawSoundRecord(): HTMLCanvasElement {
   ctx.strokeStyle = 'rgba(255,248,236,.1)'; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.arc(m, m, m - 0.9, 0, Math.PI * 2); ctx.stroke();
 
   // the label: yellow, the name printed round it in navy ("THE SOUND YOU'VE" over the top, "BEEN WEARING" under the bottom)
-  const lr = m * 0.47;
+  // (the label is 58% of the record across, as on the 3D board's own record, so the cross-fade into it is the same shot)
+  const lr = m * 0.58;
   ctx.fillStyle = YELLOW; ctx.beginPath(); ctx.arc(m, m, lr, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = 'rgba(22,32,74,.22)'; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.arc(m, m, lr - 0.3, 0, Math.PI * 2); ctx.stroke();
-  const cap = lr * 0.3;
+  const cap = lr * 0.34;
   ctx.fillStyle = NAVY; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `900 ${cap / 0.72}px system-ui, sans-serif`;
   (ctx as Spaced).letterSpacing = '0px';
-  arc(ctx, "THE SOUND YOU'VE", m, m, lr * 0.74, true, 2.5);
-  arc(ctx, 'BEEN WEARING', m, m, lr * 0.74, false, 2.5);
+  arc(ctx, "THE SOUND YOU'VE", m, m, lr * 0.73, true, 2.9);
+  arc(ctx, 'BEEN WEARING', m, m, lr * 0.73, false, 2.5);
   // a play mark in the middle
-  ctx.fillStyle = NAVY; ctx.beginPath(); ctx.moveTo(m - lr * 0.14, m - lr * 0.2); ctx.lineTo(m + lr * 0.26, m); ctx.lineTo(m - lr * 0.14, m + lr * 0.2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = NAVY; ctx.beginPath(); ctx.moveTo(m - lr * 0.13 * 0.75, m - lr * 0.13); ctx.lineTo(m + lr * 0.13 * 1.05, m); ctx.lineTo(m - lr * 0.13 * 0.75, m + lr * 0.13); ctx.closePath(); ctx.fill();
   return canvas;
 }

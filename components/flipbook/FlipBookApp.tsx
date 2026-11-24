@@ -29,7 +29,7 @@ import { DESIGN_CARDS } from '../../lib/mat/designCards';
 import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
 import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
-import { RECORD, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord } from '../../lib/mat/soundRecord';
+import { RECORD, RECORD_DIVE_FRAC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, storeRecordDive } from '../../lib/mat/soundRecord';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
@@ -352,7 +352,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // A yellow record lies on the mat above the clipboards: the way in to the interactive 3D board (lib/mat/soundRecord.ts).
   const soundRecord: StageSpec['props'][number] = {
     id: SOUND_RECORD_PROP, image: drawnOnce('record:sound', [], () => drawSoundRecord()),
-    ...at(RECORD_LAY.x, RECORD_LAY.y), w: RECORD.d / px, h: RECORD.d / px, radius: 0, cutout: true, alphaShadow: true, turn: RECORD_LAY.turn,
+    ...at(RECORD_LAY.x, RECORD_LAY.y), w: RECORD.d / px, h: RECORD.d / px, radius: 0, cutout: true, alphaShadow: true, turn: RECORD_LAY.turn, dive: { frac: RECORD_DIVE_FRAC },
   };
   const booklets = others.map((item, index) => {
     const spot = place(item.slug);
@@ -465,8 +465,10 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const arrival = homeLink?.arrival ?? null;
   const [landed, setLanded] = useState(!arrival && !staged);
   // the home stage: the wide view of the mat, down at one poster, or in the book
-  const [mode, setMode] = useState<'wide' | 'poster' | 'book'>('wide');
+  const [mode, setMode] = useState<'wide' | 'poster' | 'book' | 'dive'>('wide');
   const modeRef = useRef(mode);
+  /** The yellow record has been clicked: the camera is on its way down and the board's page is next. */
+  const diving = useRef(false);
   modeRef.current = mode;
   const [stageSpec, setStageSpec] = useState<StageSpec | null>(null);
   const [lit, setLit] = useState(false);
@@ -642,6 +644,17 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     flying.current += 1;
     return engine.focusOn(id).finally(() => { flying.current -= 1; putLateRef.current(); });
   }, []);
+  // Back from the 3D board can bring this page back as it was left (the browser keeps it): the camera comes back up off the record.
+  useEffect(() => {
+    const back = (event: PageTransitionEvent) => {
+      if (!event.persisted || !diving.current) return;
+      diving.current = false;
+      setMode('wide'); modeRef.current = 'wide';
+      void fly(null);
+    };
+    window.addEventListener('pageshow', back);
+    return () => window.removeEventListener('pageshow', back);
+  }, [fly]);
   const askResume = useCallback(() => fullResume().then((page) => { late.current.resume = page; putLateRef.current(); }, () => undefined), []);
 
   // The Zomato bag: added to the engine once the stage is laid (it lies on its click target), built as its pictures come in.
@@ -1341,11 +1354,32 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           openCaseStudy(card, rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null, reducedMotion);
           return;
         }
-        // the yellow record: the interactive 3D board, under a splash in the mat's blue that grows out of the record
+        // the yellow record: the interactive 3D board as one continuous move. The camera flies down onto the record as it
+        // spins up, the last frame is kept for the board's page to paint first (lib/mat/soundRecord.ts), and the page opens.
         if (id === SOUND_RECORD_PROP) {
+          const engine = engineRef.current;
+          if (modeRef.current !== 'wide' || diving.current || !engine) return;
+          diving.current = true;
           trackEvent('mat_case_study_opened', { project: SOUND_RECORD.id });
-          const rect = engineRef.current?.screenRect(id);
-          openCaseStudy(SOUND_RECORD, rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null, reducedMotion);
+          const go = () => window.location.assign(SOUND_RECORD.href);
+          if (reducedMotion) {
+            // no fly: a plain fade to the mat's blue, and the board fades in from it
+            storeRecordDive(null, 0, 0);
+            const veil = document.createElement('div');
+            veil.setAttribute('aria-hidden', 'true');
+            veil.style.cssText = `position:fixed;inset:0;z-index:2147483000;pointer-events:none;background:${SOUND_RECORD.band};opacity:0;transition:opacity .2s linear`;
+            document.body.appendChild(veil);
+            void veil.offsetWidth;
+            veil.style.opacity = '1';
+            window.setTimeout(go, 230);
+            return;
+          }
+          setMode('dive'); modeRef.current = 'dive';
+          void fly(id).then(() => engine.capture()).then((frame) => {
+            const turn = engine.diveState();
+            storeRecordDive(frame, turn.ang, turn.w);
+            go();
+          });
           return;
         }
         if (id === 'word:resume') id = RESUME_ID;

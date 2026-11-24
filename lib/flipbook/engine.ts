@@ -108,6 +108,11 @@ export interface StageProp {
   under?: string;
   /** A dealt card that can be picked: while its set is open, a click on it reports its id (and it lifts under the pointer). */
   pick?: boolean;
+  /**
+   * Flown to, the camera comes straight down onto its middle until it is `frac` of the window's height across, and it
+   * spins up as it comes (a record). The way into the 3D board: see diveState and capture.
+   */
+  dive?: { frac: number };
 }
 
 /**
@@ -195,6 +200,10 @@ export interface FlipBookEngine {
    * the keyboard's focus ring is drawn round it. Null when there is no such thing.
    */
   screenRect(id: string): { left: number; top: number; width: number; height: number } | null;
+  /** The dive prop's turn so far (radians, clockwise) and how fast it is turning (radians a second). */
+  diveState(): { ang: number; w: number };
+  /** The mat as the next frame draws it, as a JPEG data URL (null if no frame came in time). */
+  capture(quality?: number): Promise<string | null>;
   /** Lift a thing off the mat as the pointer resting on it does (it has keyboard focus); null lets it down again. */
   lift(id: string | null): void;
   /**
@@ -214,6 +223,8 @@ export interface FlipBookEngine {
 }
 
 const FOV = 24;
+/** How fast a record flown down to is turning when the camera arrives (radians a second, clockwise): the 3D board's own record takes up the same turn. */
+const DIVE_SPIN = 24.6;
 const PITCH = (9 * Math.PI) / 180;
 const STACK_GAP = 0.0006;
 const LIGHT = new Vector3(-0.3, 0.3, 0.9);
@@ -397,6 +408,13 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       renderer.setRenderTarget(null);
     }
     renderer.render(scene, camera);
+    if (captureReq) {
+      // (read in the same task as the render: the drawing buffer is not kept between frames)
+      const done = captureReq; captureReq = null;
+      let url: string | null = null;
+      try { url = canvas.toDataURL('image/jpeg', captureQuality); } catch { url = null; }
+      done(url);
+    }
     drawnOnce = true;
     // (the view as it was last drawn: screenPoint answers from it, never from a view resize() is part way through measuring)
     drawnView.copy(camera);
@@ -491,6 +509,10 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   /** When the poster flown to opens into a set of cards: the box that holds the whole set, for the camera. */
   let focusBox: { x: number; y: number; w: number; h: number } | null = null;
   let hoverProp: string | null = null;
+  /** A dive prop's spin: how far it has turned, how fast, and how long the dive has been going. */
+  let diveAng = 0; let diveW = 0;
+  let captureReq: ((url: string | null) => void) | null = null;
+  let captureQuality = 0.86;
   let dawning = false;
   /** Seconds the light takes to come up: 1.3, or 0.35 once the visitor scrolls before it is full (hurryDawn). */
   // (a quick pass of light over the room, started the moment the scene is ready: no fixed wait of its own. Adi, 2026-11-20:
@@ -1413,7 +1435,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       // what the camera is going to stays; the rest sinks away as the view comes down, so nothing crowds it
       const shown = item.prop.held ? 0 : child ? Math.min(1, out * 4) : landed * (mine ? 1 : up);
       // (a sheet flown to for reading stays almost flat on the mat: lifted toward the eye it would hide its own shadow)
-      const liftTarget = inSet ? arc * 2.2 + (item.prop.pick && hoverProp === item.prop.id && going > 0.95 ? 0.45 : 0) : mine ? (item.prop.read ? 0.15 : 1) * (1 - up) : hoverProp === item.prop.id && up > 0.5 && !item.prop.still ? 0.45 : 0;
+      const liftTarget = inSet ? arc * 2.2 + (item.prop.pick && hoverProp === item.prop.id && going > 0.95 ? 0.45 : 0) : mine ? (item.prop.read || item.prop.dive ? 0.15 : 1) * (1 - up) : hoverProp === item.prop.id && up > 0.5 && !item.prop.still ? 0.45 : 0;
       item.lift += (liftTarget - item.lift) * Math.min(1, dt * (inSet ? 30 : 9));
       if (Math.abs(liftTarget - item.lift) > 0.002) moving = true;
       item.mesh.position.set(px, py, 0.004 + (1 - landed) * 0.3 + item.lift * 0.035);
@@ -1424,6 +1446,17 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       shade.uLift.value = item.lift + (1 - landed) * 2;
       item.mesh.visible = shown > 0.003;
       item.shadow.visible = shown > 0.003;
+    });
+    // a record flown down to spins up as the camera comes (the 3D board's own record takes the turn from here)
+    if (focus?.dive) {
+      diveW = DIVE_SPIN * (1 - up) ** 2;
+      diveAng += diveW * dt;
+      moving = true;
+    } else if (diveAng !== 0 && !focus && up >= 0.999) { diveAng = 0; diveW = 0; }
+    propMeshes.forEach((item) => {
+      if (!item.prop.dive) return;
+      const spin = focus === item.prop ? diveAng : 0;
+      item.mesh.rotation.z = (-(item.prop.turn ?? 0) * Math.PI) / 180 - spin;
     });
     if (onMat) {
       // with motion turned down the window light holds still instead of drifting under a page that is still drawing
@@ -1478,6 +1511,10 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       const fromTop = focus.y + focus.h / 2 - halfH * 0.93;
       const atFoot = focus.y - focus.h / 2 + halfH * 0.93;
       viewTarget.set(focus.x - focus.w / 2 + halfW * (0.95 - lean * 2), tall <= whole ? focus.y : fromTop + (atFoot - fromTop) * readNow, 0);
+    } else if (focus && focus.dive) {
+      // flown down onto a record: straight over its middle, filling `frac` of the window's height
+      viewDist = focus.h / (focus.dive.frac * 2 * viewTan);
+      viewTarget.set(focus.x, focus.y, 0);
     } else if (focus) {
       // flown down to a poster: it fills most of the window's height, a little left of the middle (its words sit to the right)
       viewDist = Math.max((focus.h * 1.05) / 0.66 / (2 * viewTan), (focus.w * 1.03) / 0.44 / (2 * viewTan * viewAspect));
@@ -1492,7 +1529,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     }
 
     // (on the stage the wide view still leans a little with the pointer, so the mat has depth)
-    const still = (1 - near * 0.5) * (1 - up * (stageSpec ? 0.55 : 1));
+    // (diving onto a record the lean with the pointer goes as the camera comes over it: it ends square on)
+    const still = (1 - near * 0.5) * (1 - up * (stageSpec ? 0.55 : 1)) * (focus?.dive ? up : 1);
     placeCamera(yaw * still, pitchAdd * still, camera.position);
     camera.up.set(0, 1, 0);
     camera.lookAt(viewTarget);
@@ -2000,7 +2038,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       /** Each piece of a gradual book drawn so far: what, when (page clock) and how long it took. */
       get drawings() { return drawings.slice(); },
       get pageCount() { return leaves.length; },
-      get page() { return state.current; },
+    get page() { return state.current; },
       setLeaf(index: number, t: number) { override.set(index, t); },
       go(index: number) { goTo(index); },
       /** Lean in over a page of the open spread (-1 left, 1 right) or step back (0). */
@@ -2268,6 +2306,18 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
         canvas.style.cursor = 'default';
         invalidate();
       }
+    },
+    diveState() { return { ang: diveAng, w: diveW }; },
+    capture(quality = 0.86) {
+      return new Promise<string | null>((resolve) => {
+        if (disposed) { resolve(null); return; }
+        captureQuality = quality;
+        captureReq?.(null);
+        captureReq = resolve;
+        invalidate();
+        // (frames can be starved while the tab is hidden: the hand-over must not hang on one)
+        window.setTimeout(() => { if (captureReq === resolve) { captureReq = null; resolve(null); } }, 700);
+      });
     },
     get page() { return state.current; },
     get pageCount() { return leaves.length; },
