@@ -23,7 +23,7 @@
       var door = /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings' && w >= 760 && h > 0 && w / h >= 1.15 ? 'mat'
         : /^\/book(?:\/[a-z0-9-]+)?\/?$/i.test(p) ? 'book' : /^\/studio\/?$/.test(p) ? 'studio' : 'old';
       // "/" or "/mat" in a phone-sized, narrow or tall window: the flat home (public/home-flat), before anything else loads
-      if (door === 'old' && /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings') { location.replace('/home-flat/index.html' + location.hash); return; }
+      if (door === 'old' && /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings') { location.replace('/home-flat/' + location.hash); return; }
       window.__shipDoor = door;
       if (door !== 'old') return;
       var hero = document.createElement('link');

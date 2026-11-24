@@ -424,7 +424,7 @@ function fetchOpeningSpread(slug: string): void {
 /** Keys that scroll the page. */
 const SCROLL_KEYS = new Set(['ArrowDown', 'PageDown', 'End', ' ', 'Spacebar']);
 
-const FLAT_HOME = '/home-flat/index.html';
+const FLAT_HOME = '/home-flat/';
 const flatHomeForCurrentView = () => FLAT_HOME + (/^#experience-(self|zomato|udaan|schmooze|snapdeal)$/.test(window.location.hash) ? window.location.hash : '');
 
 const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; debug: boolean; homeLink: HomeLink | null; staged?: boolean }> = ({ book, onSelectBook, debug, homeLink, staged = false }) => {

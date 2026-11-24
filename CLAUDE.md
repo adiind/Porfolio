@@ -5,8 +5,7 @@ Personal portfolio site for adidesign.org — a React 19 + TypeScript + Vite SPA
 ## Commands
 
 ```sh
-npm run dev        # Notion pull + Vite dev server on http://localhost:3000
-npx vite           # Dev server WITHOUT the Notion pull (works offline / without .env)
+npm run dev        # Vite dev server on http://localhost:3000
 npm run build      # Type check, every test, then the production build — the standard verification step
 npm run check      # Type check and tests only
 npm run preview    # Serve the production build
@@ -17,9 +16,8 @@ Verify changes with `npm run build` plus a browser check on `localhost:3000` —
 
 ## Gotchas
 
-- `npm run dev` is `notion-sync pull && vite`. If the pull fails (missing `NOTION_TOKEN` in `.env`, or offline), the script exits 1 and **the dev server never starts**. Use `npx vite` to skip the pull.
 - Tailwind is loaded from the CDN with an inline `tailwind.config` in `index.html` — it is **not** a build dependency. Don't add a tailwind.config.js or PostCSS setup; edit the inline config instead.
-- `.env` holds `NOTION_TOKEN`. `GEMINI_API_KEY` is wired through `define` in vite.config.ts but is currently unset.
+- `.env` holds `NOTION_TOKEN`, read only by the `sync:*` scripts. `GEMINI_API_KEY` is wired through `define` in vite.config.ts but is currently unset.
 - The `@/` path alias resolves to the repo root (vite.config.ts).
 - The repo directory is spelled `Porfolio` (no "t") — keep paths as-is.
 
