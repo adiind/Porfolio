@@ -293,16 +293,16 @@ export async function setup(C) {
   shadowAll(guide); guide.userData.face.castShadow = false;
   // the plaque: a flat board on the mat, slightly raised at the back, that says what the project is about
   { const plaque = new THREE.Group(); plaque.name = 'AboutPlaque'; plaque.userData.sceneOnly = true; board.add(plaque);
-    plaque.position.set(-0.13, 0, 0.66); plaque.rotation.y = 0.08;
-    const PW2 = 0.46, PD = 0.28, tilt = new THREE.Group(); tilt.rotation.x = -Math.PI / 2 + 0.42; tilt.position.y = 0.012; plaque.add(tilt);
+    plaque.position.set(-0.13, 0, 0.88); plaque.rotation.y = 0.05;   // further forward: the mat under the board is left for the shadow words
+    const PW2 = 0.48, PD = 0.3, tilt = new THREE.Group(); tilt.rotation.x = -Math.PI / 2 + 0.52; tilt.position.y = 0.012; plaque.add(tilt);
     const slabM = new THREE.Mesh(new RoundedBoxGeometry(PW2, PD, 0.012, 3, 0.004), M.ply); slabM.position.set(0, PD / 2, 0); tilt.add(slabM);
     const t = canvasTex(1680, Math.round(1680 * PD / PW2), (c, w, h) => {
       c.fillStyle = '#e4cfa6'; c.fillRect(0, 0, w, h); c.fillStyle = '#f7f4ec'; c.beginPath(); c.roundRect(34, 34, w - 68, h - 68, 26); c.fill();
       c.fillStyle = '#16204a'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
       c.font = '700 36px system-ui, sans-serif'; c.fillStyle = '#7a7f93'; c.fillText('ABOUT THIS PROJECT', 90, 125);
       c.fillStyle = '#16204a'; c.font = '800 96px system-ui, sans-serif'; c.fillText("Make music together.", 90, 230);
-      c.font = '500 46px system-ui, sans-serif'; c.fillStyle = '#3b4262';
-      const para = (txt, y0, lh = 58, maxW = w - 180) => { const words = txt.split(' '); let line = '', y = y0; for (const wd of words) { const tst = line ? line + ' ' + wd : wd; if (c.measureText(tst).width > maxW) { c.fillText(line, 90, y); line = wd; y += lh; } else line = tst; } c.fillText(line, 90, y); return y + lh; };
+      c.font = '600 52px system-ui, sans-serif'; c.fillStyle = '#20264a';   // heavier, darker: easier to read
+      const para = (txt, y0, lh = 64, maxW = w - 180) => { const words = txt.split(' '); let line = '', y = y0; for (const wd of words) { const tst = line ? line + ' ' + wd : wd; if (c.measureText(tst).width > maxW) { c.fillText(line, 90, y); line = wd; y += lh; } else line = tst; } c.fillText(line, 90, y); return y + lh; };
       let y = para("The Sound You've Been Wearing is an immersive co-creation activity: a few people build one piece of music together, with their hands.", 320);
       y = para('A song is split into five parts: foundation, texture, drums, keys and solo. Each part is a record on the board, and each key is a different piece of music for that part.', y + 16);
       y = para('More people means more keys in play. Invite someone over, swap a key, turn a record, and a new song comes out of the group. It works as a social game as much as an instrument.', y + 16);
@@ -685,6 +685,9 @@ export async function setup(C) {
       setTimeout(() => { if (intro && intro.t0 === null) intro.t0 = performance.now(); }, 160);
     }));
   }
+  // (for tour.js: whether the intro is still running, and a way to finish it at once)
+  window.__introCtl = { get: () => intro, active: () => !!intro, started: () => !!(intro && intro.t0 !== null),
+    skip: () => { if (!intro) return; if (intro.t0 === null) engine.unlock(); intro.t0 = performance.now() - 2450; } };
   return { frame: (t) => {
     if (intro) introFrame(Math.min(0.05, (performance.now() - (introFrame.last || performance.now())) / 1000));
     introFrame.last = performance.now(); frame(t); hintFrame();

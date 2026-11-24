@@ -32,6 +32,7 @@ import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
 import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
 import { RECORD, RECORD_DIVE_FRAC, RECORD_EMBED_SRC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, soundSpin, storeRecordDive } from '../../lib/mat/soundRecord';
+import { createSoundRecordRing, type SoundRecordRing } from '../../lib/mat/soundRecordRing';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
@@ -504,6 +505,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   /** The Snapdeal courier bag (lib/mat/snapdeal/mailerLayer.ts): one for each engine. */
   const snapdealRef = useRef<{ layer: MailerLayer; engine: FlipBookEngine; remove(): void } | null>(null);
   const handoutsRef = useRef<{ layer: HandoutsLayer; engine: FlipBookEngine; remove(): void } | null>(null);
+  const recordRingRef = useRef<{ layer: SoundRecordRing; engine: FlipBookEngine; remove(): void } | null>(null);
   /** The GitHub card's opened print (lib/mat/githubRiseLayer.ts): one for each engine and card picture. */
   const githubRef = useRef<{ layer: GithubRiseLayer; engine: FlipBookEngine; card: HTMLCanvasElement; remove(): void } | null>(null);
   const [wordsBox, setWordsBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
@@ -727,6 +729,17 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (debug) (window as unknown as { __handouts?: unknown }).__handouts = { get layer() { return layer; } };
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { handoutsRef.current?.remove(); handoutsRef.current = null; }, []);
+
+  // The words round the yellow record while it is hovered (lib/mat/soundRecordRing.ts), on the mat under it.
+  useEffect(() => {
+    const engine = engineRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === SOUND_RECORD_PROP);
+    if (!staged || fallback || !engine || !target || recordRingRef.current?.engine === engine) return;
+    recordRingRef.current?.remove();
+    const layer = createSoundRecordRing({ x: target.x, y: target.y, d: target.w, reduced: reducedMotion });
+    recordRingRef.current = { layer, engine, remove: engine.addLayer(layer) };
+  }, [fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { recordRingRef.current?.remove(); recordRingRef.current = null; }, []);
 
   // The Snapdeal courier bag: added to the engine once the stage is laid (it lies on its click target; a prop's turn is in
   // degrees, clockwise as seen, a layer's the scene's own, counter-clockwise).
@@ -1456,6 +1469,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         if (id === SOUND_RECORD_PROP) {
           const engine = engineRef.current;
           if (modeRef.current !== 'wide' || diving.current || !engine) return;
+          recordRingRef.current?.layer.hide();   // the dive shows the record alone
           diving.current = true;
           trackEvent('mat_case_study_opened', { project: SOUND_RECORD.id });
           const go = () => window.location.assign(SOUND_RECORD.href);
@@ -1536,6 +1550,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       },
       hover(id) {
         if (id === SOUND_RECORD_PROP) ensureEmbed();
+        recordRingRef.current?.layer.hover(id === SOUND_RECORD_PROP && modeRef.current === 'wide' && !diving.current);
         // resting on the résumé: its full page is fetched, so the close-up is sharp when it arrives
         if (id === RESUME_ID || id === 'word:resume') void askResume();
         // resting on a closed booklet for a moment: its pictures are fetched ahead of a click
