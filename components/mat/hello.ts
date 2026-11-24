@@ -1,4 +1,4 @@
-/* "Hi, I'm Adi." is the first thing on the 3D home page: index.html draws it in the dark room under the swinging bulb,
+/* "Hi, I'm Adi." is the first thing on the 3D home page: index.html draws it in the dark room,
    before any script has loaded (#mat-hello), in the very typeface the mat's cut letters are cut from (FB Bricolage 800,
    lib/mat/wordPieces.ts GREETING). When the room lights up it is carried, in one move, onto the cut letters' place on the
    mat; once the light is full, the cut letters (held back until then: StageProp.held) are shown in that same spot and the

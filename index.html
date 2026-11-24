@@ -72,37 +72,25 @@
     }
   </script>
   <!-- port-home:BEGIN index-head (copied from SOURCE by scripts/ship/port-home.mjs: edit it there, not here) -->
-  <!-- The 3D home page (/mat) starts in a dark room: a bulb on its cord swings there while the app loads, then the app
-       switches it on (class is-on) and, once the room is lit, draws it up out of sight (is-away).
-       Drawn here, ahead of every script, so there is something alive on screen from the first moment. -->
+  <!-- The 3D home page (/mat) starts in a dark room with the greeting in it, then the app brings the light up over the mat
+       (components/flipbook/FlipBookApp.tsx). Drawn here, ahead of every script, so there are words on screen from the
+       first moment. (A swinging light bulb used to hang here while the page loaded. Adi, 2026-11-24: "we dont need those";
+       "delete the bulb fully".) -->
   <style>
-    #mat-bulb { position: fixed; left: 50%; top: 0; z-index: 30; width: min(16vh, 11vw); margin-left: calc(min(16vh, 11vw) / -2); pointer-events: none; mix-blend-mode: screen;
-      transform-origin: 50% 0; animation: mat-bulb-swing 2.6s ease-in-out infinite alternate; transition: translate 0.46s cubic-bezier(0.55, 0, 0.9, 0.35), opacity 0.34s ease-out; }
-    /* the picture is a lit bulb on black: blended as light, the black vanishes and only the bulb and its glow are added to the room */
-    /* it fades in only after 0.7 s of real waiting: a fast load goes straight to the light and never shows it */
-    #mat-bulb img { display: block; width: 100%; filter: brightness(0.4) saturate(0.55); transition: filter 0.16s ease; opacity: 0; animation: mat-bulb-in 0.3s ease-out 0.7s forwards; }
-    #mat-bulb.is-on img { opacity: 1; filter: brightness(1.12) saturate(1.05); animation: mat-bulb-catch 0.3s steps(1, end) 1; }
-    @keyframes mat-bulb-in { to { opacity: 1; } }
-    #mat-bulb.is-away { translate: 0 -112%; opacity: 0; }
-    @keyframes mat-bulb-swing { from { transform: rotate(-6.5deg); } to { transform: rotate(6.5deg); } }
-    @keyframes mat-bulb-catch { 0% { filter: brightness(1.2); } 22% { filter: brightness(0.45); } 44% { filter: brightness(1.15); } 62% { filter: brightness(0.7); } 100% { filter: brightness(1.12) saturate(1.05); } }
-    @media (prefers-reduced-motion: reduce) { #mat-bulb { animation: none; transition: opacity 0.3s ease; } #mat-bulb img { opacity: 1; animation: none; } #mat-bulb.is-on img { animation: none; } #mat-bulb.is-away { translate: none; } }
-    /* "Hi, I'm Adi." under the bulb: the first words on screen. Lit only by the bulb, its shadow swings the other way as
-       the bulb swings. When the room lights up, components/mat/hello.ts carries it onto the cut card letters on the mat,
-       which are cut from this same typeface at this same spacing (lib/mat/wordPieces.ts GREETING: FB Bricolage 800,
-       letter spacing -2 px at 84 px), so it lands on them exactly. */
+    /* "Hi, I'm Adi.": the first words on screen, dim in the dark room. When the room lights up, components/mat/hello.ts
+       carries it onto the cut card letters on the mat, which are cut from this same typeface at this same spacing
+       (lib/mat/wordPieces.ts GREETING: FB Bricolage 800, letter spacing -2 px at 84 px), so it lands on them exactly. */
     #mat-hello { position: fixed; left: 0; right: 0; top: 52vh; z-index: 29; text-align: center; pointer-events: none; }
     #mat-hello span { display: inline-block; padding-bottom: .14em; transform-origin: 0 0;
       font-family: 'FB Bricolage', sans-serif; font-weight: 800; font-size: clamp(44px, 7.2vw, 124px); line-height: 1;
       letter-spacing: -.0238em; color: #f4e6c8;
       opacity: 0; translate: 0 14px; filter: brightness(.62);
       transition: opacity .5s ease-out, translate .5s ease-out, filter .16s ease;
-      animation: mat-hello-shade 2.6s ease-in-out infinite alternate; }
+      text-shadow: 0 12px 16px rgba(0, 0, 0, .7); }
     #mat-hello span em { font-style: normal; font-weight: 800; letter-spacing: inherit; color: #f4e6c8; }
     #mat-hello.is-shown span { opacity: 1; translate: none; }
     #mat-hello.is-on span { filter: brightness(1); }
-    @keyframes mat-hello-shade { from { text-shadow: 7px 12px 16px rgba(0, 0, 0, .7); } to { text-shadow: -7px 12px 16px rgba(0, 0, 0, .7); } }
-    @media (prefers-reduced-motion: reduce) { #mat-hello span { animation: none; translate: none; transition: opacity .3s ease; } }
+    @media (prefers-reduced-motion: reduce) { #mat-hello span { translate: none; transition: opacity .3s ease; } }
   </style>
   <script>
     (function () {
@@ -111,20 +99,10 @@
       // a phone or a narrow or tall window gets the flat page (FlipBookApp sends it there): no dark room on the way
       if (innerWidth < 760 || innerWidth / innerHeight < 1.15) return;
       document.documentElement.style.background = '#02070f';
-      var bulb = document.createElement('div');
-      bulb.id = 'mat-bulb';
-      bulb.setAttribute('aria-hidden', 'true');
-      var img = new Image();
-      // (low: it is only a stand-in for a slow line, shown after 0.7 s of waiting, and must never hold the code or the pictures up)
-      img.fetchPriority = 'low'; img.decoding = 'async';
-      img.src = '/images/mat/bulb.webp';
-      img.alt = '';
-      bulb.appendChild(img);
-      document.documentElement.appendChild(bulb);
       // the greeting, in the cut letters' own typeface (the same file lib/flipbook/pageArt.ts loads for the mat's cards, so
       // it is fetched once); shown when the face has arrived, or after 3.5 s in whatever face there is (a slow line
-      // keeps the bulb alone a little longer rather than showing a stand-in face that then jumps). Once per visit: coming
-      // back to the mat from a project page, the bulb is enough.
+      // keeps the room dark a little longer rather than showing a stand-in face that then jumps). Once per visit: coming
+      // back to the mat from a project page, the room simply lights.
       var greeted = false;
       try { greeted = sessionStorage.getItem('mat-greeted') === '1'; } catch (e) {}
       if (greeted) return;
@@ -345,7 +323,7 @@
   <!-- (ship layer, scripts/ship/main.patch) What each home needs first, asked for from here rather than once the entry has run: its
        code (both homes are lazy chunks), written in by vite.config.ts (shipHeadPreloads) in a build, which knows the hashed names;
        and on the 3D home the pictures its first lit frame waits for, written in by scripts/ship/port-home.mjs from SOURCE's data.
-       All asked for at once; the code is high priority, the pictures and the bulb low. The app later asks for the same addresses
+       All asked for at once; the code and the first-frame pictures are high priority. The app later asks for the same addresses
        and gets these copies. -->
   <script>
     (function () {
@@ -383,10 +361,9 @@
         document.head.appendChild(link);
         return link;
       };
-      // All of it asked for at once, straight away (Adi, 2026-11-24: the bulb "is making the entire thing longer? we dont need
-      // those"). It used to go one after the other: the bulb, then the code once the bulb was in, then the pictures once the code
-      // was in, which cost about 0.35 s on an ordinary line before the 3D code was even asked for. The browser and the server
-      // order them by priority instead: the code (modulepreload, high) ahead of the pictures (image preloads, low) and the bulb (low).
+      // All of it asked for at once, straight away. It used to go one after the other: a bulb picture, then the code once the
+      // bulb was in, then the pictures once the code was in, which cost about 0.35 s on an ordinary line before the 3D code
+      // was even asked for. The browser and the server order them by priority instead.
       var js = first ? first.js : [], css = first ? first.css : [];
       for (var j = 0; j < js.length; j++) add('modulepreload', js[j], null, true);
       for (var k = 0; k < css.length; k++) add('preload', css[k], 'style', true);

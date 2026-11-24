@@ -16,7 +16,8 @@ const init = () => {
     if (!m.hello && document.querySelector('#mat-hello.is-shown')) m.hello = now;
     if (!m.canvas && document.querySelector('canvas')) m.canvas = now;
     const bulb = document.getElementById('mat-bulb'); if (bulb) m.sawBulb = true;
-    if (!m.dawn && m.canvas && ((bulb && bulb.classList.contains('is-on')) || (m.sawBulb && !bulb))) m.dawn = now;
+    // the light starts: the page says so (data-mat-light, from 2026-11-24); older builds are read from the bulb they had
+    if (!m.dawn && m.canvas && (document.documentElement.getAttribute('data-mat-light') === 'on' || (bulb && bulb.classList.contains('is-on')) || (m.sawBulb && !bulb))) m.dawn = now;
     if (!m.root && document.querySelector('#root > *')) m.root = now;
   });
   watch.observe(document, { subtree: true, attributes: true, childList: true });

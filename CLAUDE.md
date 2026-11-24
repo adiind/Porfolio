@@ -17,6 +17,7 @@ Verify changes with `npm run build` plus a browser check on `localhost:3000` —
 ## Gotchas
 
 - Tailwind is loaded from the CDN with an inline `tailwind.config` in `index.html` — it is **not** a build dependency. Don't add a tailwind.config.js or PostCSS setup; edit the inline config instead.
+- **Tailwind does nothing on the 3D home and the flip books** (`/`, `/mat`, `/book/<slug>`). Since 2026-11-24 `index.html` gives those pages only Tailwind's fixed base sheet (its reset, `#tw-base`) and never loads the compiler, because it held the 3D code back. A Tailwind utility class written under `components/mat`, `components/flipbook`, `lib/mat` or `lib/flipbook` silently has no effect: use the page's own CSS files there. The old home, case studies and `/experience` pages still get the compiler (added by script; `index.tsx` waits for `window.__tailwindReady` before the first render).
 - `.env` holds `NOTION_TOKEN`, read only by the `sync:*` scripts. `GEMINI_API_KEY` is wired through `define` in vite.config.ts but is currently unset.
 - The `@/` path alias resolves to the repo root (vite.config.ts).
 - The repo directory is spelled `Porfolio` (no "t") — keep paths as-is.

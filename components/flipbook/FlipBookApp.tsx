@@ -472,7 +472,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   modeRef.current = mode;
   const [stageSpec, setStageSpec] = useState<StageSpec | null>(null);
   const [lit, setLit] = useState(false);
-  // "Hi, I'm Adi." drawn by index.html under the bulb: the headline waits for it, then it is carried onto the headline
+  // "Hi, I'm Adi." drawn by index.html in the dark room: the headline waits for it, then it is carried onto the headline
   const [greeting, setGreeting] = useState<'none' | 'held' | 'landed'>(() => (staged && helloDrawn() ? 'held' : 'none'));
   const greetingRef = useRef(greeting);
   greetingRef.current = greeting;
@@ -1131,38 +1131,24 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   // the opening: once the scene is drawn, in the dark, the light comes up
   useEffect(() => {
     if (!staged || !ready || fallback) return undefined;
-    // The bulb (drawn by index.html before the app loaded) has been swinging in the dark. Give it at least a
-    // moment on screen, then switch it on: its light spreads over the room.
-    const bulb = document.getElementById('mat-bulb');
-    let away = 0;
-    let gone = 0;
     let started = false;
     const switchOn = () => {
       if (started) return;
       started = true;
       window.clearTimeout(start);
-      // (a load fast enough that the bulb never faded in (index.html waits 0.7 s): it is not switched on, it just goes)
-      const img = bulb?.querySelector('img');
-      if (bulb && img && Number(getComputedStyle(img).opacity) < 0.5) { bulb.remove(); }
-      bulb?.classList.add('is-on');
+      // (the moment the light starts, for scripts that time the page: scripts/perf/probe.mjs)
+      document.documentElement.setAttribute('data-mat-light', 'on');
       engineRef.current?.dawn();
       // the greeting travels onto the cut letters on the mat while the light comes up, and hands over to them once it is full
       void landHello(landingRef.current(), reducedMotion).then(() => setGreeting((g) => (g === 'held' ? 'landed' : g)));
-      // it has done its job the moment the room starts to brighten: it goes up and fades while the light is still spreading,
-      // so it is never left hanging over a lit room
-      away = window.setTimeout(() => bulb?.classList.add('is-away'), reducedMotion ? 0 : 120);
-      gone = window.setTimeout(() => bulb?.remove(), reducedMotion ? 300 : 600);
     };
-    // (the light comes up the moment the scene is drawn: the bulb only ever covers real loading time, never adds its own)
+    // (the light comes up the moment the scene is drawn: nothing is held on screen for its own sake)
     const start = window.setTimeout(switchOn, 0);
-    // A visitor who scrolls while the bulb is up wants the page now: switch on at once and bring the light up in about a
-    // third of a second, so the scroll after that moves the page. (Adi, 2026-11-20: scrolling did nothing for about 3 s.)
+    // A visitor who scrolls while the room is still dark wants the page now: switch on at once and bring the light up in about
+    // a third of a second, so the scroll after that moves the page. (Adi, 2026-11-20: scrolling did nothing for about 3 s.)
     const hurry = () => {
       switchOn();
       engineRef.current?.hurryDawn();
-      // (the bulb goes with it: left on its usual 0.33 s it would still be hanging over a room that is already lit)
-      window.clearTimeout(away);
-      away = window.setTimeout(() => bulb?.classList.add('is-away'), 60);
       stopListening();
     };
     const onKey = (event: KeyboardEvent) => { if (SCROLL_KEYS.has(event.key)) hurry(); };
@@ -1173,7 +1159,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       else { window.addEventListener('wheel', hurry, { passive: true }); window.addEventListener('touchmove', hurry, { passive: true }); window.addEventListener('keydown', onKey); }
     }
     const sure = window.setTimeout(() => { setLit(true); litGate.open(); dropHello(); showRef.current(); setGreeting((g) => (g === 'held' ? 'landed' : g)); }, reducedMotion ? 0 : 4200);
-    return () => { window.clearTimeout(start); window.clearTimeout(sure); window.clearTimeout(away); window.clearTimeout(gone); stopListening(); };
+    return () => { window.clearTimeout(start); window.clearTimeout(sure); stopListening(); };
   }, [fallback, ready, reducedMotion, staged]);
   // a scroll before the scene is drawn: remembered, so the opening hurries the moment it can
   useEffect(() => {

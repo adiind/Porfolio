@@ -41,26 +41,16 @@ export function canTake3DHome(): boolean {
   return fitsBySize(w, h) && hasWebGL2();
 }
 
-/** The old home is showing after all: take away the dark room index.html may have started (bulb and background). */
+/** The old home is showing after all: take away the dark room index.html may have started (greeting and background). */
 export function clearDarkRoom(): void {
-  document.getElementById('mat-bulb')?.remove();
-  // the greeting under the bulb (index.html, components/mat/hello.ts) belongs to the dark room too
+  // the greeting (index.html, components/mat/hello.ts) belongs to the dark room
   document.getElementById('mat-hello')?.remove();
   document.documentElement.style.background = '';
 }
 
-/** The 3D home is showing: make sure the dark room with its swinging bulb is up (index.html normally drew it already). */
+/** The 3D home is showing: make sure the dark room is up (index.html normally started it already). */
 export function ensureDarkRoom(): void {
   document.documentElement.style.background = '#02070f';
-  if (document.getElementById('mat-bulb')) return;
-  const bulb = document.createElement('div');
-  bulb.id = 'mat-bulb';
-  bulb.setAttribute('aria-hidden', 'true');
-  const img = new Image();
-  img.src = '/images/mat/bulb.webp';
-  img.alt = '';
-  bulb.appendChild(img);
-  document.documentElement.appendChild(bulb);
 }
 
 const HOME_KEY = 'home-from';

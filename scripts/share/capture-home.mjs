@@ -3,7 +3,7 @@
  * Takes the home share picture: public/images/share/home.jpg (1200x630) from the 3D home at /mat, plain, no overlay.
  *
  * Run `npm run build` first. This serves dist/ on 127.0.0.1 (any free port), opens /mat in Chromium at 1200x630 (device scale 2),
- * waits for the room to be lit (the bulb that index.html draws is switched on, drawn up and removed by components/flipbook/FlipBookApp.tsx
+ * waits for the room to be lit (data-lit on the stage, set by components/flipbook/FlipBookApp.tsx
  * once the scene is ready, and the "Hi, I'm Adi." greeting has landed), then waits until two shots 2 s apart are the same picture.
  *
  *   node scripts/share/capture-home.mjs [--headed] [--out <file.jpg>]
@@ -55,10 +55,9 @@ try {
   await page.goto(`${base}/mat`, { waitUntil: 'load' });
   const t0 = Date.now();
   const log = (what) => console.log(`${((Date.now() - t0) / 1000).toFixed(1).padStart(5)} s  ${what}`);
-  // 1. the bulb was drawn by index.html: it must appear first (proves the dark room started), then be switched on and removed
-  await page.waitForSelector('#mat-bulb', { state: 'attached', timeout: 15000 }).then(() => log('dark room: bulb is up'), () => log('bulb never seen (a fast load removes it before it shows)'));
-  await page.waitForFunction(() => !document.getElementById('mat-bulb'), null, { timeout: 90000 });
-  log('lit: the bulb was switched on (is-on), drawn up (is-away) and removed');
+  // 1. the dark room, then the light: the room is lit when the stage says so (components/flipbook/FlipBookApp.tsx)
+  await page.waitForSelector('.fb-root[data-lit="true"]', { timeout: 90000 });
+  log('lit: the light has come up over the mat');
   const state = await page.evaluate(() => ({ url: location.pathname, w: innerWidth, h: innerHeight, canvases: document.querySelectorAll('canvas').length, hello: !!document.getElementById('mat-hello') }));
   log(`state ${JSON.stringify(state)}`);
   if (!/^\/mat\/?$/.test(state.url)) throw new Error(`redirected to ${state.url}`);
