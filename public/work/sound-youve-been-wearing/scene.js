@@ -420,7 +420,12 @@ camera.updateProjectionMatrix();
 addEventListener('resize', () => { if (q.has('w')) return; renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
 
 let play = null;
+// Behind the scenes (tour.js): the back of the board and the making-of things on the mat, added round the scene as it is
+const TOUR = await import('./tour.js');
+const tourCtx = { THREE, scene, board, camera, renderer, controls, P, M, spinners, leds, slab, cyl, shadowAll, canvasTex, matU, sun: key, shadowCatcher };
+await TOUR.pre(tourCtx);
 if (PLAY) play = await (await import('./play.js')).setup({ THREE, RoundedBoxGeometry, canvasTex, scene, board, camera, renderer, controls, P, M, spinners, leds, keyOutline, paintTex, CoilCurve, slab, cyl, shadowAll });
+await TOUR.post(tourCtx, play);
 
 /* ---------------- idle animation ---------------- */
 const clock = new THREE.Clock();
@@ -458,6 +463,7 @@ function frame() {
     const pulse = 0.85 + 0.15 * Math.sin(t * 3 + l.k * .5);
     l.m.emissiveIntensity = on * 4 * pulse; l.glow.material.opacity = on * 0.9 * pulse;
   }
+  TOUR.frame(t);
   if (controls) {
     if (FREEZE === null) { /* a gentle sway, as on the home mat */ }
     controls.update();

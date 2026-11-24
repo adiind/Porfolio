@@ -63,12 +63,7 @@ const MobileTimeline: React.FC<Props> = ({
     // Also catch 'foundational' just in case.
     const education = items.filter(i => i.type === 'education' || i.type === 'foundational');
 
-    // Corporate/Experience
-    // Filter out duplicates if found in education (just in case)
-    const corporate = items.filter(i =>
-        (i.type === 'corporate' || i.type === 'role') &&
-        !education.some(e => e.id === i.id)
-    );
+    const corporate = items.filter(i => i.type === 'corporate');
 
     // Sort by date (newest first)
     const sortByDate = (a: TimelineItem, b: TimelineItem) => {

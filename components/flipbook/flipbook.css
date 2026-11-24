@@ -925,3 +925,6 @@
 .fb-root[data-stack='true'][data-stack-pointer='true'] .fb-canvas { cursor: pointer !important; }
 .fb-root[data-github='true'] .fb-canvas { cursor: default !important; }
 .fb-root[data-github='true'][data-github-pointer='true'] .fb-canvas { cursor: pointer !important; }
+/* At the Snapdeal courier bag (lib/mat/snapdeal/mailerLayer.ts): the same. A hand over the invoice, the shirt and the stock box. */
+.fb-root[data-snapdeal='true'] .fb-canvas { cursor: default !important; }
+.fb-root[data-snapdeal='true'][data-snapdeal-pointer='true'] .fb-canvas { cursor: pointer !important; }

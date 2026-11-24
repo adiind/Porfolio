@@ -77,7 +77,7 @@
   (function () {
     function close() { if (window.__embedMode) window.parent.history.back(); else window.location.assign('/'); }
     document.getElementById('close').addEventListener('click', close);
-    addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented) { e.preventDefault(); close(); } });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented) { e.preventDefault(); if (window.__tourEsc && window.__tourEsc()) return; close(); } });   /* behind the scenes, Esc first goes back to the front */
   })();
 </script>
 <script type="module" src="./scene.js"></script>
