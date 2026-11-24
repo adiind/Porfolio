@@ -315,7 +315,7 @@ export interface GithubRiseLayer extends MatLayer {
   arrive(): void;
   leave(): void;
   pose(t: number): void;
-  /** Once up and still: the address under this screen point, if any (the card's octocat and count). */
+  /** Once up and still: the address under this screen point, if any (the opened print). */
   linkAt(clientX: number, clientY: number): string | null;
 }
 
@@ -524,8 +524,10 @@ export function createGithubRiseLayer(opts: {
       if (!lastCamera || !cardMesh || clock !== END || target !== END) return null;
       const r = opts.canvas.getBoundingClientRect();
       ray.setFromCamera(new Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1), lastCamera);
-      const hit = ray.intersectObject(cardMesh, false)[0];
-      return hit?.uv && hit.uv.x < (GRID.x0 - 10) / CARD.w ? opts.data.href : null;
+      // (Adi, 2026-11-23: "click it once it opens and then click it again, then they should go to GitHub": the whole opened
+      // print is the link, the card, the bars rising from it and the flags, not only the octocat and the count)
+      const hit = ray.intersectObjects(root ? [root, cardMesh] : [cardMesh], true)[0];
+      return hit ? opts.data.href : null;
     },
     dispose() {
       if (ctx && root) ctx.scene.remove(root);
