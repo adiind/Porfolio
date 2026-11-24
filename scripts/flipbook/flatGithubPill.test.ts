@@ -26,9 +26,15 @@ describe('flat home page GitHub pill', () => {
   });
 
   it('updates only the count when there is no 12-week history', () => {
-    const out = patchGithubPill(page, 400, null);
-    expect(out).toContain('<b>400</b>commits');
-    expect(out).toContain('GitHub: 400 commits');
-    expect(out).toContain('in the 12 weeks ending 27 Oct 2026');
+    const typed = Number(/<span class="gh-n"><b>(\d+)<\/b>/.exec(page)![1]);
+    const count = typed + 94;
+    const out = patchGithubPill(page, count, null);
+    expect(out).toContain(`<b>${count}</b>commits`);
+    expect(out).toContain(`GitHub: ${count} commits`);
+    // the title is the page's own, and nothing but the count has changed
+    const titleOf = (html: string) => /<a class="bx-a bx-gh"[^>]* title="([^"]*)"/.exec(html)![1];
+    expect(titleOf(out)).toBe(titleOf(page));
+    const countless = (html: string, n: number) => html.replace(`<b>${n}</b>`, '<b>#</b>').replace(`GitHub: ${n} commits`, 'GitHub: # commits');
+    expect(countless(out, count)).toBe(countless(page, typed));
   });
 });

@@ -1,6 +1,6 @@
 /**
  * The timeline's stops as paper cards on the mat (prototype G, review/home-mat-tape/?c=7). Every word, date and picture
- * comes from TimelineSection.tsx's TL and LOOK (copied into ./timelineData.json; its test fails if they drift apart).
+ * comes from ./timelineData.json, the same TL and LOOK that TimelineSection.tsx reads.
  *
  * The stops, as Adi asked on 2026-11-16: Self, Northwestern, Zomato, Udaan, Schmooze, Snapdeal, BITS Pilani, and
  * Tinker Verse. Bambu Lab, Portfolio V2 and the Jarvis competition are not on it.

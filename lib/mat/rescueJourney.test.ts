@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ACCEPTED, AFTER_AT, CANCELLED, DELIVERED, DRIVER_STOPPED, JOURNEY_END, journeyAt, journeySteps, myPart, OFFERS, PICKUP, REROUTED, REWARD_SETTLED_AT } from './rescueJourney';
 
 describe('Food Rescue journey', () => {
@@ -24,5 +24,53 @@ describe('Food Rescue journey', () => {
 
   it('finishes in under 18 seconds (Adi: "dont make it too slow")', () => expect(JOURNEY_END).toBeLessThan(18));
 
-  it('prints "My part" without a draft mark: Adi confirmed it on 2026-11-17', () => expect(myPart.confirmed).toBe(true));
+});
+
+describe('the "My part" sheets', () => {
+  // No browser here: each canvas is a stand-in whose 2D context remembers the words drawn on it.
+  const printed: string[] = [];
+  const canvas = () => {
+    const state: Record<string | symbol, unknown> = {};
+    const g = new Proxy(state, {
+      get: (target, key) => {
+        if (key in target) return target[key];
+        if (key === 'fillText') return (text: string) => { printed.push(text); };
+        if (key === 'measureText') return (text: string) => ({ width: text.length * 20 });
+        if (key === 'createRadialGradient' || key === 'createLinearGradient') return () => ({ addColorStop: () => undefined });
+        return () => undefined;
+      },
+      set: (target, key, value) => { target[key] = value; return true; },
+    });
+    return { width: 0, height: 0, getContext: () => g };
+  };
+  /** Everything the phone board (once the journey is over) and the wide "My part" sheet print. */
+  const draw = async () => {
+    const { createPartSheet, createRescueBoard } = await import('./rescueBoard');
+    printed.length = 0;
+    createRescueBoard('narrow', { offer: null }).draw({ step: journeySteps.length - 1, sinceStep: 5, done: true, sinceDone: 5 });
+    const phone = [...printed];
+    printed.length = 0;
+    createPartSheet().draw({ step: 0, sinceStep: 0, done: true, sinceDone: 5 });
+    return { phone, wide: [...printed] };
+  };
+
+  beforeEach(() => { vi.stubGlobal('document', { createElement: canvas }); vi.resetModules(); });
+  afterEach(() => { vi.unstubAllGlobals(); vi.doUnmock('./rescueJourney'); });
+
+  it('prints "My part" without a draft mark: Adi confirmed it on 2026-11-17', async () => {
+    const { phone, wide } = await draw();
+    for (const sheet of [phone, wide]) {
+      expect(sheet).toContain(myPart.title);
+      expect(sheet).not.toContain('Draft');
+    }
+  });
+
+  it('prints a draft mark on both sheets while "My part" is unconfirmed', async () => {
+    vi.doMock('./rescueJourney', async (original) => {
+      const actual = await original<typeof import('./rescueJourney')>();
+      return { ...actual, myPart: { ...actual.myPart, confirmed: false } };
+    });
+    const { phone, wide } = await draw();
+    for (const sheet of [phone, wide]) expect(sheet).toContain('Draft');
+  });
 });
