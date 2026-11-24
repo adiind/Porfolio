@@ -163,7 +163,7 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     plugins: [react(), shipHeadPreloads(), flatHomeGithubPill(portfolioHistory), sharePreviewPages(), liveHostPageAddresses()],
-    test: { exclude: ['**/node_modules/**', '**/.git/**', '.claude/**', 'dist/**'] },
+    test: { exclude: ['**/node_modules/**', '**/.git/**', '.claude/**', 'dist/**', 'e2e/**'] },
     build: {
       rollupOptions: {
         output: {
