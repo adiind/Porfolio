@@ -101,7 +101,7 @@ section). Never weaken a property or a config until it passes.
 node scripts/replay-dialog-history-bugs.mjs
 ```
 
-About 10 seconds. It puts each past bug back into `hooks/useDialogA11y.ts` by exact text replacement, runs the check,
+About 15 seconds. It puts each past bug back into `hooks/useDialogA11y.ts` by exact text replacement, runs the check,
 expects red on that bug's property and prints the counterexample, restores the file, and ends with the check green.
 Exit code 0 means every replay went red on its property. `DOES NOT APPLY` means the text it replaces changed: rewrite
 that replay's edit so it re-creates the same bug in the new code.
@@ -110,6 +110,8 @@ that replay's edit so it re-creates the same bug in the new code.
 | --- | --- | --- |
 | 407961f7 | the pushed entry is recognised by object identity; pushState stores a clone, so close leaks the entry | 3 |
 | a933b6f7 | synchronous push; StrictMode's cleanup `history.back()` lands after the remount's push and closes it | 1 |
+| a933b6f7 | no own-tag guard; Back from the lightbox lands on HcdCaseStudy's entry and closes it too | 4 |
+| a933b6f7 | no listener removal in cleanup; StrictMode's first effect hears the cleanup's own `history.back()` | 1 |
 | feb77f50 | the parent ignores only its own tag; Forward onto the lightbox's entry closes HcdCaseStudy | 1 |
 | cb8a6e0d | no adoption; a Forward reopen pushes a second entry and needs two Backs | 5 |
 | cb8a6e0d | no base path; a deep link's Back lands on `/work/zero-my-ai` with no dialog | 2 |
@@ -163,10 +165,12 @@ reported `location.pathname`, `history.state` and whether popstate fired:
 Schedules per main test at the sync commit: HcdCaseStudy and its lightbox 4666, ExperienceDetail and
 FeatureCardModal 2766, each ZeroProjectDetail start 1024, ProfileModal 162.
 
-**Sync commit: 3a770a4e.** The verification describes the covered code as of this commit. Check what changed since:
+**Sync commit: b9394f3f.** The verification describes the covered code as of this commit. If a squash merge removed
+that commit, use the commit that brought `scripts/replay-dialog-history-bugs.mjs` into `main`
+(`git log --diff-filter=A --format=%h -- scripts/replay-dialog-history-bugs.mjs`). Check what changed since:
 
 ```sh
-git diff 3a770a4e -- hooks/useDialogA11y.ts hooks/dialogHistory.explore.ts hooks/dialogHistory.test.ts scripts/replay-dialog-history-bugs.mjs components/hcd/HcdCaseStudy.tsx components/ExperienceDetail.tsx components/zero/ZeroProjectDetail.tsx components/hcd/FamilySyncProjectDetail.tsx components/ProfileModal.tsx
+git diff b9394f3f -- hooks/useDialogA11y.ts hooks/dialogHistory.explore.ts hooks/dialogHistory.test.ts scripts/replay-dialog-history-bugs.mjs components/hcd/HcdCaseStudy.tsx components/ExperienceDetail.tsx components/zero/ZeroProjectDetail.tsx components/hcd/FamilySyncProjectDetail.tsx components/ProfileModal.tsx
 ```
 
 Move the sync commit forward only after you have read that diff, confirmed the configs and the fake window still
