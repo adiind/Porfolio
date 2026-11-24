@@ -164,8 +164,13 @@ function findReadingSpot(): { x: number; y: number; what: string } | null {
  */
 async function openCaseStudy(page: Page, id: string) {
   await page.goto(`/work/${id}`, { waitUntil: 'domcontentloaded' });
+  // (15 s, not the default 5: since 2026-11-24 Tailwind no longer holds the parser, so "domcontentloaded" comes about 0.6 s
+  // earlier and this wait now also covers Tailwind's download and the app's own code. The control itself shows sooner than
+  // before, counted from the start of the visit (1.2 s against 1.5 s on a slowed processor), but on the CI runner with four
+  // browsers at once the old 5 s from this earlier starting point ran out in 8 of 48 visits.)
   await expect.poll(async () => (await page.evaluate(readLayout))?.exits.length ?? 0, {
     message: `/work/${id} shows a Close or Back control`,
+    timeout: 15_000,
   }).toBeGreaterThan(0);
   await expect.poll(() => page.evaluate(() => [...document.querySelectorAll<HTMLIFrameElement>('[role="dialog"] iframe')]
     .every((frame) => frame.contentDocument?.readyState !== 'loading')), { message: 'the story iframes have run their scripts' }).toBe(true);
