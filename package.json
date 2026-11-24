@@ -15,7 +15,8 @@
     "sync:status": "node scripts/notion-sync.cjs status",
     "verify:project-wheel": "node scripts/verify-project-wheel.mjs",
     "verify:startup-layout": "node scripts/smoke-startup-layout.cjs",
-    "verify:analytics": "node scripts/verify-openpanel-analytics.mjs"
+    "verify:analytics": "node scripts/verify-openpanel-analytics.mjs",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@openpanel/web": "^1.4.1",
@@ -34,6 +35,7 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/node": "^22.14.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

@@ -30,3 +30,7 @@ _site
 # Local Claude Code worktrees. These were committed as gitlinks with no
 # .gitmodules entry, which makes submodule checkout fail.
 .claude/worktrees/
+
+# Playwright output (npm run e2e)
+e2e/results/
+e2e/report/
