@@ -664,8 +664,10 @@ export async function setup(C) {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       if (!intro) return;
       try { engine.unlock(); } catch (e) { /* needs a click: wake() on the first one */ }
-      intro.t0 = performance.now();
+      // The cover is a still frame. While it fades (150 ms) this record holds the angle that frame has, so the two are the
+      // same picture and the title never shows twice; then it carries on turning from there.
       window.__diveFade && window.__diveFade();
+      setTimeout(() => { if (intro && intro.t0 === null) intro.t0 = performance.now(); }, 160);
     }));
   }
   return { frame: (t) => {

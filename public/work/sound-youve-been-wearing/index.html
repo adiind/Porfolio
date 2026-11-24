@@ -47,14 +47,14 @@
     var c = document.createElement('div');
     c.id = 'dive-cover';
     c.setAttribute('aria-hidden', 'true');
-    c.style.cssText = 'position:fixed;inset:0;z-index:2147483000;pointer-events:none;background:#1b62d4' + (img ? ' url("' + img + '") center/cover no-repeat' : '') + ';opacity:1;transition:opacity .25s ease-out';
+    c.style.cssText = 'position:fixed;inset:0;z-index:2147483000;pointer-events:none;background:#1b62d4' + (img ? ' url("' + img + '") center/cover no-repeat' : '') + ';opacity:1;transition:opacity .15s linear';
     document.documentElement.appendChild(c);
     var gone = false;
     function fade() {
       if (gone) return;
       gone = true;
       c.style.opacity = '0';
-      setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 400);
+      setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 300);
     }
     window.__diveFade = fade;
     setTimeout(fade, 9000);   /* never stay covered if the scene fails to start */
