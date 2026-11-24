@@ -1427,7 +1427,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           // (this click is the visitor's gesture: the board's sound is unlocked now, so its drums need no second click)
           try { board()?.unlock(); } catch { /* it is still loading: the first click on it unlocks */ }
           // (the board draws at full rate from just before the camera arrives)
-          const wake = window.setTimeout(() => { try { board()?.wake(); } catch { /* not there yet */ } }, 950);
+          const wake = window.setTimeout(() => { try { board()?.wake(); } catch { /* not there yet */ } }, 850);
           const navigate = () => {
             // not ready in time: the old way, a page change behind the last frame
             void engine.capture().then((last) => { const turn = engine.diveState(); storeRecordDive(last, turn.ang, turn.w); go(); });
@@ -1440,22 +1440,23 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           })).then((ready) => {
             window.clearTimeout(wake);
             if (!ready || !frame) { navigate(); return; }
-            const now = performance.timeOrigin + performance.now();
             const thing = board()!;
             try { thing.unlock(); } catch { /* the first click on it unlocks */ }   // (again: it may have loaded after the click)
             thing.wake();
-            thing.start(now);
             frame.removeAttribute('aria-hidden');
             frame.tabIndex = 0;
-            frame.style.transition = 'opacity 120ms linear';
-            frame.style.opacity = '1';
             embedOpen.current = true;
             window.history.pushState({ mat: 'record' }, '', SOUND_RECORD.href);
-            window.setTimeout(() => {
+            // A hard cut on one frame, never a blend of two spinning records: the board (drawing every frame at opacity 0 since
+            // just before the camera arrived, reading the same spin clock) is shown and the home stops drawing in the same frame.
+            window.requestAnimationFrame(() => {
+              thing.start(performance.timeOrigin + performance.now());
+              frame.style.transition = 'none';
+              frame.style.opacity = '1';
               frame.style.pointerEvents = 'auto';
-              try { frame.contentWindow?.focus(); } catch { /* fine */ }
               engine.pause();
-            }, 140);
+              try { frame.contentWindow?.focus(); } catch { /* fine */ }
+            });
           });
           return;
         }
