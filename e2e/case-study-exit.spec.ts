@@ -167,7 +167,7 @@ async function openCaseStudy(page: Page, id: string) {
   await expect.poll(async () => (await page.evaluate(readLayout))?.exits.length ?? 0, {
     message: `/work/${id} shows a Close or Back control`,
   }).toBeGreaterThan(0);
-  await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('[role="dialog"] iframe')]
+  await expect.poll(() => page.evaluate(() => [...document.querySelectorAll<HTMLIFrameElement>('[role="dialog"] iframe')]
     .every((frame) => frame.contentDocument?.readyState !== 'loading')), { message: 'the story iframes have run their scripts' }).toBe(true);
 }
 
