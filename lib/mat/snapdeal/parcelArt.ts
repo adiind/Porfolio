@@ -203,6 +203,13 @@ export function drawTee(mark: HTMLImageElement, word: HTMLImageElement): HTMLCan
 }
 
 /**
+ * `tee-shade-crop.webp` is only the part of the 782 x 1021 shade photo that can reach the screen: the print's ink
+ * (logo, DATA SCIENCE TEAM, the red bar) spans x 211..571, y 362..591 of the shirt, and the shade is multiplied and then
+ * kept only where there is ink. The picture is that rectangle plus 4 px, laid back at the same pixels (1 to 1, no scaling).
+ */
+const TEE_SHADE_AT = { x: 207, y: 358 };
+
+/**
  * The folded team T-shirt's surface: a photo of a plain folded green tee (made with an image tool: a generic shirt, not
  * one of Adi's own products; cut out by tools/cut-tee.py), with the team print laid into it. The print (the Snapdeal mark
  * and word, cut from his own ID card photo, and DATA SCIENCE TEAM) is darkened by the photo's own light and shade, so
@@ -236,7 +243,7 @@ export function drawTeePhoto(cut: HTMLImageElement, shade: HTMLImageElement, mar
   p.globalCompositeOperation = 'source-over';
   const ink = document.createElement('canvas'); ink.width = W; ink.height = H; ink.getContext('2d')!.drawImage(print, 0, 0);
   // (at half strength: the folds still run through the ink, but white ink stays white, as screen print on cotton does)
-  p.globalCompositeOperation = 'multiply'; p.globalAlpha = 0.55; p.drawImage(shade, 0, 0, W, H); p.globalAlpha = 1;
+  p.globalCompositeOperation = 'multiply'; p.globalAlpha = 0.55; p.drawImage(shade, TEE_SHADE_AT.x, TEE_SHADE_AT.y); p.globalAlpha = 1;
   p.globalCompositeOperation = 'destination-in'; p.drawImage(ink, 0, 0);
   p.globalCompositeOperation = 'source-over';
   c.drawImage(print, 0, 0);

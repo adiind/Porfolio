@@ -31,3 +31,5 @@ The object cut-outs in `public/work/zero-assets/assets/art/` (brass, wood, felt 
 
 The flip-book route (`/book`) loads Geist (Vercel), Bricolage Grotesque (Mathieu Triay) and Source Serif 4 (Adobe) from `public/fonts/`. All three are licensed under the SIL Open Font License 1.1.
 <!-- port-home:END notices -->
+
+The home page's HTML overlay self-hosts **Bricolage Grotesque** (Mathieu Triay, variable font, latin and latin-ext subsets as served by Google Fonts) and **Instrument Serif** (Rodrigo Fuenzalida and Jordan Egstad of Instrument, regular and italic, latin and latin-ext subsets as served by Google Fonts) from `public/fonts/mat/`. Both are licensed under the SIL Open Font License 1.1.

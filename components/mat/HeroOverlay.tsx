@@ -2,21 +2,6 @@ import React from 'react';
 import './hero-overlay.css';
 import { GITHUB, TOOL_MARKS_LABEL } from '../../lib/mat/matPieces';
 
-// The two Google typefaces, asked for as soon as this file loads, alongside everything else and holding nothing up.
-// (They used to be an @import at the top of hero-overlay.css, which made the stylesheet wait for Google.)
-const WEB_TYPE = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Serif:ital@0;1&display=swap';
-if (typeof document !== 'undefined' && !document.querySelector('link[data-mh-type]')) {
-  const reach = document.createElement('link');
-  reach.rel = 'preconnect';
-  reach.href = 'https://fonts.gstatic.com';
-  reach.crossOrigin = 'anonymous';
-  const sheet = document.createElement('link');
-  sheet.rel = 'stylesheet';
-  sheet.href = WEB_TYPE;
-  sheet.dataset.mhType = 'true';
-  document.head.append(reach, sheet);
-}
-
 export interface HeroOverlayProps {
   /** false while the camera is flying to something or a book is open: the layer fades out and stops taking clicks */
   shown: boolean;

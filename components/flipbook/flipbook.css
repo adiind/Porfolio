@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'FB Geist';
-  src: url('/fonts/flipbook/Geist-Variable.ttf') format('truetype');
+  src: url('/fonts/flipbook/Geist-Variable.woff2') format('woff2');
   font-weight: 100 900;
   font-display: swap;
 }
@@ -501,7 +501,7 @@
 
 @font-face {
   font-family: 'FB Serif';
-  src: url('/fonts/pg/source-serif-4-normal-600.ttf') format('truetype');
+  src: url('/fonts/pg/source-serif-4-normal-600.woff2') format('woff2');
   font-weight: 600;
   font-display: swap;
 }

@@ -114,7 +114,7 @@
       var shown = false, show = function () { if (shown) return; shown = true; requestAnimationFrame(function () { hello.classList.add('is-shown'); }); };
       setTimeout(show, 3500);
       if (window.FontFace && document.fonts) {
-        var face = new FontFace('FB Bricolage', 'url(/fonts/flipbook/Bricolage-800.ttf)', { weight: '800', style: 'normal', display: 'block' });
+        var face = new FontFace('FB Bricolage', 'url(/fonts/flipbook/Bricolage-800.woff2)', { weight: '800', style: 'normal', display: 'block' });
         face.load().then(function (loaded) { document.fonts.add(loaded); show(); }, show);
       } else show();
     })();
@@ -369,7 +369,7 @@
       for (var k = 0; k < css.length; k++) add('preload', css[k], 'style', true);
       // the mat's text face: the first lit frame waits for it (lib/flipbook/pageArt.ts loadFlipbookFonts 'first'), and it used
       // to be asked for only once the 3D code had run
-      if (door === 'mat') add('preload', '/fonts/flipbook/Geist-Variable.ttf', 'font', true, { type: 'font/ttf' });
+      if (door === 'mat') add('preload', '/fonts/flipbook/Geist-Variable.woff2', 'font', true, { type: 'font/woff2' });
       // (high: the first lit frame waits for these; the pictures the app asks for a moment later, for the bags' insides and the
       // stack, are low and must not share the line with them)
       for (var i = 0; i < pictures.length; i++) add('preload', pictures[i], 'image', false, { fetchPriority: 'high' });

@@ -661,7 +661,7 @@ export function createMailerLayer(opts: { /** the bag's middle on the mat and it
     attach(c) {
       ctx = c;
       const dir = opts.mark.slice(0, opts.mark.lastIndexOf('/') + 1);
-      Promise.all([loadImage(opts.mark), loadImage(opts.word), loadImage(`${dir}tee-cut.webp`), loadImage(`${dir}tee-shade.webp`), loadImage(`${dir}tee-height.webp`), loadImage(`${dir}watch-cut.webp`)]).then(([mark, word, cut, shade, height, watch]) => { if (ctx !== c) return; build(c, mark, word, { cut, shade, height, watch }); done(); }, failed);
+      Promise.all([loadImage(opts.mark), loadImage(opts.word), loadImage(`${dir}tee-cut.webp`), loadImage(`${dir}tee-shade-crop.webp`), loadImage(`${dir}tee-height.webp`), loadImage(`${dir}watch-cut.webp`)]).then(([mark, word, cut, shade, height, watch]) => { if (ctx !== c) return; build(c, mark, word, { cut, shade, height, watch }); done(); }, failed);
     },
     update(dt, camera) {
       if (!pose) return false;

@@ -46,11 +46,11 @@ export type BookImages = Map<string, HTMLImageElement>;
  * or not the 600 file is in). The serif and Bricolage 600 are only drawn inside the books, so they can come later.
  */
 const FONT_FILES: Array<{ family: string; url: string; weight: string; first?: boolean }> = [
-  { family: 'FB Geist', url: '/fonts/flipbook/Geist-Variable.ttf', weight: '100 900', first: true },
-  { family: 'FB Bricolage', url: '/fonts/flipbook/Bricolage-800.ttf', weight: '800', first: true },
-  { family: 'FB Bricolage', url: '/fonts/flipbook/Bricolage-600.ttf', weight: '600' },
-  { family: 'FB Serif', url: '/fonts/pg/source-serif-4-normal-400.ttf', weight: '400' },
-  { family: 'FB Serif', url: '/fonts/pg/source-serif-4-normal-600.ttf', weight: '600' },
+  { family: 'FB Geist', url: '/fonts/flipbook/Geist-Variable.woff2', weight: '100 900', first: true },
+  { family: 'FB Bricolage', url: '/fonts/flipbook/Bricolage-800.woff2', weight: '800', first: true },
+  { family: 'FB Bricolage', url: '/fonts/flipbook/Bricolage-600.woff2', weight: '600' },
+  { family: 'FB Serif', url: '/fonts/pg/source-serif-4-normal-400.woff2', weight: '400' },
+  { family: 'FB Serif', url: '/fonts/pg/source-serif-4-normal-600.woff2', weight: '600' },
 ];
 
 const faces = new Map<string, Promise<void>>();
