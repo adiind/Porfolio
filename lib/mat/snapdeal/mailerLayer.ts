@@ -123,7 +123,7 @@ void main() {
  * the film is plain red. Along a torn edge the plastic has stretched and gone pale.
  */
 const FILM_FRAGMENT = /* glsl */ `
-uniform sampler2D tMap; uniform vec3 uLight; uniform sampler2D tSun; uniform vec2 uScreen; uniform float uDawn; uniform float uSheen;
+uniform sampler2D tMap; uniform vec3 uLight; uniform sampler2D tSun; uniform vec2 uScreen; uniform float uDawn; uniform float uSheen; uniform float uAlpha;
 uniform vec3 uBack;
 varying vec3 vN; varying vec2 vUv; varying vec3 vW; varying float vEdge; varying float vTorn;
 ${DAWN}
@@ -147,7 +147,7 @@ void main() {
   vec3 sun = texture2D(tSun, gl_FragCoord.xy / uScreen).rgb;
   vec3 lit = mix(2.0 * col * sun, 1.0 - 2.0 * (1.0 - col) * (1.0 - sun), step(0.5, sun));
   col = mix(col, lit, 0.2 * (1.0 - ink));
-  gl_FragColor = vec4(col * dawnLight(), 1.0);
+  gl_FragColor = vec4(col * dawnLight(), uAlpha);
 }`;
 const SHADOW_VERTEX = /* glsl */ `
 varying vec2 vL;
@@ -155,7 +155,7 @@ void main() { vec4 w = modelMatrix * vec4(position, 1.0); vL = w.xy; gl_Position
 /** One thing's shadow on the mat: its footprint swept from its foot to its top along the light, soft with height. */
 const SHADOW_FRAGMENT = /* glsl */ `
 uniform vec2 uC; uniform float uAng; uniform vec2 uHalf; uniform float uR; uniform float uB; uniform float uT; uniform vec2 uDir;
-uniform float uStrength; uniform float uAlpha; uniform float uDawn; uniform vec2 uScreen;
+uniform float uStrength; uniform float uAlpha; uniform float uShown; uniform float uDawn; uniform vec2 uScreen;
 varying vec2 vL;
 ${DAWN}
 float roundBox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
@@ -174,8 +174,8 @@ void main() {
   float contact = (1.0 - smoothstep(0.0, 0.006 + uT * 0.06, d0)) * step(-0.002, d0) * clamp(1.0 - uB / 0.03, 0.0, 1.0) * clamp(uT / 0.02, 0.0, 1.0);
   float dark = 1.0 - (1.0 - sweep * 0.6) * (1.0 - halo * 0.3) * (1.0 - contact * 0.55);
   dark *= uStrength * clamp(1.0 - uB * 1.2, 0.25, 1.0);
-  if (dark * uAlpha < 0.003) discard;
-  gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), dark * uAlpha);
+  if (dark * uAlpha * uShown < 0.003) discard;
+  gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), dark * uAlpha * uShown);
 }`;
 
 const LIGHT = new Vector3(0.35, 0.45, 0.9).normalize();
@@ -324,7 +324,7 @@ export interface MailerLayer extends MatLayer {
 /** The rolled strip: its innermost turn's radius, and how much wider the roll is once the whole strip is in it. */
 const ROLL = { inner: 0.011, grown: 0.03 } as const;
 
-export function createMailerLayer(opts: { /** the bag's middle on the mat and its turn in degrees (table units) */ x: number; y: number; turn: number; mark: string; word: string; reduced: boolean; /** for a still of one thing beside the bag: 'tee' shows the bag and the folded shirt only */ only?: 'tee' }): MailerLayer {
+export function createMailerLayer(opts: { /** the bag's middle on the mat and its turn in degrees (table units) */ x: number; y: number; turn: number; mark: string; word: string; reduced: boolean; /** for a still of one thing beside the bag: 'tee' shows the bag and the folded shirt only */ only?: 'tee'; /** the picture of the bag's click target on the stage: while the bag rests, the layer goes with the engine's own fade for it (another close-up sinks the mat) */ target?: HTMLCanvasElement }): MailerLayer {
   let ctx: MatLayerContext | null = null;
   let group: Group | null = null;
   const disposables: Array<{ dispose(): void }> = [];
@@ -347,6 +347,17 @@ export function createMailerLayer(opts: { /** the bag's middle on the mat and it
   type Readable = 'invoice' | 'tag' | 'box';
   let reading: Readable | null = null; let readId: Readable = 'invoice'; let readK = 0;
   const readTargets: Partial<Record<Readable, { node: Object3D; w: number; h: number }>> = {};
+  /** How shown the bag is: the engine's own fade for its click target while the bag rests (another close-up sinks it). */
+  const shown = { value: 1 };
+  let targetMesh: Mesh | null = null;
+  const findTarget = () => {
+    if (!ctx || !opts.target) return;
+    targetMesh = null;
+    ctx.scene.traverse((o) => {
+      const m = (o as Mesh).material as ShaderMaterial | undefined;
+      if (m?.uniforms?.tMap?.value?.image === opts.target && m.uniforms.uAlpha && m.uniforms.uSize) targetMesh = o as Mesh;
+    });
+  };
   let phonesNode: Object3D | null = null; let teeNode: Object3D | null = null;
   const raycaster = new Raycaster(); let lastCamera: PerspectiveCamera | null = null;
   const READ_PITCH = 0.2;
@@ -384,7 +395,7 @@ export function createMailerLayer(opts: { /** the bag's middle on the mat and it
       t.colorSpace = NoColorSpace; t.wrapS = t.wrapT = ClampToEdgeWrapping; t.magFilter = LinearFilter; t.minFilter = LinearMipmapLinearFilter;
       t.anisotropy = c.maxAnisotropy; t.generateMipmaps = true; disposables.push(t); return t;
     };
-    const shared = { uLight: { value: LIGHT }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize }, uDawn: c.dawn };
+    const shared = { uLight: { value: LIGHT }, tSun: { value: c.sunTexture }, uScreen: { value: c.screenSize }, uDawn: c.dawn, uAlpha: shown };
     const uRip = { value: MAILER.h as number }; const uTorn = { value: 0 }; const uGape = { value: 0 }; const uLean = { value: 0 }; const uSag = { value: 0 };
     const uSheen = { value: 0.8 }; sheen = uSheen;
     const filmMat = (peel: number, map: CanvasTexture) => {
@@ -407,7 +418,7 @@ export function createMailerLayer(opts: { /** the bag's middle on the mat and it
       const geo = new PlaneGeometry(reach, reach); disposables.push(geo);
       const mat = new ShaderMaterial({
         vertexShader: SHADOW_VERTEX, fragmentShader: SHADOW_FRAGMENT, transparent: true, depthTest: false, depthWrite: false,
-        uniforms: { uC: { value: new Vector2() }, uAng: { value: turn }, uHalf: { value: half }, uR: { value: r }, uB: { value: 0 }, uT: { value: top }, uDir: { value: SHADOW_DIR }, uStrength: { value: 1 }, uAlpha: { value: 1 }, uDawn: c.dawn, uScreen: { value: c.screenSize } },
+        uniforms: { uC: { value: new Vector2() }, uAng: { value: turn }, uHalf: { value: half }, uR: { value: r }, uB: { value: 0 }, uT: { value: top }, uDir: { value: SHADOW_DIR }, uStrength: { value: 1 }, uAlpha: { value: 1 }, uShown: shown, uDawn: c.dawn, uScreen: { value: c.screenSize } },
       });
       disposables.push(mat);
       const mesh = new Mesh(geo, mat); mesh.position.set(opts.x, opts.y, 0.0006); mesh.frustumCulled = false; mesh.renderOrder = 1.7;
@@ -655,6 +666,11 @@ export function createMailerLayer(opts: { /** the bag's middle on the mat and it
     update(dt, camera) {
       if (!pose) return false;
       lastCamera = camera;
+      // (resting, it goes with the engine's own fade for its spot; opened, it is the close-up and stays)
+      if (opts.target && (!targetMesh || !targetMesh.parent)) findTarget();
+      const engineShown = targetMesh ? ((targetMesh.material as ShaderMaterial).uniforms.uAlpha.value as number) : 1;
+      const now = clock === 0 && target === 0 ? engineShown : 1;
+      if (Math.abs(now - shown.value) > 1e-4) { shown.value = now; if (group) group.visible = now > 0.003; ctx?.invalidate(); }
       const readGoal = reading ? 1 : 0; const readMoving = Math.abs(readK - readGoal) > 0.002;
       if (readMoving) readK = Math.abs(readK - readGoal) < 0.004 ? readGoal : readK + (readGoal - readK) * (1 - Math.exp(-dt * 7)); else readK = readGoal;
       const moving = clock !== target;

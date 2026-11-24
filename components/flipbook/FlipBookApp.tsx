@@ -751,6 +751,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const layer = createMailerLayer({
       x: target.x, y: target.y, turn: -SNAPDEAL_AT.turn, reduced: reducedMotion,
       mark: '/images/mat/snapdeal/snapdeal-mark.png', word: '/images/mat/snapdeal/snapdeal-wordmark.png',
+      target: target.image as HTMLCanvasElement,
     });
     snapdealRef.current = { layer, engine, remove: engine.addLayer(layer) };
     if (debug) (window as unknown as { __snapdeal?: unknown }).__snapdeal = { get layer() { return layer; } };
