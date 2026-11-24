@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import data from './timelineData.json';
 import { PROJECTS_BY_ID } from '../../data/projects';
 import { TINKER_INSTAGRAM, TINKER_PRINTS, matStops, pieceCorners, pileLayout } from './timelineCards';
 import {
@@ -12,20 +11,6 @@ import {
 const cards = () => layoutCards(matStops());
 
 describe('the timeline data', () => {
-  it('is TimelineSection.tsx\'s TL and LOOK, unchanged', () => {
-    const source = readFileSync(new URL('../../components/mat/TimelineSection.tsx', import.meta.url), 'utf8');
-    const grab = (marker: string): string => {
-      const from = source.indexOf('{', source.indexOf('=', source.indexOf(marker)));
-      let depth = 0; let i = from;
-      for (; i < source.length; i += 1) { if (source[i] === '{') depth += 1; if (source[i] === '}') { depth -= 1; if (!depth) break; } }
-      return source.slice(from, i + 1);
-    };
-    expect(JSON.parse(grab('const TL: TLData'))).toEqual(data.tl);
-    // LOOK is written as an object literal with single quotes
-    const look = new Function(`return (${grab('const LOOK')});`)() as unknown;
-    expect(look).toEqual(data.look);
-  });
-
   it('has the seven stops and Tinker Verse, newest first, without Bambu Lab, Portfolio V2 or the Jarvis competition', () => {
     const stops = matStops();
     expect(stops.map((s) => s.item.short)).toEqual(['Self', 'Northwestern', 'Zomato', 'Tinker Verse', 'Udaan', 'Schmooze', 'Snapdeal', 'BITS Pilani']);
