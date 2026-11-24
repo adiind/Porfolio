@@ -30,6 +30,15 @@
 } }
 </script>
 <script>
+  /* Preloaded by the home page in an iframe (?embed=1; FlipBookApp's board embed): the scene loads and draws one frame, then waits
+     (window.__embedIdle: it draws about once a second) until the home page wakes it, hands it the record's spin clock and starts it. */
+  (function () {
+    if (new URLSearchParams(location.search).get('embed') === '1' && window.parent !== window) {
+      window.__embedMode = true; window.__embedIdle = true; window.__embed = { ready: false };
+    }
+  })();
+</script>
+<script>
   /* Arriving from the home mat's record (lib/mat/soundRecord.ts): the home page's camera has just flown down onto the record and kept
      its last frame in sessionStorage. That frame is painted full screen first thing, on the mat's blue, so the browser never shows
      black or white; play.js cross-fades it away (window.__diveFade) once this scene has drawn its own first frame, and starts the
@@ -66,7 +75,7 @@
 <button type="button" id="close" aria-label="Close and return to the portfolio"><span class="x" aria-hidden="true">✕</span><span class="label">Close</span></button>
 <script>
   (function () {
-    function close() { window.location.assign('/'); }
+    function close() { if (window.__embedMode) window.parent.history.back(); else window.location.assign('/'); }
     document.getElementById('close').addEventListener('click', close);
     addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented) { e.preventDefault(); close(); } });
   })();

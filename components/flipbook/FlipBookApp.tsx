@@ -29,7 +29,7 @@ import { DESIGN_CARDS } from '../../lib/mat/designCards';
 import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
 import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
-import { RECORD, RECORD_DIVE_FRAC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, storeRecordDive } from '../../lib/mat/soundRecord';
+import { RECORD, RECORD_DIVE_FRAC, RECORD_EMBED_SRC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, soundSpin, storeRecordDive } from '../../lib/mat/soundRecord';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
@@ -527,6 +527,23 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const cover = useCoverFirst(book, staged, litRef);
   const { images, error } = staged ? cover : eager;
   const reducedMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
+  /** The 3D board, loaded in a same-origin iframe over the home before it is wanted (hidden, drawing slowly), and whether it is up. */
+  const embedFrame = useRef<HTMLIFrameElement | null>(null);
+  const embedOpen = useRef(false);
+  const spinAt = useRef({ t0: 0 });
+  const ensureEmbed = useCallback((): HTMLIFrameElement | null => {
+    if (embedFrame.current) return embedFrame.current;
+    if (reducedMotion || window.top !== window) return null;
+    const frame = document.createElement('iframe');
+    frame.src = RECORD_EMBED_SRC;
+    frame.title = SOUND_RECORD.title;
+    frame.setAttribute('aria-hidden', 'true');
+    frame.tabIndex = -1;
+    frame.style.cssText = `position:fixed;inset:0;width:100%;height:100%;border:0;opacity:0;pointer-events:none;z-index:2147482000;background:${SOUND_RECORD.band}`;
+    document.body.appendChild(frame);
+    embedFrame.current = frame;
+    return frame;
+  }, [reducedMotion]);
   // the timeline on the mat: it is drawn in this engine's scene, in the stage's frame, and held still by the scroll handler
   const timelineEngine = useMemo(() => ({ addLayer: (layer: Parameters<FlipBookEngine['addLayer']>[0]) => engineRef.current?.addLayer(layer) ?? (() => undefined) }), []);
   const timelinePlace = useMemo(() => (stageSpec ? { frame: stageSpec.frame, unit: stageSpec.unit } : null), [stageSpec]);
@@ -644,6 +661,29 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     flying.current += 1;
     return engine.focusOn(id).finally(() => { flying.current -= 1; putLateRef.current(); });
   }, []);
+  // Back (or Close, or Escape: they all go Back) from the board: it fades out, the home draws again and the camera comes back up.
+  useEffect(() => {
+    const close = () => {
+      if (!embedOpen.current) return;
+      embedOpen.current = false;
+      const frame = embedFrame.current;
+      const engine = engineRef.current;
+      if (frame) { frame.style.pointerEvents = 'none'; frame.style.opacity = '0'; frame.setAttribute('aria-hidden', 'true'); }
+      engine?.resume();
+      setMode('wide'); modeRef.current = 'wide';
+      diving.current = false;
+      void fly(null).then(() => engine?.setDiveSpin(null));
+      window.setTimeout(() => { frame?.remove(); if (embedFrame.current === frame) embedFrame.current = null; }, 300);
+    };
+    window.addEventListener('popstate', close);
+    return () => window.removeEventListener('popstate', close);
+  }, [fly]);
+  // With the home on screen and quiet for a moment, the board loads behind it so the click can fly straight into it.
+  useEffect(() => {
+    if (!staged || fallback || reducedMotion) return undefined;
+    const timer = window.setTimeout(() => { ensureEmbed(); }, 3500);
+    return () => window.clearTimeout(timer);
+  }, [staged, fallback, reducedMotion, ensureEmbed]);
   // Back from the 3D board can bring this page back as it was left (the browser keeps it): the camera comes back up off the record.
   useEffect(() => {
     const back = (event: PageTransitionEvent) => {
@@ -1375,10 +1415,47 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
             return;
           }
           setMode('dive'); modeRef.current = 'dive';
-          void fly(id).then(() => engine.capture()).then((frame) => {
-            const turn = engine.diveState();
-            storeRecordDive(frame, turn.ang, turn.w);
-            go();
+          // One spin clock for both records (lib/mat/soundRecord.ts soundSpin): it starts now and the board's page reads it too.
+          const spin = spinAt.current;
+          spin.t0 = performance.timeOrigin + performance.now();
+          const clock = (at: number) => soundSpin((at - spin.t0) / 1000);
+          (window as unknown as { __soundSpin?: typeof clock }).__soundSpin = clock;
+          engine.setDiveSpin(clock);
+          type Embed = { ready: boolean; unlock(): void; wake(): void; start(at: number): void };
+          const frame = ensureEmbed();
+          const board = () => (frame?.contentWindow as (Window & { __embed?: Embed }) | null | undefined)?.__embed;
+          // (this click is the visitor's gesture: the board's sound is unlocked now, so its drums need no second click)
+          try { board()?.unlock(); } catch { /* it is still loading: the first click on it unlocks */ }
+          // (the board draws at full rate from just before the camera arrives)
+          const wake = window.setTimeout(() => { try { board()?.wake(); } catch { /* not there yet */ } }, 950);
+          const navigate = () => {
+            // not ready in time: the old way, a page change behind the last frame
+            void engine.capture().then((last) => { const turn = engine.diveState(); storeRecordDive(last, turn.ang, turn.w); go(); });
+          };
+          void fly(id).then(() => new Promise<boolean>((resolve) => {
+            // (the camera has arrived. If the board is not ready the record simply keeps spinning, up to 2.5 s)
+            const began = performance.now();
+            const look = () => { if (board()?.ready) resolve(true); else if (performance.now() - began > 2500) resolve(false); else window.setTimeout(look, 40); };
+            look();
+          })).then((ready) => {
+            window.clearTimeout(wake);
+            if (!ready || !frame) { navigate(); return; }
+            const now = performance.timeOrigin + performance.now();
+            const thing = board()!;
+            try { thing.unlock(); } catch { /* the first click on it unlocks */ }   // (again: it may have loaded after the click)
+            thing.wake();
+            thing.start(now);
+            frame.removeAttribute('aria-hidden');
+            frame.tabIndex = 0;
+            frame.style.transition = 'opacity 120ms linear';
+            frame.style.opacity = '1';
+            embedOpen.current = true;
+            window.history.pushState({ mat: 'record' }, '', SOUND_RECORD.href);
+            window.setTimeout(() => {
+              frame.style.pointerEvents = 'auto';
+              try { frame.contentWindow?.focus(); } catch { /* fine */ }
+              engine.pause();
+            }, 140);
           });
           return;
         }
@@ -1400,6 +1477,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         openBook();
       },
       hover(id) {
+        if (id === SOUND_RECORD_PROP) ensureEmbed();
         // resting on the résumé: its full page is fetched, so the close-up is sharp when it arrives
         if (id === RESUME_ID || id === 'word:resume') void askResume();
         // resting on a closed booklet for a moment: its pictures are fetched ahead of a click
@@ -1412,7 +1490,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (window.location.search) window.history.replaceState(null, '', window.location.pathname);
     window.addEventListener('popstate', toWide);
     return () => window.removeEventListener('popstate', toWide);
-  }, [book.slug, onSelectBook, reducedMotion, staged]);
+  }, [book.slug, ensureEmbed, onSelectBook, reducedMotion, staged]);
 
   // The tab is named after a book only while it is open: the home stage keeps the home page's name until one is picked
   // up, and gets it back on the way out. Opening a book is what flipbook_opened counts, not a visit to the home page.
@@ -1443,6 +1521,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key === 'Escape' && embedOpen.current) { event.preventDefault(); window.history.back(); return; }
       // on the stage the book's keys only work once you are in the book; Escape always steps back out
       if (staged && modeRef.current !== 'book') {
         // (a story open over the close-up closes itself on Escape, one step Back: not two)

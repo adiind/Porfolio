@@ -536,7 +536,7 @@ export async function setup(C) {
     // (9 degrees off vertical, as the home camera ends), the record centred and DIVE_FRAC of the window's height across
     // (the same number as RECORD_DIVE_FRAC in lib/mat/soundRecord.ts). The record is already turning, and the intro starts by itself.
     const dive = window.__dive || null, DIVE_FRAC = 0.7, DIVE_PITCH = 9 * Math.PI / 180;
-    if (dive && dive.frame) {
+    if ((dive && dive.frame) || window.__embedMode) {
       const away = (RR * BIG * 2) / (DIVE_FRAC * 2 * Math.tan(camera.fov * Math.PI / 360));
       start.pos.set(0, away * Math.cos(DIVE_PITCH), 0.5 + away * Math.sin(DIVE_PITCH));
     }
@@ -573,11 +573,18 @@ export async function setup(C) {
   function introFrame(dt) {
     const I = intro, L = I.lone;
     // idle: a slow turn. Hovered or clicked: the title turns upright and stays readable (no fast spin while it flies)
+    // Preloaded under the home page: the record turns by the home page's own spin clock (soundSpin in lib/mat/soundRecord.ts),
+    // the same function the home record reads, so the two are always at the same angle and speed. It never restarts or holds.
+    const clk = window.__embedMode && window.parent && window.parent.__soundSpin;
+    let spinA;
+    if (clk) { I.ang = 0; const at = performance.timeOrigin + performance.now(); spinA = -clk(at).ang }
+    else {
     I.spin += ((I.t0 === null ? (I.over ? 0 : 0.12) : 0) - I.spin) * Math.min(1, dt * 2);
     if (I.over || I.t0 !== null) { const tgt = Math.round(I.ang / (Math.PI * 2)) * Math.PI * 2; I.ang += (tgt - I.ang) * Math.min(1, dt * (window.__dive ? 2 : 5)); }   // title turns upright to be read
     else I.ang += I.spin * dt;
     // after the click it spins: three full turns that ease out exactly as it lands, so the title ends upright
-    const spinA = I.t0 === null ? 0 : -Math.PI * 6 * (1 - Math.pow(1 - Math.min(1, (performance.now() - I.t0) / 2300), 3));
+    spinA = I.t0 === null ? 0 : -Math.PI * 6 * (1 - Math.pow(1 - Math.min(1, (performance.now() - I.t0) / 2300), 3));
+    }
     I.spinA = spinA;
     if (!I.flying) L.rotation.set(-Math.PI / 2, 0, I.ang + spinA);
     // the round title fades in, grows a little and turns slowly while the record is hovered
@@ -657,6 +664,14 @@ export async function setup(C) {
   // Arrived from the home mat's record: once this scene's own first frame is drawn, the cover from the home page (index.html) fades
   // out over it and the intro starts by itself, the record already turning as it was in the last frame the home page drew.
   let begun = false;
+  if (window.__embedMode) {
+    // the home page's side of the hand-over: unlock sound inside its click, wake the drawing, start the intro at its clock's time
+    Object.assign(window.__embed, {
+      unlock: () => { engine.unlock(); },
+      wake: () => { window.__embedIdle = false; },
+      start: (at) => { window.__embedIdle = false; if (intro && intro.t0 === null) intro.t0 = at - performance.timeOrigin; },
+    });
+  }
   function beginFromHome() {
     const d = window.__dive;
     if (!intro) { window.__diveFade && window.__diveFade(); return; }
@@ -674,5 +689,6 @@ export async function setup(C) {
     if (intro) introFrame(Math.min(0.05, (performance.now() - (introFrame.last || performance.now())) / 1000));
     introFrame.last = performance.now(); frame(t); hintFrame();
     if (!begun && window.__dive) { begun = true; beginFromHome(); }
+    if (!begun && window.__embedMode) { begun = true; window.__embed.ready = true; }
   } };
 }
