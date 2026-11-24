@@ -48,7 +48,7 @@ if (hiddenBook) {
     // index.html may have started the dark room on a window that looked wide enough, but this browser cannot take the 3D
     // home (no WebGL 2): it gets the flat home (public/home-flat), as phones do; "/#writings" keeps the old home
     clearDarkRoom();
-    if (window.location.hash !== '#writings') window.location.replace('/home-flat/index.html' + window.location.hash);
+    if (window.location.hash !== '#writings') window.location.replace('/home-flat/' + window.location.hash);
   }
   if (isClassicRoute) rememberHome('classic');
 }

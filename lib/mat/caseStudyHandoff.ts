@@ -78,10 +78,7 @@ export function openCaseStudy(
   window.setTimeout(go, SPLASH_GROW_MS + 40);
 }
 
-/**
- * The story pages two case studies show in a frame (Squad Up, FamilySync). Without ".html": the live site answers
- * story.html with a redirect to this address, one more trip before the frame can start.
- */
+/** The story pages two case studies show in a frame (Squad Up, FamilySync). */
 export const CASE_STORY_PAGES = ['/work/squad-up-assets/story', '/work/familysync-assets/story'];
 /** The logos the splash shows (index.html), fetched ahead so they are there the moment it grows. */
 const SPONSOR_LOGOS = ['/images/sponsors/jpmorganchase.svg', '/images/pg/pg-logo-official.svg'];
@@ -139,11 +136,6 @@ export function warmCaseStudies(): void {
   CASE_STORY_PAGES.forEach(add);
   SPONSOR_LOGOS.forEach(add);
   pull();
-}
-
-/** The address a case study's frame loads: the story page itself (the dev server only knows it with ".html"). */
-export function storyPageSrc(path: string): string {
-  return import.meta.env.DEV ? `${path}.html` : path;
 }
 
 /** The project's name and who it was with, white on its colour (index.html draws the same). */
