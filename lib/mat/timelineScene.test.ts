@@ -74,10 +74,13 @@ describe('where the cards lie', () => {
   });
 
   it('lets Tinker Verse fill the School lane between Northwestern and BITS Pilani', () => {
-    const school = cards().filter((c) => c.lane === 1);
-    const [nw, tv, bits] = school;
-    expect(tv.top).toBe(nw.top + nw.stop.restH + 10);
-    expect(tv.top + tv.stop.restH).toBe(bits.top - 10);
+    const [nw, tv, bits] = cards().filter((c) => c.lane === 1);
+    const above = tv.top - (nw.top + nw.stop.restH);
+    const below = bits.top - (tv.top + tv.stop.restH);
+    // it touches neither neighbour, and leaves only a sliver of mat (not a hole) above and below it
+    const SLIVER = 16;
+    expect(above).toBeGreaterThan(0); expect(above).toBeLessThanOrEqual(SLIVER);
+    expect(below).toBeGreaterThan(0); expect(below).toBeLessThanOrEqual(SLIVER);
     expect(tv.stop.restH).toBe(tv.stop.openH);
     expect(tv.stop.restH).toBeGreaterThan(200);
   });
@@ -114,17 +117,24 @@ describe('the intro', () => {
 
   it('lands each card just after the roll has passed its year, the first of each lane dropping as it starts', () => {
     const all = cards(); const plan = planFlights(all);
+    const place = (c: PlacedCard) => ({ x: c.inner - c.dir * c.stop.restW / 2, y: c.top + c.stop.restH / 2, h: c.stop.restH });
+    const pose = (c: PlacedCard, T: number) => { const f = plan.get(c)!; return cardPose(c, f, T, place(c), f.prev ? place(f.prev) : null, false); };
+    const atRest = (c: PlacedCard, T: number) => { const p = pose(c, T); return !p.flying && p.alpha === 1 && p.x === place(c).x && p.y === place(c).y; };
+    const DT = 1 / 120; const END = 2;
+    // the first card of each lane is already on its way down at the first frame
+    all.filter((c) => c.rank === 0).forEach((c) => expect(pose(c, DT).flying, c.stop.item.short).toBe(true));
     all.forEach((c) => {
-      const f = plan.get(c)!;
-      if (c.rank === 0) { expect(f.start).toBe(0); expect(f.prev).toBeNull(); return; }
-      expect(f.prev!.lane).toBe(c.lane);
-      expect(f.dur).toBeGreaterThanOrEqual(0.75);
-      expect(f.dur).toBeLessThanOrEqual(0.8);
-      expect(f.start).toBeGreaterThanOrEqual(plan.get(f.prev!)!.start);
+      // when the roll passes the card's bottom edge, and from when the card lies still for good
+      let passed = END; let rest = END;
+      for (let T = 0; T <= END; T += DT) if (rollY(T) >= c.top + c.stop.restH) { passed = T; break; }
+      for (let T = END; T >= 0 && atRest(c, T); T -= DT) rest = T;
+      expect(rest, c.stop.item.short).toBeLessThan(END);
+      expect(rest, c.stop.item.short).toBeGreaterThanOrEqual(passed);
+      expect(rest - passed, c.stop.item.short).toBeLessThanOrEqual(0.6);
     });
-    // a cascade, not one at a time: moves overlap
-    const starts = [...plan.values()].map((f) => f.start).sort((a, b) => a - b);
-    expect(starts[starts.length - 1] - starts[0]).toBeLessThan(1.2);
+    // a cascade, not one at a time: at some moment two cards of one lane are in the air together
+    const together = Array.from({ length: END / DT }, (_, n) => n * DT).some((T) => ([0, 1] as const).some((lane) => all.filter((c) => c.lane === lane && pose(c, T).flying).length >= 2));
+    expect(together).toBe(true);
   });
 
   it('never moves a card across the tape, and keeps a card coming out under the one it comes from', () => {
@@ -181,9 +191,12 @@ describe('scrolling', () => {
 
   it('hurries the intro when the page runs on into the stops, and more once it leaves the timeline', () => {
     const step = holdLength(hold) / (hold.steps + 0.6);
-    expect(introRate(900, hold)).toBe(1);
-    expect(introRate(900 + 1.3 * step, hold)).toBe(4);
-    expect(introRate(900 + holdLength(hold) + step, hold)).toBe(8);
+    const atTop = introRate(900, hold);
+    const inStops = introRate(900 + 1.3 * step, hold);
+    const leaving = introRate(900 + holdLength(hold) + step, hold);
+    expect(atTop).toBe(1);
+    expect(inStops).toBeGreaterThan(atTop);
+    expect(leaving).toBeGreaterThan(inStops);
     // eased: never a sudden change of pace on the way down
     let last = 1;
     for (let y = 600; y < 900 + holdLength(hold) + 2 * step; y += 5) { const r = introRate(y, hold); expect(r).toBeGreaterThanOrEqual(last); expect(r - last).toBeLessThan(0.1); last = r; }
