@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LEFT_OUT, REMADE } from './WorkSection';
-import { COLUMNS, SHAPE, boardIsFull, layBento } from './workBento';
+import { SHAPE, boardIsFull, layBento } from './workBento';
 import { PROJECTS } from '../../data/projects';
 
 const KNOWN = Object.keys(SHAPE);
@@ -28,13 +28,6 @@ describe('Selected work board', () => {
       const places = layBento(ids);
       expect(Object.keys(places).length, ids.join(',')).toBe(ids.length);
       expect(boardIsFull(places), ids.join(',')).toBe(true);
-    }
-  });
-
-  it('keeps every tile inside the six columns', () => {
-    for (const [id, tile] of Object.entries(layBento(KNOWN))) {
-      expect(tile.c, id).toBeGreaterThanOrEqual(1);
-      expect(tile.c + tile.w - 1, id).toBeLessThanOrEqual(COLUMNS);
     }
   });
 

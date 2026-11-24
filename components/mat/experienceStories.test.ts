@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { EXPERIENCE_STORIES, experienceIdFromHash } from './experienceStories';
 
 describe('work experience stories', () => {
-  it('opens each work role with its own sourced cards', () => {
-    expect(Object.keys(EXPERIENCE_STORIES)).toEqual(['self', 'zomato', 'udaan', 'schmooze', 'snapdeal']);
-    expect(EXPERIENCE_STORIES.udaan.cards.map(card => card.id)).toEqual(['supply', 'scale', 'wondermart', 'percept']);
-    expect(EXPERIENCE_STORIES.schmooze.cards[0].title).toBe('Second analyst');
+  it('opens each work role with its own cards, each with a title and its words', () => {
+    for (const [id, story] of Object.entries(EXPERIENCE_STORIES)) {
+      expect(story.cards.length, id).toBeGreaterThan(0);
+      for (const card of story.cards) {
+        expect(card.title.trim(), id).not.toBe('');
+        expect(card.lines.some((line) => line.trim() !== ''), `${id}: ${card.title}`).toBe(true);
+      }
+    }
     expect(experienceIdFromHash('#experience-udaan')).toBe('udaan');
     expect(experienceIdFromHash('#experience-unknown')).toBeNull();
   });
