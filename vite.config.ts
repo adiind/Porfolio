@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 import sourceHistoryFallback from './data/portfolio-source-history.json';
 import { flatHomeGithubPill } from './scripts/flipbook/flatGithubPill';
 import { sharePreviewPages } from './scripts/share/sharePages';
+import { liveHostPageAddresses } from './scripts/pageAddresses';
 
 const getPortfolioRevision = (): string | null => {
   try {
@@ -161,7 +162,7 @@ export default defineConfig(async ({ mode }) => {
         // Force download with correct filename for PDFs
       },
     },
-    plugins: [react(), shipHeadPreloads(), flatHomeGithubPill(portfolioHistory), sharePreviewPages()],
+    plugins: [react(), shipHeadPreloads(), flatHomeGithubPill(portfolioHistory), sharePreviewPages(), liveHostPageAddresses()],
     test: { exclude: ['**/node_modules/**', '**/.git/**', '.claude/**', 'dist/**', 'e2e/**'] },
     build: {
       rollupOptions: {

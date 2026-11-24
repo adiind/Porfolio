@@ -38,7 +38,7 @@ const PgProjectDetail: React.FC<{ project: Project; onClose: () => void; analyti
     <div ref={engagementRef} className="pg-story-frame-wrap">
       <iframe
         className="pg-story-frame"
-        src="/pg-haircare-story/index.html"
+        src="/pg-haircare-story/"
         title="P&G packaging research scroll story"
       />
     </div>
