@@ -19,39 +19,24 @@ export interface HistoryWindow {
   clearTimeout(id: number): void;
 }
 
-// Browser-back closes the dialog; the dialog never depends on history to close.
+/**
+ * Browser Back closes the dialog: the dialog owns one history entry while open and gives it back on close.
+ * Every ordering rule in here is checked by hooks/dialogHistory.test.ts (.claude/skills/verify-dialog-history).
+ */
 export function bindDialogHistory(win: HistoryWindow, options: DialogHistoryOptions, onClose: () => void): () => void {
   const { historyTag: tag, historyPath, historyBasePath, childHistoryTags } = options;
-  let consumed = false;         // our pushed entry has been popped (by us or the user)
+  let consumed = false;
   let pushed = false;
   const handlePopState = () => {
-    // A pop that leaves our own entry on top is not a user "close" gesture:
-    // it's either a StrictMode twin consuming its duplicate entry (dev double-
-    // invoke pushes two identical entries, then its cleanup back() pops one),
-    // or a nested child dialog consuming its entry above ours. Flag-based
-    // suppression can't cover these because the back() is issued by a
-    // different effect instance than the one that hears the popstate.
     if (win.history.state?.modal === tag || childHistoryTags?.includes(win.history.state?.modal)) return;
     if (consumed) return;
     consumed = true;
     onClose();
   };
   win.addEventListener('popstate', handlePopState);
-  // The push is deferred one tick because StrictMode mounts effects twice:
-  // a synchronous push would make the twin's cleanup issue a back() whose
-  // target entry the browser resolves AT CALL TIME, so it blows past the
-  // remount's re-push and lands on the pre-dialog entry — read as a user
-  // Back, insta-closing the dialog. Deferring lets the twin's cleanup
-  // cancel the push before it ever touches the history stack.
-  // historyPath gives the dialog a shareable URL (e.g. /work/<id>) on the
-  // same entry the tag mechanism owns; back()/popstate restore the prior URL.
   const pushTimer = win.setTimeout(() => {
     pushed = true;
-    // Reopened by browser Forward onto the entry this dialog pushed earlier:
-    // adopt it instead of stacking a duplicate that would need two Backs.
     if (historyPath && win.history.state?.modal === tag && win.location.pathname === historyPath) return;
-    // Seed a deep link's Back destination only after its dialog is mounted.
-    // Replace + push run together, so the boot path is never stranded at /.
     if (historyBasePath && historyPath
       && win.location.pathname.replace(/\/$/, '') === historyPath
       && win.history.state?.modal !== tag) {
@@ -61,14 +46,11 @@ export function bindDialogHistory(win: HistoryWindow, options: DialogHistoryOpti
   }, 0);
 
   return () => {
-    // Remove the listener before consuming our entry so our own back()
-    // can't be misread; other dialogs' listeners ignore it via the
-    // state-tag check above.
     win.removeEventListener('popstate', handlePopState);
     win.clearTimeout(pushTimer);
     if (pushed && !consumed && win.history.state?.modal === tag) {
       consumed = true;
-      win.history.back(); // consume the entry we pushed
+      win.history.back();
     }
   };
 }
@@ -91,10 +73,10 @@ export function useDialogA11y(onClose: () => void, options?: Partial<DialogHisto
         if (options?.escapePassthroughSelector && e.target instanceof Element
           && e.target.closest(options.escapePassthroughSelector)) return;
         e.stopPropagation();
-        onCloseRef.current();               // state-based close — never via history
+        onCloseRef.current();
         return;
       }
-      if (e.key === 'Tab' && container) {   // focus trap
+      if (e.key === 'Tab' && container) {
         const els = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)]
           .filter(el => el.offsetParent !== null || el === document.activeElement);
         if (!els.length) { e.preventDefault(); container.focus(); return; }
