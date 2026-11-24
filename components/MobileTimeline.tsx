@@ -66,7 +66,7 @@ const MobileTimeline: React.FC<Props> = ({
     // Corporate/Experience
     // Filter out duplicates if found in education (just in case)
     const corporate = items.filter(i =>
-        (i.type === 'corporate' || i.type === 'role') &&
+        i.type === 'corporate' &&
         !education.some(e => e.id === i.id)
     );
 
