@@ -123,3 +123,27 @@ export function drawSoundRecord(): HTMLCanvasElement {
   ctx.fillStyle = NAVY; ctx.beginPath(); ctx.moveTo(m - lr * 0.13 * 0.75, m - lr * 0.13); ctx.lineTo(m + lr * 0.13 * 1.05, m); ctx.lineTo(m - lr * 0.13 * 0.75, m + lr * 0.13); ctx.closePath(); ctx.fill();
   return canvas;
 }
+
+
+/**
+ * One spin clock for the home record and the 3D board's record (the board is a preloaded page in an iframe over the home, see
+ * FlipBookApp's board embed): both read this same function of time every frame, so they are always at the same angle and the
+ * same speed, with no hold and no restart. It starts at the click, eases up to SPIN.w over SPIN.ramp seconds, then eases out
+ * over SPIN.ease seconds to rest after SPIN.turns whole turns, so the title lands upright as the board's record seats itself.
+ * (It is already slowing when the board fades in over the home, so the two pictures stay close even if one of them reaches the
+ * screen a frame after the other.) It does not depend on when the hand-over happens. Angles are clockwise radians on the mat.
+ */
+export const SPIN = { w: 22, ramp: 0.55, ease: 3.0, turns: 4 } as const;
+export function soundSpin(s: number): { ang: number; w: number } {
+  if (s <= 0) return { ang: 0, w: 0 };
+  const { w: W, ramp: R, ease: E, turns } = SPIN;
+  if (s < R) { const x = s / R; return { ang: W * R * (x ** 3 - x ** 4 / 2), w: W * (3 * x * x - 2 * x ** 3) }; }
+  const a1 = 0.5 * W * R;
+  const delta = Math.PI * 2 * turns - a1;
+  const power = (W * E) / delta - 1;                 // speed W where the ramp ends, easing to rest at E
+  const y = (s - R) / E;
+  if (y >= 1) return { ang: a1 + delta, w: 0 };
+  return { ang: a1 + delta * (1 - (1 - y) ** (power + 1)), w: W * (1 - y) ** power };
+}
+/** The board is a page of its own (public/work/sound-youve-been-wearing/), kept in an iframe at this address with ?embed=1. */
+export const RECORD_EMBED_SRC = `${'/work/sound-youve-been-wearing/'}?embed=1`;

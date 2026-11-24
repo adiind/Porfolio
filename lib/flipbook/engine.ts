@@ -202,6 +202,11 @@ export interface FlipBookEngine {
   screenRect(id: string): { left: number; top: number; width: number; height: number } | null;
   /** The dive prop's turn so far (radians, clockwise) and how fast it is turning (radians a second). */
   diveState(): { ang: number; w: number };
+  /** The record flown down to turns by this clock (clockwise radians at an absolute time in ms), not by its own; null to let go. */
+  setDiveSpin(clock: ((at: number) => { ang: number; w: number }) | null): void;
+  /** Stop drawing (another page is covering this one) and start again. */
+  pause(): void;
+  resume(): void;
   /** The mat as the next frame draws it, as a JPEG data URL (null if no frame came in time). */
   capture(quality?: number): Promise<string | null>;
   /** Lift a thing off the mat as the pointer resting on it does (it has keyboard focus); null lets it down again. */
@@ -511,6 +516,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   let hoverProp: string | null = null;
   /** A dive prop's spin: how far it has turned, how fast, and how long the dive has been going. */
   let diveAng = 0; let diveW = 0;
+  let diveClock: ((at: number) => { ang: number; w: number }) | null = null;
+  let paused = false;
   let captureReq: ((url: string | null) => void) | null = null;
   let captureQuality = 0.86;
   let dawning = false;
@@ -1449,8 +1456,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     });
     // a record flown down to spins up as the camera comes (the 3D board's own record takes the turn from here)
     if (focus?.dive) {
-      diveW = DIVE_SPIN * (1 - up) ** 2;
-      diveAng += diveW * dt;
+      if (diveClock) { const at = diveClock(performance.timeOrigin + performance.now()); diveAng = at.ang; diveW = at.w; }
+      else { diveW = DIVE_SPIN * (1 - up) ** 2; diveAng += diveW * dt; }
       moving = true;
     } else if (diveAng !== 0 && !focus && up >= 0.999) { diveAng = 0; diveW = 0; }
     propMeshes.forEach((item) => {
@@ -1663,7 +1670,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   let frozen = false;
   const frame = (now: number) => {
     raf = 0;
-    if (disposed || frozen) return;
+    if (disposed || frozen || paused) return;
     const dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 1 / 60;
     lastTime = now;
     const moving = update(dt);
@@ -2308,6 +2315,9 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       }
     },
     diveState() { return { ang: diveAng, w: diveW }; },
+    setDiveSpin(clock) { diveClock = clock; invalidate(); },
+    pause() { paused = true; },
+    resume() { paused = false; lastTime = 0; invalidate(); },
     capture(quality = 0.86) {
       return new Promise<string | null>((resolve) => {
         if (disposed) { resolve(null); return; }

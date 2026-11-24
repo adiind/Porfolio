@@ -426,6 +426,7 @@ if (PLAY) play = await (await import('./play.js')).setup({ THREE, RoundedBoxGeom
 const clock = new THREE.Clock();
 const base = controls ? camera.position.clone() : null;
 function frame() {
+  if (window.__embedIdle) { const n = performance.now(); if (n - (frame.lastIdle || 0) < 800) { requestAnimationFrame(frame); return; } frame.lastIdle = n; }   // preloaded behind the home page: about one frame a second until woken
   const t = FREEZE !== null ? FREEZE : clock.getElapsedTime();
   matU.uTime.value = t;
   const ease = (x) => { x = THREE.MathUtils.clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
