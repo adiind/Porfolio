@@ -9,13 +9,12 @@ describe('page addresses, answered as adidesign.org answers them', () => {
   const held = new Set(['home-flat/index.html', 'work/familysync-assets/story.html', 'index.html', 'work/glyph.html']);
   const has = (file: string) => held.has(file);
 
-  // each row is what the live site answered on 2026-11-23 (curl -sI https://adidesign.org<address>)
   it.each([
     ['/home-flat/index.html', { redirect: '/home-flat/' }],
     ['/home-flat/', { serve: 'home-flat/index.html' }],
     ['/work/familysync-assets/story.html', { redirect: '/work/familysync-assets/story' }],
     ['/work/familysync-assets/story', { serve: 'work/familysync-assets/story.html' }],
-  ])('%s', (address, answer) => {
+  ])('%s, as curl -sI on the live site answered on 2026-11-23', (address, answer) => {
     expect(liveHostAnswer(address, has)).toEqual(answer);
   });
 

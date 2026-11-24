@@ -48,7 +48,6 @@ function answerLikeLiveHost(folder: string): Connect.NextHandleFunction {
   };
 }
 
-/** `vite` and `vite preview` answer page addresses as the live host does, so an address that works here works there. */
 export function liveHostPageAddresses(): Plugin {
   return {
     name: 'live-host-page-addresses',

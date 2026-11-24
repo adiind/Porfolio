@@ -78,8 +78,9 @@ export function openCaseStudy(
   window.setTimeout(go, SPLASH_GROW_MS + 40);
 }
 
-/** The story pages two case studies show in a frame (Squad Up, FamilySync). */
-export const CASE_STORY_PAGES = ['/work/squad-up-assets/story', '/work/familysync-assets/story'];
+export const SQUAD_UP_STORY = '/work/squad-up-assets/story';
+export const FAMILYSYNC_STORY = '/work/familysync-assets/story';
+const CASE_STORY_PAGES = [SQUAD_UP_STORY, FAMILYSYNC_STORY];
 /** The logos the splash shows (index.html), fetched ahead so they are there the moment it grows. */
 const SPONSOR_LOGOS = ['/images/sponsors/jpmorganchase.svg', '/images/pg/pg-logo-official.svg'];
 

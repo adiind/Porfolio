@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Project } from '../../types/Project';
 import BackPill from '../BackPill';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
+import { SQUAD_UP_STORY } from '../../lib/mat/caseStudyHandoff';
 import { projectPath } from '../../lib/workRoutes';
 
 const sections = [
@@ -125,7 +126,7 @@ const McDonaldsProjectDetail: React.FC<{ project: Project; onClose: () => void }
       </nav>
       <iframe
         ref={iframeRef}
-        src="/work/squad-up-assets/story"
+        src={SQUAD_UP_STORY}
         title={project.hero.title}
         className="block h-full w-full border-0 max-sm:mt-[68px] max-sm:h-[calc(100%-68px)]"
       />
