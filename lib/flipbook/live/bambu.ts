@@ -17,7 +17,8 @@ function cover(): LiveScene { const src=DIR+'cover.svg'; return { id:'bambu-cove
   }});
 }}; }
 
-function illustration(id:string):LiveScene { const src=DIR+id+'.png'; return {id:`bambu-${id}`,sources:[src],create(images,width,height) {
+// (the same file is the page's own picture in data/flipbooks.ts, bambuIdea, so it is fetched once)
+function illustration(id:string):LiveScene { const src=DIR+id+'.webp'; return {id:`bambu-${id}`,sources:[src],create(images,width,height) {
   const stage=createStage(width,height), {base}=stage, img=images.get(src);
   return loopPage(stage,{loop:2,rest:2,once:true,step(){},draw(t){
     base.fillStyle= id === 'make' ? '#153d20' : id === 'learn' ? '#a63b19' : '#35546b'; base.fillRect(0,0,width,height);

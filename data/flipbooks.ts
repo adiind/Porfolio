@@ -1017,9 +1017,14 @@ export const MUSE_BOOK: FlipBook = {
 const bambuTone = { stage: '#0c2419', stageLight: '#1c4430', chrome: '#f2f7e9', chromeMuted: '#bad2bd', mid: '#4e9c6c', deep: '#1b4930', pale: '#f2f7e9' };
 const bambuPhoto = '/images/flipbook/bambu/01-printer-wall.jpg';
 const guide = 'https://drive.google.com/file/d/145pRL8-cY6QNTtiyWkvXoO8g3F3i8G_Z/view?usp=drive_web';
-const bambuPage = (id: string, word: string, title: string, body: string, art: string, selfCaptioned = false): FlipPage => ({
+/**
+ * The three idea pages' pictures are the very files their live scenes draw (lib/flipbook/live/bambu.ts), at their own
+ * size, so each is fetched once. (They used to have a second, 1600 by 960 copy drawn only where a page is laid out tall.)
+ */
+const bambuIdea = (id: string, w: number, h: number) => ({ src: `/images/flipbook/bambu/${id}.webp`, w, h });
+const bambuPage = (id: string, word: string, title: string, body: string, art: string | { src: string; w: number; h: number }, selfCaptioned = false): FlipPage => ({
   id, kicker: 'Bambu Lab · Northwestern', word, title, body, layout: 'poster', live: `bambu-${id}`,
-  selfCaptioned, tone: bambuTone, art: { src: art, w: 1600, h: 960, alt: `${title}. ${body}` },
+  selfCaptioned, tone: bambuTone, art: { ...(typeof art === 'string' ? { src: art, w: 1600, h: 960 } : art), alt: `${title}. ${body}` },
   ...(['resources','share'].includes(id) ? { cta: { label: 'Open the 3D Print Guide', href: guide } } : {}),
 });
 export const BAMBU_BOOK: FlipBook = {
@@ -1028,11 +1033,11 @@ export const BAMBU_BOOK: FlipBook = {
   pages: [
     bambuPage('cover', 'Making together', 'The studio, the workshops, and a guide to take with you', 'Bambu Lab School Ambassador · Northwestern', '/images/flipbook/bambu/cover.svg', true),
     bambuPage('studio', 'Studio', 'The print lab', 'I help run the print lab at Northwestern, with printers, filament and tools ready for making.', bambuPhoto, true),
-    bambuPage('make', 'Make', 'A room for making', 'A shared space for 3D printing.', '/images/flipbook/bambu/make-still.png'),
+    bambuPage('make', 'Make', 'A room for making', 'A shared space for 3D printing.', bambuIdea('make', 1752, 897)),
     bambuPage('workshops', 'Workshops', 'The workshops', 'Workshops with Corner Makery.', '/images/flipbook/bambu/13-adi-presenting.jpg', true),
-    bambuPage('learn', 'Learn', 'Learning together', 'Preparing a model and getting started with printing.', '/images/flipbook/bambu/learn-still.png'),
+    bambuPage('learn', 'Learn', 'Learning together', 'Preparing a model and getting started with printing.', bambuIdea('learn', 1774, 887)),
     bambuPage('resources', 'The guide', 'The guide', 'A condensed guide to the 3D Print Anything workshop.', '/images/flipbook/bambu/17-supports-preview.jpg', true),
-    bambuPage('share', 'Share', 'Take the workshop with you', 'Open my 3D Print Guide.', '/images/flipbook/bambu/share-still.png'),
+    bambuPage('share', 'Share', 'Take the workshop with you', 'Open my 3D Print Guide.', bambuIdea('share', 1774, 887)),
   ],
 };
 
