@@ -51,14 +51,15 @@ describe('flip state', () => {
   it('staggers a riffle so each leaf waits for the one before it', () => {
     const s = createFlipState(8);
     setCurrent(s, 4);
-    let checked = false;
+    // the frame (at 60 a second) on which each of the four turning leaves first moves
+    const started = [-1, -1, -1, -1];
+    let frame = 0;
     settle(s, (state) => {
-      if (!checked && state.t[1] > 0) {
-        expect(state.t[0]).toBeGreaterThanOrEqual(0.18);
-        checked = true;
-      }
+      frame += 1;
+      started.forEach((at, i) => { if (at < 0 && state.t[i] > 0) started[i] = frame; });
     });
-    expect(checked).toBe(true);
+    started.forEach((at) => expect(at).toBeGreaterThan(0));
+    for (let i = 1; i < started.length; i += 1) expect(started[i]).toBeGreaterThan(started[i - 1]);
   });
 
   it('keeps the page number inside the book', () => {
