@@ -16,7 +16,7 @@
 import { BOOT } from './boot';
 import { canTake3DHome, readHomeMark } from './frontDoor';
 
-const HOME_PATHS = new Set(['/', '/mat', '/classic', '/home-flat', '/home-flat/index.html']);
+const HOME_PATHS = new Set(['/', '/mat', '/classic', '/home-flat']);
 
 function cameFromHome(): boolean {
   // opened in a new tab or window: there is no page to step back to
@@ -38,13 +38,13 @@ export function landHome(): boolean {
     steppedBack = true;
     window.history.back();
     // if the step back goes nowhere, use the front door instead
-    fallback = window.setTimeout(() => { window.location.replace(canTake3DHome() ? '/' : '/home-flat/index.html'); }, 1200);
+    fallback = window.setTimeout(() => { window.location.replace(canTake3DHome() ? '/' : '/home-flat/'); }, 1200);
     return false;
   }
   if (readHomeMark() === 'classic') return false;
   if (canTake3DHome()) { window.location.replace('/'); return true; }
   // a phone or a browser without WebGL 2: its home is the flat page
-  window.location.replace('/home-flat/index.html');
+  window.location.replace('/home-flat/');
   return true;
 }
 

@@ -27,7 +27,7 @@ const ZeroProjectDetail: React.FC<{ project: Project; onClose: () => void }> = (
     <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={project.hero.title} className="fixed inset-0 z-[100] flex flex-col bg-[#0a1510] focus:outline-none">
       <iframe
         tabIndex={0}
-        src="/work/zero-assets/story.html"
+        src="/work/zero-assets/story"
         title={project.hero.title}
         className="min-h-0 flex-1 w-full border-0"
       />
