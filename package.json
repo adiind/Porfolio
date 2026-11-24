@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/notion-sync.cjs pull && vite",
+    "dev": "vite",
     "build": "npm run check && vite build",
     "check": "tsc --noEmit && vitest run",
     "preview": "vite preview",
