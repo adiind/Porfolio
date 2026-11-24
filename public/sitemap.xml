@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://adidesign.org/work/sound-youve-been-wearing/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://adidesign.org/work/glyph</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

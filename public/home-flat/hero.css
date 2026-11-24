@@ -1272,3 +1272,7 @@ html,body{background:#080b1a}
 .bx-gh{box-shadow:0 1px 0 #d9d3c3,calc(var(--sdx,1)*-8px) calc(var(--sdy,1)*11px) 14px -4px rgba(var(--sc,2,10,44),.55)}
 .bx-st img{filter:drop-shadow(calc(var(--sdx,1)*-1px) calc(var(--sdy,1)*1.5px) 1.5px rgba(var(--sc,2,10,44),.5)) drop-shadow(calc(var(--sdx,1)*-4px) calc(var(--sdy,1)*6px) 6px rgba(var(--sc,2,10,44),.3))}
 .bx-st.is-obj img{filter:drop-shadow(calc(var(--sdx,1)*-2px) calc(var(--sdy,1)*3px) 3px rgba(var(--sc,2,10,44),.5)) drop-shadow(calc(var(--sdx,1)*-22px) calc(var(--sdy,1)*26px) 22px rgba(var(--sc,2,10,44),.5))}
+
+/* The Sound You've Been Wearing: a small record beside the other links, the way in to the 3D board */
+.bx-rec{display:inline-flex;align-items:center;gap:9px}
+.bx-rec svg{flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
