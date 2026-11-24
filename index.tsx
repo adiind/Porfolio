@@ -103,7 +103,7 @@ const RouteRoot: React.FC = () => {
   if (bookRoute && FlipBookApp) {
     return (
       // (arriving from the home page's mat, index.html has already drawn the mat and the booklet: leave them showing)
-      <React.Suspense fallback={document.getElementById('book-held') ? null : <div className="min-h-screen bg-[#050505]" aria-label="Loading the book" />}>
+      <React.Suspense fallback={document.getElementById('book-held') ? null : <div style={{ minHeight: '100vh', background: '#050505' }} aria-label="Loading the book" />}>
         <FlipBookApp.Component initialSlug={bookSlug} />
       </React.Suspense>
     );
@@ -146,5 +146,8 @@ if (!hiddenBook) {
   );
   // (first the route's code, then the first render: see lazyRoot)
   const ready = (MatHome ?? FlipBookApp ?? OldHome)?.ready;
-  if (ready) void ready.then(draw); else draw();
+  // (and, where the page is written in Tailwind classes, its compiler: index.html adds it by script and says when it has run.
+  // The 3D home and the books do not load it and have nothing to wait for.)
+  const tailwind = (window as Window & { __tailwindReady?: Promise<void> }).__tailwindReady;
+  void Promise.all([ready, tailwind]).then(draw);
 }

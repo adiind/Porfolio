@@ -681,12 +681,12 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     window.addEventListener('popstate', close);
     return () => window.removeEventListener('popstate', close);
   }, [fly]);
-  // With the home on screen and quiet for a moment, the board loads behind it so the click can fly straight into it.
-  useEffect(() => {
-    if (!staged || fallback || reducedMotion) return undefined;
-    const timer = window.setTimeout(() => { ensureEmbed(); }, 3500);
-    return () => window.clearTimeout(timer);
-  }, [staged, fallback, reducedMotion, ensureEmbed]);
+  // The board loads behind the home only when the visitor goes for the record: resting the pointer on it (hover, below) or
+  // clicking it; the record keeps spinning under the camera until the board is up (about 2.2 s after the click on an ordinary
+  // line, against 1.3 s when it was already loaded). It used to load by itself 3.5 s after the page came up, and starting a
+  // second 3D page (its own three.js, Tone.js, shaders) froze this one for 0.5 to 0.8 s just as the visitor began to scroll
+  // or click. Loading it at a still moment instead only moved that freeze to whenever the stillness ended (both measured
+  // 2026-11-24), so nothing loads it ahead of the visitor's own move.
   // Back from the 3D board can bring this page back as it was left (the browser keeps it): the camera comes back up off the record.
   useEffect(() => {
     const back = (event: PageTransitionEvent) => {

@@ -115,7 +115,8 @@
       bulb.id = 'mat-bulb';
       bulb.setAttribute('aria-hidden', 'true');
       var img = new Image();
-      img.fetchPriority = 'high'; img.decoding = 'async';
+      // (low: it is only a stand-in for a slow line, shown after 0.7 s of waiting, and must never hold the code or the pictures up)
+      img.fetchPriority = 'low'; img.decoding = 'async';
       img.src = '/images/mat/bulb.webp';
       img.alt = '';
       bulb.appendChild(img);
@@ -344,9 +345,8 @@
   <!-- (ship layer, scripts/ship/main.patch) What each home needs first, asked for from here rather than once the entry has run: its
        code (both homes are lazy chunks), written in by vite.config.ts (shipHeadPreloads) in a build, which knows the hashed names;
        and on the 3D home the pictures its first lit frame waits for, written in by scripts/ship/port-home.mjs from SOURCE's data.
-       One after the other: the bulb, then the code, then the pictures. On a slow line each would otherwise share it with the one
-       before (measured at 1.6 Mbps: the bulb showed at 1.4 s instead of 0.8 s). The app later asks for the same addresses and gets
-       these copies. -->
+       All asked for at once; the code is high priority, the pictures and the bulb low. The app later asks for the same addresses
+       and gets these copies. -->
   <script>
     (function () {
       var door = window.__shipDoor;
@@ -355,7 +355,6 @@
       // port-home:BEGIN first-frame (worked out from SOURCE's data by scripts/ship/ship-layer.mjs firstFramePictures: never edit it here)
       pictures = [
         '/images/mat/posters/self.webp',
-        '/images/mat/posters/snapdeal.webp',
         '/images/mat/posters/photo.webp',
         '/images/self-logo.svg',
         '/images/mat/tool-marks.webp',
@@ -365,7 +364,6 @@
         '/images/pg/rooms/room-hero.webp',
         '/images/pg/pg-logo-official.svg',
         '/images/mat/story-art/self.webp',
-        '/images/mat/story-art/snapdeal.webp',
         '/images/flipbook/jarvis/cover/still.webp',
         '/images/flipbook/muse/cover/still.webp',
         '/images/flipbook/bambu/cover.svg',
@@ -377,27 +375,27 @@
       window.__shipCode = code;
       var first = door === 'mat' || door === 'old' ? code[door] : null;
       if (door !== 'mat') pictures = [];
-      var add = function (rel, href, as, cors) {
+      var add = function (rel, href, as, cors, more) {
         var link = document.createElement('link');
         link.rel = rel; link.href = href; if (as) link.as = as; if (cors) link.crossOrigin = '';
+        // (the type and the priority are set before the link goes in: the fetch starts the moment it does)
+        if (more) for (var key in more) link[key] = more[key];
         document.head.appendChild(link);
         return link;
       };
-      var waiting = 0, started = false;
-      var addPictures = function () { for (var i = 0; i < pictures.length; i++) add('preload', pictures[i], 'image'); };
-      var settle = function () { if (--waiting === 0) addPictures(); };
-      var addCode = function () {
-        if (started) return;
-        started = true;
-        var js = first ? first.js : [], css = first ? first.css : [];
-        for (var j = 0; j < js.length; j++) { waiting++; var module = add('modulepreload', js[j], null, true); module.onload = module.onerror = settle; }
-        for (var k = 0; k < css.length; k++) add('preload', css[k], 'style', true);
-        if (!waiting) addPictures();
-      };
-      // the code once the bulb is in (or after a second at most), the pictures once the code is in
-      var bulb = document.querySelector('#mat-bulb img');
-      if (bulb && !bulb.complete) { bulb.addEventListener('load', addCode); bulb.addEventListener('error', addCode); window.setTimeout(addCode, 1000); }
-      else addCode();
+      // All of it asked for at once, straight away (Adi, 2026-11-24: the bulb "is making the entire thing longer? we dont need
+      // those"). It used to go one after the other: the bulb, then the code once the bulb was in, then the pictures once the code
+      // was in, which cost about 0.35 s on an ordinary line before the 3D code was even asked for. The browser and the server
+      // order them by priority instead: the code (modulepreload, high) ahead of the pictures (image preloads, low) and the bulb (low).
+      var js = first ? first.js : [], css = first ? first.css : [];
+      for (var j = 0; j < js.length; j++) add('modulepreload', js[j], null, true);
+      for (var k = 0; k < css.length; k++) add('preload', css[k], 'style', true);
+      // the mat's text face: the first lit frame waits for it (lib/flipbook/pageArt.ts loadFlipbookFonts 'first'), and it used
+      // to be asked for only once the 3D code had run
+      if (door === 'mat') add('preload', '/fonts/flipbook/Geist-Variable.ttf', 'font', true, { type: 'font/ttf' });
+      // (high: the first lit frame waits for these; the pictures the app asks for a moment later, for the bags' insides and the
+      // stack, are low and must not share the line with them)
+      for (var i = 0; i < pictures.length; i++) add('preload', pictures[i], 'image', false, { fetchPriority: 'high' });
     })();
   </script>
   <style>
@@ -522,24 +520,48 @@
   <div id="root" style="position: relative; z-index: 10;"></div>
   <div class="bg-noise"></div>
   <script src="/shared/scroll-settle.js?v=3"></script>
-  <!-- Tailwind (and its config) sits here, not in the head: in the head it held up the first paint until it had arrived
-       (the 3D home's dark room and bulb, and the old home's dark page). Here the browser paints the head's own styles and
-       scripts first. The app's module script still runs only after it, so no app content is ever drawn without Tailwind. -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind, only where it is used. The old home, the case studies and the timeline pages are written in Tailwind classes
+       and get its compiler from the CDN, as before (CLAUDE.md: it is not a build dependency). The 3D home and the flip books
+       use none of its classes: all the compiler ever made for them was the fixed base sheet below (its reset and variable
+       defaults, 4.6 kB, read out of a real run of cdn.tailwindcss.com/3.4.17 on both pages, 2026-11-24). They now get that
+       sheet as plain CSS and never fetch or run the 407 kB compiler, which used to hold the 3D code back until it had run.
+       The compiler is added by script (so the browser does not fetch it early on the 3D home); window.__tailwindReady settles
+       when it has run, and index.tsx draws the old home only then, so no app content is ever drawn without Tailwind. -->
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            background: '#050505',
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          }
-        }
+    (function () {
+      var door = window.__shipDoor;
+      if (door === 'mat' || door === 'book') {
+        var base = document.createElement('style');
+        base.id = 'tw-base';
+        base.textContent = '*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:\'\'}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}';
+        document.head.appendChild(base);
+        return;
       }
-    }
+      // (no door: a phone at "/" is on its way to /home-flat/, which has its own styles)
+      if (!door) return;
+      window.__tailwindReady = new Promise(function (done) {
+        var tw = document.createElement('script');
+        tw.src = 'https://cdn.tailwindcss.com/3.4.17';   // (the bare address answers with a redirect to this one)
+        tw.onload = function () {
+          window.tailwind.config = {
+            darkMode: 'class',
+            theme: {
+              extend: {
+                colors: {
+                  background: '#050505',
+                },
+                fontFamily: {
+                  sans: ['Inter', 'sans-serif'],
+                }
+              }
+            }
+          };
+          done();
+        };
+        tw.onerror = function () { done(); };
+        document.head.appendChild(tw);
+      });
+    })();
   </script>
   <script type="module" src="/index.tsx"></script>
 </body>
