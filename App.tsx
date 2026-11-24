@@ -469,7 +469,7 @@ const PortfolioApp: React.FC = () => {
   const pageTransition = {
     type: "tween" as const,
     duration: 0.15,
-    ease: [0.32, 0.72, 0, 1] // Custom cubic-bezier for smooth feel
+    ease: [0.32, 0.72, 0, 1] as const
   };
 
   const handleNavigate = (section: PublicNavSection) => {

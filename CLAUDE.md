@@ -7,12 +7,13 @@ Personal portfolio site for adidesign.org — a React 19 + TypeScript + Vite SPA
 ```sh
 npm run dev        # Notion pull + Vite dev server on http://localhost:3000
 npx vite           # Dev server WITHOUT the Notion pull (works offline / without .env)
-npm run build      # Production build — the standard verification step
+npm run build      # Type check, every test, then the production build — the standard verification step
+npm run check      # Type check and tests only
 npm run preview    # Serve the production build
 npm run sync:pull  # Notion task cache sync (also: sync:push, sync:list, sync:status)
 ```
 
-No test runner or linter is configured. Verify changes with `npm run build` plus a browser check on `localhost:3000` — that is this repo's convention.
+Verify changes with `npm run build` plus a browser check on `localhost:3000` — that is this repo's convention. The build stops on a type error or a failing test, and CI (`.github/workflows/check.yml`) runs the same command on every push.
 
 ## Gotchas
 

@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import path from 'path';
 import { execFileSync } from 'node:child_process';
 import { defineConfig, loadEnv, type Plugin, type Rollup } from 'vite';
@@ -161,6 +162,7 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     plugins: [react(), shipHeadPreloads(), flatHomeGithubPill(portfolioHistory), sharePreviewPages()],
+    test: { exclude: ['**/node_modules/**', '**/.git/**', '.claude/**', 'dist/**'] },
     build: {
       rollupOptions: {
         output: {
