@@ -8,7 +8,7 @@
  * inside #root when the app starts, so visitors see the app exactly as before; robots get the words.
  *
  * Run: node scripts/share/make-page-text.mjs   (after changing a project, timeline stop or book)
- * lib/pageText.test.ts fails when the file has gone stale.
+ * lib/sharePages.test.ts fails when a share page has no words.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -66,7 +66,7 @@ for (const p of data.PROJECTS) {
 }
 for (const t of data.TIMELINE_DATA) {
   const heading = `${t.title}, ${t.company}`;
-  const month = (d) => (d ? new Date(`${d}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'now');
+  const month = (d) => { const t = d ? new Date(`${d}T00:00:00Z`) : null; return t && !Number.isNaN(t.getTime()) ? t.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : (d && !/^\d/.test(d) ? d : 'now'); };
   const when = t.start ? `${month(t.start)} to ${month(t.end)}` : '';
   pages[`/experience/${t.id}`] = { heading, paragraphs: cap([when, ...prose({ headline: t.headline, summary: t.summary, bullets: t.bullets })].filter(Boolean)), skills: skillsOf(t) };
   links.push([`/experience/${t.id}`, heading, t.summary]);
@@ -83,7 +83,7 @@ const indexHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const homeDesc = (/<meta name="description" content="([^"]*)"/.exec(indexHtml) || [])[1].replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 const INTRO = [
   homeDesc,
-  'Adi Agarwal (Aditya Agarwal) is a product manager who builds what he designs: AI agents, connected hardware, 3D interfaces and data products. He has led product and data analytics at Zomato, Udaan and Snapdeal, and is studying for an M.S. in Engineering Design Innovation at Northwestern University.',
+  'Adi Agarwal (Aditya Agarwal) is a product manager who builds what he designs: AI agents, connected hardware, 3D interfaces and data products. He worked as a product and data analyst at Zomato, Udaan and Snapdeal, and is studying for an M.S. in Engineering Design Innovation at Northwestern University.',
 ];
 pages['/'] = { heading: 'Adi Agarwal: Product Manager, AI and Analytics', paragraphs: INTRO, skills: [], links: links.map(([href, label, line]) => ({ href, label, line })) };
 for (const alias of ['/mat', '/classic']) pages[alias] = pages['/'];
