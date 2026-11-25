@@ -3,7 +3,7 @@
   var dialog = document.createElement('dialog');
   dialog.className = 'self-story-dialog';
   dialog.setAttribute('aria-label', 'Self story');
-  dialog.innerHTML = '<div class="self-story-head"><button type="button" class="self-story-back" aria-label="Back from Self story">← Back</button><strong>Self</strong></div><div class="self-story-track" role="region" tabindex="0" aria-label="Self story cards"></div><p class="self-story-hint">Swipe to read the cards</p>';
+  dialog.innerHTML = '<div class="self-story-head"><button type="button" class="self-story-back" aria-label="Back from Self story">← Back</button><strong>Self</strong><a class="self-story-full" href="/experience/self-xyz">Full page ↗</a></div><div class="self-story-track" role="region" tabindex="0" aria-label="Self story cards"></div><p class="self-story-hint">Swipe to read the cards</p>';
   document.body.appendChild(dialog);
   var track = dialog.querySelector('.self-story-track');
   var returnTo = null;
@@ -44,6 +44,9 @@
     track.setAttribute('aria-label', names[type] + ' story cards');
     dialog.querySelector('strong').textContent = names[type];
     dialog.querySelector('button').setAttribute('aria-label', 'Back from ' + names[type] + ' story');
+    /* the stop's full page (Adi, 2026-11-24: a link for now) */
+    var full = dialog.querySelector('.self-story-full');
+    full.href = '/experience/' + (type === 'self' ? 'self-xyz' : type); full.setAttribute('aria-label', names[type] + ': open the full page');
     if (!cached[type]) {
       try { var response = await fetch('/data/' + type + '-story.json'); if (!response.ok) throw Error('unavailable'); cached[type] = await response.json(); }
       catch (_) { if (ticket === request) track.textContent = 'The story could not be loaded. Please try again.'; }

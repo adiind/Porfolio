@@ -44,6 +44,9 @@
 /* ---- one Back pill, top left, on the story dialog (2026-11-17) ---- the same dark pill as the 3D home's Back; nothing on the right */
 .self-story-dialog .self-story-head{height:auto;min-height:64px;padding:12px 16px 0;justify-content:flex-start;gap:16px}
 .self-story-dialog .self-story-head .self-story-back{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:#0b0e16;color:#fff;font:600 14px system-ui,sans-serif;cursor:pointer;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 8px 18px -10px rgba(0,0,0,.6)}
+/* the way on, top right: the stop's full page, the 3D home's white pill (2026-11-24) */
+.self-story-dialog .self-story-head .self-story-full{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:#fff;color:#0b3027;font:600 14px system-ui,sans-serif;text-decoration:none;white-space:nowrap;box-shadow:0 8px 18px -10px rgba(0,0,0,.5)}
+.self-story-dialog .self-story-head .self-story-full:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
 /* ---- the profile dialog's one Back pill, top left (2026-11-17), like the story dialog's ---- */
 .mat-profile-dialog header{justify-content:flex-start;gap:14px}

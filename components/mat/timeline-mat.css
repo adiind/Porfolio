@@ -90,5 +90,8 @@ a.tm-row:hover { box-shadow: inset 0 0 0 2px rgba(24, 32, 79, 0.18); }
 a.tm-row:focus-visible { outline: 3px solid #e4e84f; outline-offset: 3px; }
 .tm-back { position: fixed; left: 24px; top: 22px; z-index: 6; pointer-events: auto; }
 .tm-back[data-shown='false'] { opacity: 0; pointer-events: none; }
+/* the way on from a picked-up stop: its full page (the house's white pill, top right, as in a book) */
+.tm-full { position: fixed; right: 24px; top: 22px; z-index: 6; pointer-events: auto; }
+.tm-full[data-shown='false'] { opacity: 0; pointer-events: none; }
 /* the lanes' labels lie under a picked-up stop: they go while it is up */
 .tm-layer[data-picked] .tm-lab { visibility: hidden; }

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import type { MatLayer } from '../../lib/flipbook/matLayer';
 import { loadFlipbookFonts } from '../../lib/flipbook/pageArt';
 import { TINKER_FOLLOWERS, matStops, stopBeats, stopPictures, tinkerLinks, type MatStop, type Pictures } from '../../lib/mat/timelineCards';
 import { createTimelineLayer, type TimelineLayer, type TimelinePlace } from '../../lib/mat/timelineLayer';
 import { holdLength, openingOrder, layoutCards, scrollForStep, type Hold } from '../../lib/mat/timelineScene';
+import { shipStopHref } from '../../lib/ship/links';
 import ExperienceStory from './ExperienceStory';
 import { experienceIdFromHash, type ExperienceId } from './experienceStories';
 import './timeline-mat.css';
@@ -165,6 +166,9 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
   const pickedRows = pickedStop && !pickedStop.fill ? stopBeats(pickedStop) : [];
   // (measured with the sheet's fonts, which are loaded before any stop can be picked)
   const pickedLinks = pickedStop?.fill ? tinkerLinks() : [];
+  // the stop's full page (/experience/<id>): everything the sheet leaves out (Adi, 2026-11-24: a link for now, the
+  // content itself moves onto the mat later)
+  const pickedPage = pickedStop ? shipStopHref(pickedStop.id) : null;
 
   // (links to #timeline are handled by the page, FlipBookApp: it scrolls to this timeline's room, id="timeline", by where
   // it lies, and leaves the address alone)
@@ -227,6 +231,8 @@ export default function TimelineMat({ engine, place, perUnit, holdRef, shown }: 
     </div>
     {picked && <button type="button" className="fb-pill fb-pill--back tm-back" data-shown={picked.settled ? 'true' : 'false'} onClick={() => layer?.pick(null)}>
       <ArrowLeft size={16} aria-hidden="true" /><span>Back to the timeline</span></button>}
+    {picked && pickedStop && pickedPage && <a className="fb-pill fb-pill--open tm-full" data-shown={picked.settled ? 'true' : 'false'} href={pickedPage}
+      aria-label={`${pickedStop.item.short}: open the full page`}><span>Open full page</span><ArrowUpRight size={16} aria-hidden="true" /></a>}
     <ExperienceStory id={experience} onClose={closeExperience} />
   </>;
 }

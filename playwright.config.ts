@@ -26,7 +26,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'exits', testMatch: 'case-study-exit.spec.ts' },
+    { name: 'exits', testMatch: ['case-study-exit.spec.ts', 'full-page-link.spec.ts'] },
     {
       name: 'dialogs',
       testMatch: 'dialog-history.spec.ts',

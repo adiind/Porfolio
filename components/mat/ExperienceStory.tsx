@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { EXPERIENCE_STORIES, type ExperienceId } from './experienceStories';
 import './experience-story.css';
 import { STORY_ILLUSTRATIONS } from '../../lib/mat/storyIllustrations';
+import { shipStopHref } from '../../lib/ship/links';
+
+/** The story's stop in the timeline (its full page is /experience/<stop id>). */
+const STOP_ID: Record<ExperienceId, string> = { self: 'self-xyz', zomato: 'zomato', udaan: 'udaan', schmooze: 'schmooze', snapdeal: 'snapdeal' };
 
 type Props = { id: ExperienceId | null; onClose(): void };
 const FIGURES: Record<string, string[]> = {
@@ -24,11 +28,12 @@ export default function ExperienceStory({ id, onClose }: Props) {
     if (!id && node.open) { node.close(); previous.current?.focus(); }
   }, [id]);
   const story = id ? EXPERIENCE_STORIES[id] : null;
+  const page = id ? shipStopHref(STOP_ID[id]) : null;
   // (pointerEvents: on the 3D home it is mounted in the second screen's port, which lets clicks through to the mat
   // (flipbook.css .fb-second-port, pointer-events: none); the open story must take them, or its close button is dead)
   return <dialog ref={dialog} className="experience-story" style={{ pointerEvents: 'auto' }} aria-labelledby="experience-title" onCancel={(event) => { event.preventDefault(); onClose(); }}>
     {story && <div className={`experience-board experience-${id}`}>
-      <header className="experience-header"><button ref={close} type="button" className="fb-pill fb-pill--back" onClick={onClose}><ArrowLeft size={16} aria-hidden="true" /><span>Back</span></button><div><span>EXPERIENCE</span><h2 id="experience-title">{story.title}</h2><p>{story.role}</p></div></header>
+      <header className="experience-header"><button ref={close} type="button" className="fb-pill fb-pill--back" onClick={onClose}><ArrowLeft size={16} aria-hidden="true" /><span>Back</span></button>{page && <a className="fb-pill fb-pill--open experience-full" href={page} aria-label={`${story.title}: open the full page`}><span>Open full page</span><ArrowUpRight size={16} aria-hidden="true" /></a>}<div><span>EXPERIENCE</span><h2 id="experience-title">{story.title}</h2><p>{story.role}</p></div></header>
       <div className="experience-cards" role="region" tabIndex={0} aria-label={`${story.title} story cards`}>
         {story.cards.map((card, index) => <article className="experience-card" key={card.id} data-card={card.id}>
           <p className="experience-kicker">{card.kicker}</p>
