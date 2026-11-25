@@ -45,6 +45,29 @@ const swap = (html: string, name: string, pattern: RegExp, replacement: string):
   return html.replace(pattern, () => replacement);
 };
 
+export type PageText = { heading: string; paragraphs: string[]; skills: string[]; links?: Array<{ href: string; label: string; line: string }> };
+
+const ROOT_OPEN = /<div id="root"([^>]*)><\/div>/;
+
+/**
+ * This page's words as plain HTML inside the empty <div id="root">. Robots that read raw HTML (LinkedIn, AI crawlers) get them;
+ * React clears #root when the app starts, so visitors see the app exactly as before. The words are the page's own (see
+ * scripts/share/make-page-text.mjs), not keywords written for robots.
+ */
+export const renderPageText = (html: string, text: PageText | undefined): string => {
+  if (!text) return html;
+  const parts = [`<h1>${escapeHtml(text.heading)}</h1>`, ...text.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`)];
+  if (text.skills.length) parts.push(`<p>Skills: ${escapeHtml(text.skills.join(', '))}</p>`);
+  if (text.links?.length) parts.push(`<ul>${text.links.map((l) => `<li><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a>: ${escapeHtml(l.line)}</li>`).join('')}</ul>`);
+  if (text.links === undefined) parts.push('<p><a href="/">Adi Agarwal: all work and experience</a></p>');
+  // Browsers that run JavaScript never paint it (React replaces it ~0.1 s later; without this it flashed as plain text).
+  // Robots that read raw HTML ignore CSS, and a visitor with JavaScript off still sees it.
+  const hide = '<style>@media (scripting: enabled) { [data-page-text] { visibility: hidden } }</style>';
+  const article = `${hide}<article data-page-text style="max-width:42rem;margin:0 auto;padding:4rem 1.5rem;color:#d4d4d4;font:16px/1.6 system-ui,sans-serif">${parts.join('')}</article>`;
+  const attrs = ROOT_OPEN.exec(html)?.[1] ?? '';
+  return swap(html, '<div id="root">', ROOT_OPEN, `<div id="root"${attrs}>${article}</div>`);
+};
+
 const metaProperty = (property: string) => new RegExp(`<meta property="${property}" content="[^"]*"\\s*/?>`);
 const metaName = (name: string) => new RegExp(`<meta name="${name}" content="[^"]*"\\s*/?>`);
 
@@ -87,25 +110,28 @@ export function sharePreviewPages(): Plugin {
         return;
       }
       const pages = JSON.parse(fs.readFileSync(routesFile, 'utf8')).pages as SharePage[];
+      const textFile = path.resolve(root, 'scripts/share/pageText.generated.json');
+      const texts: Record<string, PageText> = fs.existsSync(textFile) ? JSON.parse(fs.readFileSync(textFile, 'utf8')).pages : {};
+      if (!fs.existsSync(textFile)) this.warn('share-pages: scripts/share/pageText.generated.json is missing; run node scripts/share/make-page-text.mjs. Pages get no readable text.');
       // Nothing here may stop the build: this is a nicety, the site is not. Every copy is made in memory first; if any one
       // cannot be made (index.html lost a tag, a picture is missing), none is written and every address keeps the home tags,
       // exactly as before this plugin existed. lib/sharePages.test.ts checks the same things and does fail.
       try {
         const html = fs.readFileSync(path.join(outDir, 'index.html'), 'utf8');
-        const copies: Array<[string, string]> = [];
+        const copies: Array<[string, string]> = [[path.join(outDir, 'index.html'), renderPageText(html, texts['/'])]];
         for (const page of pages) {
-          if (page.path === '/') continue; // the home page is index.html itself
+          if (page.path === '/') continue; // the home page is index.html itself (its words are added above)
           if (!/^\/[a-z0-9][a-z0-9/-]*$/.test(page.path)) throw new Error(`unsafe address ${page.path}`);
           if (!fs.existsSync(path.join(root, 'public', 'images', 'share', page.image))) {
             throw new Error(`public/images/share/${page.image} is missing (needed by ${page.path})`);
           }
-          copies.push([path.join(outDir, `${page.path.slice(1)}.html`), renderSharePage(html, page)]);
+          copies.push([path.join(outDir, `${page.path.slice(1)}.html`), renderPageText(renderSharePage(html, page), texts[page.path])]);
         }
         for (const [file, text] of copies) {
           fs.mkdirSync(path.dirname(file), { recursive: true });
           fs.writeFileSync(file, text);
         }
-        console.log(`share-pages: wrote ${copies.length} per-address copies of index.html`);
+        console.log(`share-pages: wrote ${copies.length - 1} per-address copies of index.html, ${Object.keys(texts).length} with page text`);
       } catch (error) {
         this.warn(`share-pages: no per-address copies written (${error instanceof Error ? error.message : String(error)})`);
       }

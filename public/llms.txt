@@ -1,0 +1,41 @@
+# Adi Agarwal
+
+> Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation.
+
+Adi Agarwal (Aditya Agarwal) is a product manager who builds what he designs: AI agents, connected hardware, 3D interfaces and data products. He has led product and data analytics at Zomato, Udaan and Snapdeal, and is studying for an M.S. in Engineering Design Innovation at Northwestern University.
+
+Contact: https://www.linkedin.com/in/adiind · Resume: https://adidesign.org/Adi_Agarwal_Resume_2026.pdf
+
+## Projects
+
+- [Glyph: A Body for AI](https://adidesign.org/work/glyph): I built a wearable test bed to see what happens when AI leaves the chat window and becomes something you can wear, move, and build on.
+- [P&G · Hair Care Product Packaging](https://adidesign.org/work/pg-haircare): Rethinking the bottle, and the routine around it.
+- [Zero: Second Brain AI Assistant](https://adidesign.org/work/zero-my-ai): Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop.
+- [FamilySync – Agentic family coordination with JPMorgan Chase](https://adidesign.org/work/familysync-jpmorgan): An agent that coordinates a family when a child's day changes. It does the legwork; a person approves every handoff.
+- [Squad Up — group ordering for McDonald’s](https://adidesign.org/work/mcdonalds-interaction-design): Group ordering across shared digital touchpoints
+- [Surya: Kinetic Wall Timepiece](https://adidesign.org/work/surya): A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep.
+- [SoloPump: One-Handed Liquid Dispenser](https://adidesign.org/work/solopump): An automated drink dispensing machine that pours measured drinks or shots, with manual control and a web interface to adjust output.
+- [Helios: Mechanical Kinetic Lamp](https://adidesign.org/work/helios): A 3D-printed lamp. Turn the ring by hand and eight spur gears change the light.
+- [Jarvis: Voice-Controlled Smart Home Assistant](https://adidesign.org/work/jarvis): A voice assistant I built for my home. Walk up and it wakes.
+- [Plotter: Speech-to-Draw Machine](https://adidesign.org/work/plotter): A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code.
+- [Portfolio Website](https://adidesign.org/work/portfolio-website): This site. I build it with AI coding agents: Antigravity, Codex and Claude.
+
+## Experience
+
+- [AI Product Manager (Intern), Self](https://adidesign.org/experience/self-xyz): Worked across product thinking and hands-on development with engineers on multi-step agentic products, exploring how capable AI workflows can stay understandable and user-directed.
+- [Portfolio V2, Personal Project](https://adidesign.org/experience/portfolio-website): Building this portfolio with agentic coding workflows.
+- [MS Engineering Design Innovation, Northwestern University | Segal Design Institute](https://adidesign.org/experience/ms-edi): Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work.
+- [Senior Product Analyst, Zomato](https://adidesign.org/experience/zomato): Analytics for the home screen of India's largest food delivery app.
+- [Jarvis Assistant, Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge](https://adidesign.org/experience/jarvis-competition): Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT.
+- [Product Analyst, Udaan](https://adidesign.org/experience/udaan): Built analytics and decision systems across supply chain, marketplace, and product at national scale.
+- [Product and Growth Analyst, Schmooze](https://adidesign.org/experience/schmooze): Pre-PMF analytics at a seed-stage dating app exploring meme-based matching.
+- [Data Analyst · Ads & Supply Infrastructure, Snapdeal](https://adidesign.org/experience/snapdeal): Building ads analytics and supply infrastructure during Snapdeal's first-party transition.
+- [Creator, Tinker Verse](https://adidesign.org/experience/tinkerverse): Personal lab for physical computing, agentic software, and expressive prototypes.
+- [B.E. Civil Engineering + M.Sc. Biological Sciences, BITS Pilani, Hyderabad Campus](https://adidesign.org/experience/bits): Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives.
+
+## Project books
+
+- [Surya](https://adidesign.org/book/surya): A wall piece that shows when my family is awake
+- [Jarvis](https://adidesign.org/book/jarvis): A voice assistant I built for my home
+- [Muse](https://adidesign.org/book/muse): Meta’s Muse AI on my desk, in a body I built with AI agents
+- [Making together](https://adidesign.org/book/bambu): The studio, the workshops, and a guide to take with you

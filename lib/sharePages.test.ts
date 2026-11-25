@@ -53,3 +53,20 @@ describe('link preview pages', () => {
     expect(out).not.toContain('Home words');
   });
 });
+
+describe('page text for robots', () => {
+  it('is up to date with the site data and covers every share page', async () => {
+    const fs = await import('node:fs');
+    const routes = JSON.parse(fs.readFileSync('scripts/share/routes.generated.json', 'utf8')).pages as Array<{ path: string }>;
+    const texts = JSON.parse(fs.readFileSync('scripts/share/pageText.generated.json', 'utf8')).pages as Record<string, { paragraphs: string[] }>;
+    const missing = routes.map((r) => r.path).filter((p) => !texts[p] || texts[p].paragraphs.length === 0);
+    expect(missing, 'run node scripts/share/make-page-text.mjs').toEqual([]);
+  });
+
+  it('puts the words inside #root, where React replaces them', async () => {
+    const { renderPageText } = await import('../scripts/share/sharePages');
+    const out = renderPageText('<body><div id="root" style="x"></div></body>', { heading: 'A & B', paragraphs: ['One <two>'], skills: [] });
+    expect(out).toMatch(/<div id="root" style="x"><style>@media \(scripting: enabled\)[^<]*<\/style><article data-page-text/);
+    expect(out).toContain('<h1>A &amp; B</h1><p>One &lt;two&gt;</p>');
+  });
+});

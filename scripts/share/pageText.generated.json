@@ -1,0 +1,1199 @@
+{
+  "note": "Written by scripts/share/make-page-text.mjs. Do not edit by hand.",
+  "pages": {
+    "/work/glyph": {
+      "heading": "Glyph: A Body for AI",
+      "paragraphs": [
+        "I built a wearable test bed to see what happens when AI leaves the chat window and becomes something you can wear, move, and build on.",
+        "Glyph started in Northwestern's Spring 2026 Product Practicum. My first idea was a wearable test bed for tinkerers. I spoke with people who build things about attachment, feedback, and adding new parts. At the same time, I kept thinking about how AI was getting better while we were still talking to it through a chat box. Glyph brought those two ideas together.",
+        "I built one model to work out the shape, materials, lights, sleeve, and side module.",
+        "The clear model uses thermoformed PETG, PETG-GF parts, a black acrylic layer, and three white light filaments.",
+        "I built the working demo separately with a Waveshare ESP32-S3 Touch LCD 1.83-inch board and a XIAO nRF52840 Sense Plus.",
+        "I got IMU gestures, BLE-HID, air mouse control, telemetry, Wi-Fi and BLE bridges, and Home Assistant lighting control working.",
+        "The demo let me point, select, change brightness and color, and confirm with a snap or tap.",
+        "Talking to people who build wearables gave me clear needs: easy attachment, room for new parts, and feedback that makes sense quickly.",
+        "I could not build the full system in one quarter.",
+        "Use Nothing, the company, as the class reference",
+        "I liked the clear shells, black and white hardware, useful lights, and the way the products show how they are put together.",
+        "This was my class project. Nothing was only used as a reference and was not involved.",
+        "Build the form and the working demo separately",
+        "One model let me make the wearable look right. The other let me test whether the gestures and controls worked.",
+        "The polished shell and the working electronics were not one device.",
+        "The conversations with tinkerers made the module and connection ideas much clearer.",
+        "Picking Nothing helped me make consistent choices about the shell, lights, and visible parts.",
+        "The two models let me show both the physical idea and the working controls.",
+        "The polished model and the working electronics were not combined.",
+        "Haptics, EMG, a dense light matrix, a custom PCB, and the full set of modules were not built.",
+        "The size and sleeve still need longer wear testing.",
+        "For the final, I brought in the polished wearable model and the separate electronics demo. I kept them separate because that was the honest state of the project.",
+        "Two physical models and a live gesture-to-room demo, Spring 2026",
+        "AI has enough brains. I wanted to see what happens when you give it a body.",
+        "I spoke with tinkerers about attaching parts, reading feedback, and changing wearable devices.",
+        "I designed the gauntlet shape, clear shell, sleeve, lights, and side module.",
+        "I used separate models for the finished form and the working controls.",
+        "I worked with ESP32-S3 and nRF52840 hardware, IMU input, Wi-Fi, BLE, telemetry, and room controls.",
+        "I built the gesture flow for selecting, changing, and confirming an action.",
+        "Nothing, the company, was used as the class reference for the clear shell, useful lights, and black and white hardware."
+      ],
+      "skills": [
+        "Human-Centered Design",
+        "Industrial Design",
+        "Physical Prototyping",
+        "Embedded Systems",
+        "Interaction Design",
+        "Brand Study"
+      ]
+    },
+    "/work/pg-haircare": {
+      "heading": "P&G · Hair Care Product Packaging",
+      "paragraphs": [
+        "P&G · Hair Care Product Packaging",
+        "Rethinking the bottle, and the routine around it.",
+        "A P&G-sponsored Northwestern EDI project exploring hair care product packaging through consumer research, synthesis, and prototype exploration.",
+        "Handling, dispensing, and routine activities.",
+        "A final packaging concept and prototype presentation.",
+        "Testing dispensing, handling, and visual cues as distinct questions.",
+        "This was a concept and prototype presentation; commercial performance was not established.",
+        "A packaging direction and physical prototype studies.",
+        "A bottle's form, dispensing, and place in a routine need to work together.",
+        "In-home observation and central-site activities.",
+        "Bottle form, handling, visual cues, and dosing.",
+        "Experiments with bottle forms and dispensers.",
+        "Functional and emotional needs translated into requirements."
+      ],
+      "skills": [
+        "Consumer Research",
+        "Packaging Design",
+        "Physical Prototyping",
+        "Research Synthesis"
+      ]
+    },
+    "/work/zero-my-ai": {
+      "heading": "Zero: Second Brain AI Assistant",
+      "paragraphs": [
+        "Zero: Second Brain AI Assistant",
+        "Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop.",
+        "Zero started as a question: what would a second brain feel like if it could also talk back? It grew out of my earlier Jarvis home-assistant experiments. I built it as an experiment. It combines voice, chat, image generation, personal memory, coding support, home automation, and project tracking into one assistant. It knows when to use its tools, when to ask, and when to stay out of the way. It remembers people and projects, knows which devices exist in my space, and keeps a SQL-backed trail of tasks, bugs, feature requests, and decisions so the system improves through real use.",
+        "Designed voice and chat as two equal ways to interact: talk when my hands are busy, type when I need precision.",
+        "Built four layers of memory: quick preferences, SQL records, semantic search, and active session context.",
+        "Stored people, projects, todos, devices, conversations, bugs, and feature ideas in structured records.",
+        "Built a custom router that decides whether a request is conversation, home control, project lookup, image generation, bug capture, feature planning, or research before it reaches a model.",
+        "Added prompt-injection checks and tool permissions around sensitive actions like home devices, calendars, files, and project memory.",
+        "Connected Home Assistant so Zero can work with actual rooms, lights, sensors, aliases, and device state.",
+        "Created an image generation lab with reusable prompt styles, generated assets, feedback notes, and lightweight versioning.",
+        "Built a live coding workspace where Zero can talk to Codex, surface bugs, suggest next features, summarize changes, and bring in a small council of perspectives when a decision needs more than one brain.",
+        "Assistant experiment over product demo",
+        "Zero is strongest when it shows how I think through ambiguous AI interaction: what should be automated, what should be confirmed, and what should stay visible to the user.",
+        "The scope is uneven in places.",
+        "Custom router before model calls",
+        "Many requests have a clear shape: turn on a light, find a project note, log a bug, create an image, or answer normally. Routing first makes the assistant faster, cheaper, and easier to trust.",
+        "Router logic needs maintenance, especially when a request is ambiguous or combines multiple intents.",
+        "Quick memory stores preferences, SQL keeps hard facts auditable, semantic memory finds related old context, and session memory tracks what is happening right now.",
+        "More plumbing to maintain.",
+        "An assistant that can touch home devices, files, calendars, and project records needs permission boundaries and prompt-injection defenses.",
+        "Calling Zero an experiment made it easier to explain.",
+        "Voice and chat each fit a different moment: talk when my hands are busy, type when I need precision.",
+        "Home control grew out of my Jarvis experiments.",
+        "Bugs and feature ideas are logged in SQL and become the build list.",
+        "The coding workspace talks to Codex, tracks bugs, and suggests next features.",
+        "The router sends common actions down fixed paths, so they behave the same way each time.",
+        "The project can easily look like a pile of AI features if the story is not tightly edited.",
+        "Memory needs clearer user-facing controls so people can see what Zero knows, forget things, and correct records.",
+        "Prompt-injection testing has to keep evolving as more tools become available.",
+        "Some flows still need better onboarding so a first-time viewer understands what Zero can safely do.",
+        "Zero is my daily assistant experiment. It talks, chats, generates images, remembers people and projects, helps me code with Codex, controls parts of my home, and logs bugs, feature ideas and decisions.",
+        "Zero taught me that the hard part of AI product work is shaping context, trust, timing, and feedback so the assistant feels helpful without feeling chaotic. It pushed me to think like a designer, developer, and product owner at the same time.",
+        "Designing assistant behavior around trust, timing, and user control.",
+        "Supporting both conversational voice and precise text workflows.",
+        "Preferences, SQL records, semantic memory, and live session context.",
+        "Classifying intents before model calls so actions stay predictable.",
+        "Connecting assistant behavior to real rooms, sensors, and devices.",
+        "Using Codex, bug logs, feature queues, and council-style review to keep building.",
+        "Use it hands-free, interrupt it, or switch back to text when precision matters.",
+        "Project notes, people, questions, and decisions live in one assistant.",
+        "Reusable prompt styles, generated assets, and feedback notes for visual experiments.",
+        "Quick preferences, SQL facts, semantic search, and active session context.",
+        "A live coding workspace that can talk to Codex, track bugs, and suggest features.",
+        "Real rooms, lights, sensors, and aliases through Home Assistant.",
+        "Zero supports spoken conversation for quick, ambient moments and text chat for more deliberate work. The goal was to choose the interface that fits the task.",
+        "Zero keeps four layers of memory: quick preferences, SQL records for facts, semantic search for related old context, and live session context for what is happening right now. That means it can remember people, projects, notes, bugs, and decisions.",
+        "Live Coding Workspace + Council",
+        "This is the focused workspace where Zero helps me code. It can talk to Codex, keep track of bugs, turn rough feature ideas into next steps, and call in a small council of perspectives like engineer, designer, critic, and product brain when a decision needs more than one angle."
+      ],
+      "skills": [
+        "Human-Centered AI",
+        "Voice + Chat UX",
+        "4-Layer Memory",
+        "Tool Routing",
+        "Home Automation",
+        "Coding Loops"
+      ]
+    },
+    "/work/familysync-jpmorgan": {
+      "heading": "FamilySync – Agentic family coordination with JPMorgan Chase",
+      "paragraphs": [
+        "FamilySync – Agentic family coordination with JPMorgan Chase",
+        "An agent that coordinates a family when a child's day changes. It does the legwork; a person approves every handoff.",
+        "This Northwestern EDI service design project, developed with JPMorgan Chase as the partner, started from a broader question than 'where can AI fit in banking?' The opportunity was to explore where agentic systems could take on real coordination work that cuts across family life, money, logistics, and trust. The concept I landed on was FamilySync: a caregiver service that helps families handle messy moments like a sick child, pickup changes, groceries, rides, and shared payments without turning care into a manual operations project. The challenge was to design the service boundary, not just the interface, so that helpful autonomy stayed visible, consent-based, and appropriately constrained.",
+        "Framed the opportunity around family coordination work rather than a generic banking assistant",
+        "Designed FamilySync as a service actor that coordinates tasks, permissions, stakeholders, and payments across a shared household system",
+        "Mapped the service across the 5 Es structure: learn, set up, use, address problems, and opt out",
+        "Prototype-tested autonomy levels such as Preferences, Autonomous, and Ask-each-time across urgent and non-urgent caregiving scenarios",
+        "Built visible permission and privacy framing inspired by Apple-style permission tiles and first-person explanations",
+        "Modeled backstage logic, handoffs, approvals, and failure states so the concept extended beyond front-end screens",
+        "Used agentic tools in the making process by generating HTML UI components, piping them into Figma through MCP, and creating animated deck assets to explain service flows",
+        "Service actor vs chatbot with personality",
+        "Shifted the design toward coordination, permissions, and system behavior instead of conversational novelty.",
+        "Made the concept less immediately familiar than a standard assistant interface.",
+        "Shared authority vs single-user optimization",
+        "Family actions affect multiple people, so the service needed explicit decision rights and consent logic.",
+        "Introduced more complexity than designing for one account holder alone.",
+        "Configurable autonomy levels vs one default mode",
+        "Allowed people to define where the service can act automatically and where it must pause for approval.",
+        "Required careful framing so the setup itself did not become overwhelming.",
+        "Visible privacy explanations vs invisible data collection",
+        "Made trust a designed interaction rather than a policy hidden in the background.",
+        "Reduced the amount of silent automation the system could rely on.",
+        "Treating agentic AI as service infrastructure made the concept feel materially different from shallow AI feature ideas.",
+        "Scenario-card testing grounded trust conversations in specific action boundaries instead of abstract opinions about AI.",
+        "The combination of service blueprinting, storytelling, and interaction prototypes made the system legible to reviewers.",
+        "The opportunity space was larger than one quarter, so final scoping still left open questions around segment focus and long-term rollout.",
+        "FamilySync became a strong service design concept for how agentic AI could coordinate caregiving logistics without erasing human judgment. The project moved the conversation from 'AI in finance' toward a more useful frame: AI embedded in service infrastructure, where approvals, privacy, and shared authority are designed with as much care as the interface itself.",
+        "This project clarified that agentic AI becomes meaningful when it helps carry real coordination load. The value is not talking to an assistant, but preserving trust while reducing the invisible labor around family care.",
+        "Designing the full system, not only the screen-level interaction.",
+        "Shaping how autonomous behavior should act within human guardrails.",
+        "Making approvals, visibility, and consent understandable.",
+        "Using concrete situations to probe trust and autonomy boundaries."
+      ],
+      "skills": [
+        "Service Design",
+        "Agentic AI",
+        "Permission Design",
+        "Scenario Testing"
+      ]
+    },
+    "/work/mcdonalds-interaction-design": {
+      "heading": "Squad Up — group ordering for McDonald’s",
+      "paragraphs": [
+        "Squad Up — group ordering for McDonald’s",
+        "Group ordering across shared digital touchpoints",
+        "Developed with McDonald's through Northwestern EDI, this human-centered design project focused on group ordering: the messy moment where several people want food together, but one person usually ends up collecting texts, remembering edits, checking totals, and fixing the order. We synthesized observations, interviews, and survey responses into journey maps and interaction prototypes. The resulting experience lets people join from a link, add their own items, see who added what, review the group order, and coordinate payment and pickup.",
+        "Mapped the group-ordering journey from invite, join, browse, add item, review, split, and final confirmation",
+        "Designed a shared cart model where each item keeps visible ownership instead of becoming an anonymous list",
+        "Created invite and join states so friends could enter the order from a lightweight link or QR flow",
+        "Explored review readiness cues so the organizer can tell who is done before checkout",
+        "Prototyped group cart, participant, and split-payment states using McDonald's visual language from the slide deck",
+        "Kept the interface focused on coordination rather than adding chat, feeds, or social noise",
+        "Shared cart ownership vs one combined item list",
+        "Made it clear who added each item, which reduces organizer memory work and makes review faster.",
+        "The cart needs more visual structure than a single-user checkout list.",
+        "Invite link flow vs account-heavy collaboration",
+        "Let people join quickly without turning a food order into a full social setup process.",
+        "A lightweight invite model needs clear permissions so people understand what they can edit.",
+        "Review readiness vs instant organizer checkout",
+        "Helped the organizer avoid checking out before everyone has confirmed their part of the order.",
+        "Adds a coordination step before payment, but prevents more expensive mistakes.",
+        "The shared-cart framing made the concept more specific than a generic ordering redesign.",
+        "Assigning items to people clarified responsibility without needing chat or comments.",
+        "The invite and review states made the organizer role feel lighter and more controllable.",
+        "The prototype still needs stronger edge-case work around someone leaving, changing an item late, or failing to pay.",
+        "The result was a group-ordering concept that turns a messy coordination task into a shared cart with visible ownership, lightweight invites, review readiness, and split-oriented checkout. The case study became a focused exercise in designing collaboration inside a quick-service ordering flow.",
+        "The useful lesson was that group ordering is not mainly a menu problem. It is a coordination problem: who is in, who picked what, who is ready, and who is paying.",
+        "Designing how the system behaves, guides, and recovers.",
+        "Designing item ownership, review, and checkout for multiple people.",
+        "Using flows to evaluate coordination and organizer burden.",
+        "Balancing quick ordering with group readiness and payment handoffs."
+      ],
+      "skills": [
+        "Interaction Design",
+        "Shared Cart UX",
+        "Prototype Testing",
+        "Service Coordination"
+      ]
+    },
+    "/work/surya": {
+      "heading": "Surya: Kinetic Wall Timepiece",
+      "paragraphs": [
+        "Surya: Kinetic Wall Timepiece",
+        "A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep.",
+        "When I moved to the US, I began missing calls with my family because I never knew if they were awake or asleep. Constantly checking time zones on my phone felt disconnected and impersonal. The limitation was clear: screens show time, but not presence. Surya was built to make their daily rhythms visible at a glance.",
+        "Layered laser-cut wooden mandala body (wall-mount) inspired by solar geometry",
+        "Set of mechanical flowers (petals) driven by small DC motors",
+        "Custom calibration workflow for tuning each flower's motor range",
+        "Control electronics + wiring harness (power distribution + motor control)",
+        "Firmware that maps each flower to a family member and syncs motion to that time zone's light cycle",
+        "Physical button inputs for instant 'what time is it for them' checks",
+        "Assembly files: CAD/laser-cut vectors + enclosure/jig files for alignment and mounting",
+        "Micro DC Motors vs Servo Motors",
+        "Micro DC motors allowed smoother, continuous petal motion and finer emotional control without hard positional snapping.",
+        "Lost absolute position feedback, requiring careful mechanical stops and calibration logic.",
+        "Physical Motion vs Screen-Based Display",
+        "Movement communicates presence emotionally and peripherally without demanding attention.",
+        "Increased mechanical complexity and longer iteration cycles compared to UI changes.",
+        "Laser-Cut Wood Layers vs 3D-Printed Structure",
+        "Layered wood provided warmth, scale, and visual depth aligned with the mandala form.",
+        "Less tolerance for post-build changes compared to reprinting parts.",
+        "Slow, continuous motion made the piece feel calm and alive rather than mechanical.",
+        "Assigning one flower per family member made the interaction immediately understandable.",
+        "The wall-mounted, layered mandala form gave it the presence of a lasting artifact.",
+        "Achieving smooth, synchronized motion across all flowers took far more iteration than expected due to motor and mechanical variance.",
+        "Surya became a functioning kinetic wall timepiece that stays in constant sync with my family's day-night cycles across time zones. The project established my approach to translating abstract feelings into physical interaction, using motion and form instead of screens to communicate meaning.",
+        "Surya showed me that slow, ambient motion can communicate availability and care more clearly than explicit information, especially when distance makes timing fragile.",
+        "Designing responsive behaviors and user engagement patterns.",
+        "Integrating sensors, actuators and code into physical objects.",
+        "Precision fabrication of layered geometric components.",
+        "Circuit design and component integration for custom hardware.",
+        "Microcontroller programming for motor and sensor control.",
+        "Mechanical art with programmed, time-based motion.",
+        "Iterative building and testing of physical designs."
+      ],
+      "skills": [
+        "Interaction Design",
+        "Physical Computing",
+        "Laser Cutting",
+        "Electronics",
+        "Arduino",
+        "Kinetic Sculpture",
+        "Prototyping"
+      ]
+    },
+    "/work/solopump": {
+      "heading": "SoloPump: One-Handed Liquid Dispenser",
+      "paragraphs": [
+        "SoloPump: One-Handed Liquid Dispenser",
+        "An automated drink dispensing machine that pours measured drinks or shots, with manual control and a web interface to adjust output.",
+        "Free-poured drinks vary by person, speed and attention, especially in social settings. I wanted a system that could dispense repeatable quantities on demand, work hands-free when needed, and still allow manual control. The constraint was to keep it simple, affordable, and suitable for DIY deployment rather than a commercial bar system.",
+        "Automated liquid pumping and dispensing mechanism",
+        "Microcontroller-based control system",
+        "Manual dispense input for quick pours",
+        "Web-based UI to configure pour quantity and modes",
+        "Calibrated flow control logic for repeatable output",
+        "Power management and safety circuitry",
+        "3D-printed structural and mounting components",
+        "Web UI control vs physical-only controls",
+        "Allowed quick reconfiguration of pour volumes without rebuilding hardware.",
+        "Required networking and basic frontend work.",
+        "Calibration-based dosing vs flow sensors",
+        "Reduced cost and mechanical complexity.",
+        "Required periodic recalibration.",
+        "Manual override mode vs fully automated system",
+        "Preserved usability during network failure or casual use.",
+        "Calibration-based pours stayed consistent across repeated use.",
+        "Web UI made adjusting drink sizes fast and intuitive.",
+        "Manual mode ensured the system remained usable at all times.",
+        "Different liquid viscosities affected accuracy more than expected.",
+        "SoloPump became a reliable automated drink dispensing system capable of consistent pours in both manual and automated modes.",
+        "This project clarified how software control and calibration can replace human skill in repeatable physical tasks without over-engineering the system.",
+        "End-to-end device control from web interface to hardware action.",
+        "Embedded logic for real-time dispensing control.",
+        "Custom enclosure and mounting design.",
+        "Software-based accuracy tuning for physical outputs."
+      ],
+      "skills": [
+        "Full Stack IoT",
+        "Microcontrollers",
+        "3D Modeling",
+        "Calibration Logic"
+      ]
+    },
+    "/work/helios": {
+      "heading": "Helios: Mechanical Kinetic Lamp",
+      "paragraphs": [
+        "Helios: Mechanical Kinetic Lamp",
+        "A 3D-printed lamp. Turn the ring by hand and eight spur gears change the light.",
+        "Smart lighting has optimized control but removed interaction. Most lamps are reduced to sliders, presets, or voice commands. I wanted to design a lamp where changing light felt intentional and physical, something you engage with using your hands, not an app. The constraint was to make the mechanism visible, understandable, and satisfying rather than hidden.",
+        "Fully 3D-printed mechanical lamp body",
+        "Ring gear with eight interlinked spur gears",
+        "Manual rotary input for controlling light behavior",
+        "Integrated LED light source",
+        "Gear-driven linkage translating rotation into light modulation",
+        "Modular print design requiring minimal supports",
+        "CAD files and print-optimized part geometry",
+        "Manual mechanical control vs electronic dimming",
+        "Preserved tactile feedback and physical effort as part of the experience.",
+        "Less precise control compared to digital dimming. Not wireless.",
+        "Ring gear architecture vs linear linkage",
+        "Allowed synchronized, expressive motion across multiple elements.",
+        "Increased print time and alignment complexity.",
+        "3D printing vs off-the-shelf components",
+        "Enabled full control over form, scale, and mechanical behavior.",
+        "Iteration speed depended on print cycles.",
+        "Gear-driven motion made interaction slow, deliberate, and satisfying.",
+        "Print-first design reduced assembly complexity.",
+        "Small tolerance errors amplified across the gear train and required multiple iterations.",
+        "Helios resulted in a fully functional kinetic lamp where light is shaped through motion rather than settings.",
+        "Helios reinforced that physical resistance, motion, and visibility can make everyday interactions feel intentional.",
+        "Design for additive manufacturing.",
+        "Complex gear train and linkage geometry.",
+        "Translating input torque into synchronized motion.",
+        "Integrating function, form, and tactile user experience."
+      ],
+      "skills": [
+        "3D Printing",
+        "CAD / Mechanical Design",
+        "Kinetic Mechanisms",
+        "Product Design"
+      ]
+    },
+    "/work/jarvis": {
+      "heading": "Jarvis: Voice-Controlled Smart Home Assistant",
+      "paragraphs": [
+        "Jarvis: Voice-Controlled Smart Home Assistant",
+        "A voice assistant I built for my home. Walk up and it wakes.",
+        "Commercial voice assistants felt opaque, slow, and over-scoped. Simple actions required internet dependency, rigid phrasing, and cloud processing. I wanted a system I could fully understand, control, and extend, one that reacted instantly to voice input and integrated directly with my own hardware and automations. The constraint was to keep it lightweight, local-first, and hackable.",
+        "PIR motion sensor: walk up and it wakes, then listens for a command",
+        "Embedded hardware running local inference",
+        "LED-based visual feedback system",
+        "Integration with Home Assistant automations",
+        "Physical enclosure and internal wiring",
+        "Firmware for voice models, thresholds, and state handling",
+        "Local voice recognition vs cloud APIs",
+        "Reduced latency, preserved privacy, and allowed full system control.",
+        "Required careful tuning of models and thresholds.",
+        "Motion sensor + voice commands vs continuous listening",
+        "It only listens when someone is there, so fewer false triggers and less processing.",
+        "Added a two-step interaction.",
+        "MQTT messaging vs direct device control",
+        "Enabled scalable, decoupled integration with multiple devices.",
+        "Introduced system-level complexity.",
+        "LED feedback vs audio responses",
+        "Provided instant, non-intrusive confirmation without noise.",
+        "Less expressive than speech output.",
+        "Local processing made responses feel immediate and reliable.",
+        "Visual feedback reduced uncertainty during interaction.",
+        "MQTT allowed easy expansion across devices.",
+        "Voice recognition accuracy dropped in noisy environments.",
+        "Jarvis became a functional, extensible voice interface for controlling lights, sensors, and automations in my environment. It was selected among the Top 10 projects in an Edge AI & IoT challenge open across ASEAN countries and hosted by Circuit Digest and DigiKey.",
+        "Keeping recognition on the board made Jarvis fast and private, with no cloud.",
+        "Local voice inference on embedded hardware.",
+        "Decoupled device communication.",
+        "Firmware for real-time audio processing.",
+        "Integration with smart home ecosystem."
+      ],
+      "skills": [
+        "Edge AI",
+        "IoT / MQTT",
+        "Embedded C++",
+        "Home Assistant"
+      ]
+    },
+    "/work/plotter": {
+      "heading": "Plotter: Speech-to-Draw Machine",
+      "paragraphs": [
+        "Plotter: Speech-to-Draw Machine",
+        "A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code.",
+        "Most “voice” interfaces stop at transcription. I wanted voice to become a physical output, something you could hold and keep. The trigger was realizing that creative expression is often blocked by software skill and tooling. The constraint was to build a pipeline that stayed understandable: speak, preview, plot, without expensive hardware or closed ecosystems.",
+        "DIY XY plotter hardware with pen lift mechanism",
+        "Motion control firmware using G-code",
+        "Speech-to-text pipeline to capture spoken input",
+        "Text-to-vector stroke conversion (line fonts)",
+        "G-code generation script for plotting within bounds",
+        "Plot preview + settings UI (bounds, scale, font selection)",
+        "Calibration routines for origin, scaling, and pen behavior",
+        "Speech-to-text + plotting pipeline vs manual typing",
+        "Made creation faster and more accessible.",
+        "Needed error handling for transcription mistakes.",
+        "Bounds-based scaling near origin vs full-bed auto layout",
+        "Ensured predictable output and avoided edge crashes.",
+        "Required users to think in a constrained canvas.",
+        "Servo pen-lift vs third-axis stepper",
+        "Simpler mechanics and cheaper implementation for pen up/down.",
+        "More tuning for consistent lift height and timing.",
+        "The end-to-end flow (voice → plot) created a strong “physical computing” moment.",
+        "Stroke-font rendering produced clean, plotter-friendly paths.",
+        "User-defined bounds prevented most mechanical overrun issues.",
+        "Pen-up timing and final-stroke completion were inconsistent and required repeated tuning.",
+        "The plotter reliably converted spoken input into plotted text and drawings, producing repeatable physical artifacts from voice.",
+        "This project clarified how a simple pipeline design can turn a familiar input (voice) into a surprising medium (paper), as long as constraints are explicit and controllable.",
+        "Motion control logic for physical plotting.",
+        "Text-to-vector processing pipeline.",
+        "Custom XY gantry design and assembly.",
+        "Voice recognition integration."
+      ],
+      "skills": [
+        "CNC / G-code",
+        "Python",
+        "Mechatronics",
+        "Speech API"
+      ]
+    },
+    "/work/portfolio-website": {
+      "heading": "Portfolio Website",
+      "paragraphs": [
+        "This site. I build it with AI coding agents: Antigravity, Codex and Claude.",
+        "I set the product direction, visual language, content, and acceptance criteria, then work across Antigravity, Codex, and Claude to plan changes, implement them, critique the result, and verify the live experience.",
+        "React 19 and TypeScript on Vite for a fast, component-driven single-page application",
+        "Structured JSON content for project case studies, career history, and writing",
+        "A multi-agent workflow spanning Google Antigravity, OpenAI Codex, and Anthropic Claude",
+        "Production builds, browser screenshots, keyboard checks, accessibility audits, and performance verification after meaningful changes",
+        "Multi-agent collaboration vs one AI assistant",
+        "Different agents are useful for different modes of work: implementation, critique, research, browser verification, and long-running refactors.",
+        "The human has to preserve context, reconcile conflicting suggestions, and remain accountable for the final result.",
+        "Custom interaction system vs a conventional portfolio template",
+        "The 3D home page and the project stories make the portfolio itself evidence of product and interaction thinking.",
+        "A distinctive interface demands more testing, performance work, and accessibility care than a standard scrolling site.",
+        "Rapid iteration on design and content.",
+        "Using multiple agents made critique and verification part of the build loop instead of an afterthought.",
+        "Automated builds, screenshots, and browser checks made ambitious interaction changes safer to ship.",
+        "Agent output still drifts without clear product intent, source-of-truth content, and explicit verification.",
+        "A responsive portfolio, built and kept up by one person directing several AI agents.",
+        "Building this portfolio taught me to translate intent into constraints, recognize when the output is wrong, and carry one point of view through many rounds of implementation and critique.",
+        "Coordinating Antigravity, Codex, and Claude across planning, implementation, critique, and verification.",
+        "A typed component system for complex interactive portfolio states."
+      ],
+      "skills": [
+        "Multi-Agent Workflows",
+        "React + TypeScript",
+        "Vite"
+      ]
+    },
+    "/experience/self-xyz": {
+      "heading": "AI Product Manager (Intern), Self",
+      "paragraphs": [
+        "Jun 2026 to Aug 2026",
+        "Multi-step AI pipelines, with a human checkpoint.",
+        "Worked across product thinking and hands-on development with engineers on multi-step agentic products, exploring how capable AI workflows can stay understandable and user-directed.",
+        "Partnered with developers to shape and build multiple agentic product experiences.",
+        "Contributed code to multi-step AI pipelines connecting tasks across product workflows.",
+        "Explored how autonomy, evaluation, and human checkpoints affect user trust and control."
+      ],
+      "skills": [
+        "AI Product Management",
+        "Agentic Systems",
+        "AI Evaluation",
+        "Hands-on Development"
+      ]
+    },
+    "/experience/portfolio-website": {
+      "heading": "Portfolio V2, Personal Project",
+      "paragraphs": [
+        "Jan 2025 to Invalid Date",
+        "This site, built with agentic AI.",
+        "Building this portfolio with agentic coding workflows.",
+        "Coordinated Antigravity, Codex, and Claude across implementation, critique, and verification.",
+        "Checked changes with production builds, browser screenshots, and accessibility audits."
+      ],
+      "skills": [
+        "Agentic AI",
+        "React + Vite",
+        "Tailwind"
+      ]
+    },
+    "/experience/ms-edi": {
+      "heading": "MS Engineering Design Innovation, Northwestern University | Segal Design Institute",
+      "paragraphs": [
+        "Aug 2025 to Mar 2027",
+        "4 studio projects with 3 industry partners: JPMorgan Chase, McDonald's and P&G.",
+        "Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work.",
+        "Graduate program centered on human-centered design, systems thinking, and real-world problem solving",
+        "Studio-led work in ambiguous problem spaces with an emphasis on framing the right problem before building",
+        "Strong focus on user research, synthesis, and translating insight into concrete decisions",
+        "Hands-on prototyping across physical and digital artifacts to validate ideas early"
+      ],
+      "skills": [
+        "User Research",
+        "Interaction Design",
+        "Rapid Prototyping",
+        "Design Strategy",
+        "Physical Computing",
+        "Figma"
+      ]
+    },
+    "/experience/zomato": {
+      "heading": "Senior Product Analyst, Zomato",
+      "paragraphs": [
+        "Oct 2024 to Jul 2025",
+        "Home screen analytics: ~10M daily users, ~80% of orders start there.",
+        "Analytics for the home screen of India's largest food delivery app.",
+        "Senior Product Analyst on Zomato's Homepage & Search team, the surface where ~80% of all orders start.",
+        "Worked directly with product, engineering and design teams on UI layout, listing size, module ordering, ranking logic and surface interactions.",
+        "Analytics covered ~10 million daily active users, using clickstream data to understand how users scrolled, clicked, searched, abandoned, or converted.",
+        "Evaluated ML-based ranking output and helped identify gaps between algorithm predictions and real user behavior, feeding improvements into the ranking model.",
+        "Shifted decision-making toward real-time experiment reads, enabling PM + Design to make changes the same day instead of waiting for long reporting cycles."
+      ],
+      "skills": [
+        "Clickstream Analytics",
+        "A/B Testing",
+        "ML Feedback",
+        "UI Behavior"
+      ]
+    },
+    "/experience/jarvis-competition": {
+      "heading": "Jarvis Assistant, Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge",
+      "paragraphs": [
+        "Nov 2024 to Nov 2024",
+        "Voice-controlled AI home assistant built from scratch.",
+        "Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT.",
+        "Selected among the Top 10 projects in an Edge AI & IoT challenge open across ASEAN countries, hosted by Circuit Digest and DigiKey.",
+        "Integrated Voice Recognition, Motion Detection, and Home Assistant via MQTT.",
+        "Designed custom 3D-printed enclosure and open-sourced the library."
+      ],
+      "skills": [
+        "AI",
+        "3D Print",
+        "IOT",
+        "Maixduino",
+        "MQTT",
+        "Home Assistant",
+        "C++",
+        "Arduino"
+      ]
+    },
+    "/experience/udaan": {
+      "heading": "Product Analyst, Udaan",
+      "paragraphs": [
+        "Feb 2023 to Sep 2024",
+        "Supply-chain and marketplace analytics, pan-India.",
+        "Built analytics and decision systems across supply chain, marketplace, and product at national scale.",
+        "Worked full-time across Udaan's supply-chain vertical, supporting marketplace and inventory models at national scale.",
+        "Owned reporting systems and procurement and availability analytics used by product managers, central ops, warehousing, catalogue, pricing and CX teams.",
+        "Built supply-chain systems first for single-city pilots, then scaled operations pan-India across FMCG, pharma and food.",
+        "Designed real-time reporting dashboards that enabled teams to act immediately instead of waiting for analyst decks.",
+        "Founding analyst for Percept Insights, a Mixpanel-alternative analytics platform used internally and by external partner teams.",
+        "Only analyst and acting PM for Wondermart (mobile-first B2C commerce), running weekly product reviews with developers and prioritizing features using funnel and retention data."
+      ],
+      "skills": [
+        "Supply Chain",
+        "Marketplace",
+        "Product Analytics",
+        "Platform Building"
+      ]
+    },
+    "/experience/schmooze": {
+      "heading": "Product and Growth Analyst, Schmooze",
+      "paragraphs": [
+        "Oct 2022 to Dec 2022",
+        "Zero-to-one analytics for a meme-based dating app.",
+        "Pre-PMF analytics at a seed-stage dating app exploring meme-based matching.",
+        "Second analyst in the company working in a multifunctional role across product, basic growth, and user behavior.",
+        "Set up the V0 top down dashboards for creator management at scale.",
+        "Tested early tech implementations and strategies to validate whether the concept had traction."
+      ],
+      "skills": [
+        "Exploration–Exploitation",
+        "User Session Analysis",
+        "V0 Dashboards",
+        "Mixpanel"
+      ]
+    },
+    "/experience/snapdeal": {
+      "heading": "Data Analyst · Ads & Supply Infrastructure, Snapdeal",
+      "paragraphs": [
+        "Jun 2020 to Sep 2022",
+        "Building ads analytics and supply infrastructure during Snapdeal's first-party transition.",
+        "Set up data pipelines to support Snapdeal's first-party product rollout",
+        "Built replenishment logic for newly established warehouse operations",
+        "Enabled inventory planning as Snapdeal scaled owned supply and fulfillment",
+        "Contributed to ads revenue optimization, resulting in a 14% uplift"
+      ],
+      "skills": [
+        "Ad-Tech Analytics",
+        "Revenue Attribution",
+        "Supply Chain",
+        "Data Pipelines"
+      ]
+    },
+    "/experience/tinkerverse": {
+      "heading": "Creator, Tinker Verse",
+      "paragraphs": [
+        "Feb 2024 to Mar 2026",
+        "My lab for hardware and AI builds.",
+        "Personal lab for physical computing, agentic software, and expressive prototypes.",
+        "Voice-controlled home assistant.",
+        "Generative drawing plotter.",
+        "Agentic AI workspace for structuring context, outputs, and delegation."
+      ],
+      "skills": []
+    },
+    "/experience/bits": {
+      "heading": "B.E. Civil Engineering + M.Sc. Biological Sciences, BITS Pilani, Hyderabad Campus",
+      "paragraphs": [
+        "Aug 2016 to May 2021",
+        "Dual degree: civil engineering and biological sciences.",
+        "Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives.",
+        "Dual-degree education spanning civil engineering and biological sciences.",
+        "Early exposure to medical innovation and bio-design through structured workshops and healthcare-focused projects.",
+        "Led and contributed to healthcare and sanitation design projects addressing real-world constraints and usability.",
+        "Stage Design Head for TEDx BITS Hyderabad, responsible for concept development and execution.",
+        "Secretary, Synapsis (Biological Science Association).",
+        "Founder and Instructor, Inferno (Self Defense Society), trained and mentored students with a focus on fitness and personal safety.",
+        "Hockey A Team member, representing the institute in competitive sports."
+      ],
+      "skills": [
+        "Healthcare Instrumentation",
+        "Product Design",
+        "Electronics Design",
+        "Sustainability",
+        "Human-Centered Infrastructure",
+        "Systems Thinking"
+      ]
+    },
+    "/book/surya": {
+      "heading": "Surya",
+      "paragraphs": [
+        "A wall piece that shows when my family is awake",
+        "I kept missing their calls.",
+        "I moved to the US and never knew if my family was awake. A screen can show their time. It cannot show them. The choice: movement, not a screen. It shows someone is there without asking for attention. The cost: more mechanics, slower changes.",
+        "I moved to the US and kept missing calls with my family, because I never knew if they were awake. Surya has one flower for each of them. It opens when they wake and closes when they sleep.",
+        "The mandala comes from my heritage in India. This was my first try at laser cutting and sandblasting. The drawing is the real laser file: one cut line, one window for the display, three holes for the flowers, and the engraving.",
+        "Surya · where the shape comes from",
+        "The mandala comes from home.",
+        "The mandala comes from my heritage in India. Surya’s body is one, drawn from the sun.",
+        "A back layer and an engraved front layer. Stacked, they give the piece depth, and light fills the gap between them. The choice: wood layers, not a 3D-printed body. Wood gave it warmth, scale and depth. The cost: little room to change anything once it is cut.",
+        "Two layers of wood, cut by laser.",
+        "The body is two layers of laser-cut wood. Stacked, they give the mandala its depth and its warmth.",
+        "256 lights behind frosted acrylic.",
+        "A 32 by 8 grid of lights sits in the window. A frosted sheet in front turns their hard points into a soft glow. 68 more lights run around the rim, between the two layers of wood.",
+        "A matrix display behind frosted acrylic.",
+        "Frosted acrylic sits over the LED matrix display. It softens the points of light.",
+        "Three printed flowers that open.",
+        "One for each person in my family. A flower opens when they wake and closes when they sleep. The choice: small DC motors, not servos. Smoother motion. The cost: a motor cannot tell where it is, so each flower needs hard stops and tuning.",
+        "The flowers are 3D printed.",
+        "Each flower is printed, then opened and closed by a small motor. One flower for each person.",
+        "One small board runs it all.",
+        "An ESP32 keeps three clocks, drives three motors and 324 lights, and reads three buttons. Press one to see that person’s time. The hard night: one loose ground pin. The petals jerked, the code froze, a motor went too far. I traced every wire until I found it.",
+        "Every part, then the whole.",
+        "Back layer, lights, motors and board, front layer, frosted acrylic, flowers. Then the real piece.",
+        "Now it knows when I walk up.",
+        "A radar sees me come close. Home Assistant picks what matters, and Surya shows it: how far a 3D print is, or what is next on my calendar. I do not press anything to ask. The room notices me and answers. It triggers when I have been closer than 77 inches for 3 seconds.",
+        "It now connects to my house.",
+        "Surya talks to my Home Assistant. The house can put a message on its display, and its buttons report back.",
+        "What worked. What was hard.",
+        "Worked: slow, steady motion felt calm and alive. One flower per person needed no explaining. Hard: getting three motors to move in step took far more tries than I expected.",
+        "In step with my family’s days, across three time zones."
+      ],
+      "skills": []
+    },
+    "/book/jarvis": {
+      "heading": "Jarvis",
+      "paragraphs": [
+        "A voice assistant I built for my home",
+        "A voice assistant I built for my home. Walk up and it wakes.",
+        "Top 10 · IoT & Edge AI Project Challenge 2024",
+        "A PIR sensor sits behind the white dome and senses when someone is in the room. When it senses me, Jarvis starts listening for my voice. When I walk away, it stops. The choice: Presence first, then voice. It only listens when someone is there, so fewer false triggers. The cost: two steps, not one.",
+        "It knows when someone is there.",
+        "Walk up and the lights answer. Walk away and it goes dark.",
+        "I trained a voice model on my own recordings, for ten exact commands and nothing else. That is why it stays fast: it runs here, on the board. THE CHOICE: Explicit commands, on the board. Faster and private, no cloud. The cost: careful tuning of the recordings and the cut-off.",
+        "A model trained on my own recordings, for ten exact commands.",
+        "Commercial assistants felt slow and opaque. I wanted one I could understand and change. The constraint: Fast, and here. The board itself recognises the phrase. Only a short on or off message goes to a Raspberry Pi in my home.",
+        "My words go to the box in the room and stop there. Nothing is sent to a cloud.",
+        "No screen. Light gestures.",
+        "Jarvis has no screen and no voice. It answers in light gestures: four white LEDs, and two light bars on the wall beside it. The choice: Light, not a voice. Instant and quiet, no noise in the room. The cost: less expressive than speech.",
+        "No screen and no voice. Light gestures instead.",
+        "When Jarvis hears a phrase, it sends ON or OFF to Home Assistant, which runs on a Raspberry Pi in my home. Home Assistant does the rest. THE CHOICE: Messages, not direct wiring. New devices are easy to add. The cost: more parts that all have to keep running.",
+        "One phrase runs the room.",
+        "The box passes a short message on, and the lights follow.",
+        "The code and the 3D files for the case are open. Anyone can build their own. THE RESULT: Top 10. IoT & Edge AI Project Challenge 2024, run by Circuit Digest with DigiKey.",
+        "The code and the case files are open. Three people, three letters, each in their own colour."
+      ],
+      "skills": []
+    },
+    "/book/muse": {
+      "heading": "Muse",
+      "paragraphs": [
+        "Meta’s Muse AI on my desk, in a body I built with AI agents",
+        "I believe AI needs a physical presence, apart from my phone.",
+        "Muse on my desk, not only in an app",
+        "Muse lives in an app. I wanted it on my desk.",
+        "Four handoffs from me to AI agents.",
+        "I directed AI agents to build it",
+        "I set the specs and made the calls; the agents made the models, the CAD and the firmware.",
+        "Four AI directions and an AI-made mascot.",
+        "My pictures became a 3D model",
+        "My pictures and a few lines of text became a 3D model.",
+        "The board’s cutout, drawn from exact numbers.",
+        "The board needed an exact home",
+        "The board has a home cut to its exact size.",
+        "The soft frame around the screen.",
+        "A soft frame around the screen",
+        "Flat CAD became a padded pouch.",
+        "Body shells and pouch printed and assembled.",
+        "Printed halves held by push-in pins",
+        "Hold to talk, press to wake.",
+        "Press the button and Muse talks",
+        "I mounted a button at the USB-C opening."
+      ],
+      "skills": []
+    },
+    "/book/bambu": {
+      "heading": "Making together",
+      "paragraphs": [
+        "The studio, the workshops, and a guide to take with you",
+        "Bambu Lab School Ambassador · Northwestern",
+        "I help run the print lab at Northwestern, with printers, filament and tools ready for making.",
+        "A shared space for 3D printing.",
+        "Workshops with Corner Makery.",
+        "Preparing a model and getting started with printing.",
+        "A condensed guide to the 3D Print Anything workshop.",
+        "Take the workshop with you"
+      ],
+      "skills": []
+    },
+    "/work/zero": {
+      "heading": "Zero: Second Brain AI Assistant",
+      "paragraphs": [
+        "Zero: Second Brain AI Assistant",
+        "Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop.",
+        "Zero started as a question: what would a second brain feel like if it could also talk back? It grew out of my earlier Jarvis home-assistant experiments. I built it as an experiment. It combines voice, chat, image generation, personal memory, coding support, home automation, and project tracking into one assistant. It knows when to use its tools, when to ask, and when to stay out of the way. It remembers people and projects, knows which devices exist in my space, and keeps a SQL-backed trail of tasks, bugs, feature requests, and decisions so the system improves through real use.",
+        "Designed voice and chat as two equal ways to interact: talk when my hands are busy, type when I need precision.",
+        "Built four layers of memory: quick preferences, SQL records, semantic search, and active session context.",
+        "Stored people, projects, todos, devices, conversations, bugs, and feature ideas in structured records.",
+        "Built a custom router that decides whether a request is conversation, home control, project lookup, image generation, bug capture, feature planning, or research before it reaches a model.",
+        "Added prompt-injection checks and tool permissions around sensitive actions like home devices, calendars, files, and project memory.",
+        "Connected Home Assistant so Zero can work with actual rooms, lights, sensors, aliases, and device state.",
+        "Created an image generation lab with reusable prompt styles, generated assets, feedback notes, and lightweight versioning.",
+        "Built a live coding workspace where Zero can talk to Codex, surface bugs, suggest next features, summarize changes, and bring in a small council of perspectives when a decision needs more than one brain.",
+        "Assistant experiment over product demo",
+        "Zero is strongest when it shows how I think through ambiguous AI interaction: what should be automated, what should be confirmed, and what should stay visible to the user.",
+        "The scope is uneven in places.",
+        "Custom router before model calls",
+        "Many requests have a clear shape: turn on a light, find a project note, log a bug, create an image, or answer normally. Routing first makes the assistant faster, cheaper, and easier to trust.",
+        "Router logic needs maintenance, especially when a request is ambiguous or combines multiple intents.",
+        "Quick memory stores preferences, SQL keeps hard facts auditable, semantic memory finds related old context, and session memory tracks what is happening right now.",
+        "More plumbing to maintain.",
+        "An assistant that can touch home devices, files, calendars, and project records needs permission boundaries and prompt-injection defenses.",
+        "Calling Zero an experiment made it easier to explain.",
+        "Voice and chat each fit a different moment: talk when my hands are busy, type when I need precision.",
+        "Home control grew out of my Jarvis experiments.",
+        "Bugs and feature ideas are logged in SQL and become the build list.",
+        "The coding workspace talks to Codex, tracks bugs, and suggests next features.",
+        "The router sends common actions down fixed paths, so they behave the same way each time.",
+        "The project can easily look like a pile of AI features if the story is not tightly edited.",
+        "Memory needs clearer user-facing controls so people can see what Zero knows, forget things, and correct records.",
+        "Prompt-injection testing has to keep evolving as more tools become available.",
+        "Some flows still need better onboarding so a first-time viewer understands what Zero can safely do.",
+        "Zero is my daily assistant experiment. It talks, chats, generates images, remembers people and projects, helps me code with Codex, controls parts of my home, and logs bugs, feature ideas and decisions.",
+        "Zero taught me that the hard part of AI product work is shaping context, trust, timing, and feedback so the assistant feels helpful without feeling chaotic. It pushed me to think like a designer, developer, and product owner at the same time.",
+        "Designing assistant behavior around trust, timing, and user control.",
+        "Supporting both conversational voice and precise text workflows.",
+        "Preferences, SQL records, semantic memory, and live session context.",
+        "Classifying intents before model calls so actions stay predictable.",
+        "Connecting assistant behavior to real rooms, sensors, and devices.",
+        "Using Codex, bug logs, feature queues, and council-style review to keep building.",
+        "Use it hands-free, interrupt it, or switch back to text when precision matters.",
+        "Project notes, people, questions, and decisions live in one assistant.",
+        "Reusable prompt styles, generated assets, and feedback notes for visual experiments.",
+        "Quick preferences, SQL facts, semantic search, and active session context.",
+        "A live coding workspace that can talk to Codex, track bugs, and suggest features.",
+        "Real rooms, lights, sensors, and aliases through Home Assistant.",
+        "Zero supports spoken conversation for quick, ambient moments and text chat for more deliberate work. The goal was to choose the interface that fits the task.",
+        "Zero keeps four layers of memory: quick preferences, SQL records for facts, semantic search for related old context, and live session context for what is happening right now. That means it can remember people, projects, notes, bugs, and decisions.",
+        "Live Coding Workspace + Council",
+        "This is the focused workspace where Zero helps me code. It can talk to Codex, keep track of bugs, turn rough feature ideas into next steps, and call in a small council of perspectives like engineer, designer, critic, and product brain when a decision needs more than one angle."
+      ],
+      "skills": [
+        "Human-Centered AI",
+        "Voice + Chat UX",
+        "4-Layer Memory",
+        "Tool Routing",
+        "Home Automation",
+        "Coding Loops"
+      ]
+    },
+    "/": {
+      "heading": "Adi Agarwal: Product Manager, AI and Analytics",
+      "paragraphs": [
+        "Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation.",
+        "Adi Agarwal (Aditya Agarwal) is a product manager who builds what he designs: AI agents, connected hardware, 3D interfaces and data products. He has led product and data analytics at Zomato, Udaan and Snapdeal, and is studying for an M.S. in Engineering Design Innovation at Northwestern University."
+      ],
+      "skills": [],
+      "links": [
+        {
+          "href": "/work/glyph",
+          "label": "Glyph: A Body for AI",
+          "line": "I built a wearable test bed to see what happens when AI leaves the chat window and becomes something you can wear, move, and build on."
+        },
+        {
+          "href": "/work/pg-haircare",
+          "label": "P&G · Hair Care Product Packaging",
+          "line": "Rethinking the bottle, and the routine around it."
+        },
+        {
+          "href": "/work/zero-my-ai",
+          "label": "Zero: Second Brain AI Assistant",
+          "line": "Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop."
+        },
+        {
+          "href": "/work/familysync-jpmorgan",
+          "label": "FamilySync – Agentic family coordination with JPMorgan Chase",
+          "line": "An agent that coordinates a family when a child's day changes. It does the legwork; a person approves every handoff."
+        },
+        {
+          "href": "/work/mcdonalds-interaction-design",
+          "label": "Squad Up — group ordering for McDonald’s",
+          "line": "Group ordering across shared digital touchpoints"
+        },
+        {
+          "href": "/work/surya",
+          "label": "Surya: Kinetic Wall Timepiece",
+          "line": "A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep."
+        },
+        {
+          "href": "/work/solopump",
+          "label": "SoloPump: One-Handed Liquid Dispenser",
+          "line": "An automated drink dispensing machine that pours measured drinks or shots, with manual control and a web interface to adjust output."
+        },
+        {
+          "href": "/work/helios",
+          "label": "Helios: Mechanical Kinetic Lamp",
+          "line": "A 3D-printed lamp. Turn the ring by hand and eight spur gears change the light."
+        },
+        {
+          "href": "/work/jarvis",
+          "label": "Jarvis: Voice-Controlled Smart Home Assistant",
+          "line": "A voice assistant I built for my home. Walk up and it wakes."
+        },
+        {
+          "href": "/work/plotter",
+          "label": "Plotter: Speech-to-Draw Machine",
+          "line": "A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code."
+        },
+        {
+          "href": "/work/portfolio-website",
+          "label": "Portfolio Website",
+          "line": "This site. I build it with AI coding agents: Antigravity, Codex and Claude."
+        },
+        {
+          "href": "/experience/self-xyz",
+          "label": "AI Product Manager (Intern), Self",
+          "line": "Worked across product thinking and hands-on development with engineers on multi-step agentic products, exploring how capable AI workflows can stay understandable and user-directed."
+        },
+        {
+          "href": "/experience/portfolio-website",
+          "label": "Portfolio V2, Personal Project",
+          "line": "Building this portfolio with agentic coding workflows."
+        },
+        {
+          "href": "/experience/ms-edi",
+          "label": "MS Engineering Design Innovation, Northwestern University | Segal Design Institute",
+          "line": "Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work."
+        },
+        {
+          "href": "/experience/zomato",
+          "label": "Senior Product Analyst, Zomato",
+          "line": "Analytics for the home screen of India's largest food delivery app."
+        },
+        {
+          "href": "/experience/jarvis-competition",
+          "label": "Jarvis Assistant, Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge",
+          "line": "Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT."
+        },
+        {
+          "href": "/experience/udaan",
+          "label": "Product Analyst, Udaan",
+          "line": "Built analytics and decision systems across supply chain, marketplace, and product at national scale."
+        },
+        {
+          "href": "/experience/schmooze",
+          "label": "Product and Growth Analyst, Schmooze",
+          "line": "Pre-PMF analytics at a seed-stage dating app exploring meme-based matching."
+        },
+        {
+          "href": "/experience/snapdeal",
+          "label": "Data Analyst · Ads & Supply Infrastructure, Snapdeal",
+          "line": "Building ads analytics and supply infrastructure during Snapdeal's first-party transition."
+        },
+        {
+          "href": "/experience/tinkerverse",
+          "label": "Creator, Tinker Verse",
+          "line": "Personal lab for physical computing, agentic software, and expressive prototypes."
+        },
+        {
+          "href": "/experience/bits",
+          "label": "B.E. Civil Engineering + M.Sc. Biological Sciences, BITS Pilani, Hyderabad Campus",
+          "line": "Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives."
+        },
+        {
+          "href": "/book/surya",
+          "label": "Surya",
+          "line": "A wall piece that shows when my family is awake"
+        },
+        {
+          "href": "/book/jarvis",
+          "label": "Jarvis",
+          "line": "A voice assistant I built for my home"
+        },
+        {
+          "href": "/book/muse",
+          "label": "Muse",
+          "line": "Meta’s Muse AI on my desk, in a body I built with AI agents"
+        },
+        {
+          "href": "/book/bambu",
+          "label": "Making together",
+          "line": "The studio, the workshops, and a guide to take with you"
+        }
+      ]
+    },
+    "/mat": {
+      "heading": "Adi Agarwal: Product Manager, AI and Analytics",
+      "paragraphs": [
+        "Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation.",
+        "Adi Agarwal (Aditya Agarwal) is a product manager who builds what he designs: AI agents, connected hardware, 3D interfaces and data products. He has led product and data analytics at Zomato, Udaan and Snapdeal, and is studying for an M.S. in Engineering Design Innovation at Northwestern University."
+      ],
+      "skills": [],
+      "links": [
+        {
+          "href": "/work/glyph",
+          "label": "Glyph: A Body for AI",
+          "line": "I built a wearable test bed to see what happens when AI leaves the chat window and becomes something you can wear, move, and build on."
+        },
+        {
+          "href": "/work/pg-haircare",
+          "label": "P&G · Hair Care Product Packaging",
+          "line": "Rethinking the bottle, and the routine around it."
+        },
+        {
+          "href": "/work/zero-my-ai",
+          "label": "Zero: Second Brain AI Assistant",
+          "line": "Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop."
+        },
+        {
+          "href": "/work/familysync-jpmorgan",
+          "label": "FamilySync – Agentic family coordination with JPMorgan Chase",
+          "line": "An agent that coordinates a family when a child's day changes. It does the legwork; a person approves every handoff."
+        },
+        {
+          "href": "/work/mcdonalds-interaction-design",
+          "label": "Squad Up — group ordering for McDonald’s",
+          "line": "Group ordering across shared digital touchpoints"
+        },
+        {
+          "href": "/work/surya",
+          "label": "Surya: Kinetic Wall Timepiece",
+          "line": "A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep."
+        },
+        {
+          "href": "/work/solopump",
+          "label": "SoloPump: One-Handed Liquid Dispenser",
+          "line": "An automated drink dispensing machine that pours measured drinks or shots, with manual control and a web interface to adjust output."
+        },
+        {
+          "href": "/work/helios",
+          "label": "Helios: Mechanical Kinetic Lamp",
+          "line": "A 3D-printed lamp. Turn the ring by hand and eight spur gears change the light."
+        },
+        {
+          "href": "/work/jarvis",
+          "label": "Jarvis: Voice-Controlled Smart Home Assistant",
+          "line": "A voice assistant I built for my home. Walk up and it wakes."
+        },
+        {
+          "href": "/work/plotter",
+          "label": "Plotter: Speech-to-Draw Machine",
+          "line": "A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code."
+        },
+        {
+          "href": "/work/portfolio-website",
+          "label": "Portfolio Website",
+          "line": "This site. I build it with AI coding agents: Antigravity, Codex and Claude."
+        },
+        {
+          "href": "/experience/self-xyz",
+          "label": "AI Product Manager (Intern), Self",
+          "line": "Worked across product thinking and hands-on development with engineers on multi-step agentic products, exploring how capable AI workflows can stay understandable and user-directed."
+        },
+        {
+          "href": "/experience/portfolio-website",
+          "label": "Portfolio V2, Personal Project",
+          "line": "Building this portfolio with agentic coding workflows."
+        },
+        {
+          "href": "/experience/ms-edi",
+          "label": "MS Engineering Design Innovation, Northwestern University | Segal Design Institute",
+          "line": "Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work."
+        },
+        {
+          "href": "/experience/zomato",
+          "label": "Senior Product Analyst, Zomato",
+          "line": "Analytics for the home screen of India's largest food delivery app."
+        },
+        {
+          "href": "/experience/jarvis-competition",
+          "label": "Jarvis Assistant, Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge",
+          "line": "Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT."
+        },
+        {
+          "href": "/experience/udaan",
+          "label": "Product Analyst, Udaan",
+          "line": "Built analytics and decision systems across supply chain, marketplace, and product at national scale."
+        },
+        {
+          "href": "/experience/schmooze",
+          "label": "Product and Growth Analyst, Schmooze",
+          "line": "Pre-PMF analytics at a seed-stage dating app exploring meme-based matching."
+        },
+        {
+          "href": "/experience/snapdeal",
+          "label": "Data Analyst · Ads & Supply Infrastructure, Snapdeal",
+          "line": "Building ads analytics and supply infrastructure during Snapdeal's first-party transition."
+        },
+        {
+          "href": "/experience/tinkerverse",
+          "label": "Creator, Tinker Verse",
+          "line": "Personal lab for physical computing, agentic software, and expressive prototypes."
+        },
+        {
+          "href": "/experience/bits",
+          "label": "B.E. Civil Engineering + M.Sc. Biological Sciences, BITS Pilani, Hyderabad Campus",
+          "line": "Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives."
+        },
+        {
+          "href": "/book/surya",
+          "label": "Surya",
+          "line": "A wall piece that shows when my family is awake"
+        },
+        {
+          "href": "/book/jarvis",
+          "label": "Jarvis",
+          "line": "A voice assistant I built for my home"
+        },
+        {
+          "href": "/book/muse",
+          "label": "Muse",
+          "line": "Meta’s Muse AI on my desk, in a body I built with AI agents"
+        },
+        {
+          "href": "/book/bambu",
+          "label": "Making together",
+          "line": "The studio, the workshops, and a guide to take with you"
+        }
+      ]
+    },
+    "/classic": {
+      "heading": "Adi Agarwal: Product Manager, AI and Analytics",
+      "paragraphs": [
+        "Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation.",
+        "Adi Agarwal (Aditya Agarwal) is a product manager who builds what he designs: AI agents, connected hardware, 3D interfaces and data products. He has led product and data analytics at Zomato, Udaan and Snapdeal, and is studying for an M.S. in Engineering Design Innovation at Northwestern University."
+      ],
+      "skills": [],
+      "links": [
+        {
+          "href": "/work/glyph",
+          "label": "Glyph: A Body for AI",
+          "line": "I built a wearable test bed to see what happens when AI leaves the chat window and becomes something you can wear, move, and build on."
+        },
+        {
+          "href": "/work/pg-haircare",
+          "label": "P&G · Hair Care Product Packaging",
+          "line": "Rethinking the bottle, and the routine around it."
+        },
+        {
+          "href": "/work/zero-my-ai",
+          "label": "Zero: Second Brain AI Assistant",
+          "line": "Zero talks, chats, remembers people and projects, helps me code, generates images, and turns bugs and feature ideas into a build loop."
+        },
+        {
+          "href": "/work/familysync-jpmorgan",
+          "label": "FamilySync – Agentic family coordination with JPMorgan Chase",
+          "line": "An agent that coordinates a family when a child's day changes. It does the legwork; a person approves every handoff."
+        },
+        {
+          "href": "/work/mcdonalds-interaction-design",
+          "label": "Squad Up — group ordering for McDonald’s",
+          "line": "Group ordering across shared digital touchpoints"
+        },
+        {
+          "href": "/work/surya",
+          "label": "Surya: Kinetic Wall Timepiece",
+          "line": "A kinetic wall-mounted timepiece that represents my family across global time zones, opening and closing as they wake and sleep."
+        },
+        {
+          "href": "/work/solopump",
+          "label": "SoloPump: One-Handed Liquid Dispenser",
+          "line": "An automated drink dispensing machine that pours measured drinks or shots, with manual control and a web interface to adjust output."
+        },
+        {
+          "href": "/work/helios",
+          "label": "Helios: Mechanical Kinetic Lamp",
+          "line": "A 3D-printed lamp. Turn the ring by hand and eight spur gears change the light."
+        },
+        {
+          "href": "/work/jarvis",
+          "label": "Jarvis: Voice-Controlled Smart Home Assistant",
+          "line": "A voice assistant I built for my home. Walk up and it wakes."
+        },
+        {
+          "href": "/work/plotter",
+          "label": "Plotter: Speech-to-Draw Machine",
+          "line": "A DIY plotter that turns spoken words into plotted drawings by converting speech to text, then text to vector strokes and G-code."
+        },
+        {
+          "href": "/work/portfolio-website",
+          "label": "Portfolio Website",
+          "line": "This site. I build it with AI coding agents: Antigravity, Codex and Claude."
+        },
+        {
+          "href": "/experience/self-xyz",
+          "label": "AI Product Manager (Intern), Self",
+          "line": "Worked across product thinking and hands-on development with engineers on multi-step agentic products, exploring how capable AI workflows can stay understandable and user-directed."
+        },
+        {
+          "href": "/experience/portfolio-website",
+          "label": "Portfolio V2, Personal Project",
+          "line": "Building this portfolio with agentic coding workflows."
+        },
+        {
+          "href": "/experience/ms-edi",
+          "label": "MS Engineering Design Innovation, Northwestern University | Segal Design Institute",
+          "line": "Learning to decide what is worth building, and how to make it real across partner-led systems, services, and interaction design work."
+        },
+        {
+          "href": "/experience/zomato",
+          "label": "Senior Product Analyst, Zomato",
+          "line": "Analytics for the home screen of India's largest food delivery app."
+        },
+        {
+          "href": "/experience/jarvis-competition",
+          "label": "Jarvis Assistant, Top 10 Finalist · ASEAN-wide Edge AI & IoT Challenge",
+          "line": "Top-10 DIY voice-recognition home assistant built with Maixduino and MQTT."
+        },
+        {
+          "href": "/experience/udaan",
+          "label": "Product Analyst, Udaan",
+          "line": "Built analytics and decision systems across supply chain, marketplace, and product at national scale."
+        },
+        {
+          "href": "/experience/schmooze",
+          "label": "Product and Growth Analyst, Schmooze",
+          "line": "Pre-PMF analytics at a seed-stage dating app exploring meme-based matching."
+        },
+        {
+          "href": "/experience/snapdeal",
+          "label": "Data Analyst · Ads & Supply Infrastructure, Snapdeal",
+          "line": "Building ads analytics and supply infrastructure during Snapdeal's first-party transition."
+        },
+        {
+          "href": "/experience/tinkerverse",
+          "label": "Creator, Tinker Verse",
+          "line": "Personal lab for physical computing, agentic software, and expressive prototypes."
+        },
+        {
+          "href": "/experience/bits",
+          "label": "B.E. Civil Engineering + M.Sc. Biological Sciences, BITS Pilani, Hyderabad Campus",
+          "line": "Interdisciplinary academic training combined with hands-on leadership across technical, biological, and student-led initiatives."
+        },
+        {
+          "href": "/book/surya",
+          "label": "Surya",
+          "line": "A wall piece that shows when my family is awake"
+        },
+        {
+          "href": "/book/jarvis",
+          "label": "Jarvis",
+          "line": "A voice assistant I built for my home"
+        },
+        {
+          "href": "/book/muse",
+          "label": "Muse",
+          "line": "Meta’s Muse AI on my desk, in a body I built with AI agents"
+        },
+        {
+          "href": "/book/bambu",
+          "label": "Making together",
+          "line": "The studio, the workshops, and a guide to take with you"
+        }
+      ]
+    }
+  }
+}
