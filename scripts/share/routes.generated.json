@@ -27,19 +27,6 @@
       "noSitemap": true
     },
     {
-      "path": "/classic",
-      "canonical": "/",
-      "kind": "home",
-      "title": "Adi Agarwal: Product Manager, AI and Analytics",
-      "description": "Product manager with an analytics background: e-commerce, advertising, supply chains and food delivery. Now at Northwestern, M.S. Engineering Design Innovation.",
-      "image": "home.jpg",
-      "imageAlt": "Adi Agarwal's portfolio",
-      "fallback": false,
-      "source": null,
-      "why": "",
-      "noSitemap": true
-    },
-    {
       "path": "/work/glyph",
       "canonical": "/work/glyph",
       "kind": "project",

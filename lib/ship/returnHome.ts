@@ -1,22 +1,18 @@
 /**
- * A project or experience page opened by its own address (/work/<id>, /experience/<id>: a shared link, the sitemap,
- * the résumé, or a link on the 3D home) is drawn by the old home, over the old home. When it closes, the visitor goes
- * back to the home they came from:
- *  - they came from one of this site's home pages in this tab (the 3D home, /classic, or the old home at "/"): step
- *    back one page, so the browser shows that page as it was left;
- *  - they chose the old home by address earlier in this tab (/classic): stay on it;
- *  - otherwise: the front door ("/"), which is the 3D home on a capable desktop, or stay on the old home (phones).
+ * A project or experience page (/work/<id>, /experience/<id>: a link on the mat, a shared link, the sitemap, the résumé)
+ * is its own page (lib/ship/BranchPage.tsx). When it closes, the visitor goes back to the home:
+ *  - they came from the home in this tab (the 3D mat, or its flat copy on a phone): step back one page, so the browser
+ *    shows that page as it was left;
+ *  - otherwise: the front door ("/"), which is the 3D mat on a capable desktop and the flat home on a phone.
  * It only ever steps back or replaces the current page, so pressing Back again and again always leaves the site.
  *
  * The dialog history itself (hooks/useDialogA11y) is untouched: this only listens for the moment the address is back
  * at "/" with no dialog entry on top, which is where every close path (close button, Escape, browser Back) ends.
- *
- * (Ship layer: kept in scripts/ship/files/lib/ship/ and copied into place by scripts/ship/port-home.mjs.)
  */
 import { BOOT } from './boot';
 import { canTake3DHome, readHomeMark } from './frontDoor';
 
-const HOME_PATHS = new Set(['/', '/mat', '/classic', '/home-flat']);
+const HOME_PATHS = new Set(['/', '/mat', '/home-flat']);
 
 function cameFromHome(): boolean {
   // opened in a new tab or window: there is no page to step back to
@@ -41,7 +37,6 @@ export function landHome(): boolean {
     fallback = window.setTimeout(() => { window.location.replace(canTake3DHome() ? '/' : '/home-flat/'); }, 1200);
     return false;
   }
-  if (readHomeMark() === 'classic') return false;
   if (canTake3DHome()) { window.location.replace('/'); return true; }
   // a phone or a browser without WebGL 2: its home is the flat page
   window.location.replace('/home-flat/');
@@ -50,9 +45,9 @@ export function landHome(): boolean {
 
 if (typeof window !== 'undefined') {
   window.addEventListener('pagehide', () => window.clearTimeout(fallback));
-  // Forward after stepping back can bring this page back from the browser's cache: show the front door, not the old home at "/"
+  // Forward after stepping back can bring this page back from the browser's cache, closed and empty: show the front door
   window.addEventListener('pageshow', (event) => {
-    if (event.persisted && steppedBack && readHomeMark() !== 'classic' && canTake3DHome()) window.location.replace('/');
+    if (event.persisted && steppedBack && canTake3DHome()) window.location.replace('/');
   });
 }
 

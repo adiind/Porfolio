@@ -37,10 +37,10 @@ const projectDetail = read('components/ProjectDetail.tsx');
 requireSource(projectDetail.includes("trackEvent('project_opened'"), 'The canonical project detail must emit project_opened');
 requireSource(projectDetail.includes("contentType: 'project'"), 'The canonical project detail must time engagement');
 
+// (the branch page opens a case study by its address; the other two open one from inside their own page)
 const projectHosts = [
-  'components/ProjectsSection.tsx',
+  'lib/ship/BranchPage.tsx',
   'components/ExperienceDetail.tsx',
-  'components/MobileTimeline.tsx',
   'components/TinkerVerseModal.tsx',
 ];
 for (const path of projectHosts) {
@@ -54,11 +54,7 @@ for (const path of projectHosts) {
 }
 
 const experienceDetail = read('components/ExperienceDetail.tsx');
-requireSource(experienceDetail.includes("trackEvent('experience_opened'"), 'Desktop experience details must emit experience_opened');
-requireSource(experienceDetail.includes("contentType: 'experience'"), 'Desktop experience details must time engagement');
-
-const mobileTimeline = read('components/MobileTimeline.tsx');
-requireSource(mobileTimeline.includes("trackEvent('experience_opened'"), 'Mobile inline experiences must emit experience_opened');
-requireSource(mobileTimeline.includes("contentType: 'experience'"), 'Mobile inline experiences must time engagement');
+requireSource(experienceDetail.includes("trackEvent('experience_opened'"), 'Experience pages must emit experience_opened');
+requireSource(experienceDetail.includes("contentType: 'experience'"), 'Experience pages must time engagement');
 
 console.log('OpenPanel analytics source verification passed.');

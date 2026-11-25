@@ -139,7 +139,7 @@ function shipHeadPreloads(): Plugin {
           const all = closure(found[0]);
           return { js: all.js.filter((url) => !loaded.js.includes(url)), css: all.css.filter((url) => !loaded.css.includes(url)) };
         };
-        const code = { mat: home('components/flipbook/FlipBookApp.tsx'), old: home('lib/ship/OldHome.tsx') };
+        const code = { mat: home('components/flipbook/FlipBookApp.tsx'), branch: home('lib/ship/BranchPage.tsx') };
         if (!code.mat.js.some((url) => /\/three-[\w-]+\.js$/.test(url))) fail('the 3D home no longer starts with the three chunk');
         const anchor = 'var code = {};';
         if (html.split(anchor).length !== 2) fail(`index.html: \`${anchor}\` is not there exactly once`);

@@ -48,7 +48,7 @@ await esbuild.build({
 const data = await import(pathToFileURL(bundle).href);
 fs.rmSync(tmp, { recursive: true, force: true });
 
-// 2. The home page's own words (index.html), so /mat and /classic repeat them.
+// 2. The home page's own words (index.html), so /mat repeats them.
 const indexHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const grab = (re, what) => { const m = re.exec(indexHtml); if (!m) throw new Error(`index.html: no ${what}`); return m[1].replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>'); };
 const HOME_TITLE = grab(/<title>([^<]*)<\/title>/, 'title');
@@ -73,9 +73,8 @@ const localFile = (url) => (url && url.startsWith('/') ? path.join(root, 'public
 const pages = [];
 const home = { path: '/', canonical: '/', kind: 'home', title: HOME_TITLE, description: HOME_DESC, imageKey: null, imageAlt: HOME_ALT };
 pages.push(home);
-// /mat and /classic are the home page under another address: they name / as their own and stay out of the sitemap.
+// /mat is the home page under another address: it names / as its own and stays out of the sitemap.
 pages.push({ ...home, path: '/mat', canonical: '/', kind: 'home', noSitemap: true });
-pages.push({ ...home, path: '/classic', canonical: '/', kind: 'home', noSitemap: true });
 
 for (const p of data.PROJECTS) {
   pages.push({ path: `/work/${p.id}`, canonical: `/work/${p.id}`, kind: 'project', title: p.hero.title + SUFFIX, description: trim(p.hero.oneLiner), imageKey: p.id, imageSrc: p.heroImage, imageAlt: p.hero.title });

@@ -8,7 +8,7 @@ import { canTake3DHome, clearDarkRoom, ensureDarkRoom, isExperiencePath, isWorkP
 import { SHIP_BOOKS } from './lib/ship/books';
 
 // Every route's root is loaded lazily, so each route downloads only its own code:
-// the 3D home never fetches the old home (App), and the old home never fetches the 3D code or the mat pictures.
+// the 3D home never fetches the case-study pages, and those never fetch the 3D code or the mat pictures.
 
 const path = BOOT.pathname;
 const isStudioRoute = /^\/studio\/?$/.test(path);
@@ -18,20 +18,21 @@ const bookSlug = bookRoute?.[1]?.toLowerCase() ?? null;
 // Only the books that lie on the mat are published (lib/ship/books.ts); development keeps every book reachable.
 const hiddenBook = Boolean(bookRoute && bookSlug && !import.meta.env.DEV && !SHIP_BOOKS.includes(bookSlug));
 // "/" and "/mat": the 3D home, but only for a browser that can take it (decided here, before any 3D code loads).
-// "/#writings" is the old home's only address for its writings, so it keeps the old home.
 const isHomeRoute = /^\/(mat\/?)?$/i.test(path);
-const show3DHome = isHomeRoute && window.location.hash !== '#writings' && canTake3DHome();
-// "/classic": always the old home, on any device.
-const isClassicRoute = /^\/classic\/?$/i.test(path);
-// /work/<id> (a Selected Work case study) and /experience/<id> (a timeline stop) open over the old home.
+const show3DHome = isHomeRoute && canTake3DHome();
+// /work/<id> (a case study) and /experience/<id> (a timeline stop): each its own page (lib/ship/BranchPage.tsx).
 const isDeepLink = !isStudioRoute && (isWorkPath(path) || isExperiencePath(path));
+// No such page (the old home's /classic went with it): the home. index.html already sends these away; this is the same rule
+// for the development server and for a browser that ran this far.
+const noSuchPage = !isHomeRoute && !isDeepLink && !bookRoute && !isStudioRoute;
 
-if (hiddenBook) {
+if (hiddenBook || noSuchPage) {
   window.location.replace('/');
 } else {
-  // Deep link: the old home opens the detail named by the address (lib/workRoutes reads it from lib/ship/boot).
-  // Reset the address bar to the site root so the detail overlay owns the /work/<id> or /experience/<id> history entry
-  // it pushes via useDialogA11y: browser Back then closes the detail without leaving the site. Unknown ids land on "/".
+  // Deep link: the branch page opens the detail named by the address (lib/workRoutes reads it from lib/ship/boot).
+  // Reset the address bar to the site root so the detail owns the /work/<id> or /experience/<id> history entry
+  // it pushes via useDialogA11y: Close, Escape and browser Back then all end at "/" and lib/ship/returnHome takes the
+  // visitor home. Unknown ids land on "/".
   if (isDeepLink) {
     window.history.replaceState(null, '', '/');
   }
@@ -46,11 +47,10 @@ if (hiddenBook) {
     markMatLinks();
   } else if (isHomeRoute) {
     // index.html may have started the dark room on a window that looked wide enough, but this browser cannot take the 3D
-    // home (no WebGL 2): it gets the flat home (public/home-flat), as phones do; "/#writings" keeps the old home
+    // home (no WebGL 2): it gets the flat home (public/home-flat), as phones do
     clearDarkRoom();
-    if (window.location.hash !== '#writings') window.location.replace('/home-flat/' + window.location.hash);
+    window.location.replace('/home-flat/' + (window.location.hash === '#writings' ? '' : window.location.hash));
   }
-  if (isClassicRoute) rememberHome('classic');
 }
 
 /**
@@ -70,9 +70,8 @@ function lazyRoot<P extends object>(load: () => Promise<React.ComponentType<P>>)
   return { Component, ready };
 }
 
-// The old home: every route that is not the 3D home, a book or the studio.
-const toFlatHome = isHomeRoute && !show3DHome && window.location.hash !== '#writings';
-const OldHome = !show3DHome && !toFlatHome && !bookRoute && !isStudioRoute ? lazyRoot(() => import('./lib/ship/OldHome').then((module) => module.default)) : null;
+// A case study or a timeline page, alone on its page.
+const BranchPage = isDeepLink ? lazyRoot(() => import('./lib/ship/BranchPage').then((module) => module.default)) : null;
 const StudioApp = import.meta.env.DEV
   ? React.lazy(() => Promise.all([import('framer-motion'), import('./components/StudioApp')]).then(([motion, studio]) => ({
     default: () => <motion.MotionConfig reducedMotion="user"><studio.default /></motion.MotionConfig>,
@@ -92,8 +91,8 @@ if (isStudioRoute) {
   robots?.setAttribute('content', 'noindex, nofollow, noarchive');
 }
 
-// The old home's own background while its code arrives (as body has it in index.html), so the wait never flashes another colour.
-const oldHomeWait = <div style={{ minHeight: '100vh', background: '#050505' }} aria-label="Loading" />;
+// The page's own background while its code arrives (as body has it in index.html), so the wait never flashes another colour.
+const branchWait = <div style={{ minHeight: '100vh', background: '#050505' }} aria-label="Loading" />;
 
 const RouteRoot: React.FC = () => {
   if (MatHome) {
@@ -108,7 +107,9 @@ const RouteRoot: React.FC = () => {
       </React.Suspense>
     );
   }
-  if (OldHome) return <React.Suspense fallback={oldHomeWait}><OldHome.Component /></React.Suspense>;
+  if (BranchPage) return <React.Suspense fallback={branchWait}><BranchPage.Component /></React.Suspense>;
+  // (on its way to the home: draw nothing meanwhile)
+  if (noSuchPage || isHomeRoute) return null;
 
   if (!StudioApp) {
     return (
@@ -134,8 +135,8 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-// (a hidden book is on its way to "/": draw nothing meanwhile)
-if (!hiddenBook) {
+// (a hidden book or an address that is no page is on its way to "/": draw nothing meanwhile)
+if (!hiddenBook && !noSuchPage) {
   const root = ReactDOM.createRoot(rootElement);
   const draw = () => root.render(
     <React.StrictMode>
@@ -145,7 +146,7 @@ if (!hiddenBook) {
     </React.StrictMode>
   );
   // (first the route's code, then the first render: see lazyRoot)
-  const ready = (MatHome ?? FlipBookApp ?? OldHome)?.ready;
+  const ready = (MatHome ?? FlipBookApp ?? BranchPage)?.ready;
   // (and, where the page is written in Tailwind classes, its compiler: index.html adds it by script and says when it has run.
   // The 3D home and the books do not load it and have nothing to wait for.)
   const tailwind = (window as Window & { __tailwindReady?: Promise<void> }).__tailwindReady;

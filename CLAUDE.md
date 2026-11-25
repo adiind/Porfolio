@@ -24,13 +24,14 @@ Verify changes with `npm run build` plus a browser check on `localhost:3000` —
 
 ## Architecture
 
-- `App.tsx` — application shell: intro flow, section state, global modal/overlay coordination, custom scroll + mobile gesture bridging.
-- `components/` — Hero (cutting-mat SVG surface), timeline (`TimelineRail`, `TimelineEvent`, `MobileTimeline`), Selected Work (`ProjectsSection`, `ProjectCard`, `ProjectDetail`), writings (`BlogSection`, `BlogDetail`), `ProjectStudio` (live project editor), shared primitives in `components/ui/`.
-- `data/` — all portfolio content: `projects.ts`, `timeline.ts`, `posts.ts`, per-project case studies in `data/projects/*.json`, and the synced Notion cache `notion-tasks.json`.
+- **The 3D mat is the only home** (Adi, 2026-11-24: "this new 3d mat is everything and branches to everything"). There is no old home, no `/classic`, no blog: `App.tsx`, `Hero`, the old timeline, `ProjectsSection`, the project wheel and the blog components were deleted that day. Do not bring a second home back.
+- `index.html` (the inline "door" script) and `index.tsx` decide the page: `/` and `/mat` are the mat (`components/flipbook/FlipBookApp.tsx`, `components/mat/`, `lib/mat/`, `lib/flipbook/`) in a wide window and the flat copy `public/home-flat/` on a phone; `/book/<slug>` is a flip book; `/work/<id>` and `/experience/<id>` are **branch pages** (`lib/ship/BranchPage.tsx`): the detail component alone on its page (`ProjectDetail` and its variants, `ExperienceDetail`, `TinkerVerseModal`, `CaseStudyModal`), nothing underneath. Any other address goes to `/`.
+- Leaving a branch page: the detail owns one history entry (`hooks/useDialogA11y.ts`), so Close, Escape and browser Back all end at `/`, and `lib/ship/returnHome.ts` steps back to the mat as it was left (or loads the home on a direct visit). Checked by `e2e/`.
+- `data/` — all portfolio content: `projects.ts`, `timeline.ts` (the experience pages and the Snapdeal bag read it), per-project case studies in `data/projects/*.json`, the mat's own `lib/mat/timelineData.json` and `public/data/*-story.json`, and the synced Notion cache `notion-tasks.json`.
 - `context/ProjectsContext.tsx` + `lib/projectDraftStorage.ts` — runtime project state for the Portfolio Studio editor; drafts persist to IndexedDB. Publishing roadmap lives in `PORTFOLIO_STUDIO_PLAN.md`.
 - `lib/analytics.ts` — vendor-neutral event tracking (Zaraz/PostHog/Plausible/Umami browser globals, all optional).
 
 ## Conventions
 
 - `AGENTS.md` is a prepend-only session changelog: after completing a work session, add a dated one-line entry at the **top** describing what changed and how it was verified (build + browser check, screenshots for UI passes).
-- Mobile behavior is hand-tuned (touch/wheel/pointer gesture bridging in `App.tsx`) — check both desktop and mobile viewports after touching scroll or overlay logic.
+- Check both a wide window and a phone-sized one (390 px) after touching routing, a branch page or anything that scrolls: phones get the flat home and the same branch pages.

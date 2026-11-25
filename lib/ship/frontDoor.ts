@@ -54,8 +54,8 @@ export function ensureDarkRoom(): void {
 }
 
 const HOME_KEY = 'home-from';
-/** Which home this tab last showed: 'mat' (the 3D home) or 'classic' (/classic, the old home chosen by address). */
-export function rememberHome(kind: 'mat' | 'classic'): void {
+/** This tab has shown the 3D home (read by lib/ship/returnHome when a browser sends no referrer). */
+export function rememberHome(kind: 'mat'): void {
   try { window.sessionStorage.setItem(HOME_KEY, kind); } catch { /* storage blocked: the referrer still tells */ }
 }
 export function readHomeMark(): string | null {

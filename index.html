@@ -13,22 +13,26 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="manifest" href="/site.webmanifest" />
-  <!-- (ship layer, scripts/ship/main.patch) Which home this window gets, decided once, before anything is fetched. "mat": "/" or "/mat"
-       in a window the 3D home can take, at least 760 px wide and 1.15 times as wide as tall (the rule of lib/ship/frontDoor.ts and
-       components/flipbook/FlipBookApp.tsx); "/#writings" is the old home's. "book": /book/<slug>. "old": the old home, everywhere
-       else, except "/" and "/mat" in a window too small for the 3D home, which go to the flat home at /home-flat/. The head scripts below read window.__shipDoor. The old home's hero picture is preloaded for the old home only. -->
+  <!-- Which page this window gets, decided once, before anything is fetched. The 3D mat is the site's only home (Adi,
+       2026-11-24: "this new 3d mat is everything and branches to everything").
+       "mat": "/" or "/mat" in a window the 3D home can take, at least 760 px wide and 1.15 times as wide as tall (the rule of
+       lib/ship/frontDoor.ts and components/flipbook/FlipBookApp.tsx); a phone-sized, narrow or tall window is sent to the
+       flat copy of the mat at /home-flat/. "book": /book/<slug>. "branch": a case study (/work/<id>) or a timeline page
+       (/experience/<id>), drawn as its own page (lib/ship/BranchPage.tsx). "studio": the owner's editor, in development.
+       Every other address (the old home's /classic, its /#writings, anything unknown) goes to the home.
+       The head scripts below read window.__shipDoor. -->
   <script>
     (function () {
       var w = window.innerWidth || document.documentElement.clientWidth, h = window.innerHeight || document.documentElement.clientHeight, p = location.pathname;
-      var door = /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings' && w >= 760 && h > 0 && w / h >= 1.15 ? 'mat'
-        : /^\/book(?:\/[a-z0-9-]+)?\/?$/i.test(p) ? 'book' : /^\/studio\/?$/.test(p) ? 'studio' : 'old';
+      var home = /^\/(mat\/?)?$/i.test(p);
+      var door = home ? (w >= 760 && h > 0 && w / h >= 1.15 ? 'mat' : 'flat')
+        : /^\/book(?:\/[a-z0-9-]+)?\/?$/i.test(p) ? 'book' : /^\/studio\/?$/.test(p) ? 'studio'
+        : /^\/(work|experience)\/[A-Za-z0-9-]+\/?$/.test(p) ? 'branch' : 'none';
       // "/" or "/mat" in a phone-sized, narrow or tall window: the flat home (public/home-flat), before anything else loads
-      if (door === 'old' && /^\/(mat\/?)?$/i.test(p) && location.hash !== '#writings') { location.replace('/home-flat/' + location.hash); return; }
+      if (door === 'flat') { location.replace('/home-flat/' + (location.hash === '#writings' ? '' : location.hash)); return; }
+      // no such page (or one that went with the old home): the home
+      if (door === 'none') { location.replace('/'); return; }
       window.__shipDoor = door;
-      if (door !== 'old') return;
-      var hero = document.createElement('link');
-      hero.rel = 'preload'; hero.as = 'image'; hero.href = '/images/adi_floating_avatar_workshop.png'; hero.fetchPriority = 'high';
-      document.head.appendChild(hero);
     })();
   </script>
 
@@ -349,9 +353,9 @@
         '/images/flipbook/surya/parts/product.webp',
       ];
       // port-home:END first-frame
-      // (also read by the 3D home, lib/mat/caseStudyHandoff.ts warmCaseStudies: the old home's code is what a case study needs)
+      // (also read by the 3D home, lib/mat/caseStudyHandoff.ts warmCaseStudies: the branch page's code is what a case study needs)
       window.__shipCode = code;
-      var first = door === 'mat' || door === 'old' ? code[door] : null;
+      var first = door === 'mat' || door === 'branch' ? code[door] : null;
       if (door !== 'mat') pictures = [];
       var add = function (rel, href, as, cors, more) {
         var link = document.createElement('link');
@@ -496,7 +500,6 @@
 <body>
   <div id="root" style="position: relative; z-index: 10;"></div>
   <div class="bg-noise"></div>
-  <script src="/shared/scroll-settle.js?v=3"></script>
   <!-- Tailwind, only where it is used. The old home, the case studies and the timeline pages are written in Tailwind classes
        and get its compiler from the CDN, as before (CLAUDE.md: it is not a build dependency). The 3D home and the flip books
        use none of its classes: all the compiler ever made for them was the fixed base sheet below (its reset and variable

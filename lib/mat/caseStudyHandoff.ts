@@ -84,7 +84,7 @@ const CASE_STORY_PAGES = [SQUAD_UP_STORY, FAMILYSYNC_STORY];
 /** The logos the splash shows (index.html), fetched ahead so they are there the moment it grows. */
 const SPONSOR_LOGOS = ['/images/sponsors/jpmorganchase.svg', '/images/pg/pg-logo-official.svg'];
 
-type ShipCode = { old?: { js: string[]; css: string[] } };
+type ShipCode = { branch?: { js: string[]; css: string[] } };
 let warmed = false;
 
 /**
@@ -111,7 +111,7 @@ export function warmCaseStudies(): void {
     seen.add(at.href);
     queue.push(at.href);
   };
-  const code = (window as Window & { __shipCode?: ShipCode }).__shipCode?.old;
+  const code = (window as Window & { __shipCode?: ShipCode }).__shipCode?.branch;
   code?.js.forEach(add);
   code?.css.forEach(add);
 

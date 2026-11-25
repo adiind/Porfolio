@@ -13,8 +13,6 @@
     "sync:push": "node scripts/notion-sync.cjs push",
     "sync:list": "node scripts/notion-sync.cjs list",
     "sync:status": "node scripts/notion-sync.cjs status",
-    "verify:project-wheel": "node scripts/verify-project-wheel.mjs",
-    "verify:startup-layout": "node scripts/smoke-startup-layout.cjs",
     "verify:analytics": "node scripts/verify-openpanel-analytics.mjs",
     "e2e": "playwright test"
   },
