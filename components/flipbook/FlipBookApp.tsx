@@ -907,6 +907,34 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     const later = window.setTimeout(() => whenQuiet(() => warmCaseStudies(), 12000), 3000);
     return () => window.clearTimeout(later);
   }, [fallback, lit, staged]);
+  // Back from a branch (a case study, a timeline page): the mat comes back where it was left, not at its top. The browser
+  // often keeps the page as it was and nothing is needed; when it loads the mat afresh instead, its own scroll restore
+  // fails, because the page below the first screen only exists once the room is lit. So the place is noted on the way
+  // out and gone back to, in one jump, as soon as the page is long enough again. (Only on a step back or forward: a
+  // fresh visit and a reload start at the top.)
+  useEffect(() => {
+    if (!staged) return undefined;
+    const note = () => { try { window.sessionStorage.setItem('mat-left-at', String(Math.round(window.scrollY))); } catch { /* storage blocked: it starts at the top */ } };
+    window.addEventListener('pagehide', note);
+    return () => window.removeEventListener('pagehide', note);
+  }, [staged]);
+  useEffect(() => {
+    if (!staged || fallback || !lit) return undefined;
+    const arrival = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    if (arrival?.type !== 'back_forward') return undefined;
+    let leftAt = 0;
+    try { leftAt = Number(window.sessionStorage.getItem('mat-left-at')) || 0; } catch { /* starts at the top */ }
+    if (leftAt < 40 || window.scrollY > 40) return undefined;
+    let tries = 0;
+    let timer = 0;
+    const go = () => {
+      const room = document.documentElement.scrollHeight - window.innerHeight;
+      if (room >= leftAt - 2 || tries++ > 60) { window.scrollTo({ top: Math.min(leftAt, Math.max(0, room)), behavior: 'instant' }); return; }
+      timer = window.setTimeout(go, 50);
+    };
+    go();
+    return () => window.clearTimeout(timer);
+  }, [fallback, lit, staged]);
   /** Come down to the bag: it unpacks (Back waits until it has). */
   const bagArrive = useCallback(() => {
     const layer = bagRef.current?.layer;
