@@ -33,6 +33,7 @@ import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
 import { RECORD, RECORD_DIVE_FRAC, RECORD_EMBED_SRC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, soundSpin, storeRecordDive } from '../../lib/mat/soundRecord';
 import { createSoundRecordRing, type SoundRecordRing } from '../../lib/mat/soundRecordRing';
+import { BOT_TABLET } from '../../lib/mat/botTablet';
 import { createBagLayer, preloadZomatoBag, type BagLayer, type ItemId as BagItem } from '../../lib/mat/zomatoBag';
 import { TEXT as BAG_TEXT } from '../../lib/mat/zomatoBagArt';
 import { createHandoutsLayer, type HandoutsLayer } from '../../lib/mat/handoutsLayer';
@@ -275,7 +276,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the Zomato bag's pictures start coming now, beside the stage's (not waited for: the bag is built when they are in)
   void preloadZomatoBag().catch(() => undefined);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
-  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, clipPictures] = await Promise.all([
+  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, clipPictures, , botTablet] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
     hasRescue ? Promise.all([loadPicture(RESCUE_SOURCES.bag), loadPicture(RESCUE_SOURCES.logo), loadPicture(RESCUE_SOURCES.offer)]) : Promise.resolve(null),
     Promise.all(others.map((item) => loadPicture(item.pages[0].art.src))),
@@ -290,6 +291,8 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     // (the same pictures as lib/mat/designCards.ts DESIGN_PICTURES and DESIGN_PG_MARK, written out for the ship kit)
     Promise.all([loadPicture('/images/familysync_jpmorgan_chase.webp'), loadPicture('/images/mcdonalds_order.webp'), loadPicture('/images/pg/rooms/room-hero.webp'), loadPicture('/images/pg/pg-logo-official.svg')]),
     loadFlipbookFonts('first'),
+    // Bot's tablet on its birch stand (lib/mat/botTablet.ts): the mat lights without it if it cannot be loaded
+    loadPicture('/images/mat/bot-tablet.webp').catch(() => null),
   ]);
   const posters = STAGE_POSTERS.map((poster, index) => {
     const image = posterPictures[index];
@@ -353,6 +356,11 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     id: SOUND_RECORD_PROP, image: drawnOnce('record:sound', [], () => drawSoundRecord()),
     ...at(RECORD_LAY.x, RECORD_LAY.y), w: RECORD.d / px, h: RECORD.d / px, radius: 0, cutout: true, alphaShadow: true, turn: RECORD_LAY.turn, dive: { frac: RECORD_DIVE_FRAC },
   };
+  // Bot: a tablet with two eyes leaning in a birch stand, standing on the mat right of the record (lib/mat/botTablet.ts)
+  const bot: StageSpec['props'] = botTablet ? [{
+    id: BOT_TABLET.id, image: botTablet, ...at(BOT_TABLET.lay.x, BOT_TABLET.lay.y),
+    w: BOT_TABLET.lay.w / px, h: (BOT_TABLET.lay.w * BOT_TABLET.aspect) / px, radius: 0, cutout: true, alphaShadow: true,
+  }] : [];
   const booklets = others.map((item, index) => {
     const spot = place(item.slug);
     const board = item.board ?? '#2b160d';
@@ -378,7 +386,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   const handouts = { id: HANDOUTS_ID, image: handoutsTarget(), ...at(HANDOUTS_AT.x, HANDOUTS_AT.y), w: 0.74, h: 0.6, radius: 0.01, turn: HANDOUTS_AT.turn, cutout: true, alphaShadow: true };
   return {
     greeting: words.greeting,
-    props: [...posters, ...clipboards, soundRecord, bag, snapdealBag, handouts, ...story, ...booklets, ...pieces],
+    props: [...posters, ...clipboards, soundRecord, ...bot, bag, snapdealBag, handouts, ...story, ...booklets, ...pieces],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -1482,6 +1490,13 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           openCaseStudy(card, rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null, reducedMotion);
           return;
         }
+        // Bot's tablet: its page, /work/bot/ (public/work/bot/)
+        if (id === BOT_TABLET.id) {
+          if (modeRef.current !== 'wide') return;
+          trackEvent('mat_case_study_opened', { project: 'bot' });
+          window.location.assign(BOT_TABLET.href);
+          return;
+        }
         // the yellow record: the interactive 3D board as one continuous move. The camera flies down onto the record as it
         // spins up, the last frame is kept for the board's page to paint first (lib/mat/soundRecord.ts), and the page opens.
         if (id === SOUND_RECORD_PROP) {
@@ -1740,6 +1755,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
             <li key={card.id}><a href={card.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(`design:${card.id}`, event)} onBlur={ringOff}>{card.title}, {card.partner}. {card.line} Open the case study.</a></li>
           ))}
           <li><a href={SOUND_RECORD.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(SOUND_RECORD_PROP, event)} onBlur={ringOff}>{SOUND_RECORD.title}: a yellow record. Opens an interactive 3D board where you drag keys into records and layer real music.</a></li>
+          <li><a href={BOT_TABLET.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(BOT_TABLET.id, event)} onBlur={ringOff}>Bot, an AI parts helper: a tablet on a birch stand. Opens the parts rack where a student asks Bot for a part and its bin lights up, with a 10-second voiced demo.</a></li>
           <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn('book', event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.book(); }}>{book.title}, a flip book. {book.meta}. Opens the book.</button></li>
           {FLIP_BOOKS.filter((item) => item.slug !== book.slug).map((item) => (
             <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { fetchOpeningSpread(item.slug); ringOn(`book:${item.slug}`, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book. {item.meta}. Opens the book.</button></li>

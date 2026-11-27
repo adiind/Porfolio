@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bot · Adi Agarwal</title>
+<meta name="description" content="Bot, an AI parts helper for the Camp EDI electronics rack: a student says what they want to build and Bot lights up the bin with the right part.">
+<style>
+  html,body{margin:0;height:100%;background:#1b62d4;overflow:hidden;font-family:"Geist","Inter",system-ui,sans-serif}
+  canvas{display:block}
+  @font-face{font-family:"Geist";src:url(/home-flat/Geist-Variable.ttf) format("truetype");font-weight:100 900}
+  .ov{position:fixed;pointer-events:none;color:#fff}
+  #scrim{position:fixed;left:0;right:0;bottom:0;height:34vh;pointer-events:none;background:linear-gradient(to top,rgba(6,18,64,.62),rgba(6,18,64,.28) 45%,rgba(6,18,64,0))}
+  #scrimT{position:fixed;left:0;right:0;top:0;height:26vh;pointer-events:none;background:linear-gradient(to bottom,rgba(6,18,64,.35),rgba(6,18,64,0))}
+  /* chapter: a quiet label in the corner, like a museum caption */
+  .lab{font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .lab .bf{width:17px;height:15px;border-radius:5px;background:#0a0b0c;position:relative;display:inline-block}
+  .lab .bf:before,.lab .bf:after{content:"";position:absolute;top:5px;width:4px;height:5px;border-radius:50%;background:#fff}.lab .bf:before{left:4px}.lab .bf:after{right:4px}
+  /* the student's voice: subtitles at the bottom, as if from where you stand */
+  #sub{left:50%;bottom:clamp(150px,22vh,190px);transform:translateX(-50%);width:min(760px,88vw);text-align:center;transition:opacity .35s}
+  #sub .lab{justify-content:center;opacity:.8;margin-bottom:10px}
+  #sub .tx{font-size:clamp(20px,2vw,30px);font-weight:450;letter-spacing:-.01em;line-height:1.3;text-shadow:0 2px 24px rgba(0,20,80,.55),0 1px 2px rgba(0,20,80,.4)}
+  #sub.think .tx{font-style:italic;font-weight:350;opacity:.85}
+  #sub.bot .tx{color:#ffe6c4}
+  /* the Bot's voice: a card that comes out of the TV */
+  #call{width:min(330px,40vw);background:#fbf8f2;color:#1d1c1a;border-radius:18px;padding:16px 18px 18px;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 24px 60px rgba(0,20,70,.35),0 4px 14px rgba(0,20,70,.18);transition:opacity .35s,transform .5s cubic-bezier(.2,1.3,.4,1);transform-origin:0 50%}
+  #call .lab{color:#6b665d;margin-bottom:8px}#call .tx{font-size:17px;line-height:1.42;letter-spacing:-.005em}
+  #dock{position:fixed;left:50%;bottom:clamp(18px,3.5vh,32px);transform:translateX(-50%);width:min(600px,calc(100vw - 32px));display:flex;flex-direction:column;align-items:center;gap:10px;z-index:5}
+  #dock .ask{display:flex;width:100%;background:#fbf8f2;border-radius:999px;padding:6px 6px 6px 22px;box-shadow:0 20px 50px rgba(0,20,70,.35),0 2px 8px rgba(0,20,70,.15)}
+  #dock input{flex:1;border:0;outline:0;background:transparent;font:450 16px "Geist",system-ui,sans-serif;color:#1d1c1a;min-width:0}
+  #dock input::placeholder{color:#8b867c}
+  #dock .ask button{border:0;border-radius:999px;background:#1d1c1a;color:#fbf8f2;font:600 14px "Geist",system-ui,sans-serif;padding:11px 20px;cursor:pointer;transition:transform .2s cubic-bezier(.2,1.4,.4,1)}
+  #dock .ask button:hover{transform:scale(1.05)}
+  #dock .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  #dock .chips button{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);backdrop-filter:blur(10px);color:#fff;font:500 13.5px "Geist",system-ui,sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;transition:background .2s,transform .2s cubic-bezier(.2,1.4,.4,1)}
+  #dock .chips button:hover{background:rgba(255,255,255,.26);transform:translateY(-2px)}
+  #dock .hint{font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.02em}
+  canvas{cursor:grab}
+  #lead{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+  #tag{background:#fbf8f2;color:#1d1c1a;border-radius:12px;padding:9px 13px;font-size:14px;font-weight:500;box-shadow:0 14px 34px rgba(0,20,70,.3);transition:opacity .4s;white-space:nowrap}
+  #tag small{display:block;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#c2621c;margin-bottom:2px}
+  @media (max-width:700px){#call{width:auto;left:16px!important;right:16px;top:auto!important;bottom:250px}#lead{display:none}#sub{bottom:190px}#dock .chips{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;width:100%;scrollbar-width:none}#dock .chips button{flex:none}}
+  /* pass 13: warmer, cleaner */
+  #sub .tx{display:inline-block;background:rgba(10,22,60,.38);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);padding:10px 22px 12px;border-radius:22px;text-shadow:none;font-size:clamp(18px,1.7vw,24px)}
+  #sub .tx:empty{display:none}
+  #sub .lab{display:none}
+  #sub .tx::before{content:attr(data-who);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-right:12px;vertical-align:2px}
+  #call{width:min(340px,40vw);padding:14px 18px 16px;border-radius:22px}
+  #call .lab{letter-spacing:.06em;text-transform:none;font-size:13px;color:#1d1c1a;font-weight:600}
+  #call .lab .bf{width:22px;height:19px;border-radius:7px}#call .lab .bf:before,#call .lab .bf:after{top:6px;width:5px;height:6px}#call .lab .bf:before{left:5px}#call .lab .bf:after{right:5px}
+  #call .tx{font-size:17.5px;line-height:1.45;color:#2a2824}
+  #call .tx:empty{display:none}
+  #call .dots{display:none;gap:5px;padding:6px 0 2px}#call.thinking .dots{display:flex}
+  #call .dots i{width:8px;height:8px;border-radius:50%;background:#b9b2a5;animation:bob 1s infinite ease-in-out}
+  #call .dots i:nth-child(2){animation-delay:.15s}#call .dots i:nth-child(3){animation-delay:.3s}
+  @keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+  #dock .ask{align-items:center;padding:6px 6px 6px 14px;gap:10px;transition:box-shadow .25s}
+  #dock .ask:focus-within{box-shadow:0 0 0 4px rgba(255,176,102,.45),0 20px 50px rgba(0,20,70,.35)}
+  #dock .ask .bf{flex:none;width:26px;height:22px;border-radius:8px;background:#0a0b0c;position:relative}
+  #dock .ask .bf:before,#dock .ask .bf:after{content:"";position:absolute;top:7px;width:6px;height:7px;border-radius:50%;background:#fff}#dock .ask .bf:before{left:6px}#dock .ask .bf:after{right:6px}
+  #dock .ask button{width:42px;height:42px;padding:0;display:grid;place-items:center}
+  #dock .chips{min-height:36px}
+  #dock .chips button{animation:chipIn .5s cubic-bezier(.2,1.3,.4,1) both}
+  @keyframes chipIn{from{opacity:0;transform:translateY(8px) scale(.94)}}
+  #snd{position:fixed;top:18px;right:18px;z-index:6;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;background:#fbf8f2;color:#1d1c1a;font:600 13.5px "Geist",system-ui,sans-serif;padding:10px 16px 10px 13px;cursor:pointer;box-shadow:0 12px 30px rgba(0,20,70,.3);transition:transform .25s cubic-bezier(.2,1.4,.4,1)}
+  #snd:hover{transform:scale(1.04)}#snd:after{content:"";position:absolute;inset:-4px;border-radius:999px;border:2px solid rgba(251,248,242,.7);animation:ring 2s infinite}
+  #snd.on:after{display:none}@keyframes ring{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.18)}}
+  @media (max-width:700px){#call{width:auto}#snd span{display:none}#snd{padding:11px}}
+
+  /* pass 19: chat history panel on the right, speaker toggle */
+  :root{--P:min(380px,34vw)}
+  #call,#sub,#lead>path:not(.t2),#lead>circle:not(.t2){display:none}
+  #chat{position:fixed;top:16px;right:16px;bottom:16px;width:var(--P);z-index:6;display:flex;flex-direction:column;background:#fbf8f2;color:#1d1c1a;border-radius:24px;box-shadow:0 30px 70px rgba(0,20,70,.35),0 4px 14px rgba(0,20,70,.18);overflow:hidden;font-family:"Geist",system-ui,sans-serif}
+  #chat header{display:flex;align-items:center;gap:12px;padding:16px 16px 14px 18px;border-bottom:1px solid #ebe5d8}
+  #chat .bf{flex:none;width:34px;height:29px;border-radius:10px;background:#0a0b0c;position:relative}
+  #chat .bf:before,#chat .bf:after{content:"";position:absolute;top:9px;width:8px;height:9px;border-radius:50%;background:#fff}#chat .bf:before{left:8px}#chat .bf:after{right:8px}
+  #chat .who{flex:1;display:flex;flex-direction:column;line-height:1.2}#chat .who b{font-size:16px;font-weight:600}#chat .who small{font-size:12.5px;color:#7a7468}
+  #chat,#chat *{box-sizing:border-box}
+  #chat #snd{position:static;flex:none;padding:0;box-shadow:none;transform:none}#chat #snd:after{display:none}
+  #snd{width:40px;height:40px;border-radius:50%;border:1px solid #e3dccd;background:#fff;color:#8b857a;display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+  #snd:hover{border-color:#cfc6b4;color:#1d1c1a}
+  #snd .on{display:none}#snd[aria-pressed="true"]{background:#1d1c1a;border-color:#1d1c1a;color:#fbf8f2}#snd[aria-pressed="true"] .on{display:block}#snd[aria-pressed="true"] .off{display:none}
+  #log{flex:1;overflow-y:auto;padding:16px 16px 8px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin}
+  #log .note{align-self:center;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#a59e90;margin:6px 0 2px}
+  #log .m{max-width:84%;padding:9px 13px 10px;border-radius:18px;font-size:15px;line-height:1.42;animation:msgIn .35s cubic-bezier(.2,.9,.3,1) both;white-space:pre-wrap}
+  #log .m.bot{align-self:flex-start;background:#efe9dd;border-bottom-left-radius:6px}
+  #log .m.me{align-self:flex-end;background:#1d1c1a;color:#fbf8f2;border-bottom-right-radius:6px}
+  #log .m.me.student{background:#3b5bdb}
+  #log .m.dots{display:flex;gap:5px;padding:13px 14px}#log .m.dots i{width:7px;height:7px;border-radius:50%;background:#b0a898;animation:bob 1s infinite ease-in-out}#log .m.dots i:nth-child(2){animation-delay:.15s}#log .m.dots i:nth-child(3){animation-delay:.3s}
+  #log .note.snd{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500;color:#7a7468;display:flex;align-items:center;gap:8px}#log .note.snd button{border:0;border-radius:999px;background:#1d1c1a;color:#fbf8f2;font:600 12px "Geist",system-ui,sans-serif;padding:6px 11px;cursor:pointer}
+  #log .lit{align-self:flex-start;font-size:12.5px;color:#c2621c;font-weight:600;margin:-2px 0 2px 6px}
+  @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  #chat #dock{position:static;transform:none;width:auto;display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:10px 14px 14px;border-top:1px solid #ebe5d8}
+  #chat #dock .chips{justify-content:flex-start;min-height:0;gap:6px}
+  #chat #dock .chips button{border:1px solid #e0d8c8;background:#fff;backdrop-filter:none;color:#1d1c1a;font-size:13px;padding:7px 12px}
+  #chat #dock .chips button:hover{background:#f3eee4;transform:none}
+  #chat #dock .ask{box-shadow:none;border:1px solid #e0d8c8;background:#fff;padding:5px 5px 5px 16px}
+  #chat #dock .ask:focus-within{box-shadow:0 0 0 3px rgba(255,176,102,.45);border-color:#e7b27c}
+  #chat #dock .ask button{width:38px;height:38px}
+  #hint{position:fixed;left:50%;bottom:18px;transform:translateX(calc(-50% - var(--P)/2 - 8px));font:500 12px "Geist",system-ui,sans-serif;color:rgba(255,255,255,.7);letter-spacing:.02em;pointer-events:none;z-index:5}
+  @media (max-width:700px){
+    #chat{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:48vh;border-radius:20px}
+    #chat header{padding:10px 12px 10px 14px}#log .m{font-size:14.5px}
+    #chat #dock .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}#chat #dock .chips button{flex:none}
+    #hint{display:none}
+  }
+  /* Adi 2026-11-27: "i dont want a background to the text, it makes it look like a phone". The words sit straight on the mat. */
+  #chat{background:transparent;box-shadow:none;border-radius:0;color:#fff}
+  #chat header{border-bottom:0}#chat .who small{color:rgba(255,255,255,.72)}
+  #chat .bf{background:#0a0b0c}
+  #log{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 56px);mask-image:linear-gradient(to bottom,transparent 0,#000 56px)}
+  #log .m,#log .m.bot,#log .m.me,#log .m.me.student{background:none;border-radius:0;padding:2px 0;max-width:92%;font-size:18px;line-height:1.4;font-weight:500;text-shadow:0 1px 2px rgba(2,10,44,.55),0 2px 18px rgba(2,10,44,.45)}
+  #log .m.bot{color:#fff}
+  #log .m.me,#log .m.me.student{color:#ffe2b8;text-align:right}
+  #log .note{color:rgba(255,255,255,.7)}
+  #log .lit{color:#ffb066;text-shadow:0 1px 2px rgba(2,10,44,.5)}
+  #log .m.dots i{background:rgba(255,255,255,.85)}
+  #chat #dock{border-top:0}
+  /* Adi, minutes later: "text boxes need backgrounds" - the input, the suggestions and the lit label are solid paper again */
+  #chat #dock .chips button{background:#fbf6ea;border:0;color:#18204f;box-shadow:-4px 6px 10px -3px rgba(2,10,44,.5)}
+  #chat #dock .chips button:hover{background:#fff}
+  #chat #dock .ask{background:#fbf6ea;border:0;box-shadow:-6px 9px 16px -4px rgba(2,10,44,.55)}
+  #chat #dock input{color:#1d1c1a}#chat #dock input::placeholder{color:#8b867c}
+  #chat #dock .ask button{background:#0a0b10;color:#fff}
+  #snd{background:transparent;border-color:rgba(255,255,255,.6);color:#fff}
+  #tag{background:#fbf6ea;color:#1d1c1a;padding:9px 13px;box-shadow:-5px 8px 14px -4px rgba(2,10,44,.55)}
+
+  /* pass 20 (Adi 2026-11-27): the standee explains and plays the demo; the live ask is a small side entry; one paper bubble per message, no sheet behind them */
+  #chat{pointer-events:none}#log,#dock,#live{pointer-events:auto}
+  #chat header{display:none}
+  #chat #dock{display:none}#chat.open #dock{display:flex}#chat.open #live{display:none}
+  #live{align-self:flex-end;margin:4px 14px 14px;border:0;border-radius:999px;background:#fbf6ea;color:#18204f;font:600 13px "Geist",system-ui,sans-serif;padding:9px 15px;cursor:pointer;box-shadow:-5px 8px 14px -4px rgba(2,10,44,.55)}
+  #live small{font-weight:500;color:#5a6078;margin-left:4px}
+  #log .m,#log .m.bot{background:#fbf6ea;color:#18204f;border-radius:18px;border-bottom-left-radius:6px;padding:9px 14px 10px;max-width:84%;font-size:16px;line-height:1.42;font-weight:500;text-shadow:none;box-shadow:-5px 8px 14px -4px rgba(2,10,44,.5)}
+  #log .m.me,#log .m.me.student{align-self:flex-end;background:#18204f;color:#fbf6ea;text-align:left;border-radius:18px;border-bottom-right-radius:6px;padding:9px 14px 10px;max-width:84%;font-size:16px;text-shadow:none;box-shadow:-5px 8px 14px -4px rgba(2,10,44,.5)}
+  @media (max-width:700px){#chat{height:38vh}#log .m,#log .m.me{font-size:14.5px;padding:8px 12px 9px}}
+  #log .m.dots{background:#fbf6ea}#log .m.dots i{background:#5a6078}
+  #log .note{text-shadow:0 1px 2px rgba(2,10,44,.5)}
+  #log{gap:10px}
+
+  /* public page: Close back to the mat, and on phones the standee's two buttons as real buttons under the scene */
+  #live[hidden]{display:none!important}
+  #close{position:fixed;top:16px;right:16px;z-index:9;border:0;border-radius:999px;background:#fbf6ea;color:#18204f;font:600 14px "Geist",system-ui,sans-serif;padding:9px 16px;cursor:pointer;text-decoration:none;box-shadow:-5px 8px 14px -4px rgba(2,10,44,.55)}
+  #chat{top:64px}
+  #mctl{display:none}
+  @media (max-width:700px){
+    #mctl{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:8;gap:8px}
+    #mctl button{border:0;border-radius:999px;font:600 15px "Geist",system-ui,sans-serif;padding:13px 18px;cursor:pointer;box-shadow:-5px 8px 14px -4px rgba(2,10,44,.55)}
+    #mplay{flex:1;background:#16204a;color:#f7f4ec}#msnd{background:#fbf6ea;color:#16204a}
+    #chat{bottom:68px;top:auto}
+  }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/jsm/" } }
+</script>
+</head>
+<body>
+
+<svg id="lead"><path fill="none" stroke="#fbf8f2" stroke-width="1.5" stroke-dasharray="3 4" opacity=".9"/><circle r="4" fill="#fbf8f2"/><path class="t2" fill="none" stroke="#fbf8f2" stroke-width="1.5" stroke-dasharray="3 4"/><circle class="t2" r="4" fill="#ffb066"/></svg>
+<div id="tag" class="ov"><small>Lit now</small><span></span></div>
+<a id="close" href="/">✕ Close</a>
+<div id="mctl"><button id="mplay" type="button">▶ Play the demo · 10 s</button><button id="msnd" type="button" aria-pressed="true">Sound on</button></div>
+<aside id="chat" aria-label="Chat with the Bot">
+  <div id="log" role="log" aria-live="polite"></div>
+  <button id="live" type="button" hidden>Ask Bot yourself <small>experimental</small></button>
+  <form id="dock" autocomplete="off">
+    <div class="chips"></div>
+    <div class="ask"><input id="q" placeholder="Tell the Bot what you’re building…" aria-label="Talk to the Bot"><button type="submit" aria-label="Send"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </form>
+</aside>
+<div id="hint">drag to look around</div>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// Units: 1 = 1 inch. Bench top is y = 0. Wall is behind (-z). +z points at the person.
+const Q = new URLSearchParams(location.search);
+const STILL = Q.has('still'), CLOSE = Q.has('close');
+
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+document.body.appendChild(renderer.domElement);
+RectAreaLightUniformsLib.init();
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#080b1a');
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .45;
+
+const camera = new THREE.PerspectiveCamera(26, innerWidth / innerHeight, 2, 800);
+
+// ---------------- drawn surfaces ----------------
+const ANISO = renderer.capabilities.getMaxAnisotropy();
+function tex(w, h, draw, { srgb = true, repeat = [1, 1], clamp = false } = {}) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = clamp ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+  t.repeat.set(...repeat); t.anisotropy = ANISO;
+  return t;
+}
+function rng(seed) { let s = seed >>> 0 || 1; return () => ((s = Math.imul(s ^ (s >>> 15), 2246822507) ^ Math.imul(s ^ (s >>> 13), 3266489909), (s >>>= 0) / 4294967296)); }
+function grain(g, w, h, n, a, seed, size = 1.2) {
+  const r = rng(seed);
+  for (let i = 0; i < n; i++) { g.fillStyle = r() > .5 ? `rgba(255,255,255,${a * r()})` : `rgba(0,0,0,${a * r()})`; g.fillRect(r() * w, r() * h, size, size); }
+}
+
+// Butcher-block bench top: strips of oak, each with its own tone and grain
+function butcher(g, w, h, mono) {
+  const r = rng(21);
+  const strips = 26, sw = h / strips;
+  for (let i = 0; i < strips; i++) {
+    const tone = mono ? 120 + r() * 40 : 0;
+    const base = mono ? `rgb(${tone},${tone},${tone})` : `hsl(${28 + r() * 8}, ${38 + r() * 14}%, ${50 + r() * 12}%)`;
+    g.fillStyle = base; g.fillRect(0, i * sw, w, sw + 1);
+    for (let k = 0; k < 34; k++) {
+      const y = i * sw + r() * sw, amp = .6 + r() * 1.8, ph = r() * 10;
+      g.strokeStyle = mono ? `rgba(0,0,0,${.05 + r() * .12})` : `rgba(${80 + r() * 30},${48 + r() * 18},${22},${.05 + r() * .12})`;
+      g.lineWidth = .5 + r() * 1.6;
+      g.beginPath();
+      for (let x = -10; x <= w + 10; x += 12) g.lineTo(x, y + Math.sin(x / (90 + r() * 30) + ph) * amp);
+      g.stroke();
+    }
+    for (let k = 0; k < 900; k++) { g.fillStyle = `rgba(40,22,10,${r() * (mono ? .25 : .14)})`; g.fillRect(r() * w, i * sw + r() * sw, 2 + r() * 6, .7); }
+    g.fillStyle = mono ? 'rgba(0,0,0,.35)' : 'rgba(70,40,20,.28)'; g.fillRect(0, i * sw, w, 1.2);
+  }
+  for (let i = 0; i < strips; i++) { const x = r() * w; g.fillStyle = mono ? 'rgba(0,0,0,.4)' : 'rgba(60,35,15,.35)'; g.fillRect(x, i * sw, 1.5, sw); }
+  if (!mono) grain(g, w, h, 30000, .05, 4);
+}
+const woodMap = tex(2048, 1024, (g, w, h) => butcher(g, w, h, false));
+const woodRough = tex(2048, 1024, (g, w, h) => butcher(g, w, h, true), { srgb: false });
+
+// Powder coat: fine orange-peel tooth (bump) and slight mottling (colour)
+const coatBump = tex(512, 512, (g, w, h) => { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); const r = rng(9); for (let i = 0; i < 5000; i++) { const x = r() * w, y = r() * h, s = 1 + r() * 3; const v = r() > .5 ? 255 : 0; const gr = g.createRadialGradient(x, y, 0, x, y, s); gr.addColorStop(0, `rgba(${v},${v},${v},.18)`); gr.addColorStop(1, 'rgba(128,128,128,0)'); g.fillStyle = gr; g.fillRect(x - s, y - s, s * 2, s * 2); } }, { srgb: false, repeat: [6, 6] });
+const coatGrey = tex(512, 512, (g, w, h) => { g.fillStyle = '#a4a6a4'; g.fillRect(0, 0, w, h); grain(g, w, h, 12000, .06, 13); }, { repeat: [3, 3] });
+
+// Painted wall, roller stipple
+const wallMap = tex(1024, 1024, (g, w, h) => { g.fillStyle = '#e6ded1'; g.fillRect(0, 0, w, h); grain(g, w, h, 90000, .025, 17, 1.2); }, { repeat: [3, 2] });
+const wallBump = tex(1024, 1024, (g, w, h) => { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); grain(g, w, h, 90000, .07, 17, 1.2); }, { srgb: false, repeat: [3, 2] });
+
+// Self-healing cutting mat, the portfolio's own surface
+const matTex = tex(2048, 1365, (g, w, h) => {
+  g.fillStyle = '#2c5d8f'; g.fillRect(0, 0, w, h); grain(g, w, h, 60000, .05, 31);
+  const ppi = w / 24;
+  for (let x = 0; x <= 24; x += .5) { g.strokeStyle = x % 1 === 0 ? 'rgba(220,235,255,.38)' : 'rgba(220,235,255,.16)'; g.lineWidth = x % 1 === 0 ? 2 : 1; g.beginPath(); g.moveTo(x * ppi, 0); g.lineTo(x * ppi, h); g.stroke(); }
+  for (let y = 0; y <= 16; y += .5) { g.strokeStyle = y % 1 === 0 ? 'rgba(220,235,255,.38)' : 'rgba(220,235,255,.16)'; g.lineWidth = y % 1 === 0 ? 2 : 1; g.beginPath(); g.moveTo(0, y * ppi); g.lineTo(w, y * ppi); g.stroke(); }
+  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(ppi, h - ppi); g.lineTo(w - ppi, ppi * 1.5); g.stroke();
+  g.fillStyle = 'rgba(230,240,255,.7)'; g.font = `600 ${ppi * .32}px Geist, Inter, Arial`;
+  for (let x = 1; x < 24; x++) g.fillText(String(x), x * ppi + 4, ppi * .4);
+}, { clamp: true });
+
+// ---------------- materials ----------------
+const M = {
+  wood: new THREE.MeshStandardMaterial({ map: woodMap, roughnessMap: woodRough, roughness: .72, bumpMap: woodRough, bumpScale: .6, envMapIntensity: .5 }),
+  frame: new THREE.MeshStandardMaterial({ color: '#232322', roughness: .55, metalness: .4, bumpMap: coatBump, bumpScale: .8 }),
+  steel: new THREE.MeshStandardMaterial({ map: coatGrey, color: '#b9b6ae', roughness: .6, metalness: .06, bumpMap: coatBump, bumpScale: .9, envMapIntensity: .9 }),
+  steelDark: new THREE.MeshStandardMaterial({ color: '#3a3b3b', roughness: .7 }),
+  wall: new THREE.MeshStandardMaterial({ map: wallMap, color: '#f3ede4', roughness: .96, bumpMap: wallBump, bumpScale: 1.2, envMapIntensity: .2 }),
+  mat: new THREE.MeshStandardMaterial({ map: matTex, roughness: .82, envMapIntensity: .3 }),
+  tvShell: new THREE.MeshStandardMaterial({ color: '#141516', roughness: .38, metalness: .55, bumpMap: coatBump, bumpScale: .3 }),
+  tvGlass: new THREE.MeshPhysicalMaterial({ color: '#000', roughness: .08, metalness: 0, clearcoat: 1, transparent: true, opacity: .14, envMapIntensity: .8 }),
+};
+
+// Clear polypropylene: real transmission (refracts what is behind it) with a light frost
+function clearPlastic({ tint = '#ffffff', emissive = '#000000', emissiveIntensity = 0, rough = .14 } = {}) {
+  return new THREE.MeshPhysicalMaterial({ color: tint, transmission: 1, thickness: .08, roughness: rough, ior: 1.49, metalness: 0,
+    specularIntensity: 1, clearcoat: .5, clearcoatRoughness: .08, envMapIntensity: 1.4, side: THREE.DoubleSide, emissive, emissiveIntensity });
+}
+const BIN_MAT = clearPlastic({ rough: .06 });
+const BIN_RIM = clearPlastic({ rough: .12 });
+
+// ---------------- the portfolio's cutting mat ----------------
+const homeMat = tex(2048, 2048, (g, w, h) => {
+  g.fillStyle = '#1d5ad6'; g.fillRect(0, 0, w, h); grain(g, w, h, 160000, .045, 51, 1.4);
+  const step = w / 32;
+  for (let i = 0; i <= 32; i++) { const major = i % 4 === 0; g.strokeStyle = major ? 'rgba(200,225,255,.42)' : 'rgba(200,225,255,.16)'; g.lineWidth = major ? 2.4 : 1.1;
+    g.beginPath(); g.moveTo(i * step, 0); g.lineTo(i * step, h); g.stroke(); g.beginPath(); g.moveTo(0, i * step); g.lineTo(w, i * step); g.stroke(); }
+  g.strokeStyle = 'rgba(235,245,255,.75)'; g.lineWidth = 3;
+  for (let i = 4; i < 32; i += 4) for (let j = 4; j < 32; j += 4) { const x = i * step, y = j * step; g.beginPath(); g.moveTo(x - 9, y); g.lineTo(x + 9, y); g.moveTo(x, y - 9); g.lineTo(x, y + 9); g.stroke(); }
+}, { repeat: [3, 3] });
+const matBump = tex(1024, 1024, (g, w, h) => { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); grain(g, w, h, 120000, .12, 52, 1.2); }, { srgb: false, repeat: [8, 8] });
+// the DPI board's mat shader, verbatim (window light, leaf shade, mat edge, dotted desk). Scene units are inches:
+// one DPI unit = 59 in here, so as many cells cross the rig as cross the DPI board.
+const matU = { uTime: { value: 0 }, uCell: { value: 0.08 } };
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.ShaderMaterial({
+  uniforms: matU,
+  vertexShader: `varying vec2 vP; void main(){ vec4 w = modelMatrix*vec4(position,1.); vP = (w.xz - vec2(-5., -15.)) / 59. + vec2(0., .2); gl_Position = projectionMatrix*viewMatrix*w; }`,
+  fragmentShader: `
+  uniform float uTime; uniform float uCell; varying vec2 vP;
+  float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+  float noise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+    return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
+  float nearestLine(float c){ return abs(fract(c+.5)-.5); }
+  float printed(float c, float wide){ float w=max(wide, fwidth(c)*1.1); return 1.-smoothstep(w*.5-fwidth(c)*.6, w*.5+fwidth(c)*.6, nearestLine(c)); }
+  void main(){
+    vec2 g = vP / uCell + vec2(.5);
+    float px = 1./24.;
+    vec3 col = vec3(0.106, 0.384, 0.831);
+    col *= 1. + (hash(floor(g*24.)) - .5)*.035;
+    float thin = max(printed(g.x-.5, px), printed(g.y-.5, px));
+    vec2 big = (g-2.5)/5.;
+    float major = max(printed(big.x, px/5.), printed(big.y, px/5.));
+    float close = smoothstep(46., 86., 1./max(fwidth(g.x),1e-5));
+    float fine = max(printed((g.x-.5)*4., px*2.), printed((g.y-.5)*4., px*2.))*close;
+    col = mix(col, vec3(1.), fine*.05);
+    col = mix(col, vec3(1.), thin*.13);
+    col = mix(col, vec3(1.), major*.3);
+    vec2 c = (fract(big+.5)-.5)*5.;
+    float glow = .35*(1.-smoothstep(0., 7.*px, length(c)));
+    float aa = fwidth(g.x);
+    float armX = (1.-smoothstep(.65*px, .65*px+aa, abs(c.y)))*(1.-smoothstep(5.5*px, 5.5*px+aa, abs(c.x)));
+    float armY = (1.-smoothstep(.65*px, .65*px+aa, abs(c.x)))*(1.-smoothstep(5.5*px, 5.5*px+aa, abs(c.y)));
+    col = mix(col, vec3(1.), glow);
+    col = mix(col, vec3(1.), max(armX,armY)*.75);
+    // window light: soft panes along a diagonal, leaf shade drifting through them, a vignette (cut down from SUN_FRAGMENT)
+    vec2 dir = normalize(vec2(1., -.58));
+    float a = dot(vP, dir), b = dot(vP, vec2(-dir.y, dir.x));
+    float pane = smoothstep(.0, .12, abs(fract(b*.55+.2)-.5)-.06);
+    float leaves = noise(vP*2.2 + vec2(uTime*.05, sin(uTime*.3)*.08)) * noise(vP*4.5 - vec2(uTime*.04, 0.));
+    float sun = pane * (1. - .5*smoothstep(.2, .55, leaves));
+    float vig = 1. - smoothstep(1.2, 4.5, length(vP - vec2(.2, .3)));
+    float s = clamp(.5 + sun*.1 - (1.-sun)*.035 - (1.-vig)*.2, 0., 1.);
+    vec3 sunC = vec3(s) + vec3(-.02, .01, .03)*sun;
+    col = mix(2.*col*sunC, 1.-2.*(1.-col)*(1.-sunC), step(.5, sunC));
+    // the mat has edges; the dark dotted desk shows round it
+    vec2 q = abs(vP - vec2(0., .15)) - vec2(60., 60.) + .08;   // house rule: the mat runs past every screen edge (no dark desk band)
+    float edge = length(max(q, 0.)) + min(max(q.x, q.y), 0.) - .08;
+    float ea = fwidth(edge);
+    vec3 desk = vec3(.031,.043,.102);
+    vec2 dt = fract(vP / (uCell*9./24.)) - .5;
+    desk = mix(desk, vec3(.894,.91,.31), .3*(1.-smoothstep(.07,.11,length(dt))));
+    desk *= 1. - .55*(1.-smoothstep(0., .18, edge));
+    col = mix(col, vec3(1.), .22*(1.-smoothstep(0., .006, abs(edge + .004))));
+    col = mix(col, desk, smoothstep(-ea, ea, edge));
+    gl_FragColor = vec4(mix(col/12.92, pow((col+.055)/1.055, vec3(2.4)), step(.04045, col)), 1.);   // DPI writes sRGB straight to the canvas; here OutputPass encodes, so hand it linear
+  }`,
+}));
+ground.rotation.x = -Math.PI / 2; scene.add(ground);
+
+// birch-ply backboard on two ply feet (the DPI board's material language), carrying the TV
+const plyFace = tex(1024, 1024, (g, w, h) => {
+  g.fillStyle = '#e9d5b2'; g.fillRect(0, 0, w, h);
+  const r = rng(71);
+  for (let i = 0; i < 160; i++) { const y = r() * h, a = .03 + r() * .06; g.strokeStyle = `rgba(150,105,55,${a})`; g.lineWidth = 1 + r() * 4; g.beginPath();
+    for (let x = 0; x <= w; x += 16) g.lineTo(x, y + Math.sin(x / (120 + r() * 60) + i) * (3 + r() * 6)); g.stroke(); }
+  grain(g, w, h, 40000, .035, 72);
+}, { repeat: [1, 1] });
+const plyEdge = tex(64, 256, (g, w, h) => { for (let i = 0; i < 9; i++) { g.fillStyle = i % 2 ? '#d9bf94' : '#b98f5e'; g.fillRect(0, i * h / 9, w, h / 9 + 1); } }, { repeat: [40, 1] });
+const plyM = new THREE.MeshStandardMaterial({ map: plyFace, roughness: .78, bumpMap: plyFace, bumpScale: .4, envMapIntensity: .3 });
+const plyE = new THREE.MeshStandardMaterial({ map: plyEdge, roughness: .85 });
+function rrShape(w, h, r) { const s = new THREE.Shape(), x = -w / 2, y = -h / 2; s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h); s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s; }
+function faceUV(g, w, h) { const p = g.attributes.position, uv = g.attributes.uv; for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / w + .5, p.getY(i) / h + .5); uv.needsUpdate = true; return g; }
+function slab(w, h, d, r, bev) { const g = new THREE.ExtrudeGeometry(rrShape(w - bev * 2, h - bev * 2, r), { depth: d - bev * 2, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 6, curveSegments: 24 }); g.translate(0, 0, -d / 2 + bev); g.computeVertexNormals(); return faceUV(g, w, h); }
+function roundPlane(w, h, r) { return faceUV(new THREE.ShapeGeometry(rrShape(w, h, r), 24), w, h); }
+const BOARD_X = -4, BOARD_Z = -24;
+const backboard = new THREE.Mesh(slab(48, 47, .9, 3.2, .3), plyM);
+backboard.position.set(BOARD_X, 23.5, BOARD_Z); backboard.castShadow = backboard.receiveShadow = true; // Adi 2026-11-27: the mini screen on a stand replaces the wall TV, so the board that carried it is gone
+for (const fx of [-18, 18]) {
+  const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(9, 0); sh.quadraticCurveTo(1.5, 2, 0, 14); sh.closePath();
+  const foot = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .55, bevelEnabled: true, bevelThickness: .12, bevelSize: .12, bevelSegments: 4, curveSegments: 16 }), plyM);
+  foot.rotation.y = Math.PI / 2; foot.position.set(BOARD_X + fx + .375, 0, BOARD_Z - .4); foot.castShadow = true;
+}
+
+// ---------------- the rack: Uline H-1908C ----------------
+// 8 in total depth over a 19 in panel -> the panel leans back about 23 degrees
+const PANEL_W = 36, PANEL_H = 19, T = .06, TILT = THREE.MathUtils.degToRad(20);
+const rack = new THREE.Group(); rack.position.set(-4, 0, -9); scene.add(rack);
+const panel = new THREE.Group(); panel.rotation.x = -TILT; rack.add(panel);   // local: x right, y up the face, z out of the face
+
+const LOUVER_ROWS = 12, LOUVER_PITCH = 1.45, LOUVER_LEN = 1.55, LOUVER_GAP = 2.18;
+const louverRowY = (i) => 1.0 + i * LOUVER_PITCH;
+const louverXs = []; for (let x = -PANEL_W / 2 + 1.35; x <= PANEL_W / 2 - 1.3; x += LOUVER_GAP) louverXs.push(x);
+
+// the slots are real holes (alpha), so whatever glows behind the panel shows through them
+const slotAlpha = tex(2048, 1081, (g, w, h) => {
+  g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+  const ppi = w / PANEL_W; g.fillStyle = '#000';
+  for (let i = 0; i < LOUVER_ROWS; i++) for (const x of louverXs) {
+    const cx = (x + PANEL_W / 2) * ppi, cy = h - (louverRowY(i) - .12) * ppi;
+    g.beginPath(); g.roundRect(cx - (LOUVER_LEN / 2) * ppi, cy - .11 * ppi, LOUVER_LEN * ppi, .22 * ppi, .11 * ppi); g.fill();
+  }
+}, { srgb: false, clamp: true });
+const sheetMat = new THREE.MeshStandardMaterial({ map: coatGrey, color: '#d9d6cf', roughness: .62, metalness: .06, bumpMap: coatBump, bumpScale: .5, alphaMap: slotAlpha, alphaTest: .5, side: THREE.DoubleSide, envMapIntensity: .8 });
+const sheet = new THREE.Mesh(new THREE.PlaneGeometry(PANEL_W, PANEL_H), sheetMat);
+sheet.position.set(0, PANEL_H / 2, 0); sheet.castShadow = sheet.receiveShadow = true;
+sheet.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, alphaMap: slotAlpha, alphaTest: .5 });
+panel.add(sheet);
+for (const y of [PANEL_H - .03, .03]) { const f = new THREE.Mesh(new RoundedBoxGeometry(PANEL_W, T * 2.2, .55, 3, .07), M.steel); f.position.set(0, y, -.275); f.castShadow = true; panel.add(f); }
+for (const x of [-PANEL_W / 2 + .03, PANEL_W / 2 - .03]) { const f = new THREE.Mesh(new RoundedBoxGeometry(T * 2.2, PANEL_H, .55, 3, .07), M.steel); f.position.set(x, PANEL_H / 2, -.275); f.castShadow = true; panel.add(f); }
+
+// louver lips: the punched steel bent out over each slot, same colour as the panel
+const louverGeo = new THREE.CylinderGeometry(.15, .15, LOUVER_LEN, 18, 1, true, 0, Math.PI);
+louverGeo.rotateZ(Math.PI / 2); louverGeo.rotateX(Math.PI / 2);
+const louvers = new THREE.InstancedMesh(louverGeo, new THREE.MeshStandardMaterial({ map: coatGrey, color: '#d9d6cf', roughness: .6, metalness: .06, side: THREE.DoubleSide, bumpMap: coatBump, bumpScale: .5 }), LOUVER_ROWS * louverXs.length);
+louvers.castShadow = louvers.receiveShadow = true;
+{ const m = new THREE.Matrix4(); let k = 0; for (let i = 0; i < LOUVER_ROWS; i++) for (const x of louverXs) { m.makeTranslation(x, louverRowY(i), 0); louvers.setMatrixAt(k++, m); } }
+panel.add(louvers);
+
+// side plates: solid triangles, back edge vertical, the panel rides the sloped front edge, bolted foot
+const TOPZ = -PANEL_H * Math.sin(TILT), TOPY = PANEL_H * Math.cos(TILT);
+function sideSupport() {
+  const s = new THREE.Shape();
+  s.moveTo(TOPZ - .15, 0); s.lineTo(.6, 0); s.quadraticCurveTo(1.0, 0, 1.0, .4); s.lineTo(1.0, .55);
+  s.lineTo(TOPZ + .45, TOPY - .1); s.quadraticCurveTo(TOPZ + .2, TOPY + .12, TOPZ - .15, TOPY); s.closePath();
+  const hole = new THREE.Path(); hole.absarc(TOPZ + 1.6, 4.2, .9, 0, Math.PI * 2, true); s.holes.push(hole);
+  return new THREE.ExtrudeGeometry(s, { depth: T * 1.6, bevelEnabled: true, bevelThickness: .07, bevelSize: .07, bevelSegments: 4, curveSegments: 24 });
+}
+const supGeo = sideSupport();
+for (const sx of [-PANEL_W / 2 - .12, PANEL_W / 2 + .02]) {
+  const m = new THREE.Mesh(supGeo, M.steel); m.rotation.y = -Math.PI / 2; m.position.set(sx + .1, 0, 0); m.castShadow = m.receiveShadow = true; rack.add(m);
+  const tx = sx + (sx < 0 ? .75 : -.65);
+  const tab = new THREE.Mesh(new RoundedBoxGeometry(1.3, T * 2.4, 8.2, 3, .07), M.steel); tab.position.set(tx, T * .8, (TOPZ + 1) / 2); tab.castShadow = true; rack.add(tab);
+  for (const z of [TOPZ + .7, .4]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .16, 6), M.steelDark); b.position.set(tx, .14, z); rack.add(b); }
+}
+
+// ---------------- bins: hopper bins, 5.5 x 4 x 3 ----------------
+const BIN_W = 4, BIN_D = 5.5, BIN_H = 3, W = .065;
+function binGeometry() {
+  const prof = new THREE.Shape();
+  prof.moveTo(0, 0); prof.lineTo(BIN_D - .15, 0); prof.quadraticCurveTo(BIN_D, 0, BIN_D, .15);
+  prof.lineTo(BIN_D, 1.35); prof.lineTo(BIN_D - .25, 1.5); prof.lineTo(1.55, BIN_H); prof.lineTo(0, BIN_H); prof.closePath();
+  const sideG = new THREE.ExtrudeGeometry(prof, { depth: W, bevelEnabled: true, bevelThickness: .012, bevelSize: .012, bevelSegments: 1, curveSegments: 6 });
+  const L = sideG.clone(); L.rotateY(-Math.PI / 2); L.translate(-BIN_W / 2 + W, 0, 0);
+  const R = sideG.clone(); R.rotateY(-Math.PI / 2); R.translate(BIN_W / 2, 0, 0);
+  const bottom = new RoundedBoxGeometry(BIN_W, W, BIN_D, 2, .03); bottom.translate(0, W / 2, BIN_D / 2);
+  const backW = new RoundedBoxGeometry(BIN_W, BIN_H, W, 1, .03); backW.translate(0, BIN_H / 2, W / 2);
+  const front = new RoundedBoxGeometry(BIN_W, 1.4, W, 1, .03); front.translate(0, .7, BIN_D - W / 2);
+  const ribs = [];
+  for (const z of [1.6, 3.4]) for (const sx of [-1, 1]) { const rb = new RoundedBoxGeometry(.06, 1.2, .18, 1, .02); rb.translate(sx * (BIN_W / 2 + .02), .75, z); ribs.push(rb); }
+  return mergeGeometries([L, R, bottom, backW, front, ...ribs].map(clean));
+}
+function clean(g) { g = g.index ? g.toNonIndexed() : g; for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k); return g; }
+function rimGeometry() {
+  const parts = [];
+  const edge = (a, b, r = .045) => parts.push(new THREE.TubeGeometry(new THREE.LineCurve3(a, b), 1, r, 8, false));
+  for (const sx of [-1, 1]) {
+    const x = sx * (BIN_W / 2 - W / 2);
+    edge(new THREE.Vector3(x, BIN_H, 0), new THREE.Vector3(x, BIN_H, 1.55));
+    edge(new THREE.Vector3(x, BIN_H, 1.55), new THREE.Vector3(x, 1.5, BIN_D - .25));
+    edge(new THREE.Vector3(x, 1.5, BIN_D - .25), new THREE.Vector3(x, 1.35, BIN_D));
+  }
+  edge(new THREE.Vector3(-BIN_W / 2, 1.38, BIN_D + .02), new THREE.Vector3(BIN_W / 2, 1.38, BIN_D + .02), .06);
+  edge(new THREE.Vector3(-BIN_W / 2, BIN_H, 0), new THREE.Vector3(BIN_W / 2, BIN_H, 0), .05);
+  const lf = new RoundedBoxGeometry(3.1, 1.02, .05, 2, .025); lf.translate(0, .68, BIN_D + .03); parts.push(lf);
+  const hk = new RoundedBoxGeometry(2.6, .5, .1, 1, .03); hk.translate(0, BIN_H - .1, -.28); parts.push(hk);
+  const hk2 = new RoundedBoxGeometry(2.6, .1, .32, 1, .03); hk2.translate(0, BIN_H + .12, -.13); parts.push(hk2);
+  return mergeGeometries(parts.map(clean));
+}
+const binGeo = binGeometry(), rimGeo = rimGeometry();
+
+function labelTex(name, sub, n) {
+  return tex(640, 200, (g, w, h) => {
+    g.fillStyle = '#fbfaf7'; g.fillRect(0, 0, w, h); grain(g, w, h, 3000, .035, n + 1);
+    g.fillStyle = '#121212'; g.font = '700 64px Geist, Inter, "Helvetica Neue", Arial'; g.textBaseline = 'alphabetic';
+    g.fillText(name, 30, 100, w - 110);
+    g.fillStyle = '#4a4741'; g.font = '500 34px Geist, Inter, "Helvetica Neue", Arial'; g.fillText(sub, 30, 160, w - 110);
+    g.fillStyle = '#121212'; g.font = '700 34px Geist, Inter, Arial'; g.textAlign = 'right'; g.fillText(String(n).padStart(2, '0'), w - 24, 100);
+  }, { clamp: true });
+}
+
+// ---------------- parts in the bins (the Bot's sample catalogue) ----------------
+const P = {
+  servoBlue: new THREE.MeshStandardMaterial({ color: '#2346a8', roughness: .42 }),
+  servoBlack: new THREE.MeshStandardMaterial({ color: '#1b1b1d', roughness: .45 }),
+  hornWhite: new THREE.MeshStandardMaterial({ color: '#f1efe8', roughness: .5 }),
+  pcbGreen: new THREE.MeshStandardMaterial({ color: '#1f6a3f', roughness: .45, metalness: .1 }),
+  pcbBlue: new THREE.MeshStandardMaterial({ color: '#1d4f9a', roughness: .45, metalness: .1 }),
+  pcbPurple: new THREE.MeshStandardMaterial({ color: '#4b2c6e', roughness: .45 }),
+  chip: new THREE.MeshStandardMaterial({ color: '#151515', roughness: .5 }),
+  gold: new THREE.MeshStandardMaterial({ color: '#d9b45a', roughness: .3, metalness: .9 }),
+  yellow: new THREE.MeshStandardMaterial({ color: '#f0c22e', roughness: .5 }),
+  silver: new THREE.MeshStandardMaterial({ color: '#c7c9cb', roughness: .32, metalness: .85 }),
+  white: new THREE.MeshStandardMaterial({ color: '#f3f1ea', roughness: .6 }),
+  black: new THREE.MeshStandardMaterial({ color: '#1e1e20', roughness: .55 }),
+  red: new THREE.MeshStandardMaterial({ color: '#c7322c', roughness: .45 }),
+  orange: new THREE.MeshStandardMaterial({ color: '#e0791f', roughness: .45 }),
+  brown: new THREE.MeshStandardMaterial({ color: '#5b3a22', roughness: .5 }),
+  blueCap: new THREE.MeshStandardMaterial({ color: '#2a63c9', roughness: .45 }),
+};
+function cable(points, colors, r = .03) {
+  const g = new THREE.Group();
+  colors.forEach((c, i) => {
+    const pts = points.map(p => p.clone().add(new THREE.Vector3(0, 0, (i - (colors.length - 1) / 2) * r * 2.1)));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, r, 6), P[c]));
+  });
+  return g;
+}
+function servo(body) {
+  const g = new THREE.Group();
+  const b = new THREE.Mesh(new RoundedBoxGeometry(.9, .85, .48, 2, .05), body); b.position.y = .42; g.add(b);
+  const tabs = new THREE.Mesh(new RoundedBoxGeometry(1.28, .1, .48, 1, .03), body); tabs.position.y = .62; g.add(tabs);
+  const boss = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .16, 16), P.hornWhite); boss.position.set(.24, .93, 0); g.add(boss);
+  const horn = new THREE.Mesh(new RoundedBoxGeometry(.9, .06, .16, 1, .03), P.hornWhite); horn.position.set(.24, 1.02, 0); horn.rotation.y = .6; g.add(horn);
+  g.add(cable([new THREE.Vector3(-.45, .2, 0), new THREE.Vector3(-.9, .1, .2), new THREE.Vector3(-1.1, .06, .7), new THREE.Vector3(-.6, .05, 1.1)], ['brown', 'red', 'orange'], .028));
+  return g;
+}
+function board(mat, w = 1.4, d = .75, chips = 1) {
+  const g = new THREE.Group();
+  const b = new THREE.Mesh(new RoundedBoxGeometry(w, .06, d, 1, .02), mat); b.position.y = .03; g.add(b);
+  for (let i = 0; i < chips; i++) { const c = new THREE.Mesh(new THREE.BoxGeometry(.32, .07, .32), P.chip); c.position.set(-w / 4 + i * .45, .09, 0); g.add(c); }
+  const pins = new THREE.InstancedMesh(new THREE.BoxGeometry(.04, .2, .04), P.gold, 10);
+  const m4 = new THREE.Matrix4(); for (let i = 0; i < 10; i++) { m4.makeTranslation(-w / 2 + .12 + i * (w - .24) / 9, .12, d / 2 - .07); pins.setMatrixAt(i, m4); } g.add(pins);
+  return g;
+}
+function gearmotor() {
+  const g = new THREE.Group();
+  const b = new THREE.Mesh(new RoundedBoxGeometry(1.5, .75, .85, 2, .08), P.yellow); b.position.y = .38; g.add(b);
+  const can = new THREE.Mesh(new THREE.CylinderGeometry(.33, .33, .8, 20), P.silver); can.rotation.z = Math.PI / 2; can.position.set(-.95, .38, 0); g.add(can);
+  const sh = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, 1.2, 8), P.white); sh.rotation.x = Math.PI / 2; sh.position.set(.35, .38, 0); g.add(sh);
+  return g;
+}
+function stepper() {
+  const g = new THREE.Group();
+  const can = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, .75, 28), P.silver); can.position.y = .38; g.add(can);
+  const cap = new THREE.Mesh(new RoundedBoxGeometry(.5, .5, .4, 1, .05), P.blueCap); cap.position.set(0, .3, .6); g.add(cap);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, .3, 10), P.gold); shaft.position.set(.2, .88, 0); g.add(shaft);
+  return g;
+}
+function coil(colors, R = .55) {
+  const g = new THREE.Group();
+  colors.forEach((c, i) => { const pts = []; for (let t = 0; t <= 1; t += .02) { const a = t * Math.PI * 4 + i; pts.push(new THREE.Vector3(Math.cos(a) * (R - i * .06), .06 + t * .25 + i * .05, Math.sin(a) * (R - i * .06))); }
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 80, .035, 6), P[c])); });
+  return g;
+}
+function leds() {
+  const g = new THREE.Group(); const r = rng(77);
+  for (let i = 0; i < 14; i++) { const c = [P.red, P.yellow, P.white, P.blueCap][i % 4]; const d = new THREE.Mesh(new THREE.CapsuleGeometry(.09, .14, 4, 10), c); d.position.set((r() - .5) * 1.1, .1 + r() * .15, r() * 1.4); d.rotation.set(r() * 3, r() * 3, Math.PI / 2); g.add(d); }
+  return g;
+}
+const many = (fn, n, seed) => () => { const g = new THREE.Group(); const r = rng(seed); for (let i = 0; i < n; i++) { const p = fn(i); p.position.set((r() - .5) * 1.1, 0, r() * 1.4); p.rotation.y = r() * 3; g.add(p); } return g; };
+const PARTS = [
+  ['Pico 2 W', 'Microcontroller', () => board(P.pcbGreen, 1.6, .65, 1)],
+  ['Breadboard', 'Full size', () => { const g = new THREE.Group(); const b = new THREE.Mesh(new RoundedBoxGeometry(3.2, .35, 1.5, 1, .05), P.white); b.position.y = .18; g.add(b); return g; }],
+  ['SG92R servo', 'Turns to an angle', () => servo(P.servoBlue)],
+  ['MG90D servo', 'Metal gears', () => servo(P.servoBlack)],
+  ['TT gearmotor', '1:48 · 3–6 V', gearmotor],
+  ['Micro gearmotor', 'Pololu 30:1', () => { const g = new THREE.Group(); const c = new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .95, 16), P.silver); c.rotation.z = Math.PI / 2; c.position.y = .2; g.add(c); const gb = new THREE.Mesh(new THREE.BoxGeometry(.45, .4, .4), P.gold); gb.position.set(.6, .2, 0); g.add(gb); return g; }],
+  ['Stepper 28BYJ', 'Moves in steps', stepper],
+  ['TB6612FNG', 'Motor driver', () => board(P.pcbPurple, 1.1, .7, 1)],
+  ['DRV8833', 'Motor driver', () => board(P.pcbPurple, .9, .6, 1)],
+  ['ULN2003', 'Stepper driver', () => board(P.pcbGreen, 1.4, 1.1, 1)],
+  ['PCA9685', '16 servo driver', () => board(P.pcbBlue, 2.2, .9, 1)],
+  ['4×AA holder', 'With switch', () => { const g = new THREE.Group(); const b = new THREE.Mesh(new RoundedBoxGeometry(2.4, .65, 1.35, 2, .08), P.black); b.position.y = .33; g.add(b); return g; }],
+  ['5 V 4 A supply', 'Bench power', () => { const g = new THREE.Group(); const b = new THREE.Mesh(new RoundedBoxGeometry(1.9, .8, 1.2, 2, .12), P.black); b.position.y = .4; g.add(b); g.add(coil(['black'], .5)); return g; }],
+  ['US-100', 'Distance sensor', () => { const g = board(P.pcbBlue, 1.8, .8, 0); for (const x of [-.45, .45]) { const e = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 24), P.silver); e.position.set(x, .3, 0); g.add(e); } return g; }],
+  ['Jumper wires', 'M–M · M–F', () => coil(['red', 'black', 'yellow', 'orange', 'blueCap'])],
+  ['Resistors', 'Assorted', () => coil(['brown', 'orange'], .45)],
+  ['LEDs 5 mm', 'Assorted', leds],
+  ['Buttons', 'Tactile', many(i => { const g = new THREE.Group(); const b = new THREE.Mesh(new RoundedBoxGeometry(.4, .2, .4, 1, .04), P.black); b.position.y = .1; const k = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .12, 10), [P.red, P.yellow, P.blueCap][i % 3]); k.position.y = .25; g.add(b, k); return g; }, 9, 5)],
+  ['Potentiometer', '10 kΩ', many(() => { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, .3, 20), P.blueCap); b.position.y = .15; const k = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, .5, 12), P.silver); k.position.y = .5; g.add(b, k); return g; }, 5, 8)],
+  ['Piezo buzzer', 'Passive', many(() => { const b = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, .32, 24), P.black); b.position.y = .16; const g = new THREE.Group(); g.add(b); return g; }, 4, 3)],
+  ['Header pins', '2.54 mm', many(() => { const g = new THREE.Group(); const s = new THREE.Mesh(new THREE.BoxGeometry(2.2, .1, .1), P.black); s.position.y = .05; g.add(s); return g; }, 5, 6)],
+  ['DHT11', 'Temp + humidity', () => { const g = board(P.pcbBlue, .9, .6, 0); const s = new THREE.Mesh(new RoundedBoxGeometry(.5, .25, .6, 1, .04), P.blueCap); s.position.y = .18; g.add(s); return g; }],
+  ['MPU-6050', 'Tilt + motion', () => board(P.pcbBlue, .8, .6, 1)],
+  ['Mic MAX4466', 'Sound level', () => { const g = board(P.pcbPurple, .8, .5, 0); const m = new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .3, 18), P.silver); m.position.set(.2, .2, 0); g.add(m); return g; }],
+];
+
+// LED pixel above each bin (placement is a guess until a photo of the real bench)
+const ledHouse = new RoundedBoxGeometry(.7, .34, .24, 2, .08);
+const ledLens = new THREE.SphereGeometry(.12, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2); ledLens.rotateX(Math.PI / 2);
+const LENS_OFF = new THREE.MeshStandardMaterial({ color: '#efe9de', roughness: .25 });
+const LENS_ON = new THREE.MeshStandardMaterial({ color: '#fff3e0', emissive: '#ff8f2c', emissiveIntensity: 9 });
+
+const aoTex = tex(128, 128, (g) => { const gr = g.createRadialGradient(64, 54, 6, 64, 64, 64); gr.addColorStop(0, 'rgba(30,28,24,.42)'); gr.addColorStop(.7, 'rgba(30,28,24,.14)'); gr.addColorStop(1, 'rgba(30,28,24,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }, { clamp: true });
+const aoMat = new THREE.MeshBasicMaterial({ map: aoTex, transparent: true, depthWrite: false });
+const aoGeo = new THREE.PlaneGeometry(5.4, 4.6);
+const COLS = 6, ROWS = 4, PITCH_X = 6;
+const ROW_H = [2, 5, 8, 11].map(i => louverRowY(i) + .1);     // each bin's hanger sits on one louver row; bare panel shows under the bottom row
+const rand = rng(42);
+const bins = [];
+for (let row = 0; row < ROWS; row++) for (let col = 0; col < COLS; col++) {
+  const n = (ROWS - 1 - row) * COLS + col;
+  const [name, sub, make] = PARTS[n];
+  const x = (col - (COLS - 1) / 2) * PITCH_X;
+  const h = ROW_H[row] - BIN_H;
+  const bin = new THREE.Group(); bin.position.set(x, h, .2); panel.add(bin);   // bins tilt back with the panel, as on the real rack
+  const body = new THREE.Mesh(binGeo, BIN_MAT); body.renderOrder = 2; bin.add(body);
+  const rim = new THREE.Mesh(rimGeo, BIN_RIM); rim.renderOrder = 3; bin.add(rim);
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(2.9, .86), new THREE.MeshStandardMaterial({ map: labelTex(name, sub, n + 1), roughness: .7 }));
+  label.position.set(0, .68, BIN_D + .065); bin.add(label);
+  const count = ['Buttons', 'Potentiometer', 'Piezo buzzer', 'Header pins', 'LEDs 5 mm', 'Breadboard'].includes(name) || name.includes('holder') || name.includes('supply') ? 2 : 4 + Math.floor(rand() * 4);
+  for (let k = 0; k < count; k++) {
+    const p = make();
+    p.position.set((rand() - .5) * 2.1, W + k * .05, .9 + rand() * 2.6);
+    p.rotation.set((rand() - .5) * .25, rand() * Math.PI * 2, (rand() - .5) * .25);
+    p.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    bin.add(p);
+  }
+  const ao = new THREE.Mesh(aoGeo, aoMat); ao.position.set(x, h + 1.4, .02); panel.add(ao);
+  bins.push({ n, name, sub, bin, x, h, row, col, z: 0 });
+}
+
+// The bin the Bot sends you to. Its LED is behind the panel: the glow comes through the slots and fills the clear bin from the back.
+const lit = bins.find(b => b.name === 'SG92R servo');
+const diffuser = new THREE.Mesh(new THREE.PlaneGeometry(6.5, 5), new THREE.MeshBasicMaterial({ map: aoTex, color: new THREE.Color('#ff9a3c').multiplyScalar(26), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+const hotTex = tex(256, 256, (g) => { const gr = g.createRadialGradient(128, 128, 4, 128, 128, 126); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.45, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); }, { clamp: true });
+diffuser.material.map = hotTex;
+panel.add(diffuser);
+const ledPix = new THREE.PointLight('#ff9a3c', 110, 7, 2); panel.add(ledPix);
+const ledBack = new THREE.PointLight('#ff9a3c', 90, 9, 2); panel.add(ledBack);
+const wash = new THREE.Mesh(new THREE.PlaneGeometry(7, 5), new THREE.MeshBasicMaterial({ map: hotTex, color: '#ff8f35', transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending }));
+wash.scale.set(1.15, 1.15, 1); panel.add(wash);
+// unlit pixels: dark dots behind each bin, seen faintly through the slots
+for (const b of bins) { const d = new THREE.Mesh(new RoundedBoxGeometry(.7, .34, .24, 2, .08), M.tvShell); d.position.set(b.x, b.h + 1.5, -.4); panel.add(d); b.dot = d; }
+function aimLed(b) { diffuser.position.set(b.x, b.h + 1.5, -.45); ledPix.position.set(b.x, b.h + 1.5, .15); ledBack.position.set(b.x, b.h + 1.5, -.6); wash.position.set(b.x, b.h + 1.6, .03); for (const o of bins) o.dot.visible = o !== b; }
+
+// ---------------- slim wall-mounted TV with the Bot ----------------
+const TV_W = 13.6, TV_H = TV_W * 9 / 16, TV_D = .35, LEAN = THREE.MathUtils.degToRad(16);
+// a small birch side table behind the rack, so the screen sits above the bins (Adi 2026-11-27: "on something ... above it")
+const TABLE_H = 21, TABLE_Z = -23;
+const table = new THREE.Group(); table.position.set(BOARD_X, 0, TABLE_Z); scene.add(table);
+const top = new THREE.Mesh(new RoundedBoxGeometry(22, .9, 11, 3, .3), plyM); top.position.y = TABLE_H - .45; top.castShadow = top.receiveShadow = true; table.add(top);
+// closed sides: a solid birch cabinet, nothing to see beneath it (Adi: "i should not be able to see beneath it")
+const body = new THREE.Mesh(new RoundedBoxGeometry(21.4, TABLE_H - .9, 10.4, 3, .3), plyM); body.position.y = (TABLE_H - .9) / 2; body.castShadow = body.receiveShadow = true; table.add(body);
+const stand = new THREE.Group(); stand.position.set(BOARD_X, TABLE_H, TABLE_Z + 1.5); scene.add(stand);
+// birch-ply cradle: a base block with a slot, the tablet leans back in it (the concept the picker showed, design 17)
+const baseBlk = new THREE.Mesh(slab(11.2, 2.2, 3.6, .5, .18), plyM); baseBlk.rotation.x = -Math.PI / 2; baseBlk.position.set(0, .75, 0);
+{ const g = new THREE.BoxGeometry(11.2, 2.2, 3.6); baseBlk.geometry.dispose(); baseBlk.geometry = new RoundedBoxGeometry(15, 1.5, 4, 3, .4); baseBlk.rotation.x = 0; }
+baseBlk.castShadow = baseBlk.receiveShadow = true; stand.add(baseBlk);
+const back = new THREE.Mesh(new RoundedBoxGeometry(15, 3, .6, 3, .25), plyM); back.position.set(0, 1.9, -1.7); back.rotation.x = -LEAN; back.castShadow = true; stand.add(back);
+const tv = new THREE.Group(); tv.position.set(0, 1.2 + TV_H / 2 * Math.cos(LEAN), -.7 - TV_H / 2 * Math.sin(LEAN)); tv.rotation.x = -LEAN; stand.add(tv);
+const shell = new THREE.Mesh(new RoundedBoxGeometry(TV_W + .7, TV_H + .7, TV_D, 4, .25), M.tvShell); shell.castShadow = true; tv.add(shell);
+// The screen is drawn live: two eyes that look, blink and think, and the part photo when a bin lights.
+const SC = document.createElement('canvas'); SC.width = 1280; SC.height = 720;
+const sg = SC.getContext('2d');
+const screenTex = new THREE.CanvasTexture(SC); screenTex.colorSpace = THREE.SRGBColorSpace; screenTex.anisotropy = ANISO;
+const screen = new THREE.Mesh(roundPlane(TV_W, TV_H, .35), new THREE.MeshBasicMaterial({ map: screenTex, color: '#fbf6ee', toneMapped: false }));
+screen.position.z = TV_D / 2 + .005; tv.add(screen);
+const glass = new THREE.Mesh(roundPlane(TV_W + .2, TV_H + .2, .45), M.tvGlass); glass.position.z = TV_D / 2 + .02; tv.add(glass);
+// Raspberry Pi (the Bot runs on one) on the mat, cable up the backboard to the TV
+const pi = new THREE.Group(); pi.position.set(BOARD_X + 22, 0, -16); pi.rotation.y = -.3; scene.add(pi);
+const piCase = new THREE.Mesh(new RoundedBoxGeometry(3.7, 1.2, 2.6, 3, .25), new THREE.MeshStandardMaterial({ color: '#d63a4a', roughness: .5 })); piCase.position.y = .6; piCase.castShadow = true; pi.add(piCase);
+const piLid = new THREE.Mesh(new RoundedBoxGeometry(3.5, .12, 2.4, 2, .1), new THREE.MeshStandardMaterial({ color: '#f4f2ee', roughness: .45 })); piLid.position.y = 1.24; pi.add(piLid);
+const cablePts = [new THREE.Vector3(BOARD_X + 22, .4, -14.8), new THREE.Vector3(BOARD_X + 16, .25, -18), new THREE.Vector3(BOARD_X + 10.9, .5, TABLE_Z + 3), new THREE.Vector3(BOARD_X + 10.9, TABLE_H - 2, TABLE_Z + 3), new THREE.Vector3(BOARD_X + 10.3, TABLE_H + .5, TABLE_Z - 1), new THREE.Vector3(BOARD_X + 6, TABLE_H + 1.2, TABLE_Z - .6)];
+const cableM = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cablePts), 80, .14, 10), new THREE.MeshStandardMaterial({ color: '#1a1a1c', roughness: .6 })); cableM.castShadow = true; scene.add(cableM);
+
+// ---------------- light: the DPI scene's rig ----------------
+scene.add(new THREE.HemisphereLight('#ffffff', '#8aa6ee', 2.1));
+const key = new THREE.DirectionalLight('#fff4e2', 2.1);
+key.position.set(55, 120, 20); key.target.position.set(-4, 8, -14);
+key.castShadow = true; key.shadow.mapSize.set(4096, 4096);
+Object.assign(key.shadow.camera, { left: -60, right: 60, top: 60, bottom: -40, near: 20, far: 300 });
+key.shadow.radius = 22; key.shadow.blurSamples = 32; key.shadow.bias = -.0004; key.shadow.normalBias = .03;
+scene.add(key, key.target);
+const rim2 = new THREE.DirectionalLight('#cfe0ff', .6); rim2.position.set(-90, 70, -80); scene.add(rim2);
+// navy shadows on the mat, as on the home page
+ground.receiveShadow = false;
+const catcher = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ color: '#02092c', opacity: .55 }));
+catcher.rotation.x = -Math.PI / 2; catcher.position.y = .02; catcher.receiveShadow = true; scene.add(catcher);
+scene.traverse(o => { if (o.isMesh && !o.material.transparent && o !== ground) o.receiveShadow = true; });
+
+// ---------------- post: ambient occlusion, glow, vignette ----------------
+const rt = new THREE.WebGLRenderTarget(1, 1, { samples: 4, type: THREE.HalfFloatType });
+const composer = new EffectComposer(renderer, rt);
+composer.addPass(new RenderPass(scene, camera));
+const gtao = new GTAOPass(scene, camera, innerWidth, innerHeight);
+gtao.updateGtaoMaterial({ radius: 2.2, distanceExponent: 1.6, thickness: 2, scale: 1.1, samples: 16 });
+gtao.blendIntensity = .9;
+composer.addPass(gtao);
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .55, .5, 6.0);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+
+// ================= the clock =================
+// A short demo plays once on load. Any time you act (ask, tap a chip, click a bin) it hands over to you.
+const FIX = Q.has('t') ? +Q.get('t') : null;
+const clamp01 = x => Math.min(1, Math.max(0, x));
+const ss = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const spring = (a, d, x) => { const t = clamp01((x - a) / d); return t >= 1 ? 1 : 1 - Math.exp(-6 * t) * Math.cos(7.5 * t); }; // fluid settle, one soft overshoot
+const clock = () => FIX ?? performance.now() / 1000;
+
+// ---- LED: behind the panel, fades in, then breathes slightly ----
+const LED0 = { diff: diffuser.material.color.clone().multiplyScalar(1.5), pix: ledPix.intensity * 1.6, back: ledBack.intensity * 1.6 };
+function setLed(L) {
+  diffuser.material.color.copy(LED0.diff).multiplyScalar(L);
+  ledPix.intensity = LED0.pix * L; ledBack.intensity = LED0.back * L; wash.material.opacity = 1; wash.material.color.set('#ff8f35').multiplyScalar(2.2 * L);
+  diffuser.visible = wash.visible = L > .001;
+}
+
+// ---- TV drawing ----
+const photo = f => { const im = new Image(); im.src = 'img/' + f; return im; };
+const PHOTOS = {}; // (the public page carries no vendor product photos)
+for (const k in PHOTOS) PHOTOS[k] = photo(PHOTOS[k]);
+const FONT = '"Geist","Inter","Helvetica Neue",Arial,sans-serif';
+function rr(x, y, w, h, r) { sg.beginPath(); sg.roundRect(x, y, w, h, r); }
+function face(cx, cy, s, eyeX, eyeY, blink, squint) {
+  sg.save(); sg.translate(cx, cy); sg.scale(s, s);
+  sg.fillStyle = '#121212';
+  const eh = 120 * (1 - blink) * (1 - squint * .45) + 4;
+  for (const ex of [-170, 170]) { sg.beginPath(); sg.ellipse(ex + eyeX * 2, eyeY * 1.6, 78, eh, 0, 0, 7); sg.fill(); }
+  sg.restore();
+}
+function bubble(b, k, picked) {
+  if (k <= 0) return;
+  const r = 58 * k;
+  sg.save(); sg.globalAlpha = clamp01(k * 1.4);
+  sg.shadowColor = 'rgba(0,0,0,.10)'; sg.shadowBlur = 22; sg.shadowOffsetY = 6;
+  sg.fillStyle = '#fff'; sg.beginPath(); sg.arc(b.x, b.y, r, 0, 7); sg.fill(); sg.shadowColor = 'transparent';
+  if (b.im.complete && b.im.naturalWidth) { sg.save(); sg.beginPath(); sg.arc(b.x, b.y, r - 8 * k, 0, 7); sg.clip();
+    const s = (r - 8 * k) * 2 / Math.min(b.im.naturalWidth, b.im.naturalHeight);
+    sg.drawImage(b.im, b.x - b.im.naturalWidth * s / 2, b.y - b.im.naturalHeight * s / 2, b.im.naturalWidth * s, b.im.naturalHeight * s); sg.restore(); }
+  if (picked > 0) { sg.strokeStyle = '#4f8a72'; sg.lineWidth = 3; sg.beginPath(); sg.arc(b.x, b.y, r + 4, -Math.PI / 2, -Math.PI / 2 + picked * Math.PI * 2); sg.stroke();
+    if (picked >= 1) { sg.fillStyle = '#2f5a47'; sg.beginPath(); sg.arc(b.x + 42, b.y + 40, 13, 0, 7); sg.fill(); sg.strokeStyle = '#fff'; sg.lineWidth = 3; sg.beginPath(); sg.moveTo(b.x + 36, b.y + 40); sg.lineTo(b.x + 41, b.y + 45); sg.lineTo(b.x + 49, b.y + 35); sg.stroke(); } }
+  sg.fillStyle = '#3c3c3a'; sg.font = `500 19px ${FONT}`; sg.textAlign = 'center'; sg.fillText(b.name, b.x, b.y + r + 30);
+  sg.restore();
+}
+function pill(text, x, y, { dark = false, align = 'center', size = 30, alpha = 1, w0 } = {}) {
+  sg.save(); sg.globalAlpha = alpha; sg.font = `500 ${size}px ${FONT}`;
+  const w = w0 || sg.measureText(text).width + 56, h = size + 34;
+  const x0 = align === 'right' ? x - w : align === 'left' ? x : x - w / 2;
+  sg.shadowColor = 'rgba(0,0,0,.10)'; sg.shadowBlur = 20; sg.shadowOffsetY = 6;
+  sg.fillStyle = dark ? '#1f2321' : '#fff'; rr(x0, y - h / 2, w, h, h / 2); sg.fill(); sg.shadowColor = 'transparent';
+  sg.fillStyle = dark ? '#fff' : '#1b1b1b'; sg.textAlign = 'left'; sg.textBaseline = 'middle'; sg.fillText(text, x0 + 28, y + 1);
+  sg.restore(); return w;
+}
+
+// ================= what the Bot knows, and how it talks =================
+// It talks like a helpful TA at the bench: short sentences, contractions, a follow-up when the ask is vague.
+const BIN = name => bins.find(b => b.name === name);
+const ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'], ROWN = ['bottom row', 'second row', 'third row', 'top row'];
+const binNo = b => String(b.n + 1).padStart(2, '0');
+const where = b => `${ROWN[b.row]}, ${ORD[b.col]} from the left`;
+const _turn = new Map(); const pick = a => { const i = _turn.get(a) || 0; _turn.set(a, i + 1); return a[i % a.length]; };
+const litLine = b => pick([`It’s in bin ${binNo(b)}, the one glowing now.`, `I’ve lit up bin ${binNo(b)} for you.`, `Look for the glow: bin ${binNo(b)}, ${where(b)}.`, `Bin ${binNo(b)}. It’s lighting up.`]);
+// [what the student might say, the part, what the Bot says back, what pairs with it, why]
+const KNOW = [
+  [/slight|a bit|little|angle|flap|servo|point|wave|lever|door|arm|lid/, 'SG92R servo', ['Sounds like a servo. You tell it an angle and it goes there and holds.', 'A servo’s perfect for that. It turns to a spot and stops.'], 'PCA9685', 'it drives up to 16 servos, so your Pico doesn’t have to'],
+  [/spin|wheel|drive|car|fan|roll|round/, 'TT gearmotor', ['You want a TT gearmotor. It just keeps spinning, great for wheels.', 'Grab a TT gearmotor. Cheap, tough, spins all day.'], 'TB6612FNG', 'a motor needs a driver board between it and the Pico'],
+  [/step|precise|exact|clock|dial hand/, 'Stepper 28BYJ', ['A stepper. It moves in tiny exact steps, so you always know where it is.'], 'ULN2003', 'that little board is what makes the stepper step'],
+  [/distance|far|ultrasonic|range|close|near|wall|park/, 'US-100', ['The US-100! It pings sound off things and tells you how far away they are.', 'That’s the US-100. Think of it as a bat ear: it hears its own echo.'], 'Jumper wires', 'it’s four pins, so four wires and you’re set'],
+  [/light|led|blink|glow|shine|lamp|bright/, 'LEDs 5 mm', ['LEDs! Four colours in there. Don’t forget a resistor or they pop.', 'Easy one: LEDs. Pick a colour.'], 'Resistors', 'every LED needs one, or it burns out'],
+  [/beep|buzz|alarm|sound|tone|music|ring|noise|song/, 'Piezo buzzer', ['A piezo buzzer. Tiny, loud, and it can even play a tune.', 'You want the buzzer. Fair warning, it’s loud.'], 'Buttons', 'press to beep is the classic first build'],
+  [/hear|mic|clap|loud|listen|voice/, 'Mic MAX4466', ['The mic board. It hears how loud the room is, so you can react to a clap.'], 'LEDs 5 mm', 'light that reacts to sound looks great'],
+  [/temp|hot|cold|humid|weather|warm/, 'DHT11', ['The DHT11. It reads temperature and humidity every couple of seconds.'], 'Pico 2 W', 'you’ll need it to read the sensor'],
+  [/tilt|shake|gesture|accel|gyro|balance|feel/, 'MPU-6050', ['The MPU-6050. It feels tilt and shake, like the one in your phone.'], 'Breadboard', 'it’s easiest to try it on a breadboard first'],
+  [/knob|dial|adjust|volume|pot|twist/, 'Potentiometer', ['A potentiometer. It’s a knob: turn it and your code reads a number.'], 'LEDs 5 mm', 'knob plus LED is a dimmer in ten minutes'],
+  [/button|press|switch|click|trigger/, 'Buttons', ['Buttons! Press one and your code knows.'], 'Resistors', 'a pull-down resistor keeps the reading steady'],
+  [/brain|micro|wifi|control|pico|code|program|computer|arduino/, 'Pico 2 W', ['The Pico 2 W. It’s the little computer that runs your code, Wi-Fi too.'], 'Breadboard', 'it sits right on a breadboard'],
+  [/wire|connect|jumper|cable/, 'Jumper wires', ['Jumper wires. Take a handful, everyone runs out.'], 'Breadboard', 'that’s what they plug into'],
+  [/battery|batteries|portable|cordless|on the go/, '4×AA holder', ['The 4×AA holder. It has its own switch, handy.'], 'Pico 2 W', 'it can run off the pack'],
+  [/power|supply|plug|wall|outlet/, '5 V 4 A supply', ['The 5 volt supply. Enough juice for a bunch of servos.'], 'PCA9685', 'it feeds servos through that board'],
+  [/breadboard|prototype|test it|try it/, 'Breadboard', ['A breadboard. Push parts in, no soldering, change your mind anytime.'], 'Jumper wires', 'you’ll need a few'],
+  [/resist/, 'Resistors', ['Resistors. They keep the current in check so nothing fries.'], 'LEDs 5 mm', 'that’s what most people need them for'],
+  [/header|solder|pins/, 'Header pins', ['Header pins. Solder them on and the board fits a breadboard.'], 'Breadboard', 'that’s where it goes next'],
+];
+const ABOUT = {
+  'SG92R servo': 'A little servo. Give it an angle and it goes there.', 'MG90D servo': 'The tough servo, metal gears. For when the blue one isn’t strong enough.',
+  'TT gearmotor': 'Yellow gearmotors. They spin wheels on most of the robot cars here.', 'Micro gearmotor': 'Tiny gearmotors. Small, strong, for tight spaces.',
+  'TB6612FNG': 'A motor driver. It sits between the Pico and two motors.', 'DRV8833': 'Another motor driver, a bit smaller.', 'ULN2003': 'The stepper’s driver board. They come as a pair.',
+  'PCA9685': 'A servo driver. Up to 16 servos from two wires.', 'Pico 2 W': 'The Pico 2 W. Most projects here start with one.',
+};
+const kOf = name => KNOW.find(k => k[1] === name);
+const descOf = b => ABOUT[b.name] || (kOf(b.name) ? kOf(b.name)[2][0] : `${b.name}. ${b.sub}.`);
+const AMBIG = /\b(motor|move|moves|moving|turn|turns|rotate|motion)\b/;
+const SENSE = /^(sense|sensor|detect|measure)( something)?\.?$/;
+const TALK = [
+  [/^(hi|hey|hello|yo|sup|hiya)\b[ !.,?]*(bot)?[ !.?]*$/, ['Hey! Tell me what you’re building and I’ll find the part.', 'Hi! What are we making today?'], ['A robot car', 'A plant alarm', 'A night light']],
+  [/^(thanks|thank you|thx|ty|cheers|awesome|perfect|great|cool|nice)\b/, ['Anytime! Bring it back if it doesn’t work.', 'You got it. Have fun building!'], null],
+  [/who are you|what are you|your name/, ['I’m Bot. I know where everything in this rack lives, so nobody has to dig.'], ['What can you do?']],
+  [/what can you|how does this|help|how do i/, ['Tell me what your project should do, like blink or beep, and I’ll light up the bin you need.'], ['Make it beep', 'Measure distance', 'Something that glows']],
+  [/joke|funny|bored/, ['Why did the LED break up with the resistor? Too much resistance. …I’ll stick to parts.'], ['Okay, find me a part']],
+  [/robot car|car/, ['A car! You’ll want two gearmotors for the wheels. Want a sensor so it doesn’t crash?'], ['Yes, add a sensor', 'Just the motors']],
+  [/plant/, ['Nice. A DHT11 can watch temperature and humidity, and a buzzer can yell when it’s dry.'], ['Show me the DHT11', 'Show me the buzzer']],
+  [/night light/, ['Cute. LEDs, plus a resistor each. Want a knob to dim it?'], ['Show me the LEDs', 'Add a knob']],
+];
+const ROUTE = { 'Yes, add a sensor': 'distance', 'Just the motors': 'spin a wheel', 'Show me the DHT11': 'temperature', 'Show me the buzzer': 'beep', 'Show me the LEDs': 'light', 'Add a knob': 'knob', 'Okay, find me a part': 'what can you do' };
+
+// ================= a script: who says what, when; the TV states fall out of it =================
+const dur = L => Math.min(1.1, L.text.length * .016);
+function script(lines, bin, extra = {}) {
+  const L = lines.map(([who, text, at, locate]) => ({ who, text, at, locate }));
+  const S = { start: clock(), L, bin, listen: [], think: [], locateAt: null, end: 0, ...extra };
+  L.forEach((x, i) => {
+    if (x.who === 'me') { const nb = L.slice(i + 1).find(y => y.who === 'bot'); const e = x.at + dur(x) + .35; S.listen.push([x.at, e]); if (nb) S.think.push([e, nb.at]); }
+    if (x.locate) S.locateAt = x.at + .15;
+    S.end = Math.max(S.end, x.at + dur(x));
+  });
+  return S;
+}
+// with sound on, the lines wait for the recorded voices (voice/*.wav, made by gen-voice.mjs with Gemini TTS)
+const DEMO = () => { const T = [.2, 3.45, 5.4, 6.75]; return script([
+  ['me', 'Bot, I need something that turns, just a little.', T[0]],
+  ['bot', 'Like a flap, up and back?', T[1]],
+  ['me', 'Yep, that’s it.', T[2]],
+  ['bot', 'That’s a servo. Bin 03 is lit up.', T[3], true],
+], BIN('SG92R servo'), { chips: ['What goes with it?', 'Something that spins instead', 'Something that glows'], voice: ['me1', 'bot1', 'me2', 'bot2'] }); };
+let lastPart = null;
+function answer(text) {
+  const t = text.toLowerCase().replace(/[’']/g, '').trim();
+  if (ROUTE[text]) return answer(ROUTE[text]);
+  if (/goes with|else do i need|go with|plug it into|need with|pair/.test(t) && lastPart) {
+    const k = kOf(lastPart.name), b = BIN(k[3]);
+    return { say: `Grab the ${b.name} too, ${k[4]}. ${litLine(b)}`, bin: b, chips: ['Something that beeps', 'Something that feels tilt'] };
+  }
+  const talk = TALK.find(([re], i) => i !== 3 && i !== 4 && re.test(t)); if (talk) return { say: pick(talk[1]), chips: talk[2] };
+  if (SENSE.test(t)) return { say: 'Sense what, though? Distance, tilt, heat or sound?', chips: ['Distance', 'Tilt', 'Heat', 'Sound'] };
+  const k = KNOW.find(k => k[0].test(t));
+  if (!k) { const h = TALK.slice(3, 5).find(([re]) => re.test(t)); if (h) return { say: pick(h[1]), chips: h[2] }; }
+  if (!k && AMBIG.test(t)) return { say: 'Got it, it moves. Does it spin all the way round, like a wheel? Or turn to a spot and stop, like a flap?', chips: ['All the way round', 'To a spot and stop'] };
+  if (!k) return { say: pick(['Hmm, I don’t think I have that one. What should it do? Move, sense something, light up, make noise?', 'Not sure I’ve got that. Tell me what it should do and I’ll find something close.']), chips: ['Move something', 'Sense something', 'Light up', 'Make noise'] };
+  const b = BIN(k[1]);
+  return { say: `${pick(k[2])} ${litLine(b)}`, bin: b, chips: ['What goes with it?', ...pick([['Something that beeps', 'Something that feels tilt'], ['Measure distance', 'Something that glows'], ['Spin a wheel', 'A knob to turn']])] };
+}
+ROUTE['All the way round'] = 'spin round'; ROUTE['To a spot and stop'] = 'turn to an angle'; ROUTE['Move something'] = 'move'; ROUTE['Sense something'] = 'sense';
+ROUTE['Light up'] = 'light'; ROUTE['Make noise'] = 'beep'; ROUTE['Distance'] = 'distance'; ROUTE['Tilt'] = 'tilt'; ROUTE['Heat'] = 'temperature'; ROUTE['Sound'] = 'hear';
+function askScript(text, you = true) {
+  const r = answer(text), me = ['me', text, .05];
+  const a = .05 + Math.min(1.1, text.length * .016) + .35 + Math.min(1.1, .5 + r.say.length * .006); // a beat to think, longer for longer replies
+  if (r.bin) lastPart = r.bin;
+  return script([me, ['bot', r.say, a, !!r.bin]], r.bin || null, { chips: r.chips, you });
+}
+// (bin taps removed: the real Bot has no tap-a-bin feature)
+ROUTE['What else is here?'] = 'what can you do';
+let S = Q.has('ask') ? askScript(Q.get('ask')) : Object.assign(script([], null), { idle: true });
+if (FIX != null) S.start = 0;
+const isDemo = () => S.L.length === 4 && S.bin?.name === 'SG92R servo' && S.L[0].text.startsWith('Bot, I need');
+function run(next) { if (S?.voice && next !== S) stopVoices(); S?.L.forEach(L => { if (L.el && !L.done) { L.el.textContent = L.text; L.done = true; } }); S = next; lastDraw = -1; subKey = callKey = ''; chipsShown = null; }
+const said = (who, rt) => { let x = null; for (const L of S.L) if (L.who === who && rt >= L.at) x = L; return x; };
+const lastSaid = rt => { let x = null; for (const L of S.L) if (rt >= L.at) x = L; return x; };
+const typed = (L, rt) => L.text.slice(0, Math.ceil(L.text.length * clamp01((rt - L.at) / dur(L))));
+
+const short = t => { const f = t.split(/(?<=[.!?])\s/)[0]; return f.length > 58 ? f.slice(0, 56).replace(/\s\S*$/, '') + '…' : f; };
+// ================= the TV, in the Bot's own look =================
+let lastDraw = -1;
+function drawTV(rt, now) {
+  const q = Math.round(now * 30); if (q === lastDraw) return; lastDraw = q;
+  const t = now, W = 1280, H = 720;
+  const bg = sg.createRadialGradient(640, 330, 40, 640, 360, 760); bg.addColorStop(0, '#fbfbf9'); bg.addColorStop(1, '#eeeeea');
+  sg.fillStyle = bg; sg.fillRect(0, 0, W, H);
+  const win = (a, b) => ss(a, a + .25, rt) * (1 - ss(b - .2, b, rt));
+  const listen = Math.max(0, ...S.listen.map(([a, b]) => win(a, b)));
+  const think = Math.max(0, ...S.think.map(([a, b]) => win(a, b)));
+  const locate = S.locateAt != null && S.bin ? ss(S.locateAt, S.locateAt + .4, rt) : 0;
+  const awake = S.idle ? 0 : isDemo() ? ss(0, .3, rt) : 1, wander = 1 - awake;
+  const ex = Math.sin(t * 1.7) * 14 * wander - think * 10 - 6 * locate;
+  const ey = Math.sin(t * 1.1 + 1) * 5 * wander - think * 16 + locate * 30 - listen * 6;
+  const bl = t % 3.1; const blink = bl > 2.95 ? Math.sin((bl - 2.95) / .15 * Math.PI) : 0;
+  const s = 1 + listen * .05 * (1 + .25 * Math.sin(t * 9)) + .015 * Math.sin(t * 2.2);
+  if (listen > 0) { sg.save(); sg.strokeStyle = '#7fae95'; for (let k = 0; k < 2; k++) { const p = ((t * .9 + k * .5) % 1); sg.lineWidth = 6 * (1 - p); sg.globalAlpha = listen * .5 * (1 - p); rr(640 - 125 - p * 50, 327 - 114 - p * 50, 250 + p * 100, 228 + p * 100, 90 + p * 30); sg.stroke(); } sg.restore(); }
+  face(640, 340, s, ex, ey, blink, think);
+  if (think > 0) for (let k = 0; k < 3; k++) { const a = .3 + .7 * Math.max(0, Math.sin(t * 7 - k * .8)); sg.fillStyle = `rgba(30,30,30,${a * think})`; sg.beginPath(); sg.arc(590 + k * 50, 560, 15, 0, 7); sg.fill(); }
+  if (locate > 0 && PHOTOS[S.bin.name]) bubble({ name: S.bin.name, im: PHOTOS[S.bin.name], x: 1080, y: 170 }, spring(S.locateAt, .55, rt), ss(S.locateAt + .2, S.locateAt + .7, rt));
+  screenTex.needsUpdate = true;
+}
+
+// ================= camera: still, unless you drag to look around =================
+const look = new THREE.Vector3(-5, 23, -15), base = new THREE.Vector3(-5, 97, 110);
+const view = { yaw: 0, pitch: 0, yawT: 0, pitchT: 0 };
+const _o = new THREE.Vector3(), _sph = new THREE.Spherical();
+function placeCamera(dt) {
+  const k = 1 - Math.exp(-dt * 7);
+  view.yaw += (view.yawT - view.yaw) * k; view.pitch += (view.pitchT - view.pitch) * k;
+  _o.copy(base).sub(look); _sph.setFromVector3(_o); _sph.theta += view.yaw; _sph.phi = THREE.MathUtils.clamp(_sph.phi - view.pitch, .5, 1.5);
+  camera.position.copy(look).add(_o.setFromSpherical(_sph)); camera.lookAt(look); camera.updateMatrixWorld();
+}
+
+// ================= the LED follows whatever the Bot found =================
+let aimed = null, ledLevel = 0, lastNow = clock();
+function updateLed(rt, dt, now) {
+  const want = S.bin && S.locateAt != null && rt >= S.locateAt ? S.bin : null;
+  if (FIX != null) { if (want) aimLed(want); ledLevel = want ? ss(S.locateAt, S.locateAt + .6, rt) : 0; aimed = want; }
+  else if (aimed !== want) { ledLevel = Math.max(0, ledLevel - dt * 5); if (ledLevel === 0) { aimed = want; if (want) { aimLed(want); chime(); } } }
+  else if (aimed) ledLevel = Math.min(1, ledLevel + dt * 2.4);
+  setLed(ss(0, 1, ledLevel) * (1 + .06 * Math.sin(now * 3.2)));
+}
+
+// ================= drag to look around (bins do not answer taps) =================
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+const binOfObj = o => { while (o) { const b = bins.find(b => b.bin === o); if (b) return b; o = o.parent; } return null; };
+function pickBin(cx, cy) {
+  ptr.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObjects(bins.map(b => b.bin), true)[0]; return hit ? binOfObj(hit.object) : null;
+}
+// ================= the standee: a printed card in a birch slot, like DPI's "Mix and match". It says what Bot is, plays the demo, and holds the sound switch. =================
+let SOUND = true, played = false;
+const STD = { W: 22, H: 27 };
+const stdC = document.createElement('canvas'); stdC.width = 1024; stdC.height = Math.round(1024 * STD.H / STD.W);
+const stdG = stdC.getContext('2d'), stdTex = new THREE.CanvasTexture(stdC); stdTex.colorSpace = THREE.SRGBColorSpace; stdTex.anisotropy = 8;
+let stdBtns = [];
+function wrapText(g, t, maxW) { const out = []; let cur = ''; for (const w of t.split(' ')) { const n = cur ? cur + ' ' + w : w; if (g.measureText(n).width > maxW && cur) { out.push(cur); cur = w; } else cur = n; } if (cur) out.push(cur); return out; }
+function syncPhone() { const p = document.getElementById('mplay'), q = document.getElementById('msnd'); if (!p) return; p.textContent = (played ? '▶ Play it again' : '▶ Play the demo') + ' · 10 s'; q.textContent = SOUND ? 'Sound on' : 'Sound off'; q.setAttribute('aria-pressed', SOUND); }
+function drawStandee() {
+  syncPhone();
+  const g = stdG, W = stdC.width, H = stdC.height, NAVY = '#16204a', GREY = '#5a6078', pad = 72, inner = W - pad * 2;
+  g.clearRect(0, 0, W, H); g.fillStyle = '#f7f4ec'; g.beginPath(); g.roundRect(0, 0, W, H, 36); g.fill();
+  for (let i = 0; i < 1400; i++) { g.fillStyle = i % 2 ? 'rgba(0,0,0,.025)' : 'rgba(255,255,255,.05)'; g.fillRect((i * 97.3) % W, (i * 53.7) % H, 2, 2); }
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  g.fillStyle = GREY; g.font = `700 30px ${FONT}`; g.fillText('CAMP EDI  ·  AI PARTS HELPER', pad, 112);
+  g.fillStyle = NAVY; g.font = `800 128px ${FONT}`; g.fillText('Meet Bot', pad - 4, 240);
+  g.font = `500 44px ${FONT}`; let y = 320;
+  for (const l of wrapText(g, 'A screen on the parts rack. Kids say what they want to build, and Bot lights up the bin with the right part.', inner)) { g.fillText(l, pad, y); y += 58; }
+  y += 30;
+  ['Say what you’re building', 'Bot asks back if it’s unclear', 'The right bin lights up'].forEach((t, i) => {
+    g.fillStyle = NAVY; g.beginPath(); g.arc(pad + 30, y - 14, 30, 0, 7); g.fill();
+    g.fillStyle = '#f7f4ec'; g.font = `800 34px ${FONT}`; g.textAlign = 'center'; g.fillText(String(i + 1), pad + 30, y - 2); g.textAlign = 'left';
+    g.fillStyle = NAVY; g.font = `650 42px ${FONT}`; g.fillText(t, pad + 84, y); y += 82;
+  });
+  y += 24; stdBtns = [];
+  // Play: the one main action, a black-navy pill
+  const bh = 128; g.fillStyle = 'rgba(2,9,44,.3)'; g.beginPath(); g.roundRect(pad, y + 8, inner, bh, 30); g.fill();
+  g.fillStyle = NAVY; g.beginPath(); g.roundRect(pad, y, inner, bh, 30); g.fill();
+  g.fillStyle = '#f7f4ec'; g.beginPath(); g.moveTo(pad + 62, y + 40); g.lineTo(pad + 62, y + 88); g.lineTo(pad + 102, y + 64); g.closePath(); g.fill();
+  g.font = `760 50px ${FONT}`; g.fillText(played ? 'Play it again' : 'Play the demo', pad + 136, y + 82);
+  g.fillStyle = 'rgba(247,244,236,.6)'; g.font = `600 36px ${FONT}`; g.textAlign = 'right'; g.fillText('10 s', pad + inner - 44, y + 78); g.textAlign = 'left';
+  stdBtns.push({ id: 'play', x: pad, y, w: inner, h: bh }); y += bh + 44;
+  // Sound: an on/off switch, on unless they turn it off
+  const sw = 132, sh = 70, sx = pad + inner - sw, sy = y;
+  g.fillStyle = NAVY; g.font = `700 44px ${FONT}`; g.fillText('Sound', pad, sy + 50);
+  g.fillStyle = GREY; g.font = `600 34px ${FONT}`; g.fillText(SOUND ? 'on' : 'off', pad + 156, sy + 49);
+  g.fillStyle = SOUND ? NAVY : '#d6d1c4'; g.beginPath(); g.roundRect(sx, sy, sw, sh, sh / 2); g.fill();
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(SOUND ? sx + sw - sh / 2 : sx + sh / 2, sy + sh / 2, sh / 2 - 8, 0, 7); g.fill();
+  stdBtns.push({ id: 'sound', x: pad - 10, y: sy - 14, w: inner + 20, h: sh + 28 }); y += sh + 50;
+  g.fillStyle = 'rgba(22,32,74,.14)'; g.fillRect(pad, y, inner, 3); y += 52;
+  g.fillStyle = GREY; g.font = `500 30px ${FONT}`; g.fillText('A sample chat. The voices are made with AI.', pad, y);
+  stdTex.needsUpdate = true;
+}
+drawStandee();
+const standee = new THREE.Group(); scene.add(standee);
+{ const base = new THREE.Mesh(new RoundedBoxGeometry(STD.W + 2, 2.2, 5.2, 3, .5), plyM); base.position.y = 1.1; base.castShadow = base.receiveShadow = true; standee.add(base);
+  const card = new THREE.Group(); card.position.set(0, 1.4, -.4); card.rotation.x = -.24; standee.add(card);
+  const board = new THREE.Mesh(new RoundedBoxGeometry(STD.W, STD.H, .3, 3, .12), new THREE.MeshStandardMaterial({ color: '#efeadf', roughness: .9 }));
+  board.position.y = STD.H / 2; board.castShadow = true; card.add(board);
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(STD.W - .02, STD.H - .02), new THREE.MeshStandardMaterial({ map: stdTex, emissive: '#ffffff', emissiveMap: stdTex, emissiveIntensity: .42, roughness: .88, transparent: true }));
+  face.position.set(0, STD.H / 2, .16); card.add(face); standee.userData.face = face; }
+function placeStandee(phone) {
+  if (phone) { standee.position.set(-4, 0, 40); standee.rotation.y = 0; standee.scale.setScalar(1.15); }
+  else { standee.position.set(-38, 0, -3); standee.rotation.y = .3; standee.scale.setScalar(1); }
+}
+function stdButtonAt(cx, cy) {
+  ptr.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObject(standee.userData.face)[0]; if (!hit?.uv) return null;
+  const x = hit.uv.x * stdC.width, y = (1 - hit.uv.y) * stdC.height;
+  return stdBtns.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) || null;
+}
+// Safari counts only sound started inside the click, so the first line starts here and the rest are primed silently
+function playDemo() {
+  if (!HIST.length) { logBox.replaceChildren(); youNoted = false; }
+  run(DEMO()); played = true; drawStandee();
+  const first = VOICES[S.voice[0]]; S.spoken = new Set([0]);
+  if (SOUND) { first.currentTime = 0; first.play().catch(() => {}); }
+  for (const id of S.voice.slice(1)) { const a = VOICES[id]; a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }
+}
+function standeeButton(id) {
+  if (id === 'play') return playDemo();
+  SOUND = !SOUND; drawStandee();
+  if (!SOUND) return stopVoices();
+  // turned back on mid-demo: the line being said now starts from its beginning
+  if (S.voice) { const rt = clock() - S.start; S.L.forEach((L, i) => { if (rt >= L.at && rt < L.at + 2.5) { const a = VOICES[S.voice[i]]; a.currentTime = 0; a.play().catch(() => {}); } }); }
+}
+
+let hover = null, drag = null;
+const cv = renderer.domElement; cv.style.touchAction = 'none';
+cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, moved: false, yaw: view.yawT, pitch: view.pitchT }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (drag) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.hypot(dx, dy) > 5) drag.moved = true;
+    if (drag.moved) { view.yawT = THREE.MathUtils.clamp(drag.yaw - dx * .004, -.6, .6); view.pitchT = THREE.MathUtils.clamp(drag.pitch + dy * .003, -.12, .12); cv.style.cursor = 'grabbing'; return; } }
+  cv.style.cursor = stdButtonAt(e.clientX, e.clientY) ? 'pointer' : 'grab';
+});
+cv.addEventListener('pointerup', e => { const tap = drag && !drag.moved; drag = null; cv.style.cursor = 'grab'; if (tap) { const b = stdButtonAt(e.clientX, e.clientY); if (b) standeeButton(b.id); } }); // the real Bot is spoken to, not tapped: bins don't answer clicks
+cv.addEventListener('pointerleave', () => { hover = null; });
+function popBins(dt) { const k = 1 - Math.exp(-dt * 12); for (const b of bins) { const tz = b === hover ? .9 : b === aimed ? .35 * ledLevel : 0; b.z += (tz - b.z) * k; b.bin.position.z = .2 + b.z; } }
+
+// ================= ask box and quick asks =================
+const form = document.getElementById('dock'), input = document.getElementById('q');
+// ================= the real AI: Claude Haiku via ./server.mjs; built-in answers if it's not there =================
+const HIST = []; let AI = false; // (no /api/bot on the public site)
+async function askAI(text) {
+  text = text.slice(0, 300);
+  const S0 = script([['me', text, .05]], null, { you: true });
+  S0.think.push([S0.listen[0][1], 1e9]); run(S0);
+  HIST.push({ role: 'user', content: text });
+  let r = null;
+  if (AI) try {
+    const res = await fetch('/api/bot', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ history: HIST.slice(-12) }) });
+    if (res.ok) r = await res.json(); else if (res.status !== 502) AI = false;
+  } catch { AI = false; }
+  if (!r) { const l = answer(text); r = { say: l.say, bin: l.bin?.name ?? null, chips: l.chips }; }
+  HIST.push({ role: 'assistant', content: r.say });
+  if (S !== S0) { addMsg('bot').textContent = r.say; return; } // they already asked something else: still keep it in the chat
+  const b = r.bin ? BIN(r.bin) : null; if (b) lastPart = b;
+  const at = Math.max(clock() - S0.start, S0.listen[0][1] + .25), L = { who: 'bot', text: r.say, at, locate: !!b };
+  S0.think[0][1] = at; S0.L.push(L); S0.bin = b; S0.locateAt = b ? at + .15 : null; S0.chips = r.chips?.length ? r.chips : null; S0.end = at + dur(L); lastDraw = -1;
+}
+document.getElementById('mplay').addEventListener('click', () => playDemo());
+document.getElementById('msnd').addEventListener('click', () => standeeButton('sound'));
+addEventListener('keydown', e => { if (e.key === 'Escape') location.assign('/'); });
+document.getElementById('live').addEventListener('click', () => { document.getElementById('chat').classList.add('open'); input.focus(); });
+form.addEventListener('submit', e => { e.preventDefault(); const v = input.value.trim(); if (!v) return; input.value = ''; askAI(v); });
+const chipBox = form.querySelector('.chips'); let chipsShown = null;
+const START_CHIPS = ['Something that turns a little', 'Spin a wheel', 'Make it beep', 'Measure distance'];
+function setChips(list) { if (chipsShown === list) return; chipsShown = list; chipBox.replaceChildren(...list.map((q, i) => { const c = document.createElement('button'); c.type = 'button'; c.textContent = q; c.style.animationDelay = i * 60 + 'ms'; c.onclick = () => askAI(q); return c; })); }
+setChips(START_CHIPS);
+const EX = ['Tell the Bot what you’re building…', 'Try “something that glows”', 'Try “I’m making a plant alarm”', 'Try “hi”'];
+let exI = 0; setInterval(() => { if (document.activeElement !== input && !input.value) input.placeholder = EX[++exI % EX.length]; }, 3200);
+
+// ================= words on screen: the Bot from the TV, the student as subtitles =================
+const $ = id => document.getElementById(id);
+const tag = $('tag'), lead = $('lead');
+const [leadP, leadC, tagP, tagC] = [lead.querySelector('path'), lead.querySelector('circle'), lead.querySelector('path.t2'), lead.querySelector('circle.t2')];
+const _p = new THREE.Vector3();
+function toScreen(obj, local) { _p.copy(local); obj.localToWorld(_p); _p.project(camera); return [(_p.x * .5 + .5) * innerWidth, (-_p.y * .5 + .5) * innerHeight]; }
+const logBox = $('log');
+let dotsEl = null, youNoted = false;
+function addMsg(cls, note) {
+  if (note) { const n = document.createElement('div'); n.className = 'note'; n.textContent = note; logBox.append(n); }
+  const m = document.createElement('div'); m.className = 'm ' + cls; logBox.append(m); return m;
+}
+const toBottom = () => { logBox.scrollTop = logBox.scrollHeight; };
+let subKey = '', callKey = '';
+function drawLog(rt) {
+  S.logged ??= new Set(); let moved = false;
+  S.L.forEach((L, i) => {
+    if (rt >= L.at && !S.logged.has(i)) { S.logged.add(i);
+      if (dotsEl) { dotsEl.remove(); dotsEl = null; }
+      let note = null;
+      if (i === 0 && !S.you) note = 'Sample chat · a student and the Bot';
+      if (S.you && L.who === 'me' && !youNoted) { youNoted = true; note = 'Your turn'; }
+      L.el = addMsg(L.who === 'bot' ? 'bot' : S.you ? 'me' : 'me student', note); moved = true; }
+    if (L.el && !L.done) { const t = typed(L, rt); if (L.el.textContent !== t) { L.el.textContent = t; moved = true; }
+      if (t.length === L.text.length) { L.done = true;
+        if (L.who === 'bot' && L.locate && S.bin) { const n = document.createElement('div'); n.className = 'lit'; n.textContent = `● Bin ${binNo(S.bin)} lit · ${S.bin.name}`; L.el.after(n); } } }
+  });
+  const T = S.think.find(([a, b]) => rt >= a && rt < b), B = S.L.some(L => L.who === 'bot' && rt >= L.at && L.at >= (T?.[0] ?? 0));
+  if (T && !B && !dotsEl) { dotsEl = addMsg('bot dots'); dotsEl.innerHTML = '<i></i><i></i><i></i>'; moved = true; }
+  if (!T && dotsEl) { dotsEl.remove(); dotsEl = null; }
+  if (moved) toBottom();
+}
+function drawWords(rt) {
+  drawLog(rt);
+  const lastBot = S.L.filter(l => l.who === 'bot').pop();
+  if (S.chips && lastBot && rt >= lastBot.at + dur(lastBot)) setChips(S.chips);
+  const lk = aimed ? ss(.3, 1, ledLevel) : 0;
+  tag.style.opacity = lk; tagP.style.opacity = tagC.style.opacity = lk;
+  if (lk > 0) { tag.lastChild.textContent = `Bin ${binNo(aimed)} · ${aimed.name}`;
+    const [bx, by] = toScreen(panel, new THREE.Vector3(aimed.x, aimed.h + 2.6, 4 + aimed.z)); let tx = bx - tag.offsetWidth / 2, ty = by - (innerWidth > 700 ? 96 : 84); if (tx < 12) { tx = 12; }
+    tag.style.left = tx + 'px'; tag.style.top = ty + 'px';
+    tagP.setAttribute('d', ty > by ? `M${bx},${ty - 6} L${bx},${by}` : `M${bx},${ty + tag.offsetHeight + 6} L${bx},${by}`); tagC.setAttribute('cx', bx); tagC.setAttribute('cy', by); }
+}
+
+const VOICES = Object.fromEntries(['me1', 'bot1', 'me2', 'bot2'].map(id => [id, Object.assign(new Audio(`voice/${id}.m4a`), { preload: 'auto' })]));
+function speak(rt) {
+  if (!S.voice || !SOUND) return; S.spoken ??= new Set();
+  S.L.forEach((L, i) => { if (rt >= L.at && rt < L.at + .5 && !S.spoken.has(i)) { S.spoken.add(i); const a = VOICES[S.voice[i]]; a.currentTime = 0; a.playbackRate = 1; a.preservesPitch = true; a.play().catch(() => {}); } });
+}
+window.__voices = VOICES;
+const stopVoices = () => Object.values(VOICES).forEach(a => a.pause());
+function frame() {
+  const now = clock(), dt = Math.min(.05, Math.max(0, now - lastNow)); lastNow = now;
+  const rt = now - S.start;
+  matU.uTime.value = now;
+  placeCamera(FIX != null ? 1 : dt);
+  drawTV(rt, now);
+  updateLed(rt, dt, now);
+  popBins(FIX != null ? 1 : dt);
+  drawWords(rt);
+  speak(rt);
+}
+
+// soft chime when the bin lights (after any click; browsers block sound before that)
+let actx = null;
+addEventListener('pointerdown', () => { actx ??= new AudioContext(); });
+function chime() {
+  if (!actx || !SOUND) return;
+  const now = actx.currentTime;
+  [[880, 0], [1318.5, .09]].forEach(([f, d]) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, now + d); g.gain.linearRampToValueAtTime(.12, now + d + .01); g.gain.exponentialRampToValueAtTime(.0001, now + d + 1.2);
+    o.connect(g).connect(actx.destination); o.start(now + d); o.stop(now + d + 1.3); });
+}
+function fit() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w, h);
+  camera.aspect = w / h;
+  if (camera.aspect < 1) { camera.fov = 36; base.set(-4, 150, 200); look.set(-4, 8, 4); } // phone: rack above, standee in front of it
+  else { camera.fov = 30; base.set(-17, 80, 94); look.set(-17, 12, -12); } // shifted left so the standee and the rack share the frame
+  const P = w > 700 ? Math.min(380, w * .34) + 16 : 0; // chat panel width
+  camera.setViewOffset(w, h, P / 2, w > 700 ? h * .02 : h * .2, w, h);
+  placeStandee(w <= 700);
+  placeCamera(1);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', fit); fit();
+Promise.all([...Object.values(PHOTOS).map(im => im.decode().catch(() => {})), document.fonts.load('500 30px Geist').catch(() => {})]).then(() => {
+  renderer.setAnimationLoop(() => { frame(); composer.render(); });
+  window.__ready = true; window.__rack = () => bins.map(b => ({ bin: binNo(b), name: b.name, what: b.sub, where: where(b) }));
+  window.__stdAt = id => { const b = stdBtns.find(b => b.id === id); return toScreen(standee.userData.face, new THREE.Vector3(((b.x + b.w / 2) / stdC.width - .5) * STD.W, (.5 - (b.y + b.h / 2) / stdC.height) * STD.H, 0)); };
+  window.__binAt = name => { const b = bins.find(b => b.name === name); return toScreen(b.bin, new THREE.Vector3(0, .7, BIN_D)); };
+});
+</script>
+</body>
+</html>
