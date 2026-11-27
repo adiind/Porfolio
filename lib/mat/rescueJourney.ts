@@ -155,6 +155,13 @@ export const AFTER_AT = DELIVERED + 1;
 /** nothing moves after this; the finished board stays to be read */
 export const JOURNEY_END = DELIVERED + 2.2;
 
+/**
+ * How fast the journey's clock runs on screen. The event times above stay as they are (the order log, the arrow keys and
+ * the tests read them); the film plays them this many times faster. Adi, 2026-11-27, of the 17.6 s film: "too slow".
+ * At 1.6 it plays in 11 s. (An earlier 9 s film, with no order log, read as too fast.)
+ */
+export const JOURNEY_RATE = 1.6;
+
 /** Which event is showing at `seconds` (0-based). */
 export function journeyAt(seconds: number) {
   const next = journeySteps.findIndex(step => step.at > seconds);

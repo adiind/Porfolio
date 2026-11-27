@@ -7,7 +7,7 @@ import {
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { NARROW, WIDE } from './rescueLayout';
 import {
-  ACCEPTED, CANCELLED, DELIVERED, DRIVER_STOPPED, gains, JOURNEY_END, journeyAt, journeySteps, losses, neighbours as neighbourCopy,
+  ACCEPTED, CANCELLED, DELIVERED, DRIVER_STOPPED, gains, JOURNEY_END, JOURNEY_RATE, journeyAt, journeySteps, losses, neighbours as neighbourCopy,
   offer as offerCopy, OFFERS, PICKUP, REROUTED, REWARD_SETTLED_AT, type Tone,
 } from './rescueJourney';
 
@@ -45,6 +45,19 @@ const zone = { x: (originalHome.x + nextDoor.x) / 2, y: (originalHome.y + nextDo
 
 /** The rider: Adi's approved Tripo model, slimmed from 221,000 to 40,000 triangles (it is drawn about 60 px tall). */
 const RIDER_MODEL = '/images/mat/food-rescue/rider.glb';
+
+/**
+ * The film's speed: JOURNEY_RATE, or `?pace=` in the address while the pace is being settled with Adi (0.5 to 3; 1 is
+ * the old 17.6 s). Read once, as the page's code loads: the page tidies its address later, before the bag is built.
+ * Take the address value out once he has picked.
+ */
+function journeyRate() {
+  if (typeof window === 'undefined') return JOURNEY_RATE;
+  const asked = Number(new URLSearchParams(window.location.search).get('pace'));
+  return asked >= 0.5 && asked <= 3 ? asked : JOURNEY_RATE;
+}
+
+const rate = journeyRate();
 
 export function createRescueScene(parent: Group, bagModel: Group, invalidate: () => void, reduced: boolean) {
   const root = new Group();
@@ -781,7 +794,7 @@ export function createRescueScene(parent: Group, bagModel: Group, invalidate: ()
     },
     update(dt: number, narrow: boolean) {
       if (!root.visible) return false;
-      time = Math.min(JOURNEY_END, time + dt);
+      time = Math.min(JOURNEY_END, time + dt * rate);
       pose(time, narrow);
       return time < JOURNEY_END;
     },
