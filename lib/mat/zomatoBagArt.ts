@@ -20,10 +20,14 @@ export const TEXT = {
     'Evaluated ML-based ranking output; helped identify gaps between algorithm predictions and real user behavior.',
     'Shifted decision-making toward real-time experiment reads, enabling PM + Design to make changes the same day.',
   ],
-  // the four skills and the closing line from his timeline (data/timeline.ts: skills, differentiator), his words
+  // The skills and the closing line, in Adi's words (chat, 2026-11-27, correcting the old site's "ML Feedback", "UI
+  // Behavior" and its closing sentence): "Its search algo optimisation not ml feedback. And instead of ui behaviour
+  // shipped 2+ homepage redisgn. At the bottom page say with so many users most experiments gave us actuinable data in a
+  // day, any chocies impacted millions of people and impact was real, in NM, on people and in X tweets". Only his typing
+  // slips are mended. "NM" is printed as he typed it: what it stands for is asked, not guessed.
   skillsHeading: 'Skills',
-  skills: ['Clickstream Analytics', 'A/B Testing', 'ML Feedback', 'UI Behavior'],
-  closing: 'Learned to operate in an environment where design and product decisions must be made within hours, shaping a bias toward rapid iteration powered by real user behavior rather than assumptions.',
+  skills: ['Clickstream Analytics', 'A/B Testing', 'Search Algo Optimisation', 'Shipped 2+ homepage redesigns'],
+  closing: 'With so many users, most experiments gave us actionable data in a day. Any choices impacted millions of people, and the impact was real: in NM, on people and in X tweets.',
   projects: {
     home: {
       title: 'Homepage & Search Performance', role: 'Senior Product Analyst',
@@ -298,8 +302,8 @@ export function receipt(wU: number, hU: number, u: number, mark: HTMLImageElemen
   rule();
   // the skills, as a till prints its items: a small heading, then one short bold line each
   g.fillStyle = '#6b6457'; g.font = `600 ${0.0165 * u}px "FB Geist"`; g.fillText(TEXT.skillsHeading.toUpperCase(), pad, y); y += 0.03 * u;
-  g.fillStyle = ink; g.font = `700 ${0.0235 * u}px "FB Geist"`;
-  TEXT.skills.forEach((t) => { g.fillText(t, pad, y); y += 0.033 * u; });
+  g.fillStyle = ink; g.font = `700 ${0.0212 * u}px "FB Geist"`;
+  TEXT.skills.forEach((t) => { g.fillText(t, pad, y); y += 0.031 * u; });
   y += 0.008 * u;
   rule();
   // the closing line, small, as the line at the foot of a bill
