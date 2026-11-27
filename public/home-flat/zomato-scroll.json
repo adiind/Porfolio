@@ -1,0 +1,307 @@
+{
+ "note": "Written by scripts/phone/make-zomato.mjs from lib/mat/zomatoPhone.ts. Do not edit by hand.",
+ "words": {
+  "company": "Zomato",
+  "role": "Senior Product Analyst",
+  "team": "Homepage & Search",
+  "when": "Oct 2024 – Jul 2025",
+  "lines": [
+   "Homepage & Search team, the surface through which ~80% of all orders were placed.",
+   "Worked with product, engineering and design on UI layout, listing size, module ordering and ranking logic.",
+   "Analytics covered ~10 million daily active users, using clickstream data.",
+   "Evaluated ML-based ranking output; helped identify gaps between algorithm predictions and real user behavior.",
+   "Shifted decision-making toward real-time experiment reads, enabling PM + Design to make changes the same day."
+  ],
+  "skillsHeading": "Skills",
+  "skills": [
+   "Clickstream Analytics",
+   "A/B Testing",
+   "Search Algo Optimisation",
+   "Shipped 2+ homepage redesigns"
+  ],
+  "closing": "With so many users, most experiments gave us actionable data in a day. Any choices impacted millions of people, and the impact was real: in NM, on people and in X tweets.",
+  "projects": [
+   {
+    "id": "home",
+    "title": "Homepage & Search Performance",
+    "role": "Senior Product Analyst",
+    "lines": [
+     "Maintained and analyzed how homepage and search changes impacted discovery, listing selection and ranking accuracy.",
+     "Deployed multiple version changes of homepage and search algorithms and UI.",
+     "Identified high-impact modules and reduced UI noise that created empty scroll."
+    ],
+    "foot": "The team's surface: ~10M daily users, ~80% of all orders."
+   },
+   {
+    "id": "friends",
+    "title": "Friends Recommendation",
+    "role": "Lead Analyst",
+    "lines": [
+     "Led analytics for Friends Recommendation: social validation of restaurant and food choices.",
+     "Led to greater discovery and better recommendations, and gave us much more signal on how users connect.",
+     "Helped us create our own social graph, starting with a billion-plus nodes."
+    ],
+    "foot": ""
+   }
+  ],
+  "rescue": {
+   "title": "Food Rescue",
+   "role": "Lead Product Analyst",
+   "years": "2024 to 2025",
+   "kicker": "One cancelled order, event by event",
+   "example": "Example order",
+   "steps": [
+    {
+     "n": "01",
+     "clock": "8:02 pm",
+     "title": "Order cooked",
+     "line": "The meal is made. Its cost is already spent.",
+     "why": null,
+     "tone": "go"
+    },
+    {
+     "n": "02",
+     "clock": "8:09 pm",
+     "title": "Rider on the way",
+     "line": "The rider heads to the first address.",
+     "why": null,
+     "tone": "go"
+    },
+    {
+     "n": "03",
+     "clock": "8:14 pm",
+     "title": "Customer cancels",
+     "line": "The meal is cooked, packed and on the road.",
+     "why": "About 400,000 orders a month ended here, with the food thrown away.",
+     "tone": "stop"
+    },
+    {
+     "n": "04",
+     "clock": "8:14 pm",
+     "title": "Offer goes out nearby",
+     "line": "People near the rider can claim the same meal. Closest buyer first.",
+     "why": "Rule: whoever cancelled, and the people next to them, never get the offer.",
+     "tone": "go"
+    },
+    {
+     "n": "05",
+     "clock": "8:16 pm",
+     "title": "A neighbour claims it",
+     "line": "A ₹322 meal for ₹175, freshly made and sealed.",
+     "why": null,
+     "tone": "go"
+    },
+    {
+     "n": "06",
+     "clock": "8:17 pm",
+     "title": "Rider is rerouted",
+     "line": "A short detour to the new address. The rider is paid in full for it.",
+     "why": null,
+     "tone": "pay"
+    },
+    {
+     "n": "07",
+     "clock": "8:24 pm",
+     "title": "Meal delivered",
+     "line": "Eaten a few streets away, not thrown away.",
+     "why": null,
+     "tone": "go"
+    }
+   ],
+   "losses": [
+    {
+     "who": "Restaurant",
+     "text": "Food cost lost"
+    },
+    {
+     "who": "Rider",
+     "text": "Trip wasted"
+    },
+    {
+     "who": "Customer",
+     "text": "Partial refund lost"
+    }
+   ],
+   "offer": {
+    "caption": "The offer, as it showed in the app",
+    "priceTag": "₹175, was ₹322"
+   },
+   "result": {
+    "lead": "This led to",
+    "figure": "~50%",
+    "caption": "less food waste across India",
+    "gainsTitle": "The value for each side",
+    "press": "Covered by Times of India, NDTV and Verdict Foodservice"
+   },
+   "gains": [
+    {
+     "who": "Buyer",
+     "text": "A fresh meal in minutes, at a steep discount"
+    },
+    {
+     "who": "Restaurant",
+     "text": "The meal is eaten, not thrown away"
+    },
+    {
+     "who": "Rider",
+     "text": "Paid in full for the detour"
+    }
+   ],
+   "myPart": {
+    "title": "My part",
+    "role": "Lead Product Analyst, Zomato",
+    "lines": [
+     "Ran experiments and A/B tests to learn what customers prefer and how the discount's size changes buying (discount elasticity).",
+     "Did the analytics behind what discount to show, to whom, and for how long.",
+     "Tuned how the offer is broadcast (over MQTT): the wait between waves and the radius it reaches.",
+     "Added new rules and studied fraud, so a cancelled order could not be turned into a discount."
+    ]
+   }
+  },
+  "press": {
+   "heading": "Media Coverage",
+   "sections": [
+    {
+     "project": "Friends Recommendation",
+     "articles": [
+      {
+       "title": "Zomato Launches Recommendations From Friends Feature",
+       "source": "ImpactOnNet",
+       "href": "https://www.impactonnet.com/more-from-impact/zomato-launches-recommendations-from-friends-feature-9479.html"
+      },
+      {
+       "title": "Loved by Friends Feature: Zomato Private Food Choices Public Data",
+       "source": "MediaNama",
+       "href": "https://www.medianama.com/2025/10/223-loved-by-friends-feature-zomato-private-food-choices-public-data/"
+      }
+     ],
+     "more": []
+    },
+    {
+     "project": "Food Rescue",
+     "articles": [
+      {
+       "title": "Zomato has a new plan to stop food wastage, and how this ‘Flash Sale’ is good news for users.",
+       "source": "Times of India",
+       "href": ""
+      },
+      {
+       "title": "Zomato Launches ‘Rescue’ Service To Combat Food Wastage. How Does It Work?",
+       "source": "NDTV",
+       "href": ""
+      },
+      {
+       "title": "Zomato introduces Food Rescue initiative to reduce food wastage",
+       "source": "Verdict Foodservice",
+       "href": "https://www.verdictfoodservice.com/news/zomatos-introduces-food-rescue/"
+      }
+     ],
+     "more": [
+      {
+       "label": "Zomato blog",
+       "href": "https://www.zomato.com/blog/food-rescue/"
+      },
+      {
+       "label": "Green Queen",
+       "href": "https://www.greenqueen.com.hk/zomato-food-rescue-waste-climate-conscious-delivery-india/"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "pictures": {
+  "bill": {
+   "src": "/home-flat/assets/zomato/bill.webp",
+   "w": 760,
+   "h": 2222
+  },
+  "home": {
+   "src": "/home-flat/assets/zomato/home.webp",
+   "w": 616,
+   "h": 658
+  },
+  "friends": {
+   "src": "/home-flat/assets/zomato/friends.webp",
+   "w": 616,
+   "h": 560
+  },
+  "press": {
+   "src": "/home-flat/assets/zomato/press.webp",
+   "w": 780,
+   "h": 1366,
+   "regions": [
+    {
+     "x0": 0,
+     "x1": 1,
+     "y0": 0.1222,
+     "y1": 0.2763,
+     "href": "https://www.impactonnet.com/more-from-impact/zomato-launches-recommendations-from-friends-feature-9479.html",
+     "source": "ImpactOnNet"
+    },
+    {
+     "x0": 0,
+     "x1": 1,
+     "y0": 0.2866,
+     "y1": 0.403,
+     "href": "https://www.medianama.com/2025/10/223-loved-by-friends-feature-zomato-private-food-choices-public-data/",
+     "source": "MediaNama"
+    },
+    {
+     "x0": 0,
+     "x1": 1,
+     "y0": 0.797,
+     "y1": 0.9134,
+     "href": "https://www.verdictfoodservice.com/news/zomatos-introduces-food-rescue/",
+     "source": "Verdict Foodservice"
+    },
+    {
+     "x0": 0.044,
+     "x1": 0.325,
+     "y0": 0.9237,
+     "y1": 0.9648,
+     "href": "https://www.zomato.com/blog/food-rescue/",
+     "source": "Zomato blog"
+    },
+    {
+     "x0": 0.361,
+     "x1": 0.6517,
+     "y0": 0.9237,
+     "y1": 0.9648,
+     "href": "https://www.greenqueen.com.hk/zomato-food-rescue-waste-climate-conscious-delivery-india/",
+     "source": "Green Queen"
+    }
+   ]
+  },
+  "bag": {
+   "src": "/home-flat/assets/zomato/bag.webp",
+   "w": 760,
+   "h": 938
+  },
+  "homeShot": {
+   "src": "/images/mat/zomato/homepage.webp",
+   "w": 772,
+   "h": 1008
+  },
+  "friendsShot": {
+   "src": "/images/mat/zomato/friends.webp",
+   "w": 1024,
+   "h": 569
+  },
+  "photo": {
+   "src": "/images/mat/zomato/eternal.webp",
+   "w": 1024,
+   "h": 609
+  },
+  "offer": {
+   "src": "/images/mat/food-rescue/offer.webp",
+   "w": 1100,
+   "h": 867
+  },
+  "paperBag": {
+   "src": "/images/mat/food-rescue/bag.webp",
+   "w": 519,
+   "h": 600
+  }
+ }
+}
