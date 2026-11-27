@@ -84,10 +84,12 @@ export const header = {
   example: 'Example order',
 } as const;
 
-/** What each side loses when an order is cancelled (deck, slide 2). Paper tags on the map at event 03. */
+/** What each side loses when an order is cancelled (deck, slide 2). Paper tags on the map at event 03: at the shop, under the rider, under the house that cancelled. */
 export const losses = [
   { who: 'Restaurant', text: 'Food cost lost', source: 'deck' },
   { who: 'Rider', text: 'Trip wasted', source: 'deck' },
+  // deck, slide 2, Users: "Genuine users incurred partial-refund losses."
+  { who: 'Customer', text: 'Partial refund lost', source: 'deck' },
 ] as const;
 
 /** What each side gets once the meal is rescued (deck, slide 3). On the board's result block and as map tags at event 07. */
@@ -157,10 +159,10 @@ export const JOURNEY_END = DELIVERED + 2.2;
 
 /**
  * How fast the journey's clock runs on screen. The event times above stay as they are (the order log, the arrow keys and
- * the tests read them); the film plays them this many times faster. Adi, 2026-11-27, of the 17.6 s film: "too slow".
- * At 1.6 it plays in 11 s. (An earlier 9 s film, with no order log, read as too fast.)
+ * the tests read them); the film plays them this many times faster. Adi, 2026-11-27: the 17.6 s film was "too slow";
+ * shown 11 s and 9 s, he said "I want 9 seconds". At 2 it plays in 8.8 s.
  */
-export const JOURNEY_RATE = 1.6;
+export const JOURNEY_RATE = 2;
 
 /** Which event is showing at `seconds` (0-based). */
 export function journeyAt(seconds: number) {

@@ -46,19 +46,6 @@ const zone = { x: (originalHome.x + nextDoor.x) / 2, y: (originalHome.y + nextDo
 /** The rider: Adi's approved Tripo model, slimmed from 221,000 to 40,000 triangles (it is drawn about 60 px tall). */
 const RIDER_MODEL = '/images/mat/food-rescue/rider.glb';
 
-/**
- * The film's speed: JOURNEY_RATE, or `?pace=` in the address while the pace is being settled with Adi (0.5 to 3; 1 is
- * the old 17.6 s). Read once, as the page's code loads: the page tidies its address later, before the bag is built.
- * Take the address value out once he has picked.
- */
-function journeyRate() {
-  if (typeof window === 'undefined') return JOURNEY_RATE;
-  const asked = Number(new URLSearchParams(window.location.search).get('pace'));
-  return asked >= 0.5 && asked <= 3 ? asked : JOURNEY_RATE;
-}
-
-const rate = journeyRate();
-
 export function createRescueScene(parent: Group, bagModel: Group, invalidate: () => void, reduced: boolean) {
   const root = new Group();
   root.visible = false;
@@ -738,12 +725,15 @@ export function createRescueScene(parent: Group, bagModel: Group, invalidate: ()
       if (sides[i] === 0) above(tag, pins[i], from, until, 0, 0, i === 6);
       else beside(tag, pins[i], sides[i], from, until);
     });
-    // 03: what each side loses (the restaurant's tag sits where its pin is; the rider's under the rider)
+    // 03: what each side loses (the restaurant's tag sits where its pin is; the rider's under the rider; the customer's under their house)
     const lossFrom = CANCELLED + .6;
     const lossTo = narrow ? OFFERS : ACCEPTED; // on a phone the losses clear away when the offer goes out
     above(lossTags[0], pins[0], lossFrom, lossTo);
     let [cx, cy] = near(radarOrigin.x, radarOrigin.y, -.18, -.21);
     show(lossTags[1], cx, cy, lossFrom, lossTo);
+    // (the customer's, under the house that cancelled)
+    [cx, cy] = near(originalHome.x, originalHome.y, .02, -.6);
+    show(lossTags[2], cx, cy, lossFrom, lossTo);
     // 04: who gets the offer, who does not
     [cx, cy] = near(far.point.x, far.point.y, -.1, .46);
     if (narrow) offeredTag.mesh.visible = false; // on a phone the little bag on the far house is enough
@@ -794,7 +784,7 @@ export function createRescueScene(parent: Group, bagModel: Group, invalidate: ()
     },
     update(dt: number, narrow: boolean) {
       if (!root.visible) return false;
-      time = Math.min(JOURNEY_END, time + dt * rate);
+      time = Math.min(JOURNEY_END, time + dt * JOURNEY_RATE);
       pose(time, narrow);
       return time < JOURNEY_END;
     },
