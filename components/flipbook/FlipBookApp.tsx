@@ -1770,7 +1770,15 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           {(['home', 'friends', 'rescue'] as const).map((id) => (
             <section key={id}><h3>{BAG_TEXT.projects[id].title}, {BAG_TEXT.projects[id].role}</h3><p>{BAG_TEXT.projects[id].lines.join(' ')} {BAG_TEXT.projects[id].foot}</p></section>
           ))}
-          <ul>{BAG_TEXT.press.articles.map((article) => <li key={article.href}><a href={article.href} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' && !bagUi.busy ? 0 : -1}>{article.title} ({article.source})</a></li>)}</ul>
+          {BAG_TEXT.press.sections.map((section) => (
+            <section key={section.project}>
+              <h3>{BAG_TEXT.press.heading}: {section.project}</h3>
+              <ul>
+                {section.articles.map((article) => <li key={article.title}>{article.href ? <a href={article.href} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' && !bagUi.busy ? 0 : -1}>{article.title} ({article.source})</a> : `${article.title} (${article.source})`}</li>)}
+                {section.more.map((link) => <li key={link.href}><a href={link.href} target="_blank" rel="noopener noreferrer" tabIndex={mode === 'poster' && !bagUi.busy ? 0 : -1}>{link.label}</a></li>)}
+              </ul>
+            </section>
+          ))}
         </aside>
       )}
       {/* the decks are pictures on the mat: here they are as text and links, unseen (the stack has no panel beside it) */}

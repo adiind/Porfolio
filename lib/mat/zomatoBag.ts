@@ -264,7 +264,7 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
   };
   let bagCaster: Caster;
   let mouthY = 0; // where the paper bag's story comes out (its fold line)
-  let pressRegions: ClipRegion[] = []; let pressMesh: Mesh | null = null;
+  let pressRegions: ClipRegion[] = []; let pressParts: { upper: Mesh; lower: Mesh; /** how much of the sheet's height the lower half's picture takes */ lowerSpan: number } | null = null;
 
   const tex = (canvas: HTMLCanvasElement, flipY = true): Texture => {
     const t = new CanvasTexture(canvas);
@@ -609,13 +609,20 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
         const root = new Group(); root.add(lower, fold);
         addItem('receipt', root, w, hh, 0.004, { x: -1.22, y: -0.06, turn: -3 }, 0.38, { fold });
       });
-      // the press clipping: each headline a link
+      // the press clipping: a tall newspaper column, folded in half in the bag (as the bill is), each headline a link
       later.push(() => {
-        const w = 0.64; const h2 = 0.4; const cv = clipping(w, h2, U * 1.3); pressRegions = cv.regions ?? [];
-        const m = lit({ map: tex(roundCorners(cv, 0.02 * U * 1.3)), cut: true, back: '#e4dccb', side: 'double' });
-        const p = plane(w, h2, m); p.position.z = 0.0015; pressMesh = p;
-        const root = new Group(); root.add(p);
-        addItem('press', root, w, h2, 0.003, { x: 1.06, y: -0.52, turn: -4 }, 0.36);
+        const w = 0.6; const cu = U * 1.3; const cv = clipping(w, cu); const hh = cv.height / cu; pressRegions = cv.regions ?? [];
+        const map = tex(roundCorners(cv, 0.02 * cu));
+        const top = lit({ map, rect: [0, 0.5, 1, 0.5], cut: true, back: '#e4dccb', side: 'double' });
+        const ov = 0.004; // the two halves overlap a hair, so no seam shows through the fold
+        const bottom = lit({ map, rect: [0, 0, 1, 0.5 + ov / hh], cut: true, back: '#e4dccb', side: 'double' });
+        const lower = plane(w, hh / 2 + ov, bottom); lower.position.set(0, -hh / 4 + ov / 2, 0.0015);
+        const fold = new Group(); fold.position.set(0, 0, 0.0038);
+        const upper = plane(w, hh / 2, top); upper.position.set(0, hh / 4, 0); fold.add(upper);
+        pressParts = { upper, lower, lowerSpan: 0.5 + ov / hh };
+        const root = new Group(); root.add(lower, fold);
+        // (its foot lies where the shorter clipping's did, so it is inside the window wherever that one was)
+        addItem('press', root, w, hh, 0.004, { x: 1.06, y: -0.72 + hh / 2, turn: -4 }, 0.36, { fold });
       });
       // his photo at Zomato, a glossy print
       later.push(() => {
@@ -675,7 +682,8 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       const off = new Vector2(0, it.d * 0.56).rotateAround(new Vector2(), a);
       return [it.rest.x + off.x, it.rest.y + off.y, it.w * 1.25, it.d * 2.35];
     }
-    if (it.id === 'receipt') return [it.rest.x, it.rest.y, it.w * 1.3, it.d * 1.08];
+    // (the two tall papers, the bill and the clipping, fill the window's height)
+    if (it.id === 'receipt' || it.id === 'press') return [it.rest.x, it.rest.y, it.w * 1.3, it.d * 1.08];
     return [it.rest.x, it.rest.y, it.w * 1.5, it.d * 1.7];
   };
   const aimCamera = (camera: PerspectiveCamera, dur: number) => {
@@ -993,12 +1001,13 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       return out;
     },
     linkAt(x: number, y: number, rect: DOMRect) {
-      if (!lastCamera || state !== 'open' || opened !== 'press' || !pressMesh) return null;
+      if (!lastCamera || state !== 'open' || opened !== 'press' || !pressParts) return null;
       ray.setFromCamera(new Vector2((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1), lastCamera);
-      const hit = ray.intersectObject(pressMesh, false)[0];
+      const hit = ray.intersectObjects([pressParts.upper, pressParts.lower], false)[0];
       if (!hit?.uv) return null;
-      const fy = 1 - hit.uv.y;
-      return pressRegions.find((r) => fy >= r.y0 && fy <= r.y1)?.href ?? null;
+      // (the sheet is two halves: where the point lies down the whole sheet, 0 at its top)
+      const fx = hit.uv.x; const fy = hit.object === pressParts.upper ? (1 - hit.uv.y) * 0.5 : 1 - hit.uv.y * pressParts.lowerSpan;
+      return pressRegions.find((r) => fx >= r.x0 && fx <= r.x1 && fy >= r.y0 && fy <= r.y1)?.href ?? null;
     },
     hit(x: number, y: number, rect: DOMRect) {
       if (!lastCamera || (state !== 'open' && state !== 'rest')) return null;

@@ -45,11 +45,32 @@ export const TEXT = {
       foot: '',
     },
   },
+  // Friends: the two articles the bag always had. Food Rescue: the three headlines from his case study's "Media Coverage"
+  // slide (data/timeline.ts), and the two links that sat on the old Food Rescue card. A headline with no address is
+  // printed plain: the Times of India and NDTV pages could not be reached to confirm their addresses.
   press: {
     heading: 'Media Coverage',
-    articles: [
-      { title: 'Zomato Launches Recommendations From Friends Feature', source: 'ImpactOnNet', href: 'https://www.impactonnet.com/more-from-impact/zomato-launches-recommendations-from-friends-feature-9479.html' },
-      { title: 'Loved by Friends Feature: Zomato Private Food Choices Public Data', source: 'MediaNama', href: 'https://www.medianama.com/2025/10/223-loved-by-friends-feature-zomato-private-food-choices-public-data/' },
+    sections: [
+      {
+        project: 'Friends Recommendation',
+        articles: [
+          { title: 'Zomato Launches Recommendations From Friends Feature', source: 'ImpactOnNet', href: 'https://www.impactonnet.com/more-from-impact/zomato-launches-recommendations-from-friends-feature-9479.html' },
+          { title: 'Loved by Friends Feature: Zomato Private Food Choices Public Data', source: 'MediaNama', href: 'https://www.medianama.com/2025/10/223-loved-by-friends-feature-zomato-private-food-choices-public-data/' },
+        ],
+        more: [],
+      },
+      {
+        project: 'Food Rescue',
+        articles: [
+          { title: 'Zomato has a new plan to stop food wastage, and how this \u2018Flash Sale\u2019 is good news for users.', source: 'Times of India', href: '' },
+          { title: 'Zomato Launches \u2018Rescue\u2019 Service To Combat Food Wastage. How Does It Work?', source: 'NDTV', href: '' },
+          { title: 'Zomato introduces Food Rescue initiative to reduce food wastage', source: 'Verdict Foodservice', href: 'https://www.verdictfoodservice.com/news/zomatos-introduces-food-rescue/' },
+        ],
+        more: [
+          { label: 'Zomato blog', href: 'https://www.zomato.com/blog/food-rescue/' },
+          { label: 'Green Queen', href: 'https://www.greenqueen.com.hk/zomato-food-rescue-waste-climate-conscious-delivery-india/' },
+        ],
+      },
     ],
   },
 };
@@ -281,35 +302,62 @@ export function receipt(wU: number, hU: number, u: number, mark: HTMLImageElemen
   return out.c;
 }
 
-/** Where each headline of the clipping lies (fractions of its height), so a click or hover can tell which one it is on. */
-export interface ClipRegion { y0: number; y1: number; href: string; source: string }
+/** Where each link of the clipping lies (fractions of its width and height), so a click or hover can tell which one it is on. */
+export interface ClipRegion { x0: number; x1: number; y0: number; y1: number; href: string; source: string }
 
-/** The clipping: newsprint, the two headlines from his media coverage, each underlined as a link, with its source and "Read ↗". */
-export function clipping(wU: number, hU: number, u: number): HTMLCanvasElement & { regions?: ClipRegion[] } {
-  const w = wU * u; const h = hU * u;
-  const { c, g } = make(w, h);
-  g.fillStyle = '#ece6d6'; g.fillRect(0, 0, w, h);
-  for (let i = 0; i < (w * h) / 120; i++) { g.fillStyle = `rgba(60,50,30,${0.03 + rand() * 0.04})`; g.fillRect(rand() * w, rand() * h, 1, 1); }
-  const pad = 0.03 * u; g.textBaseline = 'top';
-  const regions: ClipRegion[] = [];
+/**
+ * The clipping: a tall column cut from a newspaper, one block per project (Friends Recommendation, Food Rescue). Each
+ * headline with an address is underlined as a link, with its source and "Read \u2197"; one without is printed plain,
+ * with its source. As tall as its words need (the canvas's height says how tall, as the bill's does); it lies folded
+ * in half in the bag, so a soft crease runs across its middle.
+ */
+export function clipping(wU: number, u: number): HTMLCanvasElement & { regions?: ClipRegion[] } {
+  const w = wU * u; const pad = 0.03 * u; const colW = w - pad * 2;
+  // drawn once on a canvas tall enough for anything, then cut to the height the words took
+  const { c: tall, g } = make(w, 1.4 * u);
+  g.fillStyle = '#ece6d6'; g.fillRect(0, 0, w, tall.height);
+  for (let i = 0; i < (w * tall.height) / 120; i++) { g.fillStyle = `rgba(60,50,30,${0.03 + rand() * 0.04})`; g.fillRect(rand() * w, rand() * tall.height, 1, 1); }
+  g.textBaseline = 'top';
+  const marks: Array<{ x0: number; x1: number; y0: number; y1: number; href: string; source: string }> = [];
   let y = pad;
   g.fillStyle = '#6b6457'; g.font = `600 ${0.02 * u}px "FB Geist"`; g.fillText(TEXT.press.heading.toUpperCase(), pad, y); y += 0.032 * u;
-  g.fillStyle = 'rgba(40,34,26,0.6)'; g.fillRect(pad, y, w - pad * 2, 0.002 * u); y += 0.018 * u;
-  TEXT.press.articles.forEach((a, i) => {
-    const top = y;
-    g.fillStyle = '#1d1a15'; g.font = `600 ${0.031 * u}px "FB Serif"`;
-    wrap(g, a.title, w - pad * 2).forEach((l) => {
-      g.fillText(l, pad, y);
-      g.fillStyle = 'rgba(29,26,21,0.75)'; g.fillRect(pad, y + 0.034 * u, g.measureText(l).width, 0.0022 * u); g.fillStyle = '#1d1a15';
-      y += 0.039 * u;
+  g.fillStyle = 'rgba(40,34,26,0.6)'; g.fillRect(pad, y, colW, 0.002 * u); y += 0.02 * u;
+  TEXT.press.sections.forEach((section, s) => {
+    if (s) { y += 0.012 * u; g.fillStyle = 'rgba(40,34,26,0.6)'; g.fillRect(pad, y, colW, 0.002 * u); y += 0.02 * u; }
+    g.fillStyle = '#b3202c'; g.font = `700 ${0.0165 * u}px "FB Geist"`; g.fillText(section.project.toUpperCase(), pad, y); y += 0.031 * u;
+    section.articles.forEach((a, i) => {
+      const top = y;
+      g.fillStyle = '#1d1a15'; g.font = `600 ${0.026 * u}px "FB Serif"`;
+      wrap(g, a.title, colW).forEach((l) => {
+        g.fillText(l, pad, y);
+        if (a.href) { g.fillStyle = 'rgba(29,26,21,0.75)'; g.fillRect(pad, y + 0.029 * u, g.measureText(l).width, 0.002 * u); g.fillStyle = '#1d1a15'; }
+        y += 0.033 * u;
+      });
+      g.fillStyle = '#6b6457'; g.font = `500 ${0.018 * u}px "FB Geist"`; g.fillText(a.source, pad, y + 0.003 * u);
+      if (a.href) { g.fillStyle = '#b3202c'; g.font = `700 ${0.018 * u}px "FB Geist"`; g.fillText('Read \u2197', pad + g.measureText(a.source + '   ').width, y + 0.003 * u); }
+      y += 0.03 * u;
+      if (a.href) marks.push({ x0: 0, x1: w, y0: top - 0.006 * u, y1: y, href: a.href, source: a.source });
+      if (i < section.articles.length - 1 || section.more.length) { g.fillStyle = 'rgba(40,34,26,0.25)'; g.fillRect(pad, y, colW, 0.0015 * u); y += 0.015 * u; }
     });
-    g.fillStyle = '#6b6457'; g.font = `500 ${0.019 * u}px "FB Geist"`; g.fillText(a.source, pad, y + 0.002 * u);
-    g.fillStyle = '#b3202c'; g.font = `700 ${0.019 * u}px "FB Geist"`; g.fillText('Read \u2197', pad + g.measureText(a.source + '   ').width, y + 0.002 * u);
-    y += 0.03 * u;
-    regions.push({ y0: (top - 0.006 * u) / h, y1: y / h, href: a.href, source: a.source });
-    if (i === 0) { g.fillStyle = 'rgba(40,34,26,0.25)'; g.fillRect(pad, y, w - pad * 2, 0.0015 * u); y += 0.016 * u; }
+    // the project's own pages, after the headlines: short links on one line
+    let x = pad;
+    section.more.forEach((m) => {
+      g.fillStyle = '#b3202c'; g.font = `700 ${0.018 * u}px "FB Geist"`;
+      const label = `${m.label} \u2197`; const lw = g.measureText(label).width;
+      g.fillText(label, x, y + 0.002 * u);
+      marks.push({ x0: x - 0.008 * u, x1: x + lw + 0.008 * u, y0: y - 0.006 * u, y1: y + 0.03 * u, href: m.href, source: m.label });
+      x += lw + 0.034 * u;
+    });
+    if (section.more.length) y += 0.03 * u;
   });
-  const out = c as HTMLCanvasElement & { regions?: ClipRegion[] }; out.regions = regions;
+  const h = Math.ceil((y + pad) / 2) * 2;
+  const { c, g: o } = make(w, h);
+  o.drawImage(tall, 0, 0);
+  // the crease where it was folded: a hair of shade above the fold, a hair of light below
+  o.fillStyle = 'rgba(40,34,26,0.10)'; o.fillRect(0, h / 2 - 0.0016 * u, w, 0.0016 * u);
+  o.fillStyle = 'rgba(255,255,255,0.35)'; o.fillRect(0, h / 2, w, 0.0014 * u);
+  const out = c as HTMLCanvasElement & { regions?: ClipRegion[] };
+  out.regions = marks.map((m) => ({ x0: m.x0 / w, x1: m.x1 / w, y0: m.y0 / h, y1: m.y1 / h, href: m.href, source: m.source }));
   return out;
 }
 
