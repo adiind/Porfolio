@@ -598,7 +598,7 @@ export function createBagLayer(opts: { prop: { x: number; y: number; w: number; 
       });
       // the bill, folded in half in the bag, unfolding as it lands
       later.push(() => {
-        const w = 0.42; const cu = U * 1.6; const cv = receipt(w, 1.4, cu, mark); const hh = cv.height / cu;
+        const w = 0.42; const cu = U * 1.6; const cv = receipt(w, 1.8, cu, mark); const hh = cv.height / cu;
         const map = tex(roundCorners(cv, 14));
         const top = lit({ map, rect: [0, 0.5, 1, 0.5], cut: true, back: '#f2f0ea', side: 'double' });
         const ov = 0.004; // the two halves overlap a hair, so no seam shows through the fold

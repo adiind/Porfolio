@@ -13,7 +13,7 @@ async function main() {
   const [mark, offer] = await Promise.all([picture('/images/mat/zomato/wordmark.webp'), picture('/images/mat/food-rescue/offer.webp')]);
   const U = 1400;
   // the bill
-  put('bill', roundCorners(receipt(0.42, 1.4, U * 1.6, mark), 14));
+  put('bill', roundCorners(receipt(0.42, 1.8, U * 1.6, mark), 14));
   // the two boxes: the lid's inside print, then the screen that lies in the box
   const H = TEXT.projects.home; const F = TEXT.projects.friends;
   put('home', insidePrint(0.566 * U, 0.4 * U, U, H.title, H.lines, 'white', H.foot), shot('/images/mat/zomato/homepage.webp', 'The Zomato home screen'));

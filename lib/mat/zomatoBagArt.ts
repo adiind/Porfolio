@@ -20,6 +20,10 @@ export const TEXT = {
     'Evaluated ML-based ranking output; helped identify gaps between algorithm predictions and real user behavior.',
     'Shifted decision-making toward real-time experiment reads, enabling PM + Design to make changes the same day.',
   ],
+  // the four skills and the closing line from his timeline (data/timeline.ts: skills, differentiator), his words
+  skillsHeading: 'Skills',
+  skills: ['Clickstream Analytics', 'A/B Testing', 'ML Feedback', 'UI Behavior'],
+  closing: 'Learned to operate in an environment where design and product decisions must be made within hours, shaping a bias toward rapid iteration powered by real user behavior rather than assumptions.',
   projects: {
     home: {
       title: 'Homepage & Search Performance', role: 'Senior Product Analyst',
@@ -291,6 +295,17 @@ export function receipt(wU: number, hU: number, u: number, mark: HTMLImageElemen
     wrap(g, t, width - 0.03 * u).forEach((l) => { g.fillText(l, pad + 0.03 * u, y); y += 0.029 * u; });
     y += 0.012 * u;
   });
+  rule();
+  // the skills, as a till prints its items: a small heading, then one short bold line each
+  g.fillStyle = '#6b6457'; g.font = `600 ${0.0165 * u}px "FB Geist"`; g.fillText(TEXT.skillsHeading.toUpperCase(), pad, y); y += 0.03 * u;
+  g.fillStyle = ink; g.font = `700 ${0.0235 * u}px "FB Geist"`;
+  TEXT.skills.forEach((t) => { g.fillText(t, pad, y); y += 0.033 * u; });
+  y += 0.008 * u;
+  rule();
+  // the closing line, small, as the line at the foot of a bill
+  g.fillStyle = '#4a4640'; g.font = `450 ${0.0195 * u}px "FB Geist"`;
+  wrap(g, TEXT.closing, width).forEach((l) => { g.fillText(l, pad, y); y += 0.027 * u; });
+  y += 0.012 * u;
   rule();
   // cut to what is printed, with the torn top and bottom edges
   const out = make(w, Math.ceil(y + 0.012 * u)); const og = out.g;

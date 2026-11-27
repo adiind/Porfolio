@@ -1009,13 +1009,16 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       const link = linkAt(event);
       if (link) { event.stopImmediatePropagation(); downOn = null; window.open(link, '_blank', 'noopener'); return; }
       const under = at(event);
-      if (downOn && under === downOn) { event.stopImmediatePropagation(); if (under !== 'bag') bagOpen(under); }
+      // (the opened clipping is for reading: a click on its paper that is not on a link does nothing; Back puts it away)
+      if (downOn && under === downOn) { event.stopImmediatePropagation(); if (under !== 'bag' && !(under === 'press' && bagUiRef.current.open === 'press')) bagOpen(under); }
       else if (downOn) event.stopImmediatePropagation();
       downOn = null;
     };
     const move = (event: PointerEvent) => {
       if (!on()) { if (root.dataset.bagPointer) delete root.dataset.bagPointer; return; }
-      const hand = !bagUiRef.current.busy && (rowAt(event) !== null || !!linkAt(event) || at(event) !== null);
+      // (a hand over what a click does something to: on the opened clipping, only its links)
+      const over = at(event);
+      const hand = !bagUiRef.current.busy && (rowAt(event) !== null || !!linkAt(event) || (over !== null && !(over === 'press' && bagUiRef.current.open === 'press')));
       root.dataset.bagPointer = hand ? 'true' : 'false';
     };
     canvas.addEventListener('pointerdown', down, true);
@@ -1767,6 +1770,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
             ))}
           </ul>
           <ul>{BAG_TEXT.lines.map((line) => <li key={line}>{line}</li>)}</ul>
+          <p>{BAG_TEXT.skillsHeading}: {BAG_TEXT.skills.join(', ')}.</p>
+          <p>{BAG_TEXT.closing}</p>
           {(['home', 'friends', 'rescue'] as const).map((id) => (
             <section key={id}><h3>{BAG_TEXT.projects[id].title}, {BAG_TEXT.projects[id].role}</h3><p>{BAG_TEXT.projects[id].lines.join(' ')} {BAG_TEXT.projects[id].foot}</p></section>
           ))}
