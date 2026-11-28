@@ -8,10 +8,12 @@ export const BOT_TABLET = {
   id: 'bot:tablet',
   href: '/work/bot/',
   title: 'Bot',
-  /** its middle and size in page pixels (the stage's 1440 by 900 frame): the clear mat right of the yellow record, above the clipboards */
-  lay: { x: 1094, y: 172, w: 128 },
-  /** turned (radians, counter-clockwise from above) so the stand's cut left end, with the ply's layers, shows */
-  turn: 0.75,
-  /** the click target's height over its width: the standing thing fills it */
-  aspect: (897 / 935) * 1.2,   // stretched so the mat's slant does not squash it
+  /** the click target: its middle and width in the stage's pixels (its 1440 by 900 frame, which the slanted camera shows a little lower and shorter). It boxes the whole drawn thing, on the clear mat right of the yellow record, under the Work label and above the clipboards */
+  lay: { x: 1110, y: 168, w: 104 },
+  /** the click target's height over its width */
+  aspect: 1.29,
+  /** the stand's length, as a share of the click target's width (seen turned, it is narrower than its own length) */
+  stand: 0.859,
+  /** where the stand's middle is set down, from the target's middle, as shares of the target's width (right, and down the page) */
+  foot: { x: -4 / 104, y: 22 / 104 },
 } as const;

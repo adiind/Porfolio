@@ -23,6 +23,7 @@ import { RESCUE_SCHEMES, RESCUE_SOURCES, RESCUE_STORY, drawRescueCard, drawRescu
 import { SELF_STORY, drawSelfStoryCard } from '../../lib/mat/selfCards';
 import { createMailerLayer, type MailerLayer } from '../../lib/mat/snapdeal/mailerLayer';
 import { createBookTrayLayer, trayFootprint, type BookTrayLayer, type TrayBook } from '../../lib/mat/bookTrayLayer';
+import { createBotTabletLayer, type BotTabletLayer } from '../../lib/mat/botTabletLayer';
 import { MAILER } from '../../lib/mat/snapdeal/mailerArt';
 import { PAGE as SNAPDEAL_PAGE } from '../../lib/mat/snapdeal/pageWords';
 import { GITHUB, GITHUB_YEAR, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
@@ -131,6 +132,8 @@ const SNAPDEAL_ID = 'snapdeal';
 const SNAPDEAL_AT = { x: 625, y: 662, turn: 4 };
 const SNAPDEAL_LOOK: StagePoster = { ...(matStage.posters as StagePoster[]).find((poster) => poster.id === SNAPDEAL_ID)!, label: 'Snapdeal, Data Analyst' };
 let snapdealTargetPicture: HTMLCanvasElement | null = null;
+let botTabletTargetPicture: HTMLCanvasElement | null = null;
+const botTabletTarget = () => { if (!botTabletTargetPicture) { botTabletTargetPicture = document.createElement('canvas'); botTabletTargetPicture.width = 8; botTabletTargetPicture.height = 8; } return botTabletTargetPicture; };
 const snapdealTarget = () => { if (!snapdealTargetPicture) { snapdealTargetPicture = document.createElement('canvas'); snapdealTargetPicture.width = 8; snapdealTargetPicture.height = 8; } return snapdealTargetPicture; };
 const ZOMATO_ID = 'zomato';
 /** The bag's close-up, as the poster close-up knows it (its place is the old Zomato card's). */
@@ -271,7 +274,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the Zomato bag's pictures start coming now, beside the stage's (not waited for: the bag is built when they are in)
   void preloadZomatoBag().catch(() => undefined);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
-  const [posterPictures, rescuePictures, , selfLogo, toolMarks, resumePage, selfArt, clipPictures, , botTablet] = await Promise.all([
+  const [posterPictures, rescuePictures, , selfLogo, toolMarks, resumePage, selfArt, clipPictures] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
     hasRescue ? Promise.all([loadPicture(RESCUE_SOURCES.bag), loadPicture(RESCUE_SOURCES.logo), loadPicture(RESCUE_SOURCES.offer)]) : Promise.resolve(null),
     Promise.all(others.map((item) => loadPicture(item.pages[0].art.src))),
@@ -286,8 +289,6 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     // (the same pictures as lib/mat/designCards.ts DESIGN_PICTURES and DESIGN_PG_MARK, written out for the ship kit)
     Promise.all([loadPicture('/images/familysync_jpmorgan_chase.webp'), loadPicture('/images/mcdonalds_order.webp'), loadPicture('/images/pg/rooms/room-hero.webp'), loadPicture('/images/pg/pg-logo-official.svg')]),
     loadFlipbookFonts('first'),
-    // Bot's tablet on its birch stand, design 17 itself (lib/mat/botTablet.ts): the mat lights without it if it cannot be loaded
-    loadPicture('/images/mat/bot-tablet.webp').catch(() => null),
   ]);
   const posters = STAGE_POSTERS.map((poster, index) => {
     const image = posterPictures[index];
@@ -352,10 +353,11 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     ...at(RECORD_LAY.x, RECORD_LAY.y), w: RECORD.d / px, h: RECORD.d / px, radius: 0, cutout: true, alphaShadow: true, turn: RECORD_LAY.turn, dive: { frac: RECORD_DIVE_FRAC },
   };
   // Bot: a tablet with two eyes leaning in a birch stand, standing on the mat right of the record (lib/mat/botTablet.ts)
-  const bot: StageSpec['props'] = botTablet ? [{
-    id: BOT_TABLET.id, image: botTablet, ...at(BOT_TABLET.lay.x, BOT_TABLET.lay.y),
-    w: BOT_TABLET.lay.w / px, h: (BOT_TABLET.lay.w * BOT_TABLET.aspect) / px, radius: 0, cutout: true, alphaShadow: true, height: 0.05,
-  }] : [];
+  // (an empty click target: the tablet itself is built in 3D on it, lib/mat/botTabletLayer.ts)
+  const bot: StageSpec['props'] = [{
+    id: BOT_TABLET.id, image: botTabletTarget(), ...at(BOT_TABLET.lay.x, BOT_TABLET.lay.y),
+    w: BOT_TABLET.lay.w / px, h: (BOT_TABLET.lay.w * BOT_TABLET.aspect) / px, radius: 0, cutout: true, alphaShadow: true,
+  }];
   // the books' tray (its layer draws it, lib/mat/bookTrayLayer.ts): an unseen prop over its footprint, for clicks and fades
   const foot = trayFootFor();
   const trayAt = at(TRAY_AT.x, TRAY_AT.y);
@@ -511,6 +513,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   /** The presentations stack (lib/mat/handoutsLayer.ts), drawn in this engine's scene: one for the life of the engine. */
   /** The Snapdeal courier bag (lib/mat/snapdeal/mailerLayer.ts): one for each engine. */
   const snapdealRef = useRef<{ layer: MailerLayer; engine: FlipBookEngine; remove(): void } | null>(null);
+  const botTabletRef = useRef<{ layer: BotTabletLayer; engine: FlipBookEngine; remove(): void } | null>(null);
   const handoutsRef = useRef<{ layer: HandoutsLayer; engine: FlipBookEngine; remove(): void } | null>(null);
   const recordRingRef = useRef<{ layer: SoundRecordRing; engine: FlipBookEngine; remove(): void } | null>(null);
   /** The GitHub card's opened print (lib/mat/githubRiseLayer.ts): one for each engine and card picture. */
@@ -738,6 +741,17 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (debug) (window as unknown as { __handouts?: unknown }).__handouts = { get layer() { return layer; } };
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { handoutsRef.current?.remove(); handoutsRef.current = null; }, []);
+
+  // Bot's tablet in its birch stand (lib/mat/botTabletLayer.ts), built in 3D on its empty click target.
+  useEffect(() => {
+    const engine = engineRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === BOT_TABLET.id);
+    if (!staged || fallback || !engine || !target || botTabletRef.current?.engine === engine) return;
+    botTabletRef.current?.remove();
+    const layer = createBotTabletLayer({ x: target.x + target.w * BOT_TABLET.foot.x, y: target.y - target.w * BOT_TABLET.foot.y, w: target.w * BOT_TABLET.stand, target: target.image as HTMLCanvasElement });
+    botTabletRef.current = { layer, engine, remove: engine.addLayer(layer) };
+  }, [fallback, stageSpec, staged]);
+  useEffect(() => () => { botTabletRef.current?.remove(); botTabletRef.current = null; }, []);
 
   // The words round the yellow record while it is hovered (lib/mat/soundRecordRing.ts), on the mat under it.
   useEffect(() => {
