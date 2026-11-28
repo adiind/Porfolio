@@ -89,7 +89,7 @@
 .sd-bars{height:30px;background:repeating-linear-gradient(90deg,#15171c 0 3px,transparent 3px 6px,#15171c 6px 7px,transparent 7px 11px,#15171c 11px 15px,transparent 15px 17px)}
 .sd-bars-foot{width:130px;margin:16px 0 0 auto}
 .sd-tee{width:88%;margin:0 auto;filter:drop-shadow(-9px 13px 10px rgba(2,10,44,.5))}
-.sd-tag{position:relative;width:92%;margin:18px auto 0;padding:46px 18px 20px;background:#f6f0df;border-radius:14px;transform:rotate(1.4deg);box-shadow:-10px 14px 22px -8px rgba(2,10,44,.6)}
+.sd-tag{position:relative;box-sizing:border-box;width:90%;margin:18px auto 0;padding:46px 18px 20px;background:#f6f0df;border-radius:14px;transform:rotate(1.4deg);box-shadow:-10px 14px 22px -8px rgba(2,10,44,.6)}
 .sd-tag::before{content:"";position:absolute;left:50%;top:14px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#164bac;box-shadow:0 0 0 4px rgba(60,40,0,.2)}
 .sd-lid{background:#1d2a46;padding:14px;border-radius:8px;box-shadow:-10px 14px 22px -8px rgba(2,10,44,.6)}
 .sd-lid>.sd-bars{display:none}
