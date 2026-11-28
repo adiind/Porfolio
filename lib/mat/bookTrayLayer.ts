@@ -1,21 +1,22 @@
 /**
- * The project books on the home mat, standing by their spines in a birch-ply tray (Adi, 2026-11-27: "imagine if there were
- * 6 to 8 books ... maybe there's a spine that we make for all of them"; he approved the tray with "Yeass push"). Thin
- * hardcovers with rounded spines in a curved tray tipped back on a solid birch wedge, so the spines face up at the
- * camera. The tray is as long as the list of books. The pointer resting on a spine slides that book half out; a click
- * takes it out, it arcs down and lands flat on the mat in front of the tray, where the engine's own book takes over and
- * opens. Closed again, the book goes back into its slot. Prototype: review/designs-2026-11-27/books/shelf.html.
+ * The project books on the home mat: a small stack lying flat, each book a little crooked on the one under it so the top
+ * of every cover shows, tied together with a thin white string (Adi, 2026-11-28, with a picture of file folders whose titles
+ * all show: "remove that wooden thing and lets tie them together with thin white string, a bit croocked so top of each book
+ * is kinda visible (almost fanned out) - add text at the top of the book so its visible"). Each book's title is printed
+ * across the top of its cover. The pointer resting on a book slides it a little out of the stack; a click slides it out
+ * from under the string, it lifts and lands flat on the mat beside the stack, where the engine's own book takes over and
+ * opens. Closed again, it goes back into its place. The picture he sent: review/designs-2026-11-27/books/ref/.
  *
  * A MatLayer like the Bot tablet and the Snapdeal bag: it shares the engine's camera, window light and opening light. The
- * stage keeps an empty click target where it stands; the layer fades with the engine's own fade for that target.
+ * stage keeps an empty click target where it lies; the layer fades with the engine's own fade for that target.
  *
- * Units: built in centimetres (a book is 22 cm wide, as in the prototype), drawn at one table unit per book width. The mat
- * is the xy plane, z is up, and -y is toward the viewer.
+ * Units: built in centimetres (a book is 22 cm wide), drawn at one table unit per book width. The mat is the xy plane,
+ * z is up, and -y is toward the viewer.
  */
 import {
-  Box3, BufferGeometry, ExtrudeGeometry, Float32BufferAttribute, Group, LinearFilter, LinearMipmapLinearFilter,
-  Matrix4, Mesh, MeshBasicMaterial, BoxGeometry, NoColorSpace, PerspectiveCamera, Texture, PlaneGeometry, Quaternion, Raycaster,
-  ShaderMaterial, Shape, Vector2, Vector3, DoubleSide,
+  BufferGeometry, CatmullRomCurve3, ExtrudeGeometry, Group, LinearFilter, LinearMipmapLinearFilter, Matrix4, Mesh,
+  MeshBasicMaterial, BoxGeometry, NoColorSpace, PerspectiveCamera, Texture, PlaneGeometry, Quaternion, Raycaster,
+  ShaderMaterial, Shape, SphereGeometry, TubeGeometry, Vector2, Vector3,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
@@ -24,14 +25,14 @@ import type { MatLayer, MatLayerContext } from '../flipbook/matLayer';
 const W = 22;            // a book's width, spine to fore-edge (one table unit)
 const D = 13.2;          // its height, head to tail (the engine's closed book: 0.6 of its width)
 const T = 1.5;           // its thickness
-const GAP = 0.22;        // between books in the tray
-const PULL = D / 2;      // how far the pointer slides a book out
-const TILT = (62 * Math.PI) / 180;
-/** the tray turned on its own slope, so the books' front covers show beside their spines (Adi: "angle it right too, i wanna see the front too") */
-const YAW = (-35 * Math.PI) / 180;   // the tray tipped back, so the spines face the camera looking down at the mat
 const S = 1 / W;         // table units per cm
 const BUL = 0.38, BT = 0.2, X0 = -W / 2 + BUL;   // how far the spine bulges, board thickness, where the bulge starts
-const ZI = W / 2 + 0.75, ZO = ZI + 0.8;          // the tray's inner and outer walls, front and back
+const HOVER = 2.4;       // how far the pointer slides a book out of the stack, toward its head
+const STRING_R = 0.17;   // the string's thickness (radius)
+/** How much of each book's top shows above the one lying on it (less when there are many, so the string still holds all). */
+const stepFor = (n: number) => Math.min(2.6, (D - 5.2) / Math.max(1, n - 1));
+/** the band of the cover the title is printed on, from its top (cm) */
+const TITLE_BAND = 3.0;
 
 /* the engine's own shading, as the Bot tablet and the Snapdeal bag copy it */
 const DAWN = /* glsl */ `
@@ -65,6 +66,10 @@ void main() {
   col = mix(col, lit, 0.2);
   gl_FragColor = vec4(col * dawnLight(), uAlpha);
 }`;
+/** The cover: the titled print, turning into the plain cover picture while the book flies (`uMix`), as the engine's book has it. */
+const COVER_FRAGMENT = SOLID_FRAGMENT
+  .replace('uniform vec3 uColor; uniform sampler2D tMap;', 'uniform vec3 uColor; uniform sampler2D tMap; uniform sampler2D tPlain; uniform float uMix;')
+  .replace('vec3 base = uUseMap > 0.5 ? texture2D(tMap, vUv).rgb : uColor;', 'vec3 base = mix(texture2D(tMap, vUv).rgb, texture2D(tPlain, vUv).rgb, uMix);');
 const SHADOW_VERTEX = /* glsl */ `
 varying vec2 vP;
 void main() { vec4 w = modelMatrix * vec4(position, 1.0); vP = w.xy; gl_Position = projectionMatrix * viewMatrix * w; }`;
@@ -96,31 +101,30 @@ const LIGHT = new Vector3(0.35, 0.45, 0.9).normalize();
 const SHADOW_DIR = new Vector2(-0.55, -0.7);
 /** how far a shadow runs for the height of the thing casting it */
 const LONG = 1.1;
-/** A book standing in its slot: spine toward the viewer, head up, cover to the right. */
-const STAND_Q = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(new Vector3(0, 0, -1), new Vector3(1, 0, 0), new Vector3(0, -1, 0)));
+/** A book lying flat, cover up, head away from the viewer (book space: x spine to fore-edge, y thickness, z head to tail). */
+const FLAT_Q = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, -1, 0)));
+const Z_AXIS = new Vector3(0, 0, 1);
 const hex = (h: string) => new Vector3(parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255);
+
+/** A soft dark rim on the book under this one, right round this book's edges: where it rests on it. */
+const RIM_VERTEX = /* glsl */ `
+varying vec2 vQ;
+void main() { vQ = position.xy; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0); }`;
+const RIM_FRAGMENT = /* glsl */ `
+uniform vec2 uHalf; uniform float uR; uniform float uSoft; uniform float uStrength; uniform float uAlpha; uniform float uDawn; uniform vec2 uScreen;
+varying vec2 vQ;
+${DAWN}
+float roundBox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
+void main() {
+  float d = roundBox(vQ, uHalf, uR);
+  if (d < 0.0) discard;
+  float a = (1.0 - smoothstep(0.0, uSoft, d)) * uStrength;
+  if (a * uAlpha < 0.003) discard;
+  gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), a * uAlpha);
+}`;
 
 /* ---------- shapes ---------- */
 
-/** A corner-rounded outline: each [x, y, r] corner is replaced by a curve of its own radius. */
-function rounded(pts: Array<[number, number, number]>): Shape {
-  const s = new Shape(), n = pts.length, P = (i: number) => pts[(i + n) % n];
-  const cut = (a: [number, number], b: [number, number, number], r: number): [number, number] => {
-    const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy); return [a[0] + (dx / l) * r, a[1] + (dy / l) * r];
-  };
-  for (let i = 0; i < n; i += 1) {
-    const [x, y, r] = P(i), a = cut([x, y], P(i - 1), r), c = cut([x, y], P(i + 1), r);
-    if (i) s.lineTo(a[0], a[1]); else s.moveTo(a[0], a[1]);
-    s.quadraticCurveTo(x, y, c[0], c[1]);
-  }
-  s.closePath();
-  return s;
-}
-/** A point on the spine's curve, t 0 (top board) to 1 (bottom board). */
-function spineAt(t: number): [number, number] {
-  const u = 1 - t, k = 1.33 * BUL;
-  return [u * u * u * X0 + 3 * u * u * t * (X0 - k) + 3 * u * t * t * (X0 - k) + t * t * t * X0, T * (u * u * u + 3 * u * u * t)];
-}
 /** A hardcover's two boards and its rounded spine, as one bent shell with soft edges. Book space: x spine to fore-edge, y thickness, z head to tail. */
 function shellGeometry(): BufferGeometry {
   const s = new Shape();
@@ -132,120 +136,171 @@ function shellGeometry(): BufferGeometry {
   geo.translate(0, 0, -(D - 2 * bv) / 2);
   return geo;
 }
-/** A strip laid on the curved spine, so the spine's print wraps round it. */
-function spineGeometry(): BufferGeometry {
-  const N = 18, L = D - 0.5, pos: number[] = [], uv: number[] = [], idx: number[] = [];
-  for (let i = 0; i <= N; i += 1) {
-    const t = i / N, [x, y] = spineAt(t), [x2, y2] = spineAt(Math.min(1, t + 0.01)), [x1, y1] = spineAt(Math.max(0, t - 0.01));
-    let nx = y2 - y1, ny = -(x2 - x1); const l = Math.hypot(nx, ny); nx /= l; ny /= l;
-    if (nx > 0) { nx = -nx; ny = -ny; }
-    for (const z of [-L / 2, L / 2]) { pos.push(x + nx * 0.06, y + ny * 0.06, z); uv.push((z + L / 2) / L, 1 - t); }
-  }
-  for (let i = 0; i < N; i += 1) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
-  const g = new BufferGeometry();
-  g.setAttribute('position', new Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new Float32BufferAttribute(uv, 2));
-  g.setIndex(idx); g.computeVertexNormals();
-  return g;
-}
 
 export interface TrayBook {
   slug: string;
-  /** printed on the spine */
+  /** printed across the top of the cover */
   title: string;
-  /** a small line printed after the title, near the foot (Bambu: "BAMBU LAB") */
+  /** a small line printed at the right end of the title band (Bambu: "BAMBU LAB") */
   over?: string;
-  /** the spine's cloth, its print, and the thin bar at its foot */
+  /** the cloth of the boards and the title band, the print on it, and a thin bar beside the title */
   bg: string; fg: string; accent: string;
-  /** the cover picture: printed on the cover, and a square of it on the spine */
+  /** the cover picture */
   cover: string;
-  /** where the square on the spine is cut from the cover picture: its middle and side, as fractions of the picture's height */
+  /** (no longer used: the spine's crop) */
   crop?: { x: number; y: number; side: number };
 }
 
-/** The tray's layout: where each book's slot is, and the tray's own size, all in tray space (cm, y up, z toward the viewer). */
-function trayPlan(n: number) {
-  const row = n * (T + GAP) - GAP;
-  const len = row + 2.6;
-  return { row, len, slotX: (i: number) => -row / 2 + T / 2 + i * (T + GAP) };
+/**
+ * The stack's layout, in the stack's own space (cm, x right, y away from the viewer, z up, from the stack's middle on the
+ * mat). Book 0 lies on top, nearest the viewer; each book under it lies a step further back, turned a little more
+ * clockwise, so the top of its cover shows above the one on it, widest at the left where its title starts.
+ */
+function stackPlan(n: number) {
+  const step = stepFor(n);
+  const turnOf = (j: number) => ((2.6 - j * 2.4) * Math.PI) / 180;
+  const nudge = [0, 0.6, -0.4, 0.5, -0.2, 0.3, -0.5, 0.2];
+  const books = Array.from({ length: n }, (_, j) => {
+    const a = turnOf(j);
+    return {
+      a, c: new Vector2(nudge[j % nudge.length], j * step - ((n - 1) * step) / 2),
+      /** its bottom's height */
+      z: (n - 1 - j) * (T + 0.02),
+      /** toward its head */
+      head: new Vector2(-Math.sin(a), Math.cos(a)),
+    };
+  });
+  return { step, books, top: n * (T + 0.02) };
 }
 
-/** Builds the tray's birch: the U channel, two rounded bookends and the wedge it rests on. Returns the tray group (tipped). */
-function buildTray(n: number, solid: (geo: BufferGeometry) => Mesh): { tray: Group; block: Mesh; lift: number } {
-  const { len } = trayPlan(n);
-  const tray = new Group();
-  const prof = rounded([[ZO, -0.8, 1.4], [-ZO, -0.8, 1.4], [-ZO, 2.2, 0.4], [-ZI, 2.2, 0.4], [-ZI, 0, 0.7], [ZI, 0, 0.7], [ZI, 2.2, 0.4], [ZO, 2.2, 0.4]]);
-  const chanGeo = new ExtrudeGeometry(prof, { depth: len - 1.6, bevelEnabled: false, curveSegments: 14 });
-  chanGeo.translate(0, 0, -(len - 1.6) / 2);
-  const chan = solid(chanGeo); chan.rotation.y = -Math.PI / 2; tray.add(chan);
-  const ends = rounded([[ZO, -0.8, 1.4], [-ZO, -0.8, 1.4], [-ZO, 3.4, 1.4], [ZO, 3.4, 1.4]]);
-  for (const sx of [-1, 1]) {
-    const g = new ExtrudeGeometry(ends, { depth: 0.5, bevelEnabled: true, bevelThickness: 0.15, bevelSize: 0.15, bevelSegments: 4, curveSegments: 14 });
-    g.translate(0, 0, -0.25);
-    const e = solid(g); e.rotation.y = -Math.PI / 2; e.position.x = sx * (len / 2 - 0.4); tray.add(e);
-  }
-  // turned within its own slope first (the covers come round toward the viewer), then tipped back
-  tray.rotation.set(-TILT, YAW, 0);
-  tray.updateMatrixWorld(true);
-  const bb = new Box3(); chan.updateMatrixWorld(true); bb.expandByObject(tray);
-  const lift = -bb.min.y;
-  tray.position.y = lift; tray.updateMatrixWorld(true);
-  // the block it rests on: a solid birch wedge filling the space under the tray, from its back edge on the mat to its
-  // raised front, so the tray stands on the mat and does not float (Adi, 2026-11-27: "why is it half floating")
-  // (a rounded box, each of its columns stretched from the mat up to the tray's underside right above it)
-  const wedgeGeo = new RoundedBoxGeometry(1, 1, 1, 5, 0.08);
-  const pos = wedgeGeo.getAttribute('position'), under = new Vector3();
-  for (let i = 0; i < pos.count; i += 1) {
-    const u = pos.getX(i) * (len - 1.2), t = pos.getY(i) + 0.5, w = pos.getZ(i) * (2 * ZO - 1.2);
-    tray.localToWorld(under.set(u, -0.75, w));
-    pos.setXYZ(i, under.x, under.y * t, under.z);
-  }
-  wedgeGeo.computeVertexNormals();
-  const block = solid(wedgeGeo);
-  return { tray, block, lift };
+/** The four corners of a book lying at `c`, turned `a` (stack space, cm). */
+function corners(c: Vector2, a: number, grow = 0): Vector2[] {
+  const hw = W / 2 + grow, hd = D / 2 + grow, cs = Math.cos(a), sn = Math.sin(a);
+  return [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]].map(([x, y]) => new Vector2(c.x + x * cs - y * sn, c.y + x * sn + y * cs));
 }
 
-/** The tray's footprint on the mat (table units, from the tray's middle): what the stage's click target must cover. */
+/** The stack's footprint on the mat (table units, from the stack's middle): what the stage's click target must cover. */
 export function trayFootprint(n: number, turn = 0): { w: number; h: number; dy: number } {
-  const parts: BufferGeometry[] = [];
-  const solid = (geo: BufferGeometry) => { parts.push(geo); return new Mesh(geo); };
-  const { tray, block } = buildTray(n, solid);
-  const root = new Group(); root.add(tray, block);
-  // the books' top, slid out: roughly the tray's back edge raised by a book's height
-  const top = tray.localToWorld(new Vector3(0, D + PULL, 0));
-  root.updateMatrixWorld(true);
-  const bb = new Box3().setFromObject(root);
-  for (const p of parts) p.dispose();
-  // the camera looks down about 15 degrees from straight down: things that stand up are seen a little further up the mat
-  const reach = Math.max(bb.max.y, top.y) * Math.tan((15 * Math.PI) / 180);
-  const minZ = Math.min(bb.min.z, -top.z), maxZ = bb.max.z;
-  // tray space z toward the viewer is the mat's -y
-  const near = -maxZ, far = -minZ + reach;
-  // (turned on the mat, it covers the box round its turned outline)
-  const w0 = (bb.max.x - bb.min.x + 1) * S, h0 = (far - near + 1) * S, c = Math.abs(Math.cos(turn)), sn = Math.abs(Math.sin(turn));
-  return { w: w0 * c + h0 * sn, h: w0 * sn + h0 * c, dy: ((far + near) / 2) * S };
+  const plan = stackPlan(n);
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const b of plan.books) {
+    for (const p of [...corners(b.c, b.a), ...corners(b.c.clone().addScaledVector(b.head, HOVER), b.a)]) {
+      x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y);
+    }
+  }
+  // the camera looks down about 15 degrees from straight down: the stack's top is seen a little further up the mat
+  y1 += plan.top * Math.tan((15 * Math.PI) / 180);
+  const w0 = (x1 - x0 + 1) * S, h0 = (y1 - y0 + 1) * S, c = Math.abs(Math.cos(turn)), sn = Math.abs(Math.sin(turn));
+  return { w: w0 * c + h0 * sn, h: w0 * sn + h0 * c, dy: ((y0 + y1) / 2) * S };
 }
+
+/** Andrew's monotone chain: the convex hull of points, counter-clockwise. */
+function hull(pts: Vector2[]): Vector2[] {
+  const p = [...pts].sort((a, b) => a.x - b.x || a.y - b.y);
+  const cross = (o: Vector2, a: Vector2, b: Vector2) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lo: Vector2[] = [], up: Vector2[] = [];
+  for (const q of p) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 1e-9) lo.pop(); lo.push(q); }
+  for (const q of [...p].reverse()) { while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], q) <= 1e-9) up.pop(); up.push(q); }
+  return [...lo.slice(0, -1), ...up.slice(0, -1)];
+}
+
+/**
+ * The string: pulled tight round the stack, so it runs on the convex outline of the stack's cut along it, a string's
+ * thickness out. `o` is a point on its line across the mat and `t` its direction (stack space, cm). Returns its path in
+ * the plane (s along the line, z up), counter-clockwise, rounded at each corner.
+ */
+function stringLoop(books: ReturnType<typeof stackPlan>['books'], o: Vector2, t: Vector2): Vector2[] {
+  const pts: Vector2[] = [];
+  for (const b of books) {
+    // where the line runs across this book: in the book's own frame, the slab between its sides
+    const cs = Math.cos(-b.a), sn = Math.sin(-b.a);
+    const rel = o.clone().sub(b.c);
+    const p0 = new Vector2(rel.x * cs - rel.y * sn, rel.x * sn + rel.y * cs), d = new Vector2(t.x * cs - t.y * sn, t.x * sn + t.y * cs);
+    let lo = -Infinity, hi = Infinity;
+    for (const [pc, dc, h] of [[p0.x, d.x, W / 2 - 0.05], [p0.y, d.y, D / 2 - 0.05]] as const) {
+      if (Math.abs(dc) < 1e-9) { if (Math.abs(pc) > h) { lo = Infinity; } continue; }
+      const s1 = (-h - pc) / dc, s2 = (h - pc) / dc;
+      lo = Math.max(lo, Math.min(s1, s2)); hi = Math.min(hi, Math.max(s1, s2));
+    }
+    if (lo >= hi) continue;
+    const zb = b.z, zt = b.z + T + 0.08;
+    pts.push(new Vector2(lo, zb), new Vector2(hi, zb), new Vector2(lo, zt), new Vector2(hi, zt));
+  }
+  const h = hull(pts);
+  const out: Vector2[] = [];
+  const r = STRING_R + 0.02;
+  for (let i = 0; i < h.length; i += 1) {
+    const prev = h[(i - 1 + h.length) % h.length], cur = h[i], next = h[(i + 1) % h.length];
+    const e1 = cur.clone().sub(prev).normalize(), e2 = next.clone().sub(cur).normalize();
+    // outward normals of a counter-clockwise outline point right of each edge
+    const n1 = new Vector2(e1.y, -e1.x), n2 = new Vector2(e2.y, -e2.x);
+    let a1 = Math.atan2(n1.y, n1.x), a2 = Math.atan2(n2.y, n2.x);
+    while (a2 < a1) a2 += Math.PI * 2;
+    const steps = Math.max(1, Math.ceil((a2 - a1) / 0.35));
+    for (let k = 0; k <= steps; k += 1) { const a = a1 + ((a2 - a1) * k) / steps; out.push(new Vector2(cur.x + Math.cos(a) * r, Math.max(0.03, cur.y + Math.sin(a) * r))); }
+  }
+  return out;
+}
+
+/**
+ * The cover: its picture, with the title printed across its top on the book's cloth, so it shows above the book lying on
+ * it. The engine's own book is given the same cover (FlipBookApp), so nothing changes when it takes over from the copy.
+ */
+export function titledCover(b: TrayBook, cover: HTMLImageElement | null, cw = 1200, ch = 720): HTMLCanvasElement {
+  const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+  const g = c.getContext('2d');
+  if (!g) return c;
+  const pxPerCm = ch / (D - 0.5);
+  g.fillStyle = b.bg; g.fillRect(0, 0, cw, ch);
+  if (cover && cover.naturalWidth) g.drawImage(cover, 0, 0, cw, ch);
+  const band = TITLE_BAND * pxPerCm;
+  g.fillStyle = b.bg; g.fillRect(0, 0, cw, band);
+  // (the cloth's grain, the same every time it is drawn: the copy and the engine's book carry the same cover)
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let i = 0; i < 1600 * (cw / 1200) ** 2; i += 1) { g.fillStyle = `rgba(${rnd() < 0.5 ? '255,255,255' : '0,0,0'},.05)`; g.fillRect(rnd() * cw, rnd() * band, 2 * cw / 1200, 2 * cw / 1200); }
+  g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(0, band - 3 * cw / 1200, cw, 3 * cw / 1200);
+  g.textBaseline = 'alphabetic';
+  const left = 0.75 * pxPerCm;
+  let right = cw - 0.7 * pxPerCm;
+  g.fillStyle = b.fg;
+  if (b.over) {
+    g.font = `700 ${Math.round(46 * cw / 1200)}px "FB Geist", Geist, system-ui, sans-serif`;
+    const o = b.over.split('').join(String.fromCharCode(8202));
+    g.globalAlpha = 0.85; g.textAlign = 'right'; g.fillText(o, right, band * 0.64); g.textAlign = 'left'; g.globalAlpha = 1;
+    right -= g.measureText(o).width + 0.6 * pxPerCm;
+  }
+  g.fillStyle = b.accent; g.fillRect(left, band * 0.2, 9 * cw / 1200, band * 0.5);
+  g.fillStyle = b.fg;
+  const tx = left + 0.55 * pxPerCm;
+  let fs = Math.round(band * 0.66);
+  do { g.font = `800 ${fs}px "FB Geist", Geist, system-ui, sans-serif`; fs -= 4; } while (g.measureText(b.title).width > right - tx && fs > 30 * cw / 1200);
+  g.fillText(b.title, tx, band * 0.68);
+  return c;
+}
+
 
 export interface BookTrayLayer extends MatLayer {
   readonly ready: Promise<void>;
-  /** The book under the pointer (or the last touch) in the tray, if any. */
+  /** The book under the pointer (or the last touch) in the stack, if any. */
   pickAt(): string | null;
-  /** Take a book out: it slides out and lands flat where the engine's book lies (`land`). Resolves when it has landed. */
+  /** Take a book out: it slides out of the stack and lands flat where the engine's book lies (`land`). Resolves when it has landed. */
   takeOut(slug: string): Promise<void>;
   /** The engine's book has taken over where the book landed: stop drawing the copy. */
   release(): void;
   /** The engine's book has closed and is to go back: draw the copy where it lies and send it home. */
   putBack(slug: string): void;
-  /** True while a book is out of the tray or travelling. */
+  /** True while a book is out of the stack or travelling. */
   readonly busy: boolean;
 }
 
 /**
- * `x`, `y`: the tray's middle on the mat (table units); `land`: where the engine's closed book lies (its middle and turn in
+ * `x`, `y`: the stack's middle on the mat (table units); `land`: where the engine's closed book lies (its middle and turn in
  * radians, counter-clockwise); `target`: the stage's click-target picture, whose engine fade the layer follows.
  */
 export function createBookTrayLayer(opts: {
   x: number; y: number; books: TrayBook[]; land: { x: number; y: number; turn: number }; target?: HTMLCanvasElement;
-  /** the tray's turn on the mat, radians counter-clockwise: turned so the last book's cover shows, not only the spines */
+  /** the stack's turn on the mat, radians counter-clockwise */
   turn?: number;
   canHover(): boolean; onHover?(slug: string | null): void; reducedMotion?: boolean;
 }): BookTrayLayer {
@@ -258,18 +313,20 @@ export function createBookTrayLayer(opts: {
   let targetMesh: Mesh | null = null;
   let camera: PerspectiveCamera | null = null;
   const n = opts.books.length;
-  const plan = trayPlan(n);
-  interface Slot { book: TrayBook; slot: Group; obj: Group; hit: Mesh; p: number }
+  const plan = stackPlan(n);
+  const turn = opts.turn ?? 0;
+  interface Slot { book: TrayBook; j: number; obj: Group; hit: Mesh; rim: Mesh | null; shadow: ShaderMaterial | null; cover: ShaderMaterial | null; p: number; out: number }
   const slots: Slot[] = [];
   let hover: Slot | null = null;
   const pointer = { x: 0, y: 0, in: false, moved: false };
   const ray = new Raycaster();
   const ndc = new Vector2();
   let flight: null | {
-    s: Slot; dir: 1 | -1; t: number; start: number; from: { p: Vector3; q: Quaternion }; to: { p: Vector3; q: Quaternion }; done?: () => void; phase: 'slot' | 'air';
+    s: Slot; dir: 1 | -1; t: number; start: number; from: { p: Vector3; q: Quaternion }; to: { p: Vector3; q: Quaternion }; done?: () => void; phase: 'slide' | 'air';
   } = null;
   let out: Slot | null = null;
   let flyShadow: ShaderMaterial | null = null;
+  let flyMeshShadow: Mesh | null = null;
 
   const findTarget = () => {
     if (!ctx || !opts.target) return;
@@ -280,40 +337,26 @@ export function createBookTrayLayer(opts: {
     });
   };
 
-  /** The spine's print: a square of the cover, the title, the small line, and the accent bar at the foot. */
-  function drawSpine(b: TrayBook, cover: HTMLImageElement | null): HTMLCanvasElement {
-    const c = document.createElement('canvas'); c.width = 1320; c.height = 200;
-    const g = c.getContext('2d');
-    if (!g) return c;
-    g.fillStyle = b.bg; g.fillRect(0, 0, 1320, 200);
-    for (let i = 0; i < 2500; i += 1) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '255,255,255' : '0,0,0'},.04)`; g.fillRect(Math.random() * 1320, Math.random() * 200, 2, 2); }
-    g.textBaseline = 'middle';
-    if (cover && cover.naturalWidth) {
-      const cr = b.crop ?? { x: 0.72, y: 0.5, side: 0.62 };
-      const side = cover.naturalHeight * cr.side;
-      const sx = Math.max(0, Math.min(cover.naturalWidth - side, cover.naturalWidth * cr.x - side / 2));
-      const sy = Math.max(0, Math.min(cover.naturalHeight - side, cover.naturalHeight * cr.y - side / 2));
-      g.save(); g.beginPath(); g.roundRect(34, 38, 124, 124, 16); g.clip(); g.drawImage(cover, sx, sy, side, side, 34, 38, 124, 124); g.restore();
-    }
-    g.fillStyle = b.fg;
-    let right = 1190;
-    if (b.over) {
-      g.font = '700 38px "FB Geist", Geist, system-ui, sans-serif';
-      const o = b.over.split('').join(String.fromCharCode(8202));
-      g.globalAlpha = 0.85; g.textAlign = 'right'; g.fillText(o, right, 102); g.textAlign = 'left'; g.globalAlpha = 1;
-      right -= g.measureText(o).width + 40;
-    }
-    let fs = 112;
-    do { g.font = `800 ${fs}px "FB Geist", Geist, system-ui, sans-serif`; fs -= 4; } while (g.measureText(b.title).width > right - 196 && fs > 30);
-    g.fillText(b.title, 196, 104);
-    g.fillStyle = b.accent; g.fillRect(1236, 46, 8, 108);
-    return c;
-  }
-
   const texture = (picture: HTMLCanvasElement | HTMLImageElement) => {
     const t = new Texture(picture);
     t.colorSpace = NoColorSpace; t.magFilter = LinearFilter; t.minFilter = LinearMipmapLinearFilter; t.anisotropy = ctx?.maxAnisotropy ?? 4;
     t.needsUpdate = true; parts.push(t); return t;
+  };
+
+  /** Where book `j` lies in the stack's space (cm) when slid `s` cm toward its head. */
+  const restPose = (s: Slot, slide: number) => {
+    const b = plan.books[s.j];
+    const p = new Vector3(b.c.x + b.head.x * slide, b.c.y + b.head.y * slide, b.z + T / 2);
+    const q = new Quaternion().setFromAxisAngle(Z_AXIS, b.a).multiply(FLAT_Q);
+    return { p, q };
+  };
+  const place = (s: Slot, slide: number) => {
+    const r = restPose(s, slide);
+    s.obj.position.copy(r.p); s.obj.quaternion.copy(r.q);
+    if (s.shadow) {
+      const w = root.localToWorld(new Vector3(r.p.x, r.p.y, 0));
+      s.shadow.uniforms.uC.value.set(w.x, w.y);
+    }
   };
 
   function build(c: MatLayerContext) {
@@ -321,63 +364,108 @@ export function createBookTrayLayer(opts: {
     const mat = (u: Record<string, { value: unknown }>, alpha = shown) => {
       const m = new ShaderMaterial({
         vertexShader: SOLID_VERTEX, fragmentShader: SOLID_FRAGMENT, transparent: true, depthTest: true, depthWrite: true,
-        uniforms: { uColor: { value: hex('#e2c596') }, tMap: { value: null }, uUseMap: { value: 0 }, ...shared, uAlpha: alpha, ...u },
+        uniforms: { uColor: { value: hex('#f4f1ea') }, tMap: { value: null }, uUseMap: { value: 0 }, ...shared, uAlpha: alpha, ...u },
       });
       parts.push(m); return m;
     };
-    const birch = mat({});
-    const solidWith = (m: ShaderMaterial) => (geo: BufferGeometry) => { parts.push(geo); const mesh = new Mesh(geo, m); mesh.frustumCulled = false; mesh.renderOrder = 40; return mesh; };
-
-    // tray space: cm, y up, z toward the viewer; turned into the mat's (x, -z, y) and scaled to table units
-    const space = new Group();
-    space.rotation.x = Math.PI / 2; space.scale.setScalar(S);
-    root.position.set(opts.x, opts.y, 0); root.rotation.z = opts.turn ?? 0;
-    root.add(space);
-    const { tray, block } = buildTray(n, solidWith(birch));
-    space.add(tray, block);
+    root.position.set(opts.x, opts.y, 0); root.rotation.z = turn; root.scale.setScalar(S);
 
     const shell = shellGeometry(); parts.push(shell);
-    const spineGeo = spineGeometry(); parts.push(spineGeo);
     const pagesW = W / 2 - 0.3 - (X0 + BT - 0.1);
     const pagesGeo = new RoundedBoxGeometry(pagesW, T - 2 * BT - 0.04, D - 0.6, 2, 0.05); parts.push(pagesGeo);
     const coverGeo = new PlaneGeometry(W - 1.2, D - 0.5); parts.push(coverGeo);
     const pagesMat = mat({ uColor: { value: hex('#efe5d0') } });
     const hitMat = new MeshBasicMaterial({ visible: false }); parts.push(hitMat);
-    const hitGeo = new BoxGeometry(T + GAP, D + PULL, W + 1); parts.push(hitGeo);
+    const hitGeo = new BoxGeometry(W, D, T + 0.04); parts.push(hitGeo);
+    const rimGeo = new PlaneGeometry(W + 2.4, D + 2.4); parts.push(rimGeo);
 
-    opts.books.forEach((b, i) => {
+    opts.books.forEach((b, j) => {
       const boardMat = mat({ uColor: { value: hex(b.bg) } });
-      const spineMat = mat({ tMap: { value: texture(drawSpine(b, null)) }, uUseMap: { value: 1 } }); spineMat.side = DoubleSide;
-      const coverMat = mat({ uColor: { value: hex(b.bg) } });
+      const plainCover = (img: HTMLImageElement | null) => { const p = document.createElement('canvas'); p.width = 1200; p.height = 720; const g = p.getContext('2d'); if (g) { g.fillStyle = b.bg; g.fillRect(0, 0, 1200, 720); if (img) g.drawImage(img, 0, 0, 1200, 720); } return p; };
+      const coverMat = mat({ tMap: { value: texture(titledCover(b, null)) }, uUseMap: { value: 1 }, tPlain: { value: texture(plainCover(null)) }, uMix: { value: 0 } });
+      coverMat.fragmentShader = COVER_FRAGMENT;
       const obj = new Group();
       const inner = new Group(); inner.position.y = -T / 2; obj.add(inner);
       const add = (geo: BufferGeometry, m: ShaderMaterial, x = 0, y = 0, z = 0) => { const mesh = new Mesh(geo, m); mesh.position.set(x, y, z); mesh.frustumCulled = false; mesh.renderOrder = 40; inner.add(mesh); return mesh; };
       add(shell, boardMat);
       add(pagesGeo, pagesMat, X0 + BT - 0.1 + pagesW / 2, T / 2, 0);
-      add(spineGeo, spineMat);
       const cov = add(coverGeo, coverMat, 0.5, T + 0.06, 0); cov.rotation.x = -Math.PI / 2;
-      obj.quaternion.copy(STAND_Q);
-      const slot = new Group(); slot.position.set(plan.slotX(i), D / 2, 0); slot.add(obj); tray.add(slot);
-      const hit = new Mesh(hitGeo, hitMat); hit.position.set(plan.slotX(i), (D + PULL) / 2, 0); tray.add(hit);
-      slots.push({ book: b, slot, obj, hit, p: 0 });
-      // the cover's picture: printed on the cover and cut small for the spine, once it has come
+      // where it rests on the book under it: a soft dark rim round its edges, on that book's cover
+      let rim: Mesh | null = null;
+      if (j < n - 1) {
+        const rm = new ShaderMaterial({
+          vertexShader: RIM_VERTEX, fragmentShader: RIM_FRAGMENT, transparent: true, depthTest: true, depthWrite: false,
+          uniforms: { uHalf: { value: new Vector2(W / 2, D / 2) }, uR: { value: 0.3 }, uSoft: { value: 0.9 }, uStrength: { value: 0.42 }, uAlpha: shown, uDawn: c.dawn, uScreen: { value: c.screenSize } },
+        });
+        parts.push(rm);
+        rim = new Mesh(rimGeo, rm); rim.rotation.x = -Math.PI / 2; rim.position.y = -T / 2 - 0.004; rim.renderOrder = 39; rim.frustumCulled = false;
+        obj.add(rim);
+      }
+      root.add(obj);
+      const hit = new Mesh(hitGeo, hitMat);
+      const bp = plan.books[j];
+      hit.position.set(bp.c.x, bp.c.y, bp.z + T / 2); hit.rotation.z = bp.a; root.add(hit);
+      const s: Slot = { book: b, j, obj, hit, rim, shadow: null, cover: coverMat, p: 0, out: 0 };
+      // slid clear of the books on it and of the string, before it lifts
+      const yb = stringAt.y;
+      const tail = bp.c.y - D / 2;
+      const above = j > 0 ? plan.books[j - 1].c.y + D / 2 + 1.4 : -Infinity;
+      s.out = Math.max(above - tail, yb + 1.2 - tail, 2) / Math.max(0.5, bp.head.y);
+      slots.push(s);
+      place(s, 0);
+      // the cover's picture, once it has come (drawn onto a canvas: an SVG cover, Bambu's, cannot go to the GPU as it is)
       const img = new Image(); img.decoding = 'async';
-      img.onload = () => {
+      const redraw = () => {
         if (!ctx) return;
-        (spineMat.uniforms.tMap.value as Texture).dispose();
-        spineMat.uniforms.tMap.value = texture(drawSpine(b, img));
-        // (drawn onto a canvas first: an SVG cover, Bambu's, cannot go to the GPU as it is)
-        const flat = document.createElement('canvas'); flat.width = 1200; flat.height = 720;
-        flat.getContext('2d')?.drawImage(img, 0, 0, 1200, 720);
-        coverMat.uniforms.tMap.value = texture(flat); coverMat.uniforms.uUseMap.value = 1;
+        (coverMat.uniforms.tMap.value as Texture).dispose();
+        const pic = img.complete && img.naturalWidth ? img : null;
+        coverMat.uniforms.tMap.value = texture(titledCover(b, pic));
+        (coverMat.uniforms.tPlain.value as Texture).dispose();
+        coverMat.uniforms.tPlain.value = texture(plainCover(pic));
         ctx.invalidate();
       };
+      img.onload = redraw;
       img.src = b.cover;
+      void document.fonts?.ready.then(redraw);
     });
+
+    // the string, tied once round the stack, across it a little crooked, with a plain knot and two cut ends on top
+    const loop = stringLoop(plan.books, stringAt, stringDir);
+    const to3 = (v: Vector2) => new Vector3(stringAt.x + stringDir.x * v.x, stringAt.y + stringDir.y * v.x, v.y);
+    const path = new CatmullRomCurve3(loop.map(to3), true, 'centripetal');
+    const stringMat = mat({ uColor: { value: hex('#f3efe6') } });
+    const stringGeo = new TubeGeometry(path, 360, STRING_R, 7, true); parts.push(stringGeo);
+    const stringMesh = new Mesh(stringGeo, stringMat); stringMesh.renderOrder = 42; stringMesh.frustumCulled = false; root.add(stringMesh);
+    // its shadow on the covers: the same string, a little darker and wider, just down-light of it
+    const dark = new ShaderMaterial({
+      vertexShader: RIM_VERTEX, fragmentShader: /* glsl */ `uniform float uAlpha; uniform float uDawn; uniform vec2 uScreen; ${DAWN}
+        void main() { gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), 0.32 * uAlpha); }`,
+      transparent: true, depthTest: true, depthWrite: false, uniforms: { uAlpha: shown, uDawn: c.dawn, uScreen: { value: c.screenSize } },
+    });
+    parts.push(dark);
+    const shadowGeo = new TubeGeometry(path, 360, STRING_R * 1.25, 7, true); parts.push(shadowGeo);
+    const stringShadow = new Mesh(shadowGeo, dark); stringShadow.renderOrder = 41; stringShadow.frustumCulled = false;
+    stringShadow.position.set(SHADOW_DIR.x * 0.22, SHADOW_DIR.y * 0.22, -0.12); root.add(stringShadow);
+    // the knot: where the string crosses the top cover, right of the middle, and its two cut ends lying on the cover
+    const topZ = plan.books[0].z + T + 0.08 + STRING_R;
+    const kx = 8.0;
+    const k = new Vector3(stringAt.x + stringDir.x * kx, stringAt.y + stringDir.y * kx, topZ);
+    const knotGeo = new SphereGeometry(1, 16, 12); parts.push(knotGeo);
+    const knot = new Mesh(knotGeo, stringMat); knot.scale.set(0.55, 0.42, 0.3); knot.position.copy(k); knot.rotation.z = Math.atan2(stringDir.y, stringDir.x) + 0.5;
+    knot.renderOrder = 43; knot.frustumCulled = false; root.add(knot);
+    const end = (pts: Array<[number, number]>) => {
+      const curve = new CatmullRomCurve3(pts.map(([x, y]) => new Vector3(k.x + x, k.y + y, topZ - 0.02)));
+      const geo = new TubeGeometry(curve, 24, STRING_R * 0.95, 6, false); parts.push(geo);
+      const m = new Mesh(geo, stringMat); m.renderOrder = 42; m.frustumCulled = false; root.add(m);
+      const sh = new Mesh(geo, dark); sh.renderOrder = 41; sh.frustumCulled = false; sh.position.set(SHADOW_DIR.x * 0.22, SHADOW_DIR.y * 0.22, -0.12); root.add(sh);
+    };
+    end([[0.1, -0.1], [0.9, -0.9], [1.5, -1.9], [1.7, -2.7]]);
+    end([[-0.1, -0.1], [-0.5, -1.0], [-0.4, -2.0], [-0.9, -2.6]]);
+
     c.scene.add(root);
     root.updateMatrixWorld(true);
 
-    // shadows: the tray with its books, and the book while it is out
+    // shadows on the mat: each book's, swept from the mat to its top along the light, and the book while it is out
     const caster = (alpha: { value: number }) => {
       const geo = new PlaneGeometry(8, 8); parts.push(geo);
       const m = new ShaderMaterial({
@@ -392,39 +480,16 @@ export function createBookTrayLayer(opts: {
       shadowMeshes.push(mesh); c.scene.add(mesh);
       return { mesh, m };
     };
-    // the tray's shadow follows its real outline: cut into bands front to back, each band's shadow cast from its own width
-    // and height (the hit boxes are not things, so they cast none)
-    const BANDS = 28;
-    const pts: Vector3[] = [];
-    const v = new Vector3();
-    space.updateMatrixWorld(true);
-    space.traverse((o) => {
-      const m = o as Mesh;
-      if (!m.isMesh || (m.material as MeshBasicMaterial).visible === false) return;
-      const pos = m.geometry.getAttribute('position');
-      const step = Math.max(1, Math.floor(pos.count / 400));
-      for (let i = 0; i < pos.count; i += step) pts.push(v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld).clone());
-    });
-    let y0 = Infinity, y1 = -Infinity;
-    for (const p of pts) { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }
-    const bandH = (y1 - y0) / BANDS;
-    for (let k = 0; k < BANDS; k += 1) {
-      let x0 = Infinity, x1 = -Infinity, top = 0;
-      for (const p of pts) {
-        if (p.y < y0 + k * bandH - 1e-4 || p.y > y0 + (k + 1) * bandH + 1e-4) continue;
-        x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); top = Math.max(top, p.z);
-      }
-      if (!Number.isFinite(x0)) continue;
-      const cx = (x0 + x1) / 2, cy = y0 + (k + 0.5) * bandH, reach = top * LONG;
-      const band = caster(shown);
-      const u = band.m.uniforms;
-      u.uC.value.set(cx, cy); u.uHalf.value.set((x1 - x0) / 2, bandH / 2 + 0.004); u.uR.value = 0.006;
-      u.uT.value = reach; u.uStrength.value = 0.7;
-      // (each band's plane only as big as its shadow can reach, so the mat is not shaded over and over)
-      band.mesh.geometry.dispose();
-      band.mesh.geometry = new PlaneGeometry(x1 - x0 + reach * 1.3 + 0.3, bandH + reach * 1.6 + 0.3);
-      parts.push(band.mesh.geometry);
-      band.mesh.position.set(cx + SHADOW_DIR.x * reach / 2, cy + SHADOW_DIR.y * reach / 2, 0.0006);
+    for (const s of slots) {
+      const b = plan.books[s.j];
+      const sh = caster(shown);
+      const u = sh.m.uniforms;
+      u.uAng.value = b.a + turn; u.uHalf.value.set((W / 2) * S, (D / 2) * S); u.uR.value = 0.4 * S;
+      u.uB.value = 0; u.uT.value = (b.z + T) * S * LONG; u.uStrength.value = 0.78;
+      const w = root.localToWorld(new Vector3(b.c.x, b.c.y, 0));
+      sh.mesh.position.set(w.x, w.y, 0.0006); sh.mesh.scale.setScalar(0.25);
+      s.shadow = sh.m;
+      place(s, 0);
     }
     const fs = caster(flyShown);
     fs.mesh.visible = false;
@@ -433,7 +498,10 @@ export function createBookTrayLayer(opts: {
     flyShadow = fs.m;
     flyMeshShadow = fs.mesh;
   }
-  let flyMeshShadow: Mesh | null = null;
+  // the string's line across the stack: a little below the middle, where every book lies under it, a little crooked
+  // (below the top book's title, above the bottom book's foot)
+  const stringAt = new Vector2(0.4, -((n - 1) * plan.step) / 2 + D / 2 - TITLE_BAND - 0.25 - 1.15);
+  const stringDir = new Vector2(Math.cos((-1 * Math.PI) / 180), Math.sin((-1 * Math.PI) / 180));
 
   /* ---------- pointer ---------- */
   const pick = (): Slot | null => {
@@ -448,7 +516,7 @@ export function createBookTrayLayer(opts: {
   const onMove = (e: PointerEvent) => { if (e.pointerType !== 'mouse') return; pointer.x = e.clientX; pointer.y = e.clientY; pointer.in = true; pointer.moved = true; ctx?.invalidate(); };
   const onDown = (e: PointerEvent) => {
     pointer.x = e.clientX; pointer.y = e.clientY; pointer.in = true; pointer.moved = true;
-    // a finger has no hover: its tap slides the book out, as the pointer resting on it would
+    // a finger has no hover: its tap slides the book out a little, as the pointer resting on it would
     if (e.pointerType !== 'mouse' && !flight && !out && opts.canHover()) { const s = pick(); if (s !== hover) { hover = s; opts.onHover?.(s?.book.slug ?? null); } }
     ctx?.invalidate();
   };
@@ -457,22 +525,30 @@ export function createBookTrayLayer(opts: {
   /* ---------- the trip out and back ---------- */
   const tmpP = new Vector3(), tmpQ = new Quaternion(), tmpS = new Vector3();
   const flatPose = () => {
-    const q = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, -1, 0)));
-    q.premultiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), opts.land.turn));
+    const q = FLAT_Q.clone().premultiply(new Quaternion().setFromAxisAngle(Z_AXIS, opts.land.turn));
     return { p: new Vector3(opts.land.x, opts.land.y, (T / 2) * S), q };
   };
-  /** Hand a book from its slot to the mat's own space, keeping where it is on screen. */
-  const detach = (s: Slot) => { s.obj.updateMatrixWorld(true); s.obj.matrixWorld.decompose(tmpP, tmpQ, tmpS); ctx?.scene.add(s.obj); s.obj.position.copy(tmpP); s.obj.quaternion.copy(tmpQ); s.obj.scale.setScalar(S); };
-  const attachTo = (s: Slot) => { s.slot.add(s.obj); s.obj.position.set(0, 0, 0); s.obj.scale.setScalar(1); s.obj.quaternion.copy(STAND_Q); };
-  /** Where a book stands, in the mat's space, when its slot is slid out by `p`. */
-  const slotPose = (s: Slot, p: number) => {
-    const prev = s.slot.position.y; s.slot.position.y = D / 2 + p * PULL; s.slot.updateMatrixWorld(true);
-    const m = s.slot.matrixWorld.clone().multiply(new Matrix4().makeRotationFromQuaternion(STAND_Q));
-    m.decompose(tmpP, tmpQ, tmpS);
-    s.slot.position.y = prev; s.slot.updateMatrixWorld(true);
+  /** Where a book lies in the mat's own space when slid `slide` cm out of its place. */
+  const worldPose = (s: Slot, slide: number) => {
+    const r = restPose(s, slide);
+    root.updateMatrixWorld(true);
+    new Matrix4().compose(r.p, r.q, new Vector3(1, 1, 1)).premultiply(root.matrixWorld).decompose(tmpP, tmpQ, tmpS);
     return { p: tmpP.clone(), q: tmpQ.clone() };
   };
-  const SLOT_S = 0.2, AIR_S = 0.5;
+  /** Hand a book from the stack to the mat's own space, keeping where it is on screen. */
+  const detach = (s: Slot) => {
+    s.obj.updateMatrixWorld(true); s.obj.matrixWorld.decompose(tmpP, tmpQ, tmpS);
+    ctx?.scene.add(s.obj); s.obj.position.copy(tmpP); s.obj.quaternion.copy(tmpQ); s.obj.scale.setScalar(S);
+    if (s.rim) s.rim.visible = false;
+    if (s.shadow) s.shadow.uniforms.uStrength.value = 0;
+  };
+  const attachHome = (s: Slot, slide: number) => {
+    root.add(s.obj); s.obj.scale.setScalar(1); place(s, slide);
+    if (s.rim) s.rim.visible = true;
+    if (s.shadow) s.shadow.uniforms.uStrength.value = 0.78;
+    if (s.cover) s.cover.uniforms.uMix.value = 0;
+  };
+  const SLIDE_S = 0.26, AIR_S = 0.5;
   const easeOut = (k: number) => 1 - (1 - k) ** 3;
   const easeInOut = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2);
 
@@ -494,8 +570,8 @@ export function createBookTrayLayer(opts: {
       if (!s || !ctx) return Promise.resolve();
       if (hover) { hover = null; opts.onHover?.(null); }
       return new Promise<void>((resolve) => {
-        if (opts.reducedMotion) { detach(s); const f = flatPose(); s.obj.position.copy(f.p); s.obj.quaternion.copy(f.q); out = s; flight = null; ctx?.invalidate(); resolve(); return; }
-        flight = { s, dir: 1, t: 0, start: s.p, phase: 'slot', from: slotPose(s, s.p), to: slotPose(s, 1), done: resolve };
+        if (opts.reducedMotion) { detach(s); if (s.cover) s.cover.uniforms.uMix.value = 1; const f = flatPose(); s.obj.position.copy(f.p); s.obj.quaternion.copy(f.q); out = s; flight = null; ctx?.invalidate(); resolve(); return; }
+        flight = { s, dir: 1, t: 0, start: s.p * HOVER, phase: 'slide', from: worldPose(s, s.p * HOVER), to: worldPose(s, s.out), done: resolve };
         ctx?.invalidate();
       });
     },
@@ -508,11 +584,11 @@ export function createBookTrayLayer(opts: {
     putBack(slug) {
       const s = slots.find((each) => each.book.slug === slug);
       if (!s || !ctx) return;
-      if (s.obj.parent === s.slot) detach(s);
+      if (s.obj.parent === root) detach(s);
       const f = flatPose(); s.obj.position.copy(f.p); s.obj.quaternion.copy(f.q); s.obj.visible = true;
       out = s;
-      if (opts.reducedMotion) { attachTo(s); s.p = 0; s.slot.position.y = D / 2; out = null; ctx.invalidate(); return; }
-      flight = { s, dir: -1, t: 0, start: 1, phase: 'air', from: f, to: slotPose(s, 1) };
+      if (opts.reducedMotion) { attachHome(s, 0); s.p = 0; out = null; ctx.invalidate(); return; }
+      flight = { s, dir: -1, t: 0, start: s.out, phase: 'air', from: f, to: worldPose(s, s.out) };
       ctx.invalidate();
     },
     update(dt, cam) {
@@ -536,47 +612,51 @@ export function createBookTrayLayer(opts: {
         if (flight?.s === s || out === s) continue;
         const want = hover === s ? 1 : 0;
         if (Math.abs(want - s.p) > 1e-3) { s.p += (want - s.p) * k; moving = true; } else s.p = want;
-        s.slot.position.y = D / 2 + s.p * PULL;
+        place(s, s.p * HOVER);
       }
       if (flight) {
         moving = true;
         const f = flight;
         f.t += dt;
-        if (f.phase === 'slot') {
-          const kk = Math.min(1, f.t / SLOT_S);
+        if (f.phase === 'slide') {
+          const kk = Math.min(1, f.t / SLIDE_S);
           if (f.dir === 1) {
-            // out: from wherever the pointer had slid it, all the way up out of the tray
-            const p = f.start + (1 - f.start) * easeInOut(kk);
-            f.s.p = p; f.s.slot.position.y = D / 2 + p * PULL;
+            // out: from wherever the pointer had slid it, out from under the books on it and the string
+            const sl = f.start + (f.s.out - f.start) * easeInOut(kk);
+            place(f.s, sl);
             if (kk >= 1) {
-              f.s.p = 1; detach(f.s);
-              flight = { s: f.s, dir: 1, t: 0, start: 1, phase: 'air', from: { p: f.s.obj.position.clone(), q: f.s.obj.quaternion.clone() }, to: flatPose(), done: f.done };
+              detach(f.s);
+              flight = { s: f.s, dir: 1, t: 0, start: f.s.out, phase: 'air', from: { p: f.s.obj.position.clone(), q: f.s.obj.quaternion.clone() }, to: flatPose(), done: f.done };
             }
           } else {
-            // back home: from fully out, down into its slot
-            const p = 1 - easeOut(kk);
-            f.s.p = p; f.s.slot.position.y = D / 2 + p * PULL;
-            if (kk >= 1) { f.s.p = 0; f.s.slot.position.y = D / 2; flight = null; out = null; pointer.moved = true; }
+            // back home: slid back under the string into its place
+            const sl = f.s.out * (1 - easeOut(kk));
+            place(f.s, sl);
+            if (kk >= 1) { f.s.p = 0; place(f.s, 0); flight = null; out = null; pointer.moved = true; }
           }
         } else {
           const kk = Math.min(1, f.t / AIR_S);
           const e = f.dir === 1 ? easeOut(kk) : easeInOut(kk);
           const pos = f.from.p.clone().lerp(f.to.p, e);
-          pos.z += Math.sin(Math.PI * e) * 0.28;
+          pos.z += Math.sin(Math.PI * e) * 0.3;
           f.s.obj.position.copy(pos);
           f.s.obj.quaternion.slerpQuaternions(f.from.q, f.to.q, easeInOut(kk));
+          // (its title band goes as it flies: where it lands, the engine's book, whose cover has none, takes over)
+          if (f.s.cover) f.s.cover.uniforms.uMix.value = f.dir === 1 ? easeInOut(kk) : 1 - easeInOut(kk);
           if (flyShadow && flyMeshShadow) {
             flyMeshShadow.visible = true;
-            flyShadow.uniforms.uC.value.set(pos.x, pos.y); flyShadow.uniforms.uAng.value = opts.land.turn;
+            flyShadow.uniforms.uC.value.set(pos.x, pos.y);
+            const ax = new Vector3(1, 0, 0).applyQuaternion(f.s.obj.quaternion);
+            flyShadow.uniforms.uAng.value = Math.atan2(ax.y, ax.x);
             flyShadow.uniforms.uB.value = Math.max(0, pos.z - (T / 2) * S); flyShadow.uniforms.uT.value = pos.z + 0.04;
             flyMeshShadow.position.set(pos.x, pos.y, 0.0006);
           }
           if (kk >= 1) {
             if (f.dir === 1) { out = f.s; flight = null; f.done?.(); }
             else {
-              attachTo(f.s); f.s.p = 1; f.s.slot.position.y = D / 2 + PULL;
+              attachHome(f.s, f.s.out);
               if (flyMeshShadow) flyMeshShadow.visible = false;
-              flight = { s: f.s, dir: -1, t: 0, start: 1, phase: 'slot', from: f.to, to: f.to };
+              flight = { s: f.s, dir: -1, t: 0, start: f.s.out, phase: 'slide', from: f.to, to: f.to };
             }
           }
         }
