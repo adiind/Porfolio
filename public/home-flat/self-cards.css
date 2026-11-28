@@ -27,7 +27,6 @@
 .self-story-track[data-scroll]>*{max-width:430px;margin-left:auto;margin-right:auto}
 .self-story-track[data-scroll] img{display:block;max-width:100%;height:auto}
 .zs-role{margin:2px 0 12px;font-size:16px;font-weight:500;color:#fff}
-.zs-bag{width:100%;border-radius:18px;box-shadow:-10px 14px 22px -8px rgba(2,10,44,.6)}
 .zs-thing{margin-top:34px}
 .zs-bill img{width:84%;margin:0 auto;transform:rotate(-1.2deg);filter:drop-shadow(-9px 13px 10px rgba(2,10,44,.5))}
 .zs-box>img{width:100%;border-radius:16px 16px 0 0;box-shadow:-10px 14px 22px -8px rgba(2,10,44,.6)}

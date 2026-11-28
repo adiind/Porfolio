@@ -10,7 +10,7 @@ describe('Zomato on the phone home page', () => {
   });
 
   it('has a picture file for each of the bag\'s papers', () => {
-    for (const name of ['bag', 'bill', 'home', 'friends', 'press']) {
+    for (const name of ['bill', 'home', 'friends', 'press']) {
       const picture = written.pictures[name];
       expect(picture, name).toBeTruthy();
       expect(readFileSync(`public${picture.src}`).length, picture.src).toBeGreaterThan(2000);

@@ -45,10 +45,9 @@
     track.replaceChildren();
     var top = make('header', 'zs-top', '');
     top.appendChild(make('p', 'zs-role', w.role + ' \u00b7 ' + w.when));
-    top.appendChild(pic(p.bag, 'His Zomato rider\u2019s bag, open on the mat', 'zs-bag', true));
     track.appendChild(top);
     var bill = make('section', 'zs-thing zs-bill', '');
-    bill.appendChild(pic(p.bill, 'The bill from the bag. ' + w.role + ', ' + w.team + ', ' + w.when + '. ' + w.lines.join(' ') + ' ' + w.skillsHeading + ': ' + w.skills.join(', ') + '. ' + w.closing));
+    bill.appendChild(pic(p.bill, 'The bill from the bag. ' + w.role + ', ' + w.team + ', ' + w.when + '. ' + w.lines.join(' ') + ' ' + w.skillsHeading + ': ' + w.skills.join(', ') + '. ' + w.closing, '', true));
     track.appendChild(bill);
     w.projects.forEach(function (pr) {
       var box = make('section', 'zs-thing zs-box zs-box-' + pr.id, '');

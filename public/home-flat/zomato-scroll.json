@@ -273,11 +273,6 @@
     }
    ]
   },
-  "bag": {
-   "src": "/home-flat/assets/zomato/bag.webp",
-   "w": 760,
-   "h": 938
-  },
   "homeShot": {
    "src": "/images/mat/zomato/homepage.webp",
    "w": 772,
