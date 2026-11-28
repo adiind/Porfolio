@@ -24,10 +24,10 @@ export const TEXT = {
   // Behavior" and its closing sentence): "Its search algo optimisation not ml feedback. And instead of ui behaviour
   // shipped 2+ homepage redisgn. At the bottom page say with so many users most experiments gave us actuinable data in a
   // day, any chocies impacted millions of people and impact was real, in NM, on people and in X tweets". Only his typing
-  // slips are mended. "NM" is printed as he typed it: what it stands for is asked, not guessed.
+  // slips are mended. NM = net margin (his answer, 2026-11-27: "Nm is net margin").
   skillsHeading: 'Skills',
   skills: ['Clickstream Analytics', 'A/B Testing', 'Search Algo Optimisation', 'Shipped 2+ homepage redesigns'],
-  closing: 'With so many users, most experiments gave us actionable data in a day. Any choices impacted millions of people, and the impact was real: in NM, on people and in X tweets.',
+  closing: 'With so many users, most experiments gave us actionable data in a day. Any choices impacted millions of people, and the impact was real: in net margin, on people and in X tweets.',
   projects: {
     home: {
       title: 'Homepage & Search Performance', role: 'Senior Product Analyst',

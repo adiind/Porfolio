@@ -196,8 +196,8 @@ export const TIMELINE_DATA: TimelineItem[] = [
     skills: [
       { label: "Clickstream Analytics", description: "Tracking full user paths (scroll → click → convert) to guide UI decisions." },
       { label: "A/B Testing", description: "Releasing multiple UI versions and measuring which performs better." },
-      { label: "ML Feedback", description: "Evaluating ranking model outputs and providing improvement signals." },
-      { label: "UI Behavior", description: "Interpreting how users interact with interface elements." }
+      { label: "Search Algo Optimisation", description: "Evaluating ranking output against real user behavior and feeding improvements into the ranking model." },
+      { label: "Shipped 2+ homepage redesigns", description: "Deployed multiple version changes of homepage and search algorithms and UI." }
     ],
     differentiator: "Learned to operate in an environment where design and product decisions must be made within hours, shaping a bias toward rapid iteration powered by real user behavior rather than assumptions.",
     featureCards: [
