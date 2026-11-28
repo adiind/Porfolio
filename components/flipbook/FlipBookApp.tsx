@@ -354,7 +354,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // Bot: a tablet with two eyes leaning in a birch stand, standing on the mat right of the record (lib/mat/botTablet.ts)
   const bot: StageSpec['props'] = botTablet ? [{
     id: BOT_TABLET.id, image: botTablet, ...at(BOT_TABLET.lay.x, BOT_TABLET.lay.y),
-    w: BOT_TABLET.lay.w / px, h: (BOT_TABLET.lay.w * BOT_TABLET.aspect) / px, radius: 0, cutout: true, alphaShadow: true,
+    w: BOT_TABLET.lay.w / px, h: (BOT_TABLET.lay.w * BOT_TABLET.aspect) / px, radius: 0, cutout: true, alphaShadow: true, height: 0.05,
   }] : [];
   // the books' tray (its layer draws it, lib/mat/bookTrayLayer.ts): an unseen prop over its footprint, for clicks and fades
   const foot = trayFootFor();

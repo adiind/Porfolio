@@ -9,9 +9,9 @@ export const BOT_TABLET = {
   href: '/work/bot/',
   title: 'Bot',
   /** its middle and size in page pixels (the stage's 1440 by 900 frame): the clear mat right of the yellow record, above the clipboards */
-  lay: { x: 1106, y: 175, w: 104 },
+  lay: { x: 1094, y: 172, w: 128 },
   /** turned (radians, counter-clockwise from above) so the stand's cut left end, with the ply's layers, shows */
   turn: 0.75,
   /** the click target's height over its width: the standing thing fills it */
-  aspect: 784 / 728,
+  aspect: (897 / 935) * 1.2,   // stretched so the mat's slant does not squash it
 } as const;
