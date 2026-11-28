@@ -315,7 +315,7 @@ export function createBookTrayLayer(opts: {
   const n = opts.books.length;
   const plan = stackPlan(n);
   const turn = opts.turn ?? 0;
-  interface Slot { book: TrayBook; j: number; obj: Group; hit: Mesh; rim: Mesh | null; shadow: ShaderMaterial | null; cover: ShaderMaterial | null; p: number; out: number }
+  interface Slot { book: TrayBook; j: number; obj: Group; hit: Mesh; rim: Mesh | null; shadow: ShaderMaterial | null; cover: ShaderMaterial | null; p: number; out: number; plain(): void }
   const slots: Slot[] = [];
   let hover: Slot | null = null;
   const pointer = { x: 0, y: 0, in: false, moved: false };
@@ -379,10 +379,14 @@ export function createBookTrayLayer(opts: {
     const hitGeo = new BoxGeometry(W, D, T + 0.04); parts.push(hitGeo);
     const rimGeo = new PlaneGeometry(W + 2.4, D + 2.4); parts.push(rimGeo);
 
+    const blankPicture = document.createElement('canvas'); blankPicture.width = 1; blankPicture.height = 1;
+    const blank = texture(blankPicture);
     opts.books.forEach((b, j) => {
       const boardMat = mat({ uColor: { value: hex(b.bg) } });
       const plainCover = (img: HTMLImageElement | null) => { const p = document.createElement('canvas'); p.width = 1200; p.height = 720; const g = p.getContext('2d'); if (g) { g.fillStyle = b.bg; g.fillRect(0, 0, 1200, 720); if (img) g.drawImage(img, 0, 0, 1200, 720); } return p; };
-      const coverMat = mat({ tMap: { value: texture(titledCover(b, null)) }, uUseMap: { value: 1 }, tPlain: { value: texture(plainCover(null)) }, uMix: { value: 0 } });
+      // (a small titled cover until the picture and the fonts are in, then one full-size drawing; the plain cover the book
+      // turns into while it flies is only drawn when it is first hovered or taken out: none of it is made on load)
+      const coverMat = mat({ tMap: { value: texture(titledCover(b, null, 400, 240)) }, uUseMap: { value: 1 }, tPlain: { value: blank }, uMix: { value: 0 } });
       coverMat.fragmentShader = COVER_FRAGMENT;
       const obj = new Group();
       const inner = new Group(); inner.position.y = -T / 2; obj.add(inner);
@@ -405,7 +409,7 @@ export function createBookTrayLayer(opts: {
       const hit = new Mesh(hitGeo, hitMat);
       const bp = plan.books[j];
       hit.position.set(bp.c.x, bp.c.y, bp.z + T / 2); hit.rotation.z = bp.a; root.add(hit);
-      const s: Slot = { book: b, j, obj, hit, rim, shadow: null, cover: coverMat, p: 0, out: 0 };
+      const s: Slot = { book: b, j, obj, hit, rim, shadow: null, cover: coverMat, p: 0, out: 0, plain: () => undefined };
       // slid clear of the books on it and of the string, before it lifts
       const yb = stringAt.y;
       const tail = bp.c.y - D / 2;
@@ -415,18 +419,22 @@ export function createBookTrayLayer(opts: {
       place(s, 0);
       // the cover's picture, once it has come (drawn onto a canvas: an SVG cover, Bambu's, cannot go to the GPU as it is)
       const img = new Image(); img.decoding = 'async';
-      const redraw = () => {
+      const pic = () => (img.complete && img.naturalWidth ? img : null);
+      let plainDrawn = false;
+      const drawPlain = () => {
+        if (coverMat.uniforms.tPlain.value !== blank) (coverMat.uniforms.tPlain.value as Texture).dispose();
+        coverMat.uniforms.tPlain.value = texture(plainCover(pic()));
+      };
+      s.plain = () => { if (plainDrawn || !ctx) return; plainDrawn = true; drawPlain(); };
+      const loaded = new Promise<void>((done) => { img.onload = () => done(); img.onerror = () => done(); });
+      img.src = b.cover;
+      void Promise.all([loaded, document.fonts?.ready]).then(() => {
         if (!ctx) return;
         (coverMat.uniforms.tMap.value as Texture).dispose();
-        const pic = img.complete && img.naturalWidth ? img : null;
-        coverMat.uniforms.tMap.value = texture(titledCover(b, pic));
-        (coverMat.uniforms.tPlain.value as Texture).dispose();
-        coverMat.uniforms.tPlain.value = texture(plainCover(pic));
+        coverMat.uniforms.tMap.value = texture(titledCover(b, pic()));
+        if (plainDrawn) drawPlain();
         ctx.invalidate();
-      };
-      img.onload = redraw;
-      img.src = b.cover;
-      void document.fonts?.ready.then(redraw);
+      });
     });
 
     // the string, tied once round the stack, across it a little crooked, with a plain knot and two cut ends on top
@@ -517,7 +525,7 @@ export function createBookTrayLayer(opts: {
   const onDown = (e: PointerEvent) => {
     pointer.x = e.clientX; pointer.y = e.clientY; pointer.in = true; pointer.moved = true;
     // a finger has no hover: its tap slides the book out a little, as the pointer resting on it would
-    if (e.pointerType !== 'mouse' && !flight && !out && opts.canHover()) { const s = pick(); if (s !== hover) { hover = s; opts.onHover?.(s?.book.slug ?? null); } }
+    if (e.pointerType !== 'mouse' && !flight && !out && opts.canHover()) { const s = pick(); if (s !== hover) { hover = s; s?.plain(); opts.onHover?.(s?.book.slug ?? null); } }
     ctx?.invalidate();
   };
   const onLeave = () => { pointer.in = false; pointer.moved = true; ctx?.invalidate(); };
@@ -568,6 +576,7 @@ export function createBookTrayLayer(opts: {
     takeOut(slug) {
       const s = slots.find((each) => each.book.slug === slug);
       if (!s || !ctx) return Promise.resolve();
+      s.plain();
       if (hover) { hover = null; opts.onHover?.(null); }
       return new Promise<void>((resolve) => {
         if (opts.reducedMotion) { detach(s); if (s.cover) s.cover.uniforms.uMix.value = 1; const f = flatPose(); s.obj.position.copy(f.p); s.obj.quaternion.copy(f.q); out = s; flight = null; ctx?.invalidate(); resolve(); return; }
@@ -584,6 +593,7 @@ export function createBookTrayLayer(opts: {
     putBack(slug) {
       const s = slots.find((each) => each.book.slug === slug);
       if (!s || !ctx) return;
+      s.plain();
       if (s.obj.parent === root) detach(s);
       const f = flatPose(); s.obj.position.copy(f.p); s.obj.quaternion.copy(f.q); s.obj.visible = true;
       out = s;
@@ -605,7 +615,7 @@ export function createBookTrayLayer(opts: {
       if (pointer.moved) {
         pointer.moved = false;
         const next = !flight && !out && opts.canHover() ? pick() : null;
-        if (next !== hover) { hover = next; opts.onHover?.(hover?.book.slug ?? null); }
+        if (next !== hover) { hover = next; hover?.plain(); opts.onHover?.(hover?.book.slug ?? null); }
       }
       const k = 1 - Math.exp(-dt * 13);   // moves at once, settles on a long soft tail, no overshoot
       for (const s of slots) {

@@ -91,9 +91,9 @@ interface StagePoster { id: string; label: string; src: string; x: number; y: nu
 /** What the address asked for when the page was opened, kept because the page tidies its address once it is up. */
 const ASKED = typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search);
 /**
- * The books stand by their spines in a birch tray on the open mat right of the Snapdeal bag (lib/mat/bookTrayLayer.ts; Adi,
- * 2026-11-27, "Yeass push"), not lying loose as booklets. The live book is the engine's real 3D book: put away while the
- * books are in the tray, it lies here, flat beside the tray, once one is taken out, and opens. Every book lies at this one
+ * The books lie flat in one stack on the open mat, a little fanned so each title shows, tied with a white string
+ * (lib/mat/bookTrayLayer.ts; Adi, 2026-11-28, his fanned-folders picture). The live book is the engine's real 3D book: put
+ * away while the books are in the stack, it lies here, flat beside the stack, once one is taken out, and opens. Every book lies at this one
  * place, so the stage does not move when another book is picked. In pixels on the 1440 by 900 drawing.
  */
 const BOOK_LAND = { x: 1120, y: 724, turn: -3 };
@@ -1433,7 +1433,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     };
     /** Open the live book where it lies (from the wide view). */
     const openBook = () => {
-      // the live book is still in the tray: it comes out and lands first, then opens
+      // the live book is still in the stack: it comes out and lands first, then opens
       const tray = trayRef.current?.layer;
       if (stowedRef.current && tray) {
         if (tray.busy) return;
@@ -1518,7 +1518,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           return;
         }
         if (id === TRAY_ID || id.startsWith('book:')) {
-          // a book in the tray (the spine under the pointer, or a book's button): it comes out, lands flat and opens
+          // a book in the stack (the cover under the pointer, or a book's button): it comes out, lands flat and opens
           if (modeRef.current !== 'wide') return;
           const tray = trayRef.current?.layer;
           const slug = id === TRAY_ID ? tray?.pickAt() ?? null : id.slice(5);
@@ -1817,9 +1817,9 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           ))}
           <li><a href={SOUND_RECORD.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(SOUND_RECORD_PROP, event)} onBlur={ringOff}>{SOUND_RECORD.title}: a yellow record. Opens an interactive 3D board where you drag keys into records and layer real music.</a></li>
           <li><a href={BOT_TABLET.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(BOT_TABLET.id, event)} onBlur={ringOff}>Bot, an AI parts helper: a tablet on a birch stand. Opens the parts rack where a student asks Bot for a part and its bin lights up, with a 10-second voiced demo.</a></li>
-          {/* the books standing in the tray: each comes out, lands on the mat and opens */}
+          {/* the books in the tied stack: each comes out, lands on the mat and opens */}
           {FLIP_BOOKS.map((item) => (
-            <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { if (item.slug !== book.slug) fetchOpeningSpread(item.slug); ringOn(TRAY_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book in the tray. {item.meta}. Opens the book.</button></li>
+            <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { if (item.slug !== book.slug) fetchOpeningSpread(item.slug); ringOn(TRAY_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book in the stack. {item.meta}. Opens the book.</button></li>
           ))}
         </ul>
       )}
