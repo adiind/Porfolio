@@ -24,7 +24,7 @@ import { pageBusy, stillFor } from './quiet';
 const STAGE_STILL_MS = 700;
 import { composeBack, composePage, pageSources, type BookImages, type PageLayers } from './pageArt';
 import {
-  LEAF_FRAGMENT, LEAF_VERTEX, PROP_ALPHA_SHADOW_FRAGMENT, PROP_CURL_VERTEX, PROP_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_VERTEX, SUN_FRAGMENT,
+  LEAF_FRAGMENT, LEAF_VERTEX, PROP_ALPHA_SHADOW_FRAGMENT, PROP_CURL_VERTEX, PROP_FRAGMENT, PROP_SHAPED_ALPHA_SHADOW_FRAGMENT, PROP_SHADOW_FRAGMENT, PROP_SHAPED_SHADOW_FRAGMENT, PROP_VERTEX, SUN_FRAGMENT,
   SUN_VERTEX, TABLE_FRAGMENT, TABLE_VERTEX,
 } from './shaders';
 import type { MatLayer } from './matLayer';
@@ -118,6 +118,10 @@ export interface StageProp {
    * spins up as it comes (a record). The way into the 3D board: see diveState and capture.
    */
   dive?: { frac: number };
+  /** How far it stands off the mat, for its shadow: 0.25 a sheet of paper, 0.8 a clipboard (not given: the old, taller shadows). */
+  height?: number;
+  /** It lies over the props listed before it: its shadow is drawn just under it, so it falls on them too, not only on the mat. */
+  stacked?: boolean;
 }
 
 /**
@@ -2176,7 +2180,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
         const reach = 150 * next.unit;
         const shadow = new Mesh(new PlaneGeometry(prop.w + reach * 2, prop.h + reach * 2), new ShaderMaterial({
           vertexShader: PROP_VERTEX,
-          fragmentShader: prop.alphaShadow ? PROP_ALPHA_SHADOW_FRAGMENT : PROP_SHADOW_FRAGMENT,
+          // (a prop with a height gets the shaped shadows; one without keeps the three every block had)
+          fragmentShader: prop.height === undefined ? (prop.alphaShadow ? PROP_ALPHA_SHADOW_FRAGMENT : PROP_SHADOW_FRAGMENT) : prop.alphaShadow ? PROP_SHAPED_ALPHA_SHADOW_FRAGMENT : PROP_SHAPED_SHADOW_FRAGMENT,
           transparent: true,
           depthTest: false,
           depthWrite: false,
@@ -2187,6 +2192,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
             uAlpha: { value: 0 }, uDawn: dawnUniform, uScreen: { value: screenSize },
             // (the outline and the lifted corner, for a shadow that follows the picture: PROP_ALPHA_SHADOW_FRAGMENT)
             tMap: { value: texture }, uCurl: { value: prop.curl ?? 0 },
+            // (its height off the mat, and its turn: the shadows all fall one way, however the piece is turned)
+            uHeight: { value: prop.height ?? 1 }, uTurn: { value: new Vector2(Math.cos((-(prop.turn ?? 0) * Math.PI) / 180), Math.sin((-(prop.turn ?? 0) * Math.PI) / 180)) },
           },
         }));
         mesh.frustumCulled = false;
@@ -2198,6 +2205,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
         // (a card lying under another is drawn just beneath it, in the order listed)
         const above = prop.under ? next.props.findIndex((each) => each.id === prop.under) : -1;
         mesh.renderOrder = above >= 0 ? 2 + above * 0.001 - 0.0005 + i * 1e-7 : 2 + i * 0.001;
+        if (prop.stacked) shadow.renderOrder = mesh.renderOrder - 0.0002;
         scene.add(shadow, mesh);
         return { prop, mesh, shadow, texture, lift: 0 };
       });

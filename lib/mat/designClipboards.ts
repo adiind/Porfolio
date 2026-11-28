@@ -228,19 +228,8 @@ export function drawClipboard(index: number, picture: HTMLImageElement | null, p
   ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 0.7; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(cx - jawW / 2 + 5, jawY + 1.6); ctx.lineTo(cx + jawW / 2 - 5, jawY + 1.6); ctx.stroke();
 
-  // ---- the next clipboard's shadow, where it lies over this one
-  if (shade) {
-    ctx.save();
-    ctx.globalCompositeOperation = 'source-atop';
-    const reach = 15;
-    const across = ctx.createLinearGradient(shade.from - reach, 0, shade.from, 0);
-    across.addColorStop(0, 'rgba(8,12,40,0)'); across.addColorStop(0.6, 'rgba(8,12,40,.16)'); across.addColorStop(1, 'rgba(8,12,40,.42)');
-    ctx.fillStyle = across;
-    ctx.fillRect(shade.from - reach, shade.top + 5, reach, shade.bottom - shade.top);
-    ctx.fillStyle = 'rgba(8,12,40,.42)';
-    ctx.fillRect(shade.from, shade.top + 5, w - shade.from, shade.bottom - shade.top);
-    ctx.restore();
-  }
+  // (the next clipboard's shadow on this one is the real one now: the engine draws it just under that clipboard,
+  // StageProp.stacked. `shade` still says where the words must stop.)
   return canvas;
 }
 

@@ -1,3 +1,4 @@
+import { shadowHeight, shadowLayers } from '../../lib/mat/shadowHeights';
 /* "Hi, I'm Adi." is the first thing on the 3D home page: index.html draws it in the dark room,
    before any script has loaded (#mat-hello), in the very typeface the mat's cut letters are cut from (FB Bricolage 800,
    lib/mat/wordPieces.ts GREETING). When the room lights up it is carried, in one move, onto the cut letters' place on the
@@ -127,9 +128,8 @@ export function landHello(to: HelloLanding | null, reducedMotion: boolean): Prom
   const ink = 'rgba(2,10,44,';
   const shadow = [
     `${(-0.9 * k).toFixed(2)}px ${(1.1 * k).toFixed(2)}px 0 #e3d9c0`,
-    `${(-1.5 * k).toFixed(2)}px ${(2 * k).toFixed(2)}px ${(2 * k).toFixed(2)}px ${ink}.42)`,
-    `${(-8 * k).toFixed(2)}px ${(10 * k).toFixed(2)}px ${(12 * k).toFixed(2)}px ${ink}.36)`,
-    `${(-30 * k).toFixed(2)}px ${(38 * k).toFixed(2)}px ${(40 * k).toFixed(2)}px ${ink}.45)`,
+    // (the same three the cut letters get on the mat; the long one a little lighter, as it always was here)
+    ...shadowLayers(shadowHeight('word:hello') ?? 1).map((layer, i) => `${(layer.x * k).toFixed(2)}px ${(-layer.y * k).toFixed(2)}px ${(layer.blur * k).toFixed(2)}px ${ink}${(layer.amount * (i === 2 ? 0.82 : 1)).toFixed(3)})`),
   ].join(', ');
   // (its colours turn as the light reaches it, not before: "Adi." turning black in the dark would vanish for a moment)
   words.style.transition = 'color .5s ease .55s, text-shadow .5s ease .55s';

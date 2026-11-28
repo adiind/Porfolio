@@ -32,6 +32,7 @@ import { DESIGN_CARDS } from '../../lib/mat/designCards';
 import { openCaseStudy, warmCaseStudies } from '../../lib/mat/caseStudyHandoff';
 import { whenQuiet } from '../../lib/flipbook/quiet';
 import { CLIPBOARD, CLIPBOARD_LAY, clipboardShade, drawClipboard } from '../../lib/mat/designClipboards';
+import { withShadowHeight } from '../../lib/mat/shadowHeights';
 import { RECORD, RECORD_DIVE_FRAC, RECORD_EMBED_SRC, RECORD_LAY, SOUND_RECORD, SOUND_RECORD_PROP, drawSoundRecord, soundSpin, storeRecordDive } from '../../lib/mat/soundRecord';
 import { createSoundRecordRing, type SoundRecordRing } from '../../lib/mat/soundRecordRing';
 import { BOT_TABLET } from '../../lib/mat/botTablet';
@@ -285,7 +286,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     // (the same pictures as lib/mat/designCards.ts DESIGN_PICTURES and DESIGN_PG_MARK, written out for the ship kit)
     Promise.all([loadPicture('/images/familysync_jpmorgan_chase.webp'), loadPicture('/images/mcdonalds_order.webp'), loadPicture('/images/pg/rooms/room-hero.webp'), loadPicture('/images/pg/pg-logo-official.svg')]),
     loadFlipbookFonts('first'),
-    // Bot's tablet on its birch stand (lib/mat/botTablet.ts): the mat lights without it if it cannot be loaded
+    // Bot's tablet on its birch stand, design 17 itself (lib/mat/botTablet.ts): the mat lights without it if it cannot be loaded
     loadPicture('/images/mat/bot-tablet.webp').catch(() => null),
   ]);
   const posters = STAGE_POSTERS.map((poster, index) => {
@@ -379,7 +380,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   const handouts = { id: HANDOUTS_ID, image: handoutsTarget(), ...at(HANDOUTS_AT.x, HANDOUTS_AT.y), w: 0.74, h: 0.6, radius: 0.01, turn: HANDOUTS_AT.turn, cutout: true, alphaShadow: true };
   return {
     greeting: words.greeting,
-    props: [...posters, ...clipboards, soundRecord, ...bot, bag, snapdealBag, handouts, ...story, tray, ...pieces],
+    props: [...posters, ...clipboards, soundRecord, ...bot, bag, snapdealBag, handouts, ...story, tray, ...pieces].map(withShadowHeight),
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,

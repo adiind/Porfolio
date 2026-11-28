@@ -6,6 +6,7 @@
  * display (gamma) space, the same way the 2D canvases that feed the textures
  * were drawn, so the page looks the same flat and in 3D.
  */
+import { SHADOW_FALL } from '../mat/shadowHeights';
 
 export const LEAF_VERTEX = /* glsl */ `
 uniform float uT;
@@ -635,6 +636,49 @@ void main() {
 }
 `;
 
+/**
+ * The home mat's shaped shadows. The same three (tight, middle, long and soft, down and to the left) as
+ * PROP_SHADOW_FRAGMENT, with three things added:
+ *  - a height for each piece (uHeight: 0.25 a sheet of paper, 0.8 a clipboard): the middle and long shadows reach and
+ *    soften in proportion to it, so thin things hug the mat and thick ones stand off it;
+ *  - the weight sits at the contact and fades toward the tip (0.5, 0.3, 0.18), where the old ones were darkest furthest out;
+ *  - one direction for the whole mat: the sheet turns with its piece, so the fall is turned back by the same angle (uTurn).
+ * The numbers are lib/mat/shadowHeights.ts SHADOW_FALL (kept there, a small file, for what must match them outside the
+ * shader: the loading greeting).
+ */
+const f = (n: number): string => n.toFixed(3);
+const pick = (key: 'blur' | 'shrink' | 'amount'): string => `(i == 0 ? ${f(SHADOW_FALL[0][key])} : i == 1 ? ${f(SHADOW_FALL[1][key])} : ${f(SHADOW_FALL[2][key])})`;
+/** Shared by both shaped shadows: `k` is the layer's scale (its height, lifted), `fall` its offset on the turned sheet. */
+const SHAPED_FALL = /* glsl */ `
+uniform float uHeight;   // how far the piece stands off the mat: 0.25 paper, 0.8 a clipboard
+uniform vec2 uTurn;      // cos and sin of the sheet's turn on the mat
+float layerScale(int i) {
+  // (lifted under the pointer or still landing, it stands higher by what the old shadows grew by)
+  float h = uHeight + uLift * 1.6;
+  return i == 0 ? 0.5 + 0.5 * h : h;
+}
+vec2 turnedBack(vec2 v) { return vec2(uTurn.x * v.x + uTurn.y * v.y, uTurn.x * v.y - uTurn.y * v.x); }
+vec2 fall(int i) {
+  vec2 off = i == 0 ? vec2(${f(SHADOW_FALL[0].x)}, ${f(SHADOW_FALL[0].y)}) : i == 1 ? vec2(${f(SHADOW_FALL[1].x)}, ${f(SHADOW_FALL[1].y)}) : vec2(${f(SHADOW_FALL[2].x)}, ${f(SHADOW_FALL[2].y)});
+  return turnedBack(off) * layerScale(i) * uUnit;
+}
+`;
+const cutMain = (source: string): string => source.slice(0, source.lastIndexOf('void main()'));
+export const PROP_SHAPED_SHADOW_FRAGMENT = `${cutMain(PROP_SHADOW_FRAGMENT)}${SHAPED_FALL}
+void main() {
+  vec2 p = (vUv - 0.5) * uSheet;
+  float dark = 0.0;
+  for (int i = 0; i < 3; i++) {
+    float u = uUnit * layerScale(i);
+    float blur = ${pick('blur')};
+    float d = roundBoxDistance(p - fall(i), uSize * 0.5, uRadius) + ${pick('shrink')} * u;
+    float a = ${pick('amount')} * (1.0 - smoothstep(-blur * u * 0.5, blur * u * 0.5, d));
+    dark = dark + a * (1.0 - dark);
+  }
+  gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), dark * uAlpha);
+}
+`;
+
 /** How far the near right corner of a sheet is lifted, at a point of the sheet (uv): 1 at the corner, 0 well inside. */
 const CURL_LIFT = /* glsl */ `
 float curlLift(vec2 uv) {
@@ -712,6 +756,27 @@ void main() {
     q += vec2(1.0, 1.25) * lift * 0.9;
     float c = cover(q, blur * u * 0.5 + lift * 0.35, i == 0 ? 1.0 : i == 1 ? 3.5 : 5.0);
     float a = amount * smoothstep(0.08, 0.92, c) * (i == 0 ? 1.0 - clamp(lift / max(uCurl, 1e-4), 0.0, 1.0) * 0.8 : 1.0);
+    dark = dark + a * (1.0 - dark);
+  }
+  gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), dark * uAlpha);
+}
+`;
+
+/** PROP_ALPHA_SHADOW_FRAGMENT, shaped as PROP_SHAPED_SHADOW_FRAGMENT is (a height, the weight at the contact, one direction). */
+export const PROP_SHAPED_ALPHA_SHADOW_FRAGMENT = `${cutMain(PROP_ALPHA_SHADOW_FRAGMENT)}${SHAPED_FALL}
+void main() {
+  vec2 p = (vUv - 0.5) * uSheet;
+  float dark = 0.0;
+  for (int i = 0; i < 3; i++) {
+    float k = layerScale(i);
+    float blur = ${pick('blur')};
+    vec2 q = p - fall(i);
+    float lift = uCurl > 0.0 ? curlLift(q / uSize + 0.5) * uCurl : 0.0;
+    q -= turnedBack(vec2(-1.0, -1.25)) * lift * 0.9;
+    // (each tap reads an already blurred copy of the picture: how blurred follows the layer's softness too)
+    float soft = (i == 0 ? 1.0 : i == 1 ? 3.5 : 5.0) + log2(k * blur / (i == 0 ? 2.0 : i == 1 ? 12.0 : 40.0));
+    float c = cover(q, blur * k * uUnit * 0.5 + lift * 0.35, max(soft, 0.0));
+    float a = ${pick('amount')} * smoothstep(0.08, 0.92, c) * (i == 0 ? 1.0 - clamp(lift / max(uCurl, 1e-4), 0.0, 1.0) * 0.8 : 1.0);
     dark = dark + a * (1.0 - dark);
   }
   gl_FragColor = vec4(vec3(0.008, 0.039, 0.173) * dawnLight(), dark * uAlpha);
