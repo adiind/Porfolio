@@ -38,7 +38,7 @@
   }
   /* Zomato: not cards but one scroll of the papers from his rider's bag, the same pictures and words as the 3D bag
      (zomato-scroll.json and assets/zomato/, written by scripts/phone/make-zomato.mjs). Asked for only when opened. */
-  var scroll = null;
+  var scrolls = {};
   function pic(p, alt, cls, now) { var el = document.createElement('img'); el.src = p.src; el.width = p.w; el.height = p.h; el.alt = alt; if (cls) el.className = cls; el.decoding = 'async'; if (!now) el.loading = 'lazy'; return el; }
   function renderScroll(d) {
     var w = d.words, p = d.pictures, r = w.rescue;
@@ -92,6 +92,44 @@
     press.appendChild(wrap); track.appendChild(press);
     var photo = make('section', 'zs-thing zs-photo', ''); photo.appendChild(pic(p.photo, 'Adi at the Zomato office')); track.appendChild(photo);
   }
+  /* Snapdeal: what comes out of his torn courier bag, as one scroll: the invoice, the shirt with its tag, the stock box's
+     label. Every word of the Snapdeal entry, as on the 3D bag (snapdeal-scroll.json, written by
+     scripts/phone/make-snapdeal.mjs), set as real text in the papers' look so it reads at a phone's width. */
+  function feature(f, cls) {
+    var el = make('div', 'sd-feature ' + cls, '');
+    el.appendChild(make('h2', '', f.title)); el.appendChild(make('p', 'sd-sub', f.subtitle)); el.appendChild(make('p', 'sd-text', f.text));
+    var dl = make('dl', 'sd-defs', ''); f.pills.forEach(function (x) { dl.appendChild(make('dt', '', x.label)); dl.appendChild(make('dd', '', x.description)); }); el.appendChild(dl);
+    el.appendChild(make('h3', 'sd-label', 'What I did'));
+    var ul = make('ul', 'sd-did', ''); f.details.forEach(function (d) { ul.appendChild(make('li', '', d)); }); el.appendChild(ul);
+    el.appendChild(make('h3', 'sd-label', 'Skills'));
+    var sk = make('dl', 'sd-defs', ''); f.skills.forEach(function (x) { sk.appendChild(make('dt', '', x.label)); sk.appendChild(make('dd', '', x.description)); }); el.appendChild(sk);
+    return el;
+  }
+  function bars(cls) { var b = make('div', 'sd-bars ' + (cls || ''), ''); b.setAttribute('aria-hidden', 'true'); return b; }
+  function renderSnapdeal(d) {
+    var w = d.words, p = d.pictures;
+    track.replaceChildren();
+    var top = make('header', 'zs-top', ''); top.appendChild(make('p', 'zs-role', w.title + ' · ' + w.dates)); track.appendChild(top);
+    /* the invoice */
+    var inv = make('section', 'zs-thing sd-invoice', ''); inv.dataset.card = 'invoice';
+    var brand = make('div', 'sd-brand', ''); var mk = make('span', 'sd-mark', ''); mk.setAttribute('aria-hidden', 'true'); mk.style.setProperty('--mark', 'url(' + p.mark.src + ')'); brand.appendChild(mk); brand.appendChild(pic(p.word, 'Snapdeal', 'sd-word', true)); brand.appendChild(make('span', 'sd-kind', 'Invoice')); inv.appendChild(brand);
+    inv.appendChild(make('h2', '', w.title)); inv.appendChild(make('p', 'sd-sub', w.company + ' · ' + w.dates));
+    inv.appendChild(make('p', 'sd-head', w.headline));
+    var ul = make('ul', 'sd-did', ''); w.bullets.forEach(function (b) { ul.appendChild(make('li', '', b)); }); inv.appendChild(ul);
+    inv.appendChild(make('h3', 'sd-label', 'Skills'));
+    var sk = make('dl', 'sd-defs', ''); w.skills.forEach(function (x) { sk.appendChild(make('dt', '', x.label)); sk.appendChild(make('dd', '', x.description)); }); inv.appendChild(sk);
+    inv.appendChild(make('p', 'sd-diff', w.differentiator));
+    var stamp = make('div', 'sd-stamp', ''); stamp.appendChild(make('strong', '', '★ ' + w.award.title)); stamp.appendChild(make('p', '', w.award.summary)); inv.appendChild(stamp);
+    inv.appendChild(bars('sd-bars-foot'));
+    track.appendChild(inv);
+    /* the shirt and its tag */
+    var shirt = make('section', 'zs-thing sd-shirt', ''); shirt.dataset.card = 'ads';
+    shirt.appendChild(pic(p.tee, 'A folded green Snapdeal T-shirt printed Data Science Team', 'sd-tee'));
+    var tag = feature(w.ads, 'sd-tag'); shirt.appendChild(tag); track.appendChild(shirt);
+    /* the stock box's lid and its label */
+    var box = make('section', 'zs-thing sd-box', ''); box.dataset.card = 'warehouse';
+    var label = make('div', 'sd-lid', ''); label.appendChild(bars()); label.appendChild(feature(w.warehouse, '')); box.appendChild(label); track.appendChild(box);
+  }
   async function open(link, type, restore) {
     var ticket = ++request;
     returnTo = link;
@@ -103,19 +141,20 @@
     /* the stop's full page (Adi, 2026-11-24: a link for now) */
     var full = dialog.querySelector('.self-story-full');
     full.href = '/experience/' + (type === 'self' ? 'self-xyz' : type); full.setAttribute('aria-label', names[type] + ': open the full page');
-    if (type === 'zomato' && !scroll) {
-      try { var papers = await fetch('/home-flat/zomato-scroll.json'); if (papers.ok) scroll = await papers.json(); } catch (_) { /* the cards below stand in */ }
+    var scrollable = type === 'zomato' || type === 'snapdeal';
+    if (scrollable && !scrolls[type]) {
+      try { var papers = await fetch('/home-flat/' + type + '-scroll.json'); if (papers.ok) scrolls[type] = await papers.json(); } catch (_) { /* the cards below stand in */ }
       if (ticket !== request) return;
     }
-    var asScroll = type === 'zomato' && !!scroll;
+    var asScroll = scrollable && !!scrolls[type];
     if (asScroll) { dialog.dataset.scroll = 'true'; track.dataset.scroll = 'true'; } else { delete dialog.dataset.scroll; delete track.dataset.scroll; }
-    track.setAttribute('aria-label', names[type] + (asScroll ? ' work, from his rider\u2019s bag' : ' story cards'));
+    track.setAttribute('aria-label', names[type] + (asScroll ? (type === 'zomato' ? ' work, from his rider\u2019s bag' : ' work, from his courier bag') : ' story cards'));
     if (!asScroll && !cached[type]) {
       try { var response = await fetch('/data/' + type + '-story.json'); if (!response.ok) throw Error('unavailable'); cached[type] = await response.json(); }
       catch (_) { if (ticket === request) track.textContent = 'The story could not be loaded. Please try again.'; }
     }
     if (ticket !== request) return;
-    if (asScroll) renderScroll(scroll); else if (cached[type]) render(cached[type], type);
+    if (asScroll) (type === 'zomato' ? renderScroll : renderSnapdeal)(scrolls[type]); else if (cached[type]) render(cached[type], type);
     track.scrollLeft = 0; track.scrollTop = 0;
     if (!dialog.open) { if (!restore) history.pushState({ selfStory: true }, '', '#experience-' + type); dialog.showModal(); }
     if (link && link.classList.contains('bx-rescue')) { var rc = track.querySelector('[data-card="rescue"]'); if (rc) rc.scrollIntoView({ inline: 'start', block: asScroll ? 'start' : 'nearest' }); }

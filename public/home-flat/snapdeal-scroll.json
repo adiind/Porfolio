@@ -1,0 +1,138 @@
+{
+ "note": "Written by scripts/phone/make-snapdeal.mjs from lib/mat/snapdealPhone.ts. Do not edit by hand.",
+ "words": {
+  "company": "Snapdeal",
+  "title": "Data Analyst · Ads & Supply Infrastructure",
+  "dates": "Jun 2020 – Sep 2022",
+  "headline": "Building ads analytics and supply infrastructure during Snapdeal's first-party transition.",
+  "bullets": [
+   "Set up data pipelines to support Snapdeal's first-party product rollout",
+   "Built replenishment logic for newly established warehouse operations",
+   "Enabled inventory planning as Snapdeal scaled owned supply and fulfillment",
+   "Contributed to ads revenue optimization, resulting in a 14% uplift"
+  ],
+  "skills": [
+   {
+    "label": "Ad-Tech Analytics",
+    "description": "Performance measurement and optimization for advertising products."
+   },
+   {
+    "label": "Revenue Attribution",
+    "description": "Tracing revenue back to specific ad actions and campaigns."
+   },
+   {
+    "label": "Supply Chain",
+    "description": "Logistics and inventory management for e-commerce operations."
+   },
+   {
+    "label": "Data Pipelines",
+    "description": "Automated data flows powering analytics and decision systems."
+   }
+  ],
+  "differentiator": "Rare combination of ad-tech revenue optimization and supply-chain infrastructure experience, bridging the gap between monetization strategy and operational execution.",
+  "award": {
+   "title": "Above and Beyond",
+   "summary": "Awarded for exceptional contribution to the Ad-Tech revenue optimization project.",
+   "icon": "trophy"
+  },
+  "ads": {
+   "title": "Seller Ads Intelligence System",
+   "subtitle": "Analytics Owner",
+   "text": "Worked on ads revenue analytics and supply-side data infrastructure during Snapdeal's shift toward first-party products and in-house warehousing. Set up data pipelines, built replenishment logic, and enabled inventory planning as Snapdeal scaled owned supply and fulfillment.",
+   "pills": [
+    {
+     "label": "CPC",
+     "description": "Cost Per Click. Advertisers are charged only when a user clicks on their ad."
+    },
+    {
+     "label": "CPT",
+     "description": "Cost Per Transaction. Advertisers pay a commission only when a sale occurs."
+    },
+    {
+     "label": "Banner Ads",
+     "description": "High-visibility visual placements on the homepage and category pages."
+    }
+   ],
+   "details": [
+    "End-to-end ownership of data pipelines powering seller ads analytics",
+    "Defining and maintaining core performance metrics beyond surface-level CTR",
+    "Analyzing pricing and performance patterns across CPT, CPC, and banner ads",
+    "Supporting internal product and business decisions around ad effectiveness",
+    "Upkeep of algo pipelines that charge individual seller, audit with finance team"
+   ],
+   "skills": [
+    {
+     "label": "SQL",
+     "description": "Structured query language for complex data analysis."
+    },
+    {
+     "label": "Revenue Attribution",
+     "description": "Tracking revenue to specific ad interactions."
+    },
+    {
+     "label": "A/B Testing",
+     "description": "Controlled experiments to measure ad effectiveness."
+    },
+    {
+     "label": "Pricing Analytics",
+     "description": "Analyzing optimal pricing strategies for ad products."
+    }
+   ]
+  },
+  "warehouse": {
+   "title": "First-Party Warehousing Setup",
+   "subtitle": "Analytics Owner",
+   "text": "Contributed to Snapdeal's first attempt at first-party warehousing, focusing on analytics and data systems supporting procurement automation, inventory visibility, and operational decision-making.",
+   "pills": [
+    {
+     "label": "Warehousing",
+     "description": "Optimization of physical storage, layout, and fulfillment center operations."
+    },
+    {
+     "label": "Procurement",
+     "description": "Automated purchasing workflows and supplier management systems."
+    },
+    {
+     "label": "Inventory",
+     "description": "Real-time stock tracking and SKU-level availability analysis."
+    }
+   ],
+   "details": [
+    "Working on analytics for Snapdeal-owned inventory instead of pure seller fulfillment",
+    "Supporting automated procurement and inventory tracking workflows",
+    "Analyzing warehouse- and SKU-level patterns affecting availability and fulfillment"
+   ],
+   "skills": [
+    {
+     "label": "Forecasting",
+     "description": "Predicting future demand and inventory needs."
+    },
+    {
+     "label": "Inventory Analytics",
+     "description": "Analyzing stock levels, turnover, and availability."
+    },
+    {
+     "label": "Operational Dashboards",
+     "description": "Real-time monitoring of warehouse operations."
+    }
+   ]
+  }
+ },
+ "pictures": {
+  "tee": {
+   "src": "/home-flat/assets/snapdeal/tee.webp",
+   "w": 720,
+   "h": 940
+  },
+  "mark": {
+   "src": "/images/mat/snapdeal/snapdeal-mark.webp",
+   "w": 371,
+   "h": 353
+  },
+  "word": {
+   "src": "/images/mat/snapdeal/snapdeal-wordmark.webp",
+   "w": 1245,
+   "h": 361
+  }
+ }
+}
