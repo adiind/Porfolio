@@ -26,7 +26,9 @@ const D = 13.2;          // its height, head to tail (the engine's closed book: 
 const T = 1.5;           // its thickness
 const GAP = 0.22;        // between books in the tray
 const PULL = D / 2;      // how far the pointer slides a book out
-const TILT = (62 * Math.PI) / 180;   // the tray tipped back, so the spines face the camera looking down at the mat
+const TILT = (62 * Math.PI) / 180;
+/** the tray turned on its own slope, so the books' front covers show beside their spines (Adi: "angle it right too, i wanna see the front too") */
+const YAW = (-35 * Math.PI) / 180;   // the tray tipped back, so the spines face the camera looking down at the mat
 const S = 1 / W;         // table units per cm
 const BUL = 0.38, BT = 0.2, X0 = -W / 2 + BUL;   // how far the spine bulges, board thickness, where the bulge starts
 const ZI = W / 2 + 0.75, ZO = ZI + 0.8;          // the tray's inner and outer walls, front and back
@@ -181,19 +183,24 @@ function buildTray(n: number, solid: (geo: BufferGeometry) => Mesh): { tray: Gro
     g.translate(0, 0, -0.25);
     const e = solid(g); e.rotation.y = -Math.PI / 2; e.position.x = sx * (len / 2 - 0.4); tray.add(e);
   }
-  tray.rotation.x = -TILT;
+  // turned within its own slope first (the covers come round toward the viewer), then tipped back
+  tray.rotation.set(-TILT, YAW, 0);
   tray.updateMatrixWorld(true);
   const bb = new Box3(); chan.updateMatrixWorld(true); bb.expandByObject(tray);
   const lift = -bb.min.y;
   tray.position.y = lift; tray.updateMatrixWorld(true);
   // the block it rests on: a solid birch wedge filling the space under the tray, from its back edge on the mat to its
   // raised front, so the tray stands on the mat and does not float (Adi, 2026-11-27: "why is it half floating")
-  const back = tray.localToWorld(new Vector3(0, -0.8, -ZO + 1.4));
-  const front = tray.localToWorld(new Vector3(0, -0.8, ZO - 1.4));
-  const side = rounded([[back.z - 0.3, 0, 0.3], [front.z, 0, 0.9], [front.z, front.y + 0.05, 0.9], [back.z - 0.3, back.y + 0.05, 0.3]]);
-  const wedgeGeo = new ExtrudeGeometry(side, { depth: len - 1.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2, bevelSegments: 3, curveSegments: 10 });
-  wedgeGeo.translate(0, 0, -(len - 1.4) / 2);
-  const block = solid(wedgeGeo); block.rotation.y = -Math.PI / 2;
+  // (a rounded box, each of its columns stretched from the mat up to the tray's underside right above it)
+  const wedgeGeo = new RoundedBoxGeometry(1, 1, 1, 5, 0.08);
+  const pos = wedgeGeo.getAttribute('position'), under = new Vector3();
+  for (let i = 0; i < pos.count; i += 1) {
+    const u = pos.getX(i) * (len - 1.2), t = pos.getY(i) + 0.5, w = pos.getZ(i) * (2 * ZO - 1.2);
+    tray.localToWorld(under.set(u, -0.75, w));
+    pos.setXYZ(i, under.x, under.y * t, under.z);
+  }
+  wedgeGeo.computeVertexNormals();
+  const block = solid(wedgeGeo);
   return { tray, block, lift };
 }
 
@@ -359,7 +366,10 @@ export function createBookTrayLayer(opts: {
         if (!ctx) return;
         (spineMat.uniforms.tMap.value as Texture).dispose();
         spineMat.uniforms.tMap.value = texture(drawSpine(b, img));
-        coverMat.uniforms.tMap.value = texture(img); coverMat.uniforms.uUseMap.value = 1;
+        // (drawn onto a canvas first: an SVG cover, Bambu's, cannot go to the GPU as it is)
+        const flat = document.createElement('canvas'); flat.width = 1200; flat.height = 720;
+        flat.getContext('2d')?.drawImage(img, 0, 0, 1200, 720);
+        coverMat.uniforms.tMap.value = texture(flat); coverMat.uniforms.uUseMap.value = 1;
         ctx.invalidate();
       };
       img.src = b.cover;
