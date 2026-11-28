@@ -61,6 +61,11 @@ export interface FlipBookEngineOptions {
   onFilled?(slug: string): void;
   /** Expose window.__flipbook for review captures. */
   debug?: boolean;
+  /**
+   * The closed book starts put away (the home page's books stand in a tray drawn by a layer, lib/mat/bookTrayLayer.ts):
+   * it is not on the mat, and a click where it would lie is no click on it. `stow` puts it out and away.
+   */
+  stowed?: boolean;
 }
 
 /**
@@ -211,6 +216,8 @@ export interface FlipBookEngine {
   capture(quality?: number): Promise<string | null>;
   /** Lift a thing off the mat as the pointer resting on it does (it has keyboard focus); null lets it down again. */
   lift(id: string | null): void;
+  /** Put the closed book away (true: off the mat, as with the `stowed` option) or out where it lies (false). */
+  stow(on: boolean): void;
   /**
    * Give a prop a new picture (same shape, any resolution): a sharper copy that has come in, or a card whose photograph has
    * arrived. The caller picks the moment (not while it is moving, so the change is never seen mid-motion).
@@ -568,6 +575,8 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
   let bow = BOW; let bowVel = 0;
   // book slide (changing books)
   let slideY = 0;
+  /** The closed book is put away (opts.stowed, stow): drawn far off the mat, and never under the pointer. */
+  let stowed = Boolean(opts.stowed);
   let slide: Tween | null = null;
   // review overrides
   const override = new Map<number, number>();
@@ -1367,7 +1376,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
     bookGroup.rotation.z = turn;
     // while the camera is down at a poster or a set of cards, the book is slid off the near edge of the table, out of the way
     const tucked = focus ? (1 - up) * 5 : 0;
-    bookGroup.position.set(-closedShift * Math.cos(turn), slideY - closedShift * Math.sin(turn) - tucked, 0);
+    bookGroup.position.set(-closedShift * Math.cos(turn), slideY - closedShift * Math.sin(turn) - tucked - (stowed ? 60 : 0), 0);
     tableMaterial.uniforms.uBookTurn.value = turn;
     tableMaterial.uniforms.uMatEdge.value = up;
     // Scrolling moves the view down the table, but the mat's print is slid along with it: to the eye the mat stays put
@@ -1732,7 +1741,7 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
         return prop.under ? stageSpec?.props.find((each) => each.id === prop.under) ?? prop : prop;
       }
     }
-    return Math.abs(hit.x) <= 0.52 && Math.abs(hit.y) <= pageH / 2 + 0.02 ? 'book' : null;
+    return !stowed && Math.abs(hit.x) <= 0.52 && Math.abs(hit.y) <= pageH / 2 + 0.02 ? 'book' : null;
   };
   /** While a set of cards is open: the card that can be picked under a point of the window, where it lies in the open row. */
   const pickHit = (clientX: number, clientY: number): StageProp | null => {
@@ -2236,6 +2245,11 @@ export function createFlipBookEngine(canvas: HTMLCanvasElement, opts: FlipBookEn
       item.mesh.updateMatrixWorld(true);
       const point = new Vector3((u - 0.5) * item.prop.w, (0.5 - v) * item.prop.h, 0).applyMatrix4(item.mesh.matrixWorld).project(drawnView);
       return { x: (point.x * 0.5 + 0.5) * w, y: (-point.y * 0.5 + 0.5) * h };
+    },
+    stow(on: boolean) {
+      if (stowed === on) return;
+      stowed = on;
+      invalidate();
     },
     lift(id: string | null) {
       if (id === hoverProp) return;

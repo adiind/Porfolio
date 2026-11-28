@@ -22,6 +22,7 @@ import { matScroll, type Hold } from '../../lib/mat/timelineScene';
 import { RESCUE_SCHEMES, RESCUE_SOURCES, RESCUE_STORY, drawRescueCard, drawRescueStoryCard, type NotchStyle, type RescueScheme } from '../../lib/mat/foodRescueCards';
 import { SELF_STORY, drawSelfStoryCard } from '../../lib/mat/selfCards';
 import { createMailerLayer, type MailerLayer } from '../../lib/mat/snapdeal/mailerLayer';
+import { createBookTrayLayer, trayFootprint, type BookTrayLayer, type TrayBook } from '../../lib/mat/bookTrayLayer';
 import { MAILER } from '../../lib/mat/snapdeal/mailerArt';
 import { PAGE as SNAPDEAL_PAGE } from '../../lib/mat/snapdeal/pageWords';
 import { GITHUB, GITHUB_YEAR, RESUME_PAGE, RESUME_PDF } from '../../lib/mat/matPieces';
@@ -85,21 +86,34 @@ interface StagePoster { id: string; label: string; src: string; x: number; y: nu
  * (data/matStage.json, measured from it by scripts/mat/capture-posters.mjs). The booklet lies in the open
  * mat to the right of the Snapdeal poster.
  */
-/**
- * Where the books lie, in pixels on the 1440 by 900 drawing: loose on the open mat right of the Snapdeal poster, two to a row. They never overlap. The open book is a real 3D book and always draws under the loose
- * booklets, so a booklet lying over it would hide its title once it had been opened and put back.
- */
 /** What the address asked for when the page was opened, kept because the page tidies its address once it is up. */
 const ASKED = typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search);
-const STAGE_BOOK_SLOTS = [
-  { x: 930, y: 652, turn: -4 }, { x: 1180, y: 660, turn: 3 },
-  { x: 930, y: 806, turn: -2 }, { x: 1180, y: 806, turn: 3 },
-];
-const bookPlace = (index: number) => {
-  const slot = STAGE_BOOK_SLOTS[index % STAGE_BOOK_SLOTS.length];
-  // more books than places: the next round lies a little to the right of the first
-  return { ...slot, x: slot.x + Math.floor(index / STAGE_BOOK_SLOTS.length) * 40 };
+/**
+ * The books stand by their spines in a birch tray on the open mat right of the Snapdeal bag (lib/mat/bookTrayLayer.ts; Adi,
+ * 2026-11-27, "Yeass push"), not lying loose as booklets. The live book is the engine's real 3D book: put away while the
+ * books are in the tray, it lies here, flat beside the tray, once one is taken out, and opens. Every book lies at this one
+ * place, so the stage does not move when another book is picked. In pixels on the 1440 by 900 drawing.
+ */
+const BOOK_LAND = { x: 1120, y: 724, turn: -3 };
+const bookPlace = (_index: number) => BOOK_LAND;
+/** Where the tray stands (its middle), and its click target: an empty picture the size of its footprint (the layer draws it). */
+const TRAY_AT = { x: 880, y: 700 };
+const TRAY_ID = 'book-tray';
+let trayTargetPicture: HTMLCanvasElement | null = null;
+const trayTarget = () => { if (!trayTargetPicture) { trayTargetPicture = document.createElement('canvas'); trayTargetPicture.width = 8; trayTargetPicture.height = 8; } return trayTargetPicture; };
+let trayFoot: ReturnType<typeof trayFootprint> | null = null;
+const trayFootFor = () => (trayFoot ??= trayFootprint(FLIP_BOOKS.length));
+/** Each book's spine: its cloth, print and foot bar, and the small line after the title (the prototype's spines). */
+const SPINES: Record<string, Partial<TrayBook>> = {
+  surya: { bg: '#3b1912', fg: '#f6ead8', accent: '#ff8a3d' },
+  jarvis: { bg: '#1d1b19', fg: '#efe6d6', accent: '#e0b25a' },
+  muse: { bg: '#2b1d42', fg: '#f1eaff', accent: '#b9a3ff' },
+  // (Adi: "Bambu student ambassador should say that")
+  bambu: { title: 'Student Ambassador', over: 'BAMBU LAB', bg: '#1d8c3a', fg: '#ffffff', accent: '#c8f5d2' },
 };
+const trayBook = (item: FlipBook): TrayBook => ({
+  slug: item.slug, title: item.title, bg: item.board ?? '#2b160d', fg: '#f6ead8', accent: '#e0b25a', cover: item.pages[0].art.src, ...SPINES[item.slug],
+});
 // The printer is not on this stage (Adi, 2026-11-16: "Keep the booklet, remove the printer": Bambu is a booklet like the
 // others). Its picture stays in data/matStage.json for the flat page, which still has it.
 // Zomato is his red rider's bag (lib/mat/zomatoBag.ts), lying where the Zomato card was: it takes the place of the ~10M
@@ -238,26 +252,6 @@ function drawnOnce(key: string, from: unknown[], draw: () => HTMLCanvasElement):
 }
 
 /** A closed book as it lies on the mat: its cover on its boards, the outer corners round and the spine edge square. */
-function bookletPicture(cover: HTMLImageElement, board: string): HTMLCanvasElement {
-  const w = 1100;                    // the cover's width in canvas pixels
-  const edge = w * 0.017;            // the boards show this far round the cover
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(w + edge * 2);
-  canvas.height = Math.round(w * 0.6 + edge * 2);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return canvas;
-  ctx.fillStyle = board;
-  ctx.beginPath();
-  ctx.roundRect(0, 0, canvas.width, canvas.height, [0, w * 0.053, w * 0.053, 0]);
-  ctx.fill();
-  ctx.save();
-  ctx.beginPath();
-  ctx.roundRect(edge, edge, w, w * 0.6, [0, w * 0.036, w * 0.036, 0]);
-  ctx.clip();
-  ctx.drawImage(cover, edge, edge, w, w * 0.6);
-  ctx.restore();
-  return canvas;
-}
 
 /** The stage as seen from one book: that book is the live one at the middle of the table's map, the others lie as closed booklets. */
 /** Asked for once, when the résumé is about to be read (the pointer rests on it or its tab, or it is opened). */
@@ -276,7 +270,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the Zomato bag's pictures start coming now, beside the stage's (not waited for: the bag is built when they are in)
   void preloadZomatoBag().catch(() => undefined);
   const hasRescue = STAGE_POSTERS.some((poster) => poster.id === 'rescue');
-  const [posterPictures, rescuePictures, coverPictures, selfLogo, toolMarks, resumePage, selfArt, clipPictures, , botTablet] = await Promise.all([
+  const [posterPictures, rescuePictures, , selfLogo, toolMarks, resumePage, selfArt, clipPictures, , botTablet] = await Promise.all([
     Promise.all(STAGE_POSTERS.map((poster) => loadPicture(poster.src))),
     hasRescue ? Promise.all([loadPicture(RESCUE_SOURCES.bag), loadPicture(RESCUE_SOURCES.logo), loadPicture(RESCUE_SOURCES.offer)]) : Promise.resolve(null),
     Promise.all(others.map((item) => loadPicture(item.pages[0].art.src))),
@@ -361,12 +355,11 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
     id: BOT_TABLET.id, image: botTablet, ...at(BOT_TABLET.lay.x, BOT_TABLET.lay.y),
     w: BOT_TABLET.lay.w / px, h: (BOT_TABLET.lay.w * BOT_TABLET.aspect) / px, radius: 0, cutout: true, alphaShadow: true,
   }] : [];
-  const booklets = others.map((item, index) => {
-    const spot = place(item.slug);
-    const board = item.board ?? '#2b160d';
-    const picture = drawnOnce(`book:${item.slug}`, [coverPictures[index], board], () => bookletPicture(coverPictures[index], board));
-    return { id: `book:${item.slug}`, image: picture, ...at(spot.x, spot.y), w: 1.034, h: 0.634, radius: 0, cutout: true, turn: spot.turn };
-  });
+  // the books' tray (its layer draws it, lib/mat/bookTrayLayer.ts): an unseen prop over its footprint, for clicks and fades
+  const foot = trayFootFor();
+  const trayAt = at(TRAY_AT.x, TRAY_AT.y);
+  const tray = { id: TRAY_ID, image: trayTarget(), x: trayAt.x, y: trayAt.y + foot.dy, w: foot.w, h: foot.h, radius: 0, cutout: true, alphaShadow: true };
+
   // the words, laid on the mat (their typefaces are the 'first' ones, loaded above): drawn once, here, for this window's width
   const photo = STAGE_POSTERS.find((poster) => poster.id === 'photo') ?? { x: 91, y: 192, w: 187, h: 198 };
   const words = wordProps({
@@ -386,7 +379,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   const handouts = { id: HANDOUTS_ID, image: handoutsTarget(), ...at(HANDOUTS_AT.x, HANDOUTS_AT.y), w: 0.74, h: 0.6, radius: 0.01, turn: HANDOUTS_AT.turn, cutout: true, alphaShadow: true };
   return {
     greeting: words.greeting,
-    props: [...posters, ...clipboards, soundRecord, ...bot, bag, snapdealBag, handouts, ...story, ...booklets, ...pieces],
+    props: [...posters, ...clipboards, soundRecord, ...bot, bag, snapdealBag, handouts, ...story, tray, ...pieces],
     frame: { ...at(matStage.ref.w / 2, matStage.ref.h / 2), w: matStage.ref.w / px, h: matStage.ref.h / px },
     turn: here.turn,
     unit: 1 / px,
@@ -490,8 +483,13 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
   const bigWords = viewport.w < WORDS_BIG_BELOW;
   const litRef = useRef(false);
   litRef.current = lit;
-  /** A booklet that was clicked and is being made the live book: open it as soon as it is. */
+  /** A book that was taken out of the tray to be made the live book: open it as soon as it is (and has landed). */
   const openAfter = useRef<string | null>(null);
+  /** The taken-out book has landed and the engine's book has taken its place: what opening it waits for. */
+  const landing = useRef<Promise<void> | null>(null);
+  /** The books' tray (lib/mat/bookTrayLayer.ts), and whether the engine's live book is put away in it. */
+  const trayRef = useRef<{ layer: BookTrayLayer; engine: FlipBookEngine; remove(): void } | null>(null);
+  const stowedRef = useRef(staged);
   const [looking, setLooking] = useState<StagePoster | null>(null);
   const lookingRef = useRef<string | null>(null);
   /** At the résumé: how far down the sheet the reader is (0 its top, 1 its foot). */
@@ -585,6 +583,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
         onFilled: setFilled,
         onCta: (href) => window.location.assign(href),
         onError: () => setFallback(true),
+        // on the home stage the books stand in their tray: the live book is put away until one is taken out
+        stowed: staged,
       });
       engineRef.current = engine;
       return () => { engine.dispose(); engineRef.current = null; };
@@ -592,7 +592,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       setFallback(true);
       return undefined;
     }
-  }, [debug, homeLink, reducedMotion]);
+  }, [debug, homeLink, reducedMotion, staged]);
 
   // from the home page: once the book is on screen, come down to it and open the cover
   useEffect(() => {
@@ -765,6 +765,24 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (debug) (window as unknown as { __snapdeal?: unknown }).__snapdeal = { get layer() { return layer; } };
   }, [debug, fallback, reducedMotion, stageSpec, staged]);
   useEffect(() => () => { snapdealRef.current?.remove(); snapdealRef.current = null; }, []);
+
+  // The books' tray: added to the engine once the stage is laid, standing on its click target. The book that comes out
+  // lands where the engine's live book lies (the stage's own middle: BOOK_LAND is every book's place).
+  useEffect(() => {
+    const engine = engineRef.current;
+    const target = stageSpec?.props.find((prop) => prop.id === TRAY_ID);
+    if (!staged || fallback || !engine || !target || trayRef.current?.engine === engine) return;
+    trayRef.current?.remove();
+    const layer = createBookTrayLayer({
+      x: target.x, y: target.y - trayFootFor().dy, books: FLIP_BOOKS.map(trayBook), target: target.image as HTMLCanvasElement,
+      land: { x: 0, y: 0, turn: (-BOOK_LAND.turn * Math.PI) / 180 }, reducedMotion,
+      canHover: () => modeRef.current === 'wide',
+      onHover: (slug) => stageActs.current.hover(slug ? `book:${slug}` : null),
+    });
+    trayRef.current = { layer, engine, remove: engine.addLayer(layer) };
+    if (debug) (window as unknown as { __tray?: unknown }).__tray = layer;
+  }, [debug, fallback, reducedMotion, stageSpec, staged]);
+  useEffect(() => () => { trayRef.current?.remove(); trayRef.current = null; }, []);
 
   // The GitHub card's opened print: built once the stage is laid and its few pictures are in (the tools' marks and the
   // three flags' screenshots), on the card's own spot. It hides the stage's card while it holds it (an empty picture).
@@ -1058,7 +1076,12 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       setReady(true);
       if (staged) setSetFor(book.slug);
       // this book was picked from the mat as a closed booklet: now that it is the live one, open it
-      if (openAfter.current === book.slug) { openAfter.current = null; stageActs.current.book(); }
+      if (openAfter.current === book.slug) {
+        openAfter.current = null;
+        const landed = landing.current ?? Promise.resolve();
+        landing.current = null;
+        void landed.then(() => { if (live) stageActs.current.book(); });
+      }
     }).catch(() => { if (live) setFallback(true); });
     return () => { live = false; };
   }, [book, images, fallback, staged, stageSpec]);
@@ -1382,8 +1405,24 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (!staged) return undefined;
     /** Counts the books opened: a way back out cancels the controls an opening would show once it has landed. */
     let openings = 0;
+    /** A book taken out of the tray has landed: the engine's live book takes its place. */
+    const handOver = () => { engineRef.current?.stow(false); stowedRef.current = false; trayRef.current?.layer.release(); };
+    /** The live book has closed at the wide view: it goes back into the tray. */
+    const putAway = () => {
+      const tray = trayRef.current?.layer;
+      if (!tray || stowedRef.current) return;
+      engineRef.current?.stow(true); stowedRef.current = true;
+      tray.putBack(book.slug);
+    };
     /** Open the live book where it lies (from the wide view). */
     const openBook = () => {
+      // the live book is still in the tray: it comes out and lands first, then opens
+      const tray = trayRef.current?.layer;
+      if (stowedRef.current && tray) {
+        if (tray.busy) return;
+        void tray.takeOut(book.slug).then(() => { handOver(); if (modeRef.current === 'wide') openBook(); });
+        return;
+      }
       const mine = ++openings;
       setMode('book');
       // its first spread's pictures jump the queue (the cover opens once it is drawn: engine.arrive)
@@ -1446,7 +1485,7 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
       // (once up at the wide view the address is read again: Forward pressed while the camera was on its way up names a
       // close-up or a book again, and the view goes back down to it rather than leaving the address wrong)
       const up = () => { setMode('wide'); modeRef.current = 'wide'; toWide(); };
-      if (modeRef.current === 'book') { openings += 1; setLanded(false); void engine.leave().then(up); }
+      if (modeRef.current === 'book') { openings += 1; setLanded(false); void engine.leave().then(() => { putAway(); up(); }); }
       // (at the bag, everything goes back in and it zips shut before the camera goes up)
       // (at the stack, the decks go back and the clip goes on as the camera goes up)
       else if (modeRef.current === 'poster') { handoutsRef.current?.layer.leave(); githubRef.current?.layer.leave(); snapdealRef.current?.layer.leave(); void bagActs.current.out().then(() => fly(null)).then(() => { setLooking(null); up(); }); }
@@ -1461,13 +1500,18 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           if (modeRef.current === 'poster') { if (lookingRef.current === ZOMATO_ID) bagActs.current.back(); else if (lookingRef.current === SNAPDEAL_ID && snapdealRef.current?.layer.reading) snapdealRef.current.layer.read(null); else window.history.back(); }
           return;
         }
-        if (id.startsWith('book:')) {
-          // another book: it becomes the live one where it lies, then opens
+        if (id === TRAY_ID || id.startsWith('book:')) {
+          // a book in the tray (the spine under the pointer, or a book's button): it comes out, lands flat and opens
           if (modeRef.current !== 'wide') return;
-          openAfter.current = id.slice(5);
+          const tray = trayRef.current?.layer;
+          const slug = id === TRAY_ID ? tray?.pickAt() ?? null : id.slice(5);
+          if (!slug || tray?.busy) return;
+          if (slug === book.slug) { stageActs.current.book(); return; }
+          landing.current = (tray ? tray.takeOut(slug) : Promise.resolve()).then(handOver);
+          openAfter.current = slug;
           // (out of the click's own task: the whole page is drawn again for the new book, and done at once in the click
           // it held the frame the click is answered in; as a transition React does it in short slices)
-          React.startTransition(() => onSelectBook(id.slice(5)));
+          React.startTransition(() => onSelectBook(slug));
           return;
         }
         // the words on the mat do what their links do (HeroOverlay's, by data-piece), without a fly-in: GitHub and LinkedIn
@@ -1756,9 +1800,9 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
           ))}
           <li><a href={SOUND_RECORD.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(SOUND_RECORD_PROP, event)} onBlur={ringOff}>{SOUND_RECORD.title}: a yellow record. Opens an interactive 3D board where you drag keys into records and layer real music.</a></li>
           <li><a href={BOT_TABLET.href} tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn(BOT_TABLET.id, event)} onBlur={ringOff}>Bot, an AI parts helper: a tablet on a birch stand. Opens the parts rack where a student asks Bot for a part and its bin lights up, with a 10-second voiced demo.</a></li>
-          <li><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => ringOn('book', event)} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.book(); }}>{book.title}, a flip book. {book.meta}. Opens the book.</button></li>
-          {FLIP_BOOKS.filter((item) => item.slug !== book.slug).map((item) => (
-            <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { fetchOpeningSpread(item.slug); ringOn(`book:${item.slug}`, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book. {item.meta}. Opens the book.</button></li>
+          {/* the books standing in the tray: each comes out, lands on the mat and opens */}
+          {FLIP_BOOKS.map((item) => (
+            <li key={item.slug}><button type="button" tabIndex={mode === 'wide' ? 0 : -1} onFocus={(event) => { if (item.slug !== book.slug) fetchOpeningSpread(item.slug); ringOn(TRAY_ID, event); }} onBlur={ringOff} onClick={() => { ringOff(); stageActs.current.prop(`book:${item.slug}`); }}>{item.title}, a flip book in the tray. {item.meta}. Opens the book.</button></li>
           ))}
         </ul>
       )}
