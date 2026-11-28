@@ -99,12 +99,14 @@ const ASKED = typeof window === 'undefined' ? new URLSearchParams() : new URLSea
 const BOOK_LAND = { x: 1120, y: 724, turn: -3 };
 const bookPlace = (_index: number) => BOOK_LAND;
 /** Where the tray stands (its middle), and its click target: an empty picture the size of its footprint (the layer draws it). */
-const TRAY_AT = { x: 880, y: 700 };
+/** (turn: degrees clockwise, as a prop's: turned so the last book's cover shows beside the spines) */
+const TRAY_AT = { x: 880, y: 700, turn: 0 };
+const TRAY_TURN = (-TRAY_AT.turn * Math.PI) / 180;
 const TRAY_ID = 'book-tray';
 let trayTargetPicture: HTMLCanvasElement | null = null;
 const trayTarget = () => { if (!trayTargetPicture) { trayTargetPicture = document.createElement('canvas'); trayTargetPicture.width = 8; trayTargetPicture.height = 8; } return trayTargetPicture; };
 let trayFoot: ReturnType<typeof trayFootprint> | null = null;
-const trayFootFor = () => (trayFoot ??= trayFootprint(FLIP_BOOKS.length));
+const trayFootFor = () => (trayFoot ??= trayFootprint(FLIP_BOOKS.length, TRAY_TURN));
 /** Each book's spine: its cloth, print and foot bar, and the small line after the title (the prototype's spines). */
 const SPINES: Record<string, Partial<TrayBook>> = {
   surya: { bg: '#3b1912', fg: '#f6ead8', accent: '#ff8a3d' },
@@ -361,7 +363,7 @@ async function loadStage(active: FlipBook, windowWidth = 1440, holdGreeting = fa
   // the books' tray (its layer draws it, lib/mat/bookTrayLayer.ts): an unseen prop over its footprint, for clicks and fades
   const foot = trayFootFor();
   const trayAt = at(TRAY_AT.x, TRAY_AT.y);
-  const tray = { id: TRAY_ID, image: trayTarget(), x: trayAt.x, y: trayAt.y + foot.dy, w: foot.w, h: foot.h, radius: 0, cutout: true, alphaShadow: true };
+  const tray = { id: TRAY_ID, image: trayTarget(), x: trayAt.x - foot.dy * Math.sin(TRAY_TURN), y: trayAt.y + foot.dy * Math.cos(TRAY_TURN), w: foot.w, h: foot.h, radius: 0, cutout: true, alphaShadow: true };
 
   // the words, laid on the mat (their typefaces are the 'first' ones, loaded above): drawn once, here, for this window's width
   const photo = STAGE_POSTERS.find((poster) => poster.id === 'photo') ?? { x: 91, y: 192, w: 187, h: 198 };
@@ -789,8 +791,8 @@ const BookStage: React.FC<{ book: FlipBook; onSelectBook(slug: string): void; de
     if (!staged || fallback || !engine || !target || trayRef.current?.engine === engine) return;
     trayRef.current?.remove();
     const layer = createBookTrayLayer({
-      x: target.x, y: target.y - trayFootFor().dy, books: FLIP_BOOKS.map(trayBook), target: target.image as HTMLCanvasElement,
-      land: { x: 0, y: 0, turn: (-BOOK_LAND.turn * Math.PI) / 180 }, reducedMotion,
+      x: target.x + trayFootFor().dy * Math.sin(TRAY_TURN), y: target.y - trayFootFor().dy * Math.cos(TRAY_TURN), books: FLIP_BOOKS.map(trayBook), target: target.image as HTMLCanvasElement,
+      land: { x: 0, y: 0, turn: (-BOOK_LAND.turn * Math.PI) / 180 }, turn: TRAY_TURN, reducedMotion,
       canHover: () => modeRef.current === 'wide',
       onHover: (slug) => stageActs.current.hover(slug ? `book:${slug}` : null),
     });

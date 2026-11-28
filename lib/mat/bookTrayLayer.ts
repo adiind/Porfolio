@@ -1,7 +1,7 @@
 /**
  * The project books on the home mat, standing by their spines in a birch-ply tray (Adi, 2026-11-27: "imagine if there were
  * 6 to 8 books ... maybe there's a spine that we make for all of them"; he approved the tray with "Yeass push"). Thin
- * hardcovers with rounded spines in a curved tray tipped back on a rounded birch block, so the spines face up at the
+ * hardcovers with rounded spines in a curved tray tipped back on a solid birch wedge, so the spines face up at the
  * camera. The tray is as long as the list of books. The pointer resting on a spine slides that book half out; a click
  * takes it out, it arcs down and lands flat on the mat in front of the tray, where the engine's own book takes over and
  * opens. Closed again, the book goes back into its slot. Prototype: review/designs-2026-11-27/books/shelf.html.
@@ -26,7 +26,7 @@ const D = 13.2;          // its height, head to tail (the engine's closed book: 
 const T = 1.5;           // its thickness
 const GAP = 0.22;        // between books in the tray
 const PULL = D / 2;      // how far the pointer slides a book out
-const TILT = (50 * Math.PI) / 180;   // the tray tipped back, so the spines face the camera looking down at the mat
+const TILT = (62 * Math.PI) / 180;   // the tray tipped back, so the spines face the camera looking down at the mat
 const S = 1 / W;         // table units per cm
 const BUL = 0.38, BT = 0.2, X0 = -W / 2 + BUL;   // how far the spine bulges, board thickness, where the bulge starts
 const ZI = W / 2 + 0.75, ZO = ZI + 0.8;          // the tray's inner and outer walls, front and back
@@ -80,7 +80,7 @@ void main() {
   for (int i = 0; i < 12; i++) {
     float t = float(i) / 11.0;
     float h = mix(uB, uT, t);
-    float blur = 0.004 + h * 0.12;
+    float blur = 0.012 + h * 0.16;
     sweep = max(sweep, (1.0 - smoothstep(-blur, blur, caster(vP - uDir * h))) * mix(1.0, 0.55, t));
   }
   float d0 = caster(vP - uDir * uB);
@@ -92,8 +92,8 @@ void main() {
 }`;
 const LIGHT = new Vector3(0.35, 0.45, 0.9).normalize();
 const SHADOW_DIR = new Vector2(-0.55, -0.7);
-/** a shadow runs about twice as far as the thing is tall (the sun is low), as the Bot tablet's does */
-const LONG = 2.2;
+/** how far a shadow runs for the height of the thing casting it */
+const LONG = 1.1;
 /** A book standing in its slot: spine toward the viewer, head up, cover to the right. */
 const STAND_Q = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(new Vector3(0, 0, -1), new Vector3(1, 0, 0), new Vector3(0, -1, 0)));
 const hex = (h: string) => new Vector3(parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255);
@@ -167,7 +167,7 @@ function trayPlan(n: number) {
   return { row, len, slotX: (i: number) => -row / 2 + T / 2 + i * (T + GAP) };
 }
 
-/** Builds the tray's birch: the U channel, two rounded bookends and the rounded block under it. Returns the tray group (tipped). */
+/** Builds the tray's birch: the U channel, two rounded bookends and the wedge it rests on. Returns the tray group (tipped). */
 function buildTray(n: number, solid: (geo: BufferGeometry) => Mesh): { tray: Group; block: Mesh; lift: number } {
   const { len } = trayPlan(n);
   const tray = new Group();
@@ -186,16 +186,19 @@ function buildTray(n: number, solid: (geo: BufferGeometry) => Mesh): { tray: Gro
   const bb = new Box3(); chan.updateMatrixWorld(true); bb.expandByObject(tray);
   const lift = -bb.min.y;
   tray.position.y = lift; tray.updateMatrixWorld(true);
-  // the block under the middle of the tray
-  const under = tray.localToWorld(new Vector3(0, -0.8, 1));
-  const h = under.y + 0.05, th = 2.6;
-  const block = solid(new RoundedBoxGeometry(len - 1, h, th, 6, Math.min(1.25, h / 2 - 0.01)));
-  block.position.set(0, h / 2, under.z);
+  // the block it rests on: a solid birch wedge filling the space under the tray, from its back edge on the mat to its
+  // raised front, so the tray stands on the mat and does not float (Adi, 2026-11-27: "why is it half floating")
+  const back = tray.localToWorld(new Vector3(0, -0.8, -ZO + 1.4));
+  const front = tray.localToWorld(new Vector3(0, -0.8, ZO - 1.4));
+  const side = rounded([[back.z - 0.3, 0, 0.3], [front.z, 0, 0.9], [front.z, front.y + 0.05, 0.9], [back.z - 0.3, back.y + 0.05, 0.3]]);
+  const wedgeGeo = new ExtrudeGeometry(side, { depth: len - 1.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2, bevelSegments: 3, curveSegments: 10 });
+  wedgeGeo.translate(0, 0, -(len - 1.4) / 2);
+  const block = solid(wedgeGeo); block.rotation.y = -Math.PI / 2;
   return { tray, block, lift };
 }
 
 /** The tray's footprint on the mat (table units, from the tray's middle): what the stage's click target must cover. */
-export function trayFootprint(n: number): { w: number; h: number; dy: number } {
+export function trayFootprint(n: number, turn = 0): { w: number; h: number; dy: number } {
   const parts: BufferGeometry[] = [];
   const solid = (geo: BufferGeometry) => { parts.push(geo); return new Mesh(geo); };
   const { tray, block } = buildTray(n, solid);
@@ -210,7 +213,9 @@ export function trayFootprint(n: number): { w: number; h: number; dy: number } {
   const minZ = Math.min(bb.min.z, -top.z), maxZ = bb.max.z;
   // tray space z toward the viewer is the mat's -y
   const near = -maxZ, far = -minZ + reach;
-  return { w: (bb.max.x - bb.min.x + 1) * S, h: (far - near + 1) * S, dy: ((far + near) / 2) * S };
+  // (turned on the mat, it covers the box round its turned outline)
+  const w0 = (bb.max.x - bb.min.x + 1) * S, h0 = (far - near + 1) * S, c = Math.abs(Math.cos(turn)), sn = Math.abs(Math.sin(turn));
+  return { w: w0 * c + h0 * sn, h: w0 * sn + h0 * c, dy: ((far + near) / 2) * S };
 }
 
 export interface BookTrayLayer extends MatLayer {
@@ -233,6 +238,8 @@ export interface BookTrayLayer extends MatLayer {
  */
 export function createBookTrayLayer(opts: {
   x: number; y: number; books: TrayBook[]; land: { x: number; y: number; turn: number }; target?: HTMLCanvasElement;
+  /** the tray's turn on the mat, radians counter-clockwise: turned so the last book's cover shows, not only the spines */
+  turn?: number;
   canHover(): boolean; onHover?(slug: string | null): void; reducedMotion?: boolean;
 }): BookTrayLayer {
   let ctx: MatLayerContext | null = null;
@@ -317,7 +324,7 @@ export function createBookTrayLayer(opts: {
     // tray space: cm, y up, z toward the viewer; turned into the mat's (x, -z, y) and scaled to table units
     const space = new Group();
     space.rotation.x = Math.PI / 2; space.scale.setScalar(S);
-    root.position.set(opts.x, opts.y, 0);
+    root.position.set(opts.x, opts.y, 0); root.rotation.z = opts.turn ?? 0;
     root.add(space);
     const { tray, block } = buildTray(n, solidWith(birch));
     space.add(tray, block);
@@ -375,12 +382,40 @@ export function createBookTrayLayer(opts: {
       shadowMeshes.push(mesh); c.scene.add(mesh);
       return { mesh, m };
     };
-    const bb = new Box3().setFromObject(space);
-    const trayShadow = caster(shown);
-    trayShadow.mesh.position.set((bb.min.x + bb.max.x) / 2, (bb.min.y + bb.max.y) / 2, 0.0006);
-    trayShadow.m.uniforms.uC.value.set((bb.min.x + bb.max.x) / 2, (bb.min.y + bb.max.y) / 2);
-    trayShadow.m.uniforms.uHalf.value.set((bb.max.x - bb.min.x) / 2, (bb.max.y - bb.min.y) / 2 * 0.8);
-    trayShadow.m.uniforms.uT.value = bb.max.z * LONG * 0.8;
+    // the tray's shadow follows its real outline: cut into bands front to back, each band's shadow cast from its own width
+    // and height (the hit boxes are not things, so they cast none)
+    const BANDS = 28;
+    const pts: Vector3[] = [];
+    const v = new Vector3();
+    space.updateMatrixWorld(true);
+    space.traverse((o) => {
+      const m = o as Mesh;
+      if (!m.isMesh || (m.material as MeshBasicMaterial).visible === false) return;
+      const pos = m.geometry.getAttribute('position');
+      const step = Math.max(1, Math.floor(pos.count / 400));
+      for (let i = 0; i < pos.count; i += step) pts.push(v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld).clone());
+    });
+    let y0 = Infinity, y1 = -Infinity;
+    for (const p of pts) { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }
+    const bandH = (y1 - y0) / BANDS;
+    for (let k = 0; k < BANDS; k += 1) {
+      let x0 = Infinity, x1 = -Infinity, top = 0;
+      for (const p of pts) {
+        if (p.y < y0 + k * bandH - 1e-4 || p.y > y0 + (k + 1) * bandH + 1e-4) continue;
+        x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); top = Math.max(top, p.z);
+      }
+      if (!Number.isFinite(x0)) continue;
+      const cx = (x0 + x1) / 2, cy = y0 + (k + 0.5) * bandH, reach = top * LONG;
+      const band = caster(shown);
+      const u = band.m.uniforms;
+      u.uC.value.set(cx, cy); u.uHalf.value.set((x1 - x0) / 2, bandH / 2 + 0.004); u.uR.value = 0.006;
+      u.uT.value = reach; u.uStrength.value = 0.7;
+      // (each band's plane only as big as its shadow can reach, so the mat is not shaded over and over)
+      band.mesh.geometry.dispose();
+      band.mesh.geometry = new PlaneGeometry(x1 - x0 + reach * 1.3 + 0.3, bandH + reach * 1.6 + 0.3);
+      parts.push(band.mesh.geometry);
+      band.mesh.position.set(cx + SHADOW_DIR.x * reach / 2, cy + SHADOW_DIR.y * reach / 2, 0.0006);
+    }
     const fs = caster(flyShown);
     fs.mesh.visible = false;
     fs.m.uniforms.uHalf.value.set(0.5, 0.3);
@@ -477,7 +512,7 @@ export function createBookTrayLayer(opts: {
       const now = targetMesh ? ((targetMesh.material as ShaderMaterial).uniforms.uAlpha.value as number) : 1;
       if (Math.abs(now - shown.value) > 1e-4) {
         shown.value = now; root.visible = now > 0.003;
-        shadowMeshes[0].visible = root.visible;
+        for (const m of shadowMeshes) if (m !== flyMeshShadow) m.visible = root.visible;
       }
       let moving = false;
       // the pointer: which book it rests on (only at the wide view, and not while a book is out)
